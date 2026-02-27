@@ -1,0 +1,38 @@
+model Reservation {
+  id Int @id @default(autoincrement())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  controllers Int
+  email       String
+  inventory   String
+
+  startTime DateTime
+  endTime   DateTime
+
+  status ReservationStatus
+}
+
+model TimeTableEntry {
+  id Int @id @default(autoincrement())
+
+  dayOfWeek Int
+  startTime DateTime
+  endTime   DateTime
+
+  label String // Potentially add a status field to replace this and then add a note field for extra information
+  type  TimeTableType
+}
+
+enum TimeTableType {
+  OPEN
+  CLOSED
+}
+
+enum ReservationStatus {
+  RESERVED
+  CANCELLED
+  PRESENT
+  NO_SHOW
+}
