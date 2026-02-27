@@ -14,7 +14,7 @@ export default function HomePage() {
             Reserveer
           </Link>
           <Link href="/schedule" className="bg-slate-800 border border-slate-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-slate-700">
-            Openings uren
+            Openingsuren
           </Link>
         </div>
       </div>
