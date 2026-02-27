@@ -56,14 +56,23 @@ export default function InfoPage() {
           </div>
 
           {formUrl && (
-            <div className="mb-16">
+            <div className="mb-16 w-full">
               <h2 className="text-3xl font-bold mb-8 text-center flex items-center justify-center gap-3">
                 <ClipboardList className="text-red-600" size={32} /> Aanvraag / Feedback
               </h2>
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden h-200 shadow-2xl">
-                <iframe src={formUrl} className="w-full h-full border-0" title="Google Form">
-                  Laden...
-                </iframe>
+
+              <div className="flex flex-col items-center w-full">
+                <a
+                  href={formUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold py-6 px-10 rounded-2xl transition-all duration-200 shadow-[0_0_20px_rgba(220,38,38,0.5)] hover:shadow-[0_0_30px_rgba(220,38,38,0.8)] text-xl uppercase tracking-wide border-2 border-red-400/50 hover:border-red-300"
+                >
+                  <span>Open formulier</span>
+                  <span className="text-3xl group-hover:rotate-12 transition-transform duration-200" role="img" aria-label="controller">
+                    🎮
+                  </span>
+                </a>
               </div>
             </div>
           )}
