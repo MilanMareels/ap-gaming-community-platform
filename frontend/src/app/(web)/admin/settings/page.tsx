@@ -40,7 +40,12 @@ export default function AdminSettingsPage() {
   };
 
   const handleAddAdmin = async () => {
-    if (!newAdminEmail.trim() || !newAdminSNumber.trim() || !newAdminGmail.trim()) return;
+    if (
+      !newAdminEmail.trim() ||
+      !newAdminSNumber.trim() ||
+      !newAdminGmail.trim()
+    )
+      return;
     try {
       await apiClient.POST('/settings/admins', {
         body: {
@@ -156,10 +161,12 @@ export default function AdminSettingsPage() {
               key={admin.id}
               className='flex justify-between items-center bg-slate-950 p-3 rounded'
             >
-            <div className='flex flex-col'>
-              <span className='font-medium'>{admin.user.email}</span>
-              <span className='text-xs text-gray-500'>{admin.user.sNumber}</span>
-            </div>
+              <div className='flex flex-col'>
+                <span className='font-medium'>{admin.user.email}</span>
+                <span className='text-xs text-gray-500'>
+                  {admin.user.sNumber}
+                </span>
+              </div>
               <Button
                 size='sm'
                 variant='danger'
