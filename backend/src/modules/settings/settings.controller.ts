@@ -26,6 +26,14 @@ export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
   @Public()
+  @Get('public')
+  @ApiOperation({ summary: 'Get public-facing settings (no auth required)' })
+  @ApiOkResponse({ type: [PrismaModel.Setting] })
+  getPublicSettings() {
+    return this.settingsService.getPublicSettings();
+  }
+
+  @Public()
   @Get('inventory')
   @ApiOperation({ summary: 'Get inventory counts (public)' })
   @ApiOkResponse({ type: [PrismaModel.Setting] })

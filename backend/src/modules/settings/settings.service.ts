@@ -13,6 +13,13 @@ export class SettingsService {
     return this.prisma.setting.findMany();
   }
 
+  async getPublicSettings() {
+    const publicKeys = ['googleFormUrl'];
+    return this.prisma.setting.findMany({
+      where: { key: { in: publicKeys } },
+    });
+  }
+
   async getInventorySettings() {
     const inventoryKeys = [
       'pc',

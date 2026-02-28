@@ -55,7 +55,7 @@ export default function InfoPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await apiClient.GET('/settings', {});
+        const res = await apiClient.GET('/settings/public' as never);
         if (res.data) {
           const settings = res.data as unknown as Array<{
             key: string;
