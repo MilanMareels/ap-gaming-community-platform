@@ -31,7 +31,7 @@ export default function EventsPage() {
 
   const fetchEvents = async () => {
     try {
-      const res = await apiClient.GET('/events' as never, {});
+      const res = await apiClient.GET('/events');
       if (res.data) {
         setEvents(res.data as unknown as Event[]);
       }
