@@ -299,6 +299,23 @@ export interface paths {
         patch: operations["TimetableController_update"];
         trace?: never;
     };
+    "/settings/public": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get public-facing settings (no auth required) */
+        get: operations["SettingsController_getPublicSettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/settings/inventory": {
         parameters: {
             query?: never;
@@ -613,8 +630,21 @@ export interface components {
             userId: number;
         };
         CreateAdminDto: {
-            /** @example admin@student.ap.be */
+            /**
+             * @description Student email address (used as the User account email)
+             * @example admin@student.ap.be
+             */
             email: string;
+            /**
+             * @description Student number
+             * @example s123456
+             */
+            sNumber: string;
+            /**
+             * @description Gmail address used for Google SSO login
+             * @example admin@gmail.com
+             */
+            gmailEmail: string;
         };
         CreateEventDto: {
             /** @example League of Legends Tournament */
@@ -1190,6 +1220,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TimeTableEntry"];
+                };
+            };
+        };
+    };
+    SettingsController_getPublicSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Setting"][];
                 };
             };
         };

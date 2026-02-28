@@ -55,12 +55,9 @@ export default function InfoPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await apiClient.GET('/settings/public' as never);
+        const res = await apiClient.GET('/settings/public');
         if (res.data) {
-          const settings = res.data as unknown as Array<{
-            key: string;
-            value: string;
-          }>;
+          const settings = res.data;
           const formSetting = settings.find((s) => s.key === 'googleFormUrl');
           if (formSetting) setFormUrl(formSetting.value);
         }
