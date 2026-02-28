@@ -1,0 +1,15 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../../src/generated/prisma"
+  runtime      = "nodejs"
+  moduleFormat = "esm"
+}
+
+generator classgenerator {
+  provider = "tsx prisma/generators/class-generator.ts"
+  output   = "../../src/_gen/prisma-class"
+}
