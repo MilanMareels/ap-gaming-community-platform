@@ -1,0 +1,292 @@
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service.js';
+import {
+  AdminCreateReservationDto,
+  CreateReservationDto,
+  ReservationStatus,
+  UpdateReservationDto,
+  UpdateReservationStatusDto,
+} from '../../dtos/reservations/reservation.dto.js';
+
+@Injectable()
+export class ReservationsService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(dto: CreateReservationDto) {
+    // Validate date is not more than 3 days ahead
+    const now = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + 3);
+    maxDate.setHours(23, 59, 59, 999);
+    const startTime = new Date(dto.startTime);
+
+    if (startTime < now) {
+      throw new BadRequestException('Cannot reserve in the past');
+    }
+    if (startTime > maxDate) {
+      throw new BadRequestException(
+        'Reservations can only be made up to 3 days in advance',
+      );
+    }
+
+    // Find or create user
+    let user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (!user) {
+      user = await this.prisma.user.create({
+        data: {
+          email: dto.email,
+          sNumber: dto.sNumber,
+        },
+      });
+    }
+
+    // Check for conflicts
+    const conflictingReservation = await this.prisma.reservation.findFirst({
+      where: {
+        inventory: dto.inventory,
+        status: ReservationStatus.RESERVED,
+        OR: [
+          {
+            AND: [
+              { startTime: { lte: new Date(dto.startTime) } },
+              { endTime: { gt: new Date(dto.startTime) } },
+            ],
+          },
+          {
+            AND: [
+              { startTime: { lt: new Date(dto.endTime) } },
+              { endTime: { gte: new Date(dto.endTime) } },
+            ],
+          },
+        ],
+      },
+    });
+
+    if (conflictingReservation) {
+      throw new BadRequestException('This time slot is already reserved');
+    }
+
+    return this.prisma.reservation.create({
+      data: {
+        userId: user.id,
+        inventory: dto.inventory,
+        controllers: dto.controllers,
+        email: dto.email,
+        startTime: new Date(dto.startTime),
+        endTime: new Date(dto.endTime),
+        status: ReservationStatus.RESERVED,
+      },
+      include: {
+        user: true,
+      },
+    });
+  }
+
+  async adminCreate(dto: AdminCreateReservationDto) {
+    // Find or create user (sNumber defaults to 'N/A' for anonymous)
+    let user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (!user) {
+      user = await this.prisma.user.create({
+        data: {
+          email: dto.email,
+          sNumber: dto.sNumber || 'N/A',
+        },
+      });
+    }
+
+    // Check for conflicts
+    const conflictingReservation = await this.prisma.reservation.findFirst({
+      where: {
+        inventory: dto.inventory,
+        status: ReservationStatus.RESERVED,
+        OR: [
+          {
+            AND: [
+              { startTime: { lte: new Date(dto.startTime) } },
+              { endTime: { gt: new Date(dto.startTime) } },
+            ],
+          },
+          {
+            AND: [
+              { startTime: { lt: new Date(dto.endTime) } },
+              { endTime: { gte: new Date(dto.endTime) } },
+            ],
+          },
+        ],
+      },
+    });
+
+    if (conflictingReservation) {
+      throw new BadRequestException('This time slot is already reserved');
+    }
+
+    return this.prisma.reservation.create({
+      data: {
+        userId: user.id,
+        inventory: dto.inventory,
+        controllers: dto.controllers,
+        email: dto.email,
+        startTime: new Date(dto.startTime),
+        endTime: new Date(dto.endTime),
+        status: ReservationStatus.RESERVED,
+      },
+      include: {
+        user: true,
+      },
+    });
+  }
+
+  async update(id: number, dto: UpdateReservationDto) {
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id },
+      include: { user: true },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Reservation not found');
+    }
+
+    // If email or sNumber changed, update or create the user
+    if (dto.email || dto.sNumber) {
+      const newEmail = dto.email || reservation.email;
+      const newSNumber = dto.sNumber || reservation.user.sNumber;
+
+      if (newEmail !== reservation.email) {
+        // Find or create user with new email
+        let user = await this.prisma.user.findUnique({
+          where: { email: newEmail },
+        });
+
+        if (!user) {
+          user = await this.prisma.user.create({
+            data: { email: newEmail, sNumber: newSNumber },
+          });
+        }
+
+        await this.prisma.reservation.update({
+          where: { id },
+          data: { userId: user.id, email: newEmail },
+        });
+      } else if (dto.sNumber) {
+        await this.prisma.user.update({
+          where: { id: reservation.userId },
+          data: { sNumber: newSNumber },
+        });
+      }
+    }
+
+    // Build update data for reservation fields
+    const updateData: any = {};
+    if (dto.email) updateData.email = dto.email;
+    if (dto.inventory) updateData.inventory = dto.inventory;
+    if (dto.controllers !== undefined) updateData.controllers = dto.controllers;
+    if (dto.startTime) updateData.startTime = new Date(dto.startTime);
+    if (dto.endTime) updateData.endTime = new Date(dto.endTime);
+
+    return this.prisma.reservation.update({
+      where: { id },
+      data: updateData,
+      include: { user: true },
+    });
+  }
+
+  async getSlots(date: string) {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const reservations = await this.prisma.reservation.findMany({
+      where: {
+        status: ReservationStatus.RESERVED,
+        startTime: { gte: startOfDay, lte: endOfDay },
+      },
+      select: {
+        inventory: true,
+        startTime: true,
+        endTime: true,
+        controllers: true,
+      },
+      orderBy: { startTime: 'asc' },
+    });
+
+    return reservations;
+  }
+
+  async findAll(date?: string, search?: string) {
+    const where: any = {};
+
+    if (date) {
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      where.startTime = {
+        gte: startOfDay,
+        lte: endOfDay,
+      };
+    }
+
+    if (search) {
+      where.OR = [
+        { email: { contains: search, mode: 'insensitive' } },
+        { user: { sNumber: { contains: search, mode: 'insensitive' } } },
+      ];
+    }
+
+    return this.prisma.reservation.findMany({
+      where,
+      include: {
+        user: true,
+      },
+      orderBy: {
+        startTime: 'desc',
+      },
+    });
+  }
+
+  async updateStatus(id: number, dto: UpdateReservationStatusDto) {
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Reservation not found');
+    }
+
+    return this.prisma.reservation.update({
+      where: { id },
+      data: { status: dto.status },
+      include: { user: true },
+    });
+  }
+
+  async remove(id: number) {
+    await this.prisma.reservation.delete({ where: { id } });
+  }
+
+  async getNoShows() {
+    return this.prisma.reservation.findMany({
+      where: {
+        status: ReservationStatus.NO_SHOW,
+      },
+      include: {
+        user: true,
+      },
+      orderBy: {
+        startTime: 'desc',
+      },
+    });
+  }
+}

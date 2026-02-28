@@ -1,0 +1,19 @@
+{
+  "name": "migrator",
+  "version": "1.0.0",
+  "description": "Firebase → PostgreSQL migration for AP Gaming Hub",
+  "type": "module",
+  "scripts": {
+    "migrate": "tsx migrate.ts"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "firebase": "^11.6.0",
+    "pg": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.4",
+    "tsx": "^4.21.0",
+    "typescript": "^5.7.3"
+  }
+}

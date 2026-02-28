@@ -1,0 +1,25 @@
+model User {
+  id Int @id @default(autoincrement())
+
+  name    String?
+  email   String  @unique
+  sNumber String
+
+  reservations   Reservation[]
+  adminUsers     AdminUser[]
+  googleSSOUsers GoogleSSOUser[]
+  rosterEntries  RosterEntry[]
+}
+
+model AdminUser {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model GoogleSSOUser {
+  id     Int    @id @default(autoincrement())
+  ssoId  String @unique
+  userId Int
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
