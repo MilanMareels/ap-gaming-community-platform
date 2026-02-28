@@ -3,6 +3,8 @@ name: Build & Push Docker Images
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: ["**"]
   workflow_dispatch:
 
 env:
@@ -10,6 +12,31 @@ env:
   IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/ap-gaming-hub
 
 jobs:
+  test-backend:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "./backend/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test:cov
+        env:
+          NODE_OPTIONS: --experimental-vm-modules
+
   build-backend:
     name: Build Backend
     runs-on: ubuntu-latest
