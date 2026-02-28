@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import {
   CreateAdminDto,
@@ -59,14 +55,21 @@ export class SettingsService {
   }
 
   async createAdmin(dto: CreateAdminDto) {
-    const user = await this.prisma.user.findUnique({
+    // 1) Find or create the User by student email
+    let user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
 
     if (!user) {
-      throw new NotFoundException('User with this email not found');
+      user = await this.prisma.user.create({
+        data: {
+          email: dto.email,
+          sNumber: dto.sNumber,
+        },
+      });
     }
 
+    // 2) Ensure they are not already an admin
     const existingAdmin = await this.prisma.adminUser.findFirst({
       where: { userId: user.id },
     });
@@ -75,6 +78,16 @@ export class SettingsService {
       throw new BadRequestException('This user is already an admin');
     }
 
+    // 3) Whitelist the Gmail address so the Google OAuth callback can link it
+    //    Store as a setting: "admin_whitelist.<gmailEmail>" → userId
+    const whitelistKey = `admin_whitelist.${dto.gmailEmail.toLowerCase()}`;
+    await this.prisma.setting.upsert({
+      where: { key: whitelistKey },
+      update: { value: String(user.id) },
+      create: { key: whitelistKey, value: String(user.id) },
+    });
+
+    // 4) Create the AdminUser record
     return this.prisma.adminUser.create({
       data: {
         userId: user.id,

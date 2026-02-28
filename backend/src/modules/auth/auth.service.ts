@@ -139,6 +139,46 @@ export class AuthService {
       },
     });
 
+    if (existingUser) {
+      // Link existing user to this Google SSO
+      await this.prisma.googleSSOUser.create({
+        data: {
+          ssoId: profile.sub,
+          userId: existingUser.id,
+        },
+      });
+
+      return existingUser;
+    }
+
+    // 3) Check the admin whitelist — an admin may have whitelisted this Gmail
+    const whitelistKey = `admin_whitelist.${profile.email.toLowerCase()}`;
+    const whitelist = await this.prisma.setting.findUnique({
+      where: { key: whitelistKey },
+    });
+
+    if (whitelist) {
+      const userId = Number(whitelist.value);
+      const whitelistedUser = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (whitelistedUser) {
+        // Link this Google account to the whitelisted user
+        await this.prisma.googleSSOUser.create({
+          data: {
+            ssoId: profile.sub,
+            userId: whitelistedUser.id,
+          },
+        });
+
+        // Clean up the whitelist entry — it's been consumed
+        await this.prisma.setting.delete({ where: { key: whitelistKey } });
+
+        return whitelistedUser;
+      }
+    }
+
     if (!existingUser) {
       // Check if this is the first user in the system
       const userCount = await this.prisma.user.count();
@@ -173,15 +213,6 @@ export class AuthService {
 
       return null;
     }
-
-    await this.prisma.googleSSOUser.create({
-      data: {
-        ssoId: profile.sub,
-        userId: existingUser.id,
-      },
-    });
-
-    return existingUser;
   }
 
   private async generateToken(userId: number, email: string) {

@@ -10,6 +10,8 @@ export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Setting[]>([]);
   const [adminUsers, setAdminUsers] = useState<AdminUserWithUser[]>([]);
   const [newAdminEmail, setNewAdminEmail] = useState('');
+  const [newAdminSNumber, setNewAdminSNumber] = useState('');
+  const [newAdminGmail, setNewAdminGmail] = useState('');
 
   async function fetchData() {
     try {
@@ -38,12 +40,18 @@ export default function AdminSettingsPage() {
   };
 
   const handleAddAdmin = async () => {
-    if (!newAdminEmail.trim()) return;
+    if (!newAdminEmail.trim() || !newAdminSNumber.trim() || !newAdminGmail.trim()) return;
     try {
       await apiClient.POST('/settings/admins', {
-        body: { email: newAdminEmail },
+        body: {
+          email: newAdminEmail,
+          sNumber: newAdminSNumber,
+          gmailEmail: newAdminGmail,
+        } as never,
       });
       setNewAdminEmail('');
+      setNewAdminSNumber('');
+      setNewAdminGmail('');
       await fetchData();
     } catch (err: unknown) {
       alert((err as Error)?.message || 'Failed to add admin');
@@ -114,14 +122,30 @@ export default function AdminSettingsPage() {
         <h2 className='text-xl font-bold mb-4 flex items-center gap-2'>
           <Lock size={20} /> Admin Whitelist
         </h2>
-        <div className='flex gap-2 mb-4'>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-2 mb-4'>
           <input
             type='email'
-            placeholder='user@student.ap.be'
-            className='flex-1 bg-slate-950 border border-slate-700 rounded p-2 text-white'
+            placeholder='Student e-mail (bijv. student@student.ap.be)'
+            className='bg-slate-950 border border-slate-700 rounded p-2 text-white'
             value={newAdminEmail}
             onChange={(e) => setNewAdminEmail(e.target.value)}
           />
+          <input
+            type='text'
+            placeholder='S-nummer (bijv. s123456)'
+            className='bg-slate-950 border border-slate-700 rounded p-2 text-white'
+            value={newAdminSNumber}
+            onChange={(e) => setNewAdminSNumber(e.target.value)}
+          />
+          <input
+            type='email'
+            placeholder='Gmail (bijv. naam@gmail.com)'
+            className='bg-slate-950 border border-slate-700 rounded p-2 text-white'
+            value={newAdminGmail}
+            onChange={(e) => setNewAdminGmail(e.target.value)}
+          />
+        </div>
+        <div className='mb-4'>
           <Button onClick={handleAddAdmin}>
             <Plus size={16} /> Add Admin
           </Button>
@@ -132,7 +156,10 @@ export default function AdminSettingsPage() {
               key={admin.id}
               className='flex justify-between items-center bg-slate-950 p-3 rounded'
             >
-              <span>{admin.user.email}</span>
+            <div className='flex flex-col'>
+              <span className='font-medium'>{admin.user.email}</span>
+              <span className='text-xs text-gray-500'>{admin.user.sNumber}</span>
+            </div>
               <Button
                 size='sm'
                 variant='danger'
