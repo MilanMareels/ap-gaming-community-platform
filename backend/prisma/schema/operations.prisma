@@ -36,3 +36,14 @@ enum ReservationStatus {
   PRESENT
   NO_SHOW
 }
+
+model Event {
+  id Int @id @default(autoincrement())
+
+  title     String
+  startTime DateTime
+  endTime   DateTime
+  type      String
+
+  createdAt DateTime @default(now())
+}

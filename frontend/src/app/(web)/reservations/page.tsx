@@ -11,7 +11,7 @@ import {
   Gamepad,
 } from 'lucide-react';
 import { apiClient } from '@/api';
-import type { TimeTableEntry, Reservation, Setting } from '@/api';
+import type { TimeTableEntry, ReservationSlot, Setting } from '@/api';
 
 /** Convert ISO datetime or HH:mm string to minutes since midnight */
 const timeToMins = (t: string) => {
@@ -37,7 +37,7 @@ export default function ReservationsPage() {
 
   const [timetable, setTimetable] = useState<TimeTableEntry[]>([]);
   const [existingReservations, setExistingReservations] = useState<
-    Reservation[]
+    ReservationSlot[]
   >([]);
   const [inventory, setInventory] = useState<Record<string, number>>({
     pc: 5,
@@ -66,7 +66,7 @@ export default function ReservationsPage() {
       try {
         const [timetableRes, settingsRes] = await Promise.all([
           apiClient.GET('/timetable', {}),
-          apiClient.GET('/settings', {}),
+          apiClient.GET('/settings/inventory', {}),
         ]);
 
         if (timetableRes.data) {
@@ -107,11 +107,11 @@ export default function ReservationsPage() {
 
     const fetchReservations = async () => {
       try {
-        const res = await apiClient.GET('/reservations', {
+        const res = await apiClient.GET('/reservations/slots', {
           params: { query: { date: formData.date } },
         });
         if (res.data) {
-          setExistingReservations(res.data as Reservation[]);
+          setExistingReservations(res.data as ReservationSlot[]);
         }
       } catch (err) {
         console.error('Failed to fetch reservations:', err);
@@ -292,13 +292,15 @@ export default function ReservationsPage() {
         },
       });
 
-      if (res.error) {
-        throw new Error(res.error.message || 'Failed to create reservation');
+      if (!res.data) {
+        throw new Error('Failed to create reservation');
       }
 
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : 'Failed to create reservation',
+      );
     } finally {
       setLoading(false);
     }

@@ -103,10 +103,10 @@ export default function PrivacyPage() {
                     beheerder/ontwikkelaar:
                   </p>
                   <a
-                    href='mailto:privacy@ap.be'
+                    href='mailto:milan.mareels@student.ap.be'
                     className='text-red-500 font-bold hover:underline mt-2 inline-block'
                   >
-                    privacy@ap.be
+                    milan.mareels@student.ap.be
                   </a>
                 </div>
               </div>

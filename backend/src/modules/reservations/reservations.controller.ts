@@ -18,7 +18,10 @@ import {
 import { ReservationsService } from './reservations.service.js';
 import {
   CreateReservationDto,
+  AdminCreateReservationDto,
   ReservationQueryDto,
+  ReservationSlotDto,
+  UpdateReservationDto,
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
@@ -47,6 +50,26 @@ export class ReservationsController {
     return this.reservationsService.findAll(query.date, query.search);
   }
 
+  @Public()
+  @Get('slots')
+  @ApiOperation({
+    summary: 'Get occupied time slots for a date (public, no PII)',
+  })
+  @ApiOkResponse({ type: [ReservationSlotDto] })
+  getSlots(@Query('date') date: string) {
+    return this.reservationsService.getSlots(date);
+  }
+
+  @Post('admin')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiOperation({
+    summary: 'Create a reservation as admin (no date restrictions)',
+  })
+  @ApiCreatedResponse({ type: PrismaModel.Reservation })
+  adminCreate(@Body() dto: AdminCreateReservationDto) {
+    return this.reservationsService.adminCreate(dto);
+  }
+
   @Get('no-shows')
   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiOperation({ summary: 'Get all no-shows (Admin only)' })
@@ -64,6 +87,14 @@ export class ReservationsController {
     @Body() dto: UpdateReservationStatusDto,
   ) {
     return this.reservationsService.updateStatus(+id, dto);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiOperation({ summary: 'Update a reservation (Admin only)' })
+  @ApiOkResponse({ type: PrismaModel.Reservation })
+  update(@Param('id') id: string, @Body() dto: UpdateReservationDto) {
+    return this.reservationsService.update(+id, dto);
   }
 
   @Delete(':id')

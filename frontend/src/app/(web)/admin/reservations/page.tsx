@@ -1,12 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Trash2, Check, UserX, Gamepad2 } from 'lucide-react';
+import {
+  Trash2,
+  Check,
+  UserX,
+  Gamepad2,
+  Plus,
+  Pencil,
+  Ban,
+} from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Pagination } from '@/components/ui/Pagination';
 import { apiClient } from '@/api';
 import type { ReservationWithUser, ReservationStatus } from '@/api';
+import ReservationModal from './ReservationModal';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -24,9 +33,14 @@ function formatTime(iso: string): string {
 
 export default function AdminReservationsPage() {
   const [reservations, setReservations] = useState<ReservationWithUser[]>([]);
-  const [filterDate, setFilterDate] = useState('');
+  const [filterDate, setFilterDate] = useState(() =>
+    new Date().toISOString().slice(0, 10),
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingReservation, setEditingReservation] =
+    useState<ReservationWithUser | null>(null);
 
   async function fetchReservations() {
     try {
@@ -70,7 +84,35 @@ export default function AdminReservationsPage() {
     }
   };
 
-  const filtered = reservations.filter((r) => {
+  const handleCancel = async (id: number) => {
+    if (!confirm('Weet je zeker dat je deze reservering wilt annuleren?'))
+      return;
+    try {
+      await apiClient.PATCH('/reservations/{id}/status', {
+        params: { path: { id: id.toString() } },
+        body: { status: 'CANCELLED' },
+      });
+      await fetchReservations();
+    } catch (err) {
+      console.error('Failed to cancel reservation:', err);
+    }
+  };
+
+  const openCreateModal = () => {
+    setEditingReservation(null);
+    setModalOpen(true);
+  };
+
+  const openEditModal = (r: ReservationWithUser) => {
+    setEditingReservation(r);
+    setModalOpen(true);
+  };
+
+  const sorted = [...reservations].sort(
+    (a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime(),
+  );
+
+  const filtered = sorted.filter((r) => {
     if (filterDate && dateFromISO(r.startTime) !== filterDate) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -91,6 +133,9 @@ export default function AdminReservationsPage() {
   return (
     <div className='bg-slate-900 rounded-xl border border-slate-800 overflow-hidden'>
       <div className='p-4 border-b border-slate-800 flex items-center gap-4 bg-slate-950 flex-wrap'>
+        <Button size='sm' variant='primary' onClick={openCreateModal}>
+          <Plus size={16} /> Nieuwe Reservering
+        </Button>
         <span className='text-sm font-bold text-gray-500 uppercase'>
           Filter op datum:
         </span>
@@ -194,8 +239,24 @@ export default function AdminReservationsPage() {
                         >
                           <UserX size={16} />
                         </Button>
+                        <Button
+                          size='sm'
+                          variant='secondary'
+                          onClick={() => handleCancel(r.id)}
+                          title='Annuleer reservering'
+                        >
+                          <Ban size={16} />
+                        </Button>
                       </>
                     )}
+                    <Button
+                      size='sm'
+                      variant='secondary'
+                      onClick={() => openEditModal(r)}
+                      title='Bewerk reservering'
+                    >
+                      <Pencil size={16} />
+                    </Button>
                     <Button
                       size='sm'
                       variant='danger'
@@ -225,6 +286,13 @@ export default function AdminReservationsPage() {
           onPageChange={setCurrentPage}
         />
       </div>
+
+      <ReservationModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSaved={fetchReservations}
+        reservation={editingReservation}
+      />
     </div>
   );
 }

@@ -56,6 +56,12 @@ export class RosterService {
           name: dto.name,
         },
       });
+    } else if (dto.name) {
+      // Keep the user name up-to-date with what the admin entered
+      user = await this.prisma.user.update({
+        where: { id: user.id },
+        data: { name: dto.name },
+      });
     }
 
     return this.prisma.rosterEntry.create({
@@ -75,20 +81,5 @@ export class RosterService {
 
   async deleteEntry(id: number) {
     await this.prisma.rosterEntry.delete({ where: { id } });
-  }
-
-  // Events
-  async findAllEvents() {
-    const now = new Date();
-    return this.prisma.reservation.findMany({
-      where: {
-        startTime: { gte: now },
-        status: 'RESERVED',
-      },
-      orderBy: {
-        startTime: 'asc',
-      },
-      take: 50,
-    });
   }
 }

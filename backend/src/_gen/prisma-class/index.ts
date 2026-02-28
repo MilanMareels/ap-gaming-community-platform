@@ -6,6 +6,7 @@ import { RosterGameRelations as _RosterGameRelations } from './roster_game_relat
 import { RosterEntryRelations as _RosterEntryRelations } from './roster_entry_relations.js';
 import { ReservationRelations as _ReservationRelations } from './reservation_relations.js';
 import { TimeTableEntryRelations as _TimeTableEntryRelations } from './time_table_entry_relations.js';
+import { EventRelations as _EventRelations } from './event_relations.js';
 import { User as _User } from './user.js';
 import { AdminUser as _AdminUser } from './admin_user.js';
 import { GoogleSSOUser as _GoogleSSOUser } from './google_s_s_o_user.js';
@@ -14,6 +15,7 @@ import { RosterGame as _RosterGame } from './roster_game.js';
 import { RosterEntry as _RosterEntry } from './roster_entry.js';
 import { Reservation as _Reservation } from './reservation.js';
 import { TimeTableEntry as _TimeTableEntry } from './time_table_entry.js';
+import { Event as _Event } from './event.js';
 
 export namespace PrismaModel {
   export class UserRelations extends _UserRelations {}
@@ -24,6 +26,7 @@ export namespace PrismaModel {
   export class RosterEntryRelations extends _RosterEntryRelations {}
   export class ReservationRelations extends _ReservationRelations {}
   export class TimeTableEntryRelations extends _TimeTableEntryRelations {}
+  export class EventRelations extends _EventRelations {}
   export class User extends _User {}
   export class AdminUser extends _AdminUser {}
   export class GoogleSSOUser extends _GoogleSSOUser {}
@@ -32,6 +35,7 @@ export namespace PrismaModel {
   export class RosterEntry extends _RosterEntry {}
   export class Reservation extends _Reservation {}
   export class TimeTableEntry extends _TimeTableEntry {}
+  export class Event extends _Event {}
 
   export const extraModels = [
     UserRelations,
@@ -42,6 +46,7 @@ export namespace PrismaModel {
     RosterEntryRelations,
     ReservationRelations,
     TimeTableEntryRelations,
+    EventRelations,
     User,
     AdminUser,
     GoogleSSOUser,
@@ -50,5 +55,6 @@ export namespace PrismaModel {
     RosterEntry,
     Reservation,
     TimeTableEntry,
+    Event,
   ];
 }

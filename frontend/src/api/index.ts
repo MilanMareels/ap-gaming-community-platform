@@ -8,6 +8,7 @@ type ApiSchemas = components['schemas'];
 export type TimeTableEntry = ApiSchemas['TimeTableEntry'];
 export type TimeTableType = ApiSchemas['TimeTableType'];
 export type Reservation = ApiSchemas['Reservation'];
+export type ReservationSlot = ApiSchemas['ReservationSlotDto'];
 export type ReservationStatus = ApiSchemas['ReservationStatus'];
 export type Setting = ApiSchemas['Setting'];
 export type RosterGame = ApiSchemas['RosterGame'];
@@ -15,6 +16,8 @@ export type RosterEntry = ApiSchemas['RosterEntry'];
 export type User = ApiSchemas['User'];
 export type AdminUser = ApiSchemas['AdminUser'];
 export type CreateReservationDto = ApiSchemas['CreateReservationDto'];
+export type AdminCreateReservationDto = ApiSchemas['AdminCreateReservationDto'];
+export type UpdateReservationDto = ApiSchemas['UpdateReservationDto'];
 export type CreateRosterGameDto = ApiSchemas['CreateRosterGameDto'];
 export type CreateRosterEntryDto = ApiSchemas['CreateRosterEntryDto'];
 export type CreateTimeTableEntryDto = ApiSchemas['CreateTimeTableEntryDto'];
@@ -31,4 +34,15 @@ export type RosterEntryWithRelations = RosterEntry & {
 };
 export type RosterGameWithEntries = RosterGame & {
   rosterEntries: (RosterEntry & { user: User })[];
+};
+
+/** Event type — matches the backend Event model.
+ *  Will be available as ApiSchemas['Event'] once definitions.ts is regenerated. */
+export type Event = {
+  id: number;
+  title: string;
+  startTime: string;
+  endTime: string;
+  type: string;
+  createdAt: string;
 };

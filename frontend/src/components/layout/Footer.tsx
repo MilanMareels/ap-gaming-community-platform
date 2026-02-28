@@ -46,6 +46,14 @@ export function Footer() {
                   Huisregels
                 </Link>
               </li>
+              <li>
+                <Link
+                  href='/privacy'
+                  className='hover:text-white transition-colors'
+                >
+                  Privacybeleid
+                </Link>
+              </li>
             </ul>
           </div>
 

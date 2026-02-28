@@ -17,6 +17,19 @@ export class SettingsService {
     return this.prisma.setting.findMany();
   }
 
+  async getInventorySettings() {
+    const inventoryKeys = [
+      'pc',
+      'ps5',
+      'switch',
+      'controller',
+      'Nintendo Controllers',
+    ];
+    return this.prisma.setting.findMany({
+      where: { key: { in: inventoryKeys } },
+    });
+  }
+
   async updateSetting(dto: UpdateSettingDto) {
     const existing = await this.prisma.setting.findUnique({
       where: { key: dto.key },

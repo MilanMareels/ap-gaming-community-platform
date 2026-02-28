@@ -23,6 +23,7 @@ export const useAdmin = () => {
 
 const TABS = [
   { id: 'reservations', label: 'Reservaties', href: '/admin/reservations' },
+  { id: 'events', label: 'Events', href: '/admin/events' },
   { id: 'noshows', label: 'No-Shows', href: '/admin/noshows' },
   { id: 'roster', label: 'Teams', href: '/admin/roster' },
   { id: 'timetable', label: 'Openingsuren', href: '/admin/timetable' },

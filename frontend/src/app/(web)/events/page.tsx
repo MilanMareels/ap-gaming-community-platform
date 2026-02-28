@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Clock, Gamepad2 } from 'lucide-react';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { apiClient } from '@/api';
-import type { Reservation } from '@/api';
+import type { Event } from '@/api';
 
 function formatDateParts(dateStr: string): [string, string] {
   const d = new Date(dateStr);
@@ -15,13 +15,14 @@ function formatDateParts(dateStr: string): [string, string] {
 }
 
 function formatTime(iso: string): string {
-  if (/^\d{2}:\d{2}$/.test(iso)) return iso;
-  const d = new Date(iso);
-  return d.toISOString().slice(11, 16);
+  return new Date(iso).toLocaleTimeString('nl-NL', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Reservation[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,9 +31,9 @@ export default function EventsPage() {
 
   const fetchEvents = async () => {
     try {
-      const res = await apiClient.GET('/roster/events', {});
+      const res = await apiClient.GET('/events' as never, {});
       if (res.data) {
-        setEvents(res.data as Reservation[]);
+        setEvents(res.data as unknown as Event[]);
       }
     } catch (err) {
       console.error('Failed to fetch events:', err);
@@ -79,7 +80,7 @@ export default function EventsPage() {
                     </div>
                     <div className='flex-1 text-center md:text-left'>
                       <h3 className='text-2xl font-bold text-white mb-2'>
-                        Reservering
+                        {event.title}
                       </h3>
                       <div className='flex gap-4 text-sm text-gray-400 justify-center md:justify-start'>
                         <span className='flex items-center gap-2'>
@@ -89,7 +90,7 @@ export default function EventsPage() {
                         </span>
                         <span className='flex items-center gap-2'>
                           <Gamepad2 size={16} className='text-red-500' />{' '}
-                          {event.inventory.toUpperCase()}
+                          {event.type}
                         </span>
                       </div>
                     </div>

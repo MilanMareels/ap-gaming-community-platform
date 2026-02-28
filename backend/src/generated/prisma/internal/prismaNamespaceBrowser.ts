@@ -58,7 +58,8 @@ export const ModelName = {
   RosterGame: 'RosterGame',
   RosterEntry: 'RosterEntry',
   Reservation: 'Reservation',
-  TimeTableEntry: 'TimeTableEntry'
+  TimeTableEntry: 'TimeTableEntry',
+  Event: 'Event'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -157,6 +158,18 @@ export const TimeTableEntryScalarFieldEnum = {
 } as const
 
 export type TimeTableEntryScalarFieldEnum = (typeof TimeTableEntryScalarFieldEnum)[keyof typeof TimeTableEntryScalarFieldEnum]
+
+
+export const EventScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  type: 'type',
+  createdAt: 'createdAt'
+} as const
+
+export type EventScalarFieldEnum = (typeof EventScalarFieldEnum)[keyof typeof EventScalarFieldEnum]
 
 
 export const SortOrder = {

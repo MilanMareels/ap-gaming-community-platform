@@ -73,12 +73,4 @@ export class RosterController {
   deleteEntry(@Param('id') id: string) {
     return this.rosterService.deleteEntry(+id);
   }
-
-  @Public()
-  @Get('events')
-  @ApiOperation({ summary: 'Get upcoming events' })
-  @ApiOkResponse({ type: [PrismaModel.Reservation] })
-  findAllEvents() {
-    return this.rosterService.findAllEvents();
-  }
 }

@@ -81,3 +81,8 @@ export type Reservation = Prisma.ReservationModel
  * 
  */
 export type TimeTableEntry = Prisma.TimeTableEntryModel
+/**
+ * Model Event
+ * 
+ */
+export type Event = Prisma.EventModel

@@ -13,7 +13,6 @@ export function Navbar() {
     { label: 'Reservations', href: '/reservations' },
     { label: 'Roster', href: '/roster' },
     { label: 'Schedule', href: '/schedule' },
-    { label: 'Highscores', href: '/highscores' },
     { label: 'Info', href: '/info' },
   ];
 

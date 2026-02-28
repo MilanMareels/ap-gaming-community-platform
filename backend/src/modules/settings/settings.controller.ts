@@ -17,12 +17,21 @@ import {
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { AdminGuard } from '../../guards/admin.guard.js';
 import { PrismaModel } from '../../_gen/prisma-class/index.js';
+import { Public } from '../auth/public.decorator.js';
 
 @ApiTags('Settings')
 @Controller('settings')
 @UseGuards(JwtAuthGuard, AdminGuard)
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
+
+  @Public()
+  @Get('inventory')
+  @ApiOperation({ summary: 'Get inventory counts (public)' })
+  @ApiOkResponse({ type: [PrismaModel.Setting] })
+  getInventorySettings() {
+    return this.settingsService.getInventorySettings();
+  }
 
   @Get()
   @ApiOperation({ summary: 'Get all settings (Admin only)' })

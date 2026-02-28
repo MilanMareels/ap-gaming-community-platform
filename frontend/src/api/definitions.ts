@@ -107,6 +107,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reservations/slots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get occupied time slots for a date (public, no PII) */
+        get: operations["ReservationsController_getSlots"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reservations/admin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a reservation as admin (no date restrictions) */
+        post: operations["ReservationsController_adminCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reservations/no-shows": {
         parameters: {
             query?: never;
@@ -155,7 +189,8 @@ export interface paths {
         delete: operations["ReservationsController_remove"];
         options?: never;
         head?: never;
-        patch?: never;
+        /** Update a reservation (Admin only) */
+        patch: operations["ReservationsController_update"];
         trace?: never;
     };
     "/roster/games": {
@@ -228,23 +263,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/roster/events": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get upcoming events */
-        get: operations["RosterController_findAllEvents"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/timetable": {
         parameters: {
             query?: never;
@@ -279,6 +297,23 @@ export interface paths {
         head?: never;
         /** Update a timetable entry (Admin only) */
         patch: operations["TimetableController_update"];
+        trace?: never;
+    };
+    "/settings/inventory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get inventory counts (public) */
+        get: operations["SettingsController_getInventorySettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/settings": {
@@ -332,6 +367,59 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get upcoming events (public) */
+        get: operations["EventsController_findUpcoming"];
+        put?: never;
+        /** Create a new event (Admin only) */
+        post: operations["EventsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all events (Admin only) */
+        get: operations["EventsController_findAll"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete an event (Admin only) */
+        delete: operations["EventsController_delete"];
+        options?: never;
+        head?: never;
+        /** Update an event (Admin only) */
+        patch: operations["EventsController_update"];
         trace?: never;
     };
 }
@@ -388,9 +476,59 @@ export interface components {
             endTime: string;
             status: components["schemas"]["ReservationStatus"];
         };
+        ReservationSlotDto: {
+            /** @example pc */
+            inventory: string;
+            /** @example 2 */
+            controllers: number;
+            /**
+             * Format: date-time
+             * @example 2026-02-28T10:00:00.000Z
+             */
+            startTime: string;
+            /**
+             * Format: date-time
+             * @example 2026-02-28T12:00:00.000Z
+             */
+            endTime: string;
+        };
+        AdminCreateReservationDto: {
+            /** @example s123456 */
+            sNumber?: string;
+            /** @example student@student.ap.be */
+            email: string;
+            /**
+             * @example pc
+             * @enum {string}
+             */
+            inventory: "pc" | "ps5" | "switch";
+            /** @example 2 */
+            controllers: number;
+            /** @example 2026-02-28T10:00:00.000Z */
+            startTime: string;
+            /** @example 2026-02-28T12:00:00.000Z */
+            endTime: string;
+        };
         UpdateReservationStatusDto: {
             /** @enum {string} */
             status: "RESERVED" | "CANCELLED" | "PRESENT" | "NO_SHOW";
+        };
+        UpdateReservationDto: {
+            /** @example student@student.ap.be */
+            email?: string;
+            /** @example s123456 */
+            sNumber?: string;
+            /**
+             * @example pc
+             * @enum {string}
+             */
+            inventory?: "pc" | "ps5" | "switch";
+            /** @example 2 */
+            controllers?: number;
+            /** @example 2026-02-28T10:00:00.000Z */
+            startTime?: string;
+            /** @example 2026-02-28T12:00:00.000Z */
+            endTime?: string;
         };
         RosterGame: {
             id: number;
@@ -478,6 +616,26 @@ export interface components {
             /** @example admin@student.ap.be */
             email: string;
         };
+        CreateEventDto: {
+            /** @example League of Legends Tournament */
+            title: string;
+            /** @example 2026-03-15T18:00:00.000Z */
+            startTime: string;
+            /** @example 2026-03-15T22:00:00.000Z */
+            endTime: string;
+            /** @example Tournament */
+            type: string;
+        };
+        UpdateEventDto: {
+            /** @example Updated Tournament */
+            title?: string;
+            /** @example 2026-03-16T18:00:00.000Z */
+            startTime?: string;
+            /** @example 2026-03-16T22:00:00.000Z */
+            endTime?: string;
+            /** @example Casual */
+            type?: string;
+        };
         GoogleSSOUser: {
             id: number;
             ssoId: string;
@@ -513,6 +671,18 @@ export interface components {
             user: components["schemas"]["User"];
         };
         TimeTableEntryRelations: Record<string, never>;
+        EventRelations: Record<string, never>;
+        Event: {
+            id: number;
+            title: string;
+            /** Format: date-time */
+            startTime: string;
+            /** Format: date-time */
+            endTime: string;
+            type: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -684,6 +854,50 @@ export interface operations {
             };
         };
     };
+    ReservationsController_getSlots: {
+        parameters: {
+            query: {
+                date: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationSlotDto"][];
+                };
+            };
+        };
+    };
+    ReservationsController_adminCreate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminCreateReservationDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
     ReservationsController_getNoShows: {
         parameters: {
             query?: never;
@@ -744,6 +958,31 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    ReservationsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateReservationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
             };
         };
     };
@@ -869,25 +1108,6 @@ export interface operations {
             };
         };
     };
-    RosterController_findAllEvents: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Reservation"][];
-                };
-            };
-        };
-    };
     TimetableController_findAll: {
         parameters: {
             query?: never;
@@ -970,6 +1190,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TimeTableEntry"];
+                };
+            };
+        };
+    };
+    SettingsController_getInventorySettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Setting"][];
                 };
             };
         };
@@ -1074,6 +1313,111 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    EventsController_findUpcoming: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateEventDto"][];
+                };
+            };
+        };
+    };
+    EventsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateEventDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateEventDto"];
+                };
+            };
+        };
+    };
+    EventsController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateEventDto"][];
+                };
+            };
+        };
+    };
+    EventsController_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EventsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateEventDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateEventDto"];
+                };
             };
         };
     };

@@ -5,6 +5,7 @@ import { ReservationsModule } from './modules/reservations/reservations.module.j
 import { RosterModule } from './modules/roster/roster.module.js';
 import { TimetableModule } from './modules/timetable/timetable.module.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
+import { EventsModule } from './modules/events/events.module.js';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { SettingsModule } from './modules/settings/settings.module.js';
     RosterModule,
     TimetableModule,
     SettingsModule,
+    EventsModule,
   ],
   controllers: [],
   providers: [],
