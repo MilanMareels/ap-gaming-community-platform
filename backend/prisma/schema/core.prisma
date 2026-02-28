@@ -1,0 +1,26 @@
+model Setting {
+  id Int @id @default(autoincrement())
+
+  key   String @unique
+  value String
+}
+
+model RosterGame {
+  id            Int           @id @default(autoincrement())
+  name          String
+  rosterEntries RosterEntry[]
+}
+
+model RosterEntry {
+  id Int @id @default(autoincrement())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  gameId Int
+  game   RosterGame @relation(fields: [gameId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  handle String
+  rank   String
+  role   String
+}
