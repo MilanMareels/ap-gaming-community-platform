@@ -39,6 +39,7 @@ jobs:
 
   build-backend:
     name: Build Backend
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -74,6 +75,7 @@ jobs:
 
   build-frontend:
     name: Build Frontend
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -109,6 +111,7 @@ jobs:
 
   build-nginx:
     name: Build Nginx
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
