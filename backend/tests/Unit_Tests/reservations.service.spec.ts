@@ -64,7 +64,26 @@ describe('ReservationsService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
+    it('should throw if hardware is not configured in settings', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.setting.findFirst.mockResolvedValue(null);
+
+      await expect(service.create(baseDto as any)).rejects.toThrow(
+        "Hardware type 'pc' is not configured in settings.",
+      );
+    });
+
+    it('should throw if capacity configuration is invalid', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.setting.findFirst.mockResolvedValue({ value: 'invalid_string' });
+
+      await expect(service.create(baseDto as any)).rejects.toThrow(
+        "Configuration error: capacity for 'pc' is not a valid number.",
+      );
+    });
+
     it('should throw on conflicts for both create and adminCreate', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
       prisma.setting.findFirst.mockResolvedValue({ value: '5' });
       prisma.reservation.count.mockResolvedValue(5);
 
