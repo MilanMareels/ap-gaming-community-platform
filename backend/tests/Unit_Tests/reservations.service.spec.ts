@@ -36,6 +36,10 @@ describe('ReservationsService', () => {
         update: jest.fn(),
         findMany: jest.fn(),
         delete: jest.fn(),
+        count: jest.fn(),
+      },
+      setting: {
+        findFirst: jest.fn(),
       },
     };
 
@@ -61,11 +65,14 @@ describe('ReservationsService', () => {
     });
 
     it('should throw on conflicts for both create and adminCreate', async () => {
-      prisma.reservation.findFirst.mockResolvedValue({ id: 1 });
+      prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+      prisma.reservation.count.mockResolvedValue(5);
 
       await expect(service.create(baseDto as any)).rejects.toThrow(
         'already reserved',
       );
+
+      prisma.reservation.findFirst.mockResolvedValue({ id: 1 });
       await expect(service.adminCreate(baseDto as any)).rejects.toThrow(
         'already reserved',
       );
@@ -74,6 +81,8 @@ describe('ReservationsService', () => {
     it('should create reservation and user successfully', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
       prisma.user.create.mockResolvedValue(mockUser);
+      prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+      prisma.reservation.count.mockResolvedValue(0);
       prisma.reservation.findFirst.mockResolvedValue(null);
       prisma.reservation.create.mockResolvedValue({ id: 10 });
 
