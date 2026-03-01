@@ -1,9 +1,9 @@
 import { Test } from '@nestjs/testing';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { ReservationsService } from '../src/modules/reservations/reservations.service.js';
-import { PrismaService } from '../src/modules/prisma/prisma.service.js';
-import { ReservationStatus } from '../src/dtos/reservations/reservation.dto.js';
+import { ReservationsService } from '../../src/modules/reservations/reservations.service.js';
+import { PrismaService } from '../../src/modules/prisma/prisma.service.js';
+import { ReservationStatus } from '../../src/dtos/reservations/reservation.dto.js';
 
 describe('ReservationsService', () => {
   let service: ReservationsService;
