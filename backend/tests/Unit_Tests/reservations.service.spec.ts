@@ -109,6 +109,34 @@ describe('ReservationsService', () => {
       expect(res.id).toBe(10);
     });
 
+    it('should allow multiple different users to book the same timeslot if capacity allows it', async () => {
+      prisma.user.findUnique.mockResolvedValue(null);
+
+      prisma.user.create.mockResolvedValue({
+        id: 2,
+        email: 'anderestudent@student.ap.be',
+        sNumber: 's987654',
+      });
+
+      prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+
+      prisma.reservation.count.mockResolvedValue(1);
+
+      prisma.reservation.create.mockResolvedValue({ id: 11 });
+
+      const secondUserDto = {
+        ...baseDto,
+        email: 'anderestudent@student.ap.be',
+        sNumber: 's987654',
+      };
+
+      const res = await service.create(secondUserDto as any);
+
+      expect(res.id).toBe(11);
+      expect(prisma.reservation.count).toHaveBeenCalled();
+      expect(prisma.reservation.create).toHaveBeenCalled();
+    });
+
     it('should allow admin to create and return the result', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
       prisma.user.create.mockResolvedValue(mockUser);
