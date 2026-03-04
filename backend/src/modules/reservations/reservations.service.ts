@@ -69,7 +69,7 @@ export class ReservationsService {
     const conflictingReservationsCount = await this.prisma.reservation.count({
       where: {
         inventory: dto.inventory,
-        status: ReservationStatus.RESERVED,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
         startTime: { lt: endTime },
         endTime: { gt: startTime },
       },
@@ -116,7 +116,7 @@ export class ReservationsService {
     const conflictingReservation = await this.prisma.reservation.findFirst({
       where: {
         inventory: dto.inventory,
-        status: ReservationStatus.RESERVED,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
         OR: [
           {
             AND: [
@@ -216,7 +216,7 @@ export class ReservationsService {
 
     const reservations = await this.prisma.reservation.findMany({
       where: {
-        status: ReservationStatus.RESERVED,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
         startTime: { gte: startOfDay, lte: endOfDay },
       },
       select: {
