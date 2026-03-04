@@ -97,6 +97,41 @@ describe('ReservationsService', () => {
       );
     });
 
+    it('should include PRESENT status in conflict check for create', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.setting.findFirst.mockResolvedValue({ value: '1' });
+      prisma.reservation.count.mockResolvedValue(1);
+
+      await expect(service.create(baseDto as any)).rejects.toThrow(
+        'already reserved',
+      );
+
+      expect(prisma.reservation.count).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+          }),
+        }),
+      );
+    });
+
+    it('should include PRESENT status in conflict check for adminCreate', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.reservation.findFirst.mockResolvedValue({ id: 1 });
+
+      await expect(service.adminCreate(baseDto as any)).rejects.toThrow(
+        'already reserved',
+      );
+
+      expect(prisma.reservation.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+          }),
+        }),
+      );
+    });
+
     it('should create reservation and user successfully', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
       prisma.user.create.mockResolvedValue(mockUser);
@@ -210,6 +245,19 @@ describe('ReservationsService', () => {
       await service.getSlots('2026-02-28');
       await service.findAll('2026-02-28', 'term');
       expect(prisma.reservation.findMany).toHaveBeenCalledTimes(2);
+    });
+
+    it('should include PRESENT status when fetching slots', async () => {
+      prisma.reservation.findMany.mockResolvedValue([]);
+      await service.getSlots('2026-02-28');
+
+      expect(prisma.reservation.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+          }),
+        }),
+      );
     });
 
     it('should update status successfully', async () => {
