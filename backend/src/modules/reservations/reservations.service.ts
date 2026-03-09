@@ -259,7 +259,7 @@ export class ReservationsService {
         user: true,
       },
       orderBy: {
-        startTime: 'desc',
+        startTime: 'asc',
       },
     });
   }
