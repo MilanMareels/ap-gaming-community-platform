@@ -1175,6 +1175,7 @@ export type RosterEntryScalarFieldEnum = (typeof RosterEntryScalarFieldEnum)[key
 
 export const ReservationScalarFieldEnum = {
   id: 'id',
+  cuid: 'cuid',
   userId: 'userId',
   controllers: 'controllers',
   email: 'email',

@@ -1,0 +1,146 @@
+<mjml>
+  <mj-head>
+    <mj-title>Reservatie Bevestiging - AP Gaming Hub</mj-title>
+    <mj-attributes>
+      <mj-all font-family="Arial, sans-serif" />
+      <mj-text font-size="14px" color="#333333" line-height="1.6" />
+      <mj-button
+        background-color="#DC2626"
+        color="#ffffff"
+        border-radius="4px"
+      />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f4">
+    <!-- Header -->
+    <mj-section background-color="#DC2626" padding="30px 0">
+      <mj-column>
+        <mj-text
+          align="center"
+          font-size="32px"
+          font-weight="bold"
+          color="#ffffff"
+        >
+          AP Gaming Hub
+        </mj-text>
+        <mj-text align="center" font-size="18px" color="#ffffff">
+          Reservatie Bevestiging
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Main Content -->
+    <mj-section background-color="#ffffff" padding="40px 30px">
+      <mj-column>
+        <mj-text font-size="16px" color="#1f2937">
+          Beste {{ sNumber }},
+        </mj-text>
+        <mj-text font-size="14px" color="#4b5563">
+          Je reservatie is succesvol bevestigd! Hieronder vind je alle details:
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Reservation Details -->
+    <mj-section background-color="#ffffff" padding="0 30px">
+      <mj-column>
+        <mj-text
+          font-size="14px"
+          font-weight="bold"
+          color="#DC2626"
+          padding-bottom="10px"
+        >
+          Reservatie Details
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section
+      background-color="#f9fafb"
+      padding="20px 30px"
+      border-radius="8px"
+    >
+      <mj-column>
+        <mj-text font-size="14px" color="#1f2937" line-height="1.8">
+          <strong>Reservatie ID:</strong> {{ reservationId }}<br />
+          <strong>Apparatuur:</strong> {{ inventory }}<br />
+          <strong>Controllers:</strong> {{ controllers }}<br />
+          <strong>Start tijd:</strong> {{ startTime }}<br />
+          <strong>Eind tijd:</strong> {{ endTime }}<br />
+          <strong>E-mail:</strong> {{ email }}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- QR Code Section -->
+    <mj-section background-color="#ffffff" padding="30px 30px 20px 30px">
+      <mj-column>
+        <mj-text
+          align="center"
+          font-size="14px"
+          font-weight="bold"
+          color="#DC2626"
+          padding-bottom="15px"
+        >
+          Scan deze QR code bij aankomst
+        </mj-text>
+        <mj-image src="cid:qrcode" alt="QR Code" width="200px" align="center" />
+        <mj-text
+          align="center"
+          font-size="12px"
+          color="#6b7280"
+          padding-top="10px"
+        >
+          Reservatie ID: {{ reservationId }}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Important Notice -->
+    <mj-section
+      background-color="#fef2f2"
+      padding="25px 30px"
+      border-left="4px solid #DC2626"
+    >
+      <mj-column>
+        <mj-text
+          font-size="14px"
+          font-weight="bold"
+          color="#DC2626"
+          padding-bottom="10px"
+        >
+          ⚠️ Belangrijke informatie
+        </mj-text>
+        <mj-text font-size="13px" color="#991b1b" line-height="1.7">
+          • <strong>Wees op tijd:</strong> Je sessie begint om {{ startTime }}.
+          Bij te late aankomst (meer dan 15 minuten) wordt je reservatie
+          gemarkeerd als "niet verschenen" en kunnen we je plaats niet meer
+          garanderen.<br /><br />
+          • <strong>Kan je niet komen?</strong> Stuur ons dan tijdig een bericht
+          zodat anderen van je tijdslot gebruik kunnen maken.<br /><br />
+          • <strong>Vragen of problemen?</strong> Neem zo snel mogelijk contact
+          met ons op.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+    <mj-section background-color="#1f2937" padding="30px 30px">
+      <mj-column>
+        <mj-text
+          align="center"
+          font-size="13px"
+          color="#9ca3af"
+          line-height="1.6"
+        >
+          Bedankt voor je reservatie bij AP Gaming Hub!<br />
+          Voor vragen, neem contact met ons op.
+        </mj-text>
+        <mj-divider border-color="#374151" padding="20px 0"></mj-divider>
+        <mj-text align="center" font-size="11px" color="#6b7280">
+          © 2026 AP Gaming Hub. Alle rechten voorbehouden.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

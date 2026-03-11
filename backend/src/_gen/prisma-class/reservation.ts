@@ -6,6 +6,9 @@ export class Reservation {
   @ApiProperty({ type: Number })
   id: number;
 
+  @ApiProperty({ type: String })
+  cuid: string;
+
   @ApiProperty({ type: Number })
   userId: number;
 

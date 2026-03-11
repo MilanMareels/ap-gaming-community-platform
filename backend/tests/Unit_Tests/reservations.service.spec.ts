@@ -3,11 +3,13 @@ import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ReservationsService } from '../../src/modules/reservations/reservations.service.js';
 import { PrismaService } from '../../src/modules/prisma/prisma.service.js';
+import { MailService } from '../../src/modules/mail/mail.service.js';
 import { ReservationStatus } from '../../src/dtos/reservations/reservation.dto.js';
 
 describe('ReservationsService', () => {
   let service: ReservationsService;
   let prisma: any;
+  let mailService: any;
 
   const mockUser = { id: 1, email: 'test@student.ap.be', sNumber: 's123456' };
 
@@ -43,15 +45,22 @@ describe('ReservationsService', () => {
       },
     };
 
+    const mockMailService = {
+      sendMailWithAttachments: jest.fn().mockResolvedValue(undefined),
+      generateQRCode: jest.fn().mockResolvedValue(Buffer.from('fake-qr-code')),
+    };
+
     const module = await Test.createTestingModule({
       providers: [
         ReservationsService,
         { provide: PrismaService, useValue: mockPrisma },
+        { provide: MailService, useValue: mockMailService },
       ],
     }).compile();
 
     service = module.get(ReservationsService);
     prisma = module.get(PrismaService);
+    mailService = module.get(MailService);
   });
 
   describe('Reservation Creation', () => {
@@ -109,7 +118,9 @@ describe('ReservationsService', () => {
       expect(prisma.reservation.count).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+            status: {
+              in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT],
+            },
           }),
         }),
       );
@@ -126,7 +137,9 @@ describe('ReservationsService', () => {
       expect(prisma.reservation.findFirst).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+            status: {
+              in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT],
+            },
           }),
         }),
       );
@@ -254,7 +267,9 @@ describe('ReservationsService', () => {
       expect(prisma.reservation.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+            status: {
+              in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT],
+            },
           }),
         }),
       );
@@ -286,6 +301,225 @@ describe('ReservationsService', () => {
       prisma.reservation.findMany.mockResolvedValue([]);
       await service.getNoShows();
       expect(prisma.reservation.findMany).toHaveBeenCalled();
+    });
+  });
+
+  describe('Email Confirmation', () => {
+    const mockCuid = 'clx1234567890abcdefghij';
+    const mockReservation = {
+      id: 123,
+      cuid: mockCuid,
+      userId: 1,
+      email: baseDto.email,
+      inventory: baseDto.inventory,
+      controllers: baseDto.controllers,
+      startTime: new Date(baseDto.startTime),
+      endTime: new Date(baseDto.endTime),
+      status: ReservationStatus.RESERVED,
+      user: mockUser,
+    };
+
+    beforeEach(() => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+      prisma.reservation.count.mockResolvedValue(0);
+      prisma.reservation.findFirst.mockResolvedValue(null);
+      prisma.reservation.create.mockResolvedValue(mockReservation);
+    });
+
+    it('should send confirmation email after creating reservation', async () => {
+      await service.create(baseDto as any);
+
+      expect(mailService.generateQRCode).toHaveBeenCalledWith(mockCuid);
+      expect(mailService.sendMailWithAttachments).toHaveBeenCalledWith(
+        baseDto.email,
+        'Reservatie Bevestiging - AP Gaming Hub',
+        'reservation/confirmation',
+        expect.objectContaining({
+          sNumber: baseDto.sNumber,
+          reservationId: mockCuid,
+          email: baseDto.email,
+          controllers: baseDto.controllers,
+        }),
+        expect.arrayContaining([
+          expect.objectContaining({
+            filename: 'qrcode.png',
+            cid: 'qrcode',
+          }),
+        ]),
+      );
+    });
+
+    it('should include formatted Dutch dates in email', async () => {
+      await service.create(baseDto as any);
+
+      expect(mailService.sendMailWithAttachments).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(String),
+        expect.any(String),
+        expect.objectContaining({
+          startTime: expect.any(String),
+          endTime: expect.any(String),
+        }),
+        expect.any(Array),
+      );
+
+      const callArgs = mailService.sendMailWithAttachments.mock.calls[0];
+      const emailData = callArgs[3];
+
+      // Verify dates are formatted (contain Dutch text)
+      expect(typeof emailData.startTime).toBe('string');
+      expect(typeof emailData.endTime).toBe('string');
+    });
+
+    it('should capitalize inventory names correctly in email', async () => {
+      const testCases = [
+        { inventory: 'pc', expected: 'PC' },
+        { inventory: 'ps5', expected: 'PlayStation 5' },
+        { inventory: 'switch', expected: 'Nintendo Switch' },
+      ];
+
+      for (const testCase of testCases) {
+        prisma.reservation.create.mockResolvedValue({
+          ...mockReservation,
+          cuid: mockCuid,
+          inventory: testCase.inventory,
+        });
+
+        await service.create({
+          ...baseDto,
+          inventory: testCase.inventory,
+        } as any);
+
+        const lastCall =
+          mailService.sendMailWithAttachments.mock.calls[
+            mailService.sendMailWithAttachments.mock.calls.length - 1
+          ];
+        expect(lastCall[3].inventory).toBe(testCase.expected);
+      }
+    });
+
+    it('should send confirmation email for admin-created reservations', async () => {
+      await service.adminCreate(baseDto as any);
+
+      expect(mailService.generateQRCode).toHaveBeenCalledWith(mockCuid);
+      expect(mailService.sendMailWithAttachments).toHaveBeenCalled();
+    });
+
+    it('should handle admin reservations without sNumber', async () => {
+      const dtoWithoutSNumber = { ...baseDto };
+      delete (dtoWithoutSNumber as any).sNumber;
+
+      await service.adminCreate(dtoWithoutSNumber as any);
+
+      expect(mailService.sendMailWithAttachments).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(String),
+        expect.any(String),
+        expect.objectContaining({
+          sNumber: 'N/A',
+        }),
+        expect.any(Array),
+      );
+    });
+
+    it('should not fail reservation creation if email sending fails', async () => {
+      mailService.sendMailWithAttachments.mockRejectedValue(
+        new Error('SMTP error'),
+      );
+
+      const result = await service.create(baseDto as any);
+
+      expect(result).toEqual(mockReservation);
+      expect(prisma.reservation.create).toHaveBeenCalled();
+    });
+
+    it('should log error when email fails but continue', async () => {
+      const consoleErrorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      mailService.sendMailWithAttachments.mockRejectedValue(
+        new Error('Email service down'),
+      );
+
+      await service.create(baseDto as any);
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed to send confirmation email:',
+        expect.any(Error),
+      );
+
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('should generate QR code with reservation CUID', async () => {
+      await service.create(baseDto as any);
+
+      expect(mailService.generateQRCode).toHaveBeenCalledWith(
+        expect.stringMatching(/^c[a-z0-9]+$/),
+      );
+    });
+
+    it('should include QR code as inline attachment with correct CID', async () => {
+      const qrBuffer = Buffer.from('test-qr-data');
+      mailService.generateQRCode.mockResolvedValue(qrBuffer);
+
+      await service.create(baseDto as any);
+
+      expect(mailService.sendMailWithAttachments).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(String),
+        expect.any(String),
+        expect.any(Object),
+        expect.arrayContaining([
+          expect.objectContaining({
+            filename: 'qrcode.png',
+            content: qrBuffer,
+            cid: 'qrcode',
+          }),
+        ]),
+      );
+    });
+
+    it('should send email to the correct recipient', async () => {
+      const testEmail = 'specific@student.ap.be';
+      await service.create({ ...baseDto, email: testEmail } as any);
+
+      expect(mailService.sendMailWithAttachments).toHaveBeenCalledWith(
+        testEmail,
+        expect.any(String),
+        expect.any(String),
+        expect.any(Object),
+        expect.any(Array),
+      );
+    });
+
+    it('should use correct email template path', async () => {
+      await service.create(baseDto as any);
+
+      expect(mailService.sendMailWithAttachments).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(String),
+        'reservation/confirmation',
+        expect.any(Object),
+        expect.any(Array),
+      );
+    });
+
+    it('should include all required data in email template', async () => {
+      await service.create(baseDto as any);
+
+      const callArgs = mailService.sendMailWithAttachments.mock.calls[0];
+      const emailData = callArgs[3];
+
+      expect(emailData).toHaveProperty('sNumber');
+      expect(emailData).toHaveProperty('reservationId');
+      expect(emailData).toHaveProperty('inventory');
+      expect(emailData).toHaveProperty('controllers');
+      expect(emailData).toHaveProperty('startTime');
+      expect(emailData).toHaveProperty('endTime');
+      expect(emailData).toHaveProperty('email');
     });
   });
 });
