@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import {
   AdminCreateReservationDto,
@@ -28,9 +24,7 @@ export class ReservationsService {
       throw new BadRequestException('Cannot reserve in the past');
     }
     if (startTime > maxDate) {
-      throw new BadRequestException(
-        'Reservations can only be made up to 3 days in advance',
-      );
+      throw new BadRequestException('Reservations can only be made up to 3 days in advance');
     }
 
     let user = await this.prisma.user.findUnique({
@@ -53,17 +47,13 @@ export class ReservationsService {
     });
 
     if (!settingRecord) {
-      throw new BadRequestException(
-        `Hardware type '${dto.inventory}' is not configured in settings.`,
-      );
+      throw new BadRequestException(`Hardware type '${dto.inventory}' is not configured in settings.`);
     }
 
     const maxCapacity = parseInt(settingRecord.value, 10);
 
     if (isNaN(maxCapacity)) {
-      throw new BadRequestException(
-        `Configuration error: capacity for '${dto.inventory}' is not a valid number.`,
-      );
+      throw new BadRequestException(`Configuration error: capacity for '${dto.inventory}' is not a valid number.`);
     }
 
     const conflictingReservationsCount = await this.prisma.reservation.count({
@@ -76,9 +66,18 @@ export class ReservationsService {
     });
 
     if (conflictingReservationsCount >= maxCapacity) {
-      throw new BadRequestException(
-        `All ${dto.inventory}s are already reserved for this time slot`,
-      );
+      throw new BadRequestException(`All ${dto.inventory}s are already reserved for this time slot`);
+    }
+
+    const noShowCount = await this.prisma.reservation.count({
+      where: {
+        userId: user.id,
+        status: ReservationStatus.NO_SHOW,
+      },
+    });
+
+    if (noShowCount >= 3) {
+      throw new BadRequestException('You already have three no-shows. You can no longer make new reservations.');
     }
 
     return this.prisma.reservation.create({
@@ -119,16 +118,10 @@ export class ReservationsService {
         status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
         OR: [
           {
-            AND: [
-              { startTime: { lte: new Date(dto.startTime) } },
-              { endTime: { gt: new Date(dto.startTime) } },
-            ],
+            AND: [{ startTime: { lte: new Date(dto.startTime) } }, { endTime: { gt: new Date(dto.startTime) } }],
           },
           {
-            AND: [
-              { startTime: { lt: new Date(dto.endTime) } },
-              { endTime: { gte: new Date(dto.endTime) } },
-            ],
+            AND: [{ startTime: { lt: new Date(dto.endTime) } }, { endTime: { gte: new Date(dto.endTime) } }],
           },
         ],
       },
@@ -247,10 +240,7 @@ export class ReservationsService {
     }
 
     if (search) {
-      where.OR = [
-        { email: { contains: search, mode: 'insensitive' } },
-        { user: { sNumber: { contains: search, mode: 'insensitive' } } },
-      ];
+      where.OR = [{ email: { contains: search, mode: 'insensitive' } }, { user: { sNumber: { contains: search, mode: 'insensitive' } } }];
     }
 
     return this.prisma.reservation.findMany({
