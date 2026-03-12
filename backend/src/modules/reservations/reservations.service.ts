@@ -287,4 +287,24 @@ export class ReservationsService {
       },
     });
   }
+
+  async unBlockUser(userId: number) {
+    const noShowReservations = await this.prisma.reservation.findMany({
+      where: {
+        userId,
+        status: ReservationStatus.NO_SHOW,
+      },
+    });
+
+    if (noShowReservations.length === 0) {
+      throw new NotFoundException('No no-shows found for this user');
+    }
+
+    for (const reservation of noShowReservations) {
+      await this.prisma.reservation.update({
+        where: { id: reservation.id },
+        data: { status: ReservationStatus.CANCELLED }, // Andere status nodig voor deblock??
+      });
+    }
+  }
 }

@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Trash2, Check, UserX, Gamepad2, Plus, Pencil, Ban } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-import { Pagination } from "@/components/ui/Pagination";
-import { apiClient } from "@/api";
-import type { ReservationWithUser, ReservationStatus } from "@/api";
-import ReservationModal from "./ReservationModal";
+import { useState, useEffect } from 'react';
+import { Trash2, Check, UserX, Gamepad2, Plus, Pencil, Ban } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { Pagination } from '@/components/ui/Pagination';
+import { apiClient } from '@/api';
+import type { ReservationWithUser, ReservationStatus } from '@/api';
+import ReservationModal from './ReservationModal';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -26,17 +26,17 @@ function formatTime(iso: string): string {
 export default function AdminReservationsPage() {
   const [reservations, setReservations] = useState<ReservationWithUser[]>([]);
   const [filterDate, setFilterDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingReservation, setEditingReservation] = useState<ReservationWithUser | null>(null);
 
   async function fetchReservations() {
     try {
-      const res = await apiClient.GET("/reservations", {});
+      const res = await apiClient.GET('/reservations', {});
       if (res.data) setReservations(res.data as ReservationWithUser[]);
     } catch (err) {
-      console.error("Failed to fetch reservations:", err);
+      console.error('Failed to fetch reservations:', err);
     }
   }
 
@@ -51,38 +51,38 @@ export default function AdminReservationsPage() {
 
   const handleUpdateStatus = async (id: number, status: ReservationStatus) => {
     try {
-      await apiClient.PATCH("/reservations/{id}/status", {
+      await apiClient.PATCH('/reservations/{id}/status', {
         params: { path: { id: id.toString() } },
         body: { status },
       });
       await fetchReservations();
     } catch (err) {
-      console.error("Failed to update status:", err);
+      console.error('Failed to update status:', err);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this reservation?")) return;
+    if (!confirm('Weet je zeker dat je deze reservering wilt verwijderen?')) return;
     try {
-      await apiClient.DELETE("/reservations/{id}", {
+      await apiClient.DELETE('/reservations/{id}', {
         params: { path: { id: id.toString() } },
       });
       await fetchReservations();
     } catch (err) {
-      console.error("Failed to delete reservation:", err);
+      console.error('Failed to delete reservation:', err);
     }
   };
 
   const handleCancel = async (id: number) => {
-    if (!confirm("Weet je zeker dat je deze reservering wilt annuleren?")) return;
+    if (!confirm('Weet je zeker dat je deze reservering wilt annuleren?')) return;
     try {
-      await apiClient.PATCH("/reservations/{id}/status", {
+      await apiClient.PATCH('/reservations/{id}/status', {
         params: { path: { id: id.toString() } },
-        body: { status: "CANCELLED" },
+        body: { status: 'CANCELLED' },
       });
       await fetchReservations();
     } catch (err) {
-      console.error("Failed to cancel reservation:", err);
+      console.error('Failed to cancel reservation:', err);
     }
   };
 
@@ -124,7 +124,7 @@ export default function AdminReservationsPage() {
           className="bg-slate-900 border border-slate-700 rounded p-2 text-white text-sm [&::-webkit-calendar-picker-indicator]:invert"
           value={filterDate}
           onChange={(e) => setFilterDate(e.target.value)}
-          style={{ colorScheme: "dark" }}
+          style={{ colorScheme: 'dark' }}
         />
         <input
           type="text"
@@ -134,7 +134,7 @@ export default function AdminReservationsPage() {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         {filterDate && (
-          <button onClick={() => setFilterDate("")} className="text-xs text-red-500 hover:underline">
+          <button onClick={() => setFilterDate('')} className="text-xs text-red-500 hover:underline">
             Reset Filter
           </button>
         )}
@@ -155,7 +155,7 @@ export default function AdminReservationsPage() {
             {paginated.map((r) => (
               <tr key={r.id}>
                 <td className="p-4 font-bold">
-                  {r.user?.name || "Unknown"}
+                  {r.user?.name || 'Unknown'}
                   <div className="text-xs text-gray-500 font-normal">
                     {r.email}
                     {r.user?.sNumber && <span className="ml-2 text-gray-600">({r.user.sNumber})</span>}
@@ -166,7 +166,7 @@ export default function AdminReservationsPage() {
                   {formatTime(r.startTime)} - {formatTime(r.endTime)}
                 </td>
                 <td className="p-4">
-                  <Badge variant={r.inventory === "pc" || r.inventory === "switch" ? "danger" : "info"}>{r.inventory.toUpperCase()}</Badge>
+                  <Badge variant={r.inventory === 'pc' || r.inventory === 'switch' ? 'danger' : 'info'}>{r.inventory.toUpperCase()}</Badge>
                   {r.controllers > 0 && (
                     <span className="ml-2 text-xs text-gray-400">
                       <Gamepad2 className="inline" size={12} /> {r.controllers}
@@ -174,11 +174,11 @@ export default function AdminReservationsPage() {
                   )}
                 </td>
                 <td className="p-4">
-                  {r.status === "PRESENT" ? (
+                  {r.status === 'PRESENT' ? (
                     <Badge variant="success">Aanwezig</Badge>
-                  ) : r.status === "NO_SHOW" ? (
+                  ) : r.status === 'NO_SHOW' ? (
                     <Badge variant="danger">Afwezig</Badge>
-                  ) : r.status === "CANCELLED" ? (
+                  ) : r.status === 'CANCELLED' ? (
                     <Badge variant="warning">Geannuleerd</Badge>
                   ) : (
                     <Badge variant="warning">Geboekt</Badge>
@@ -186,12 +186,12 @@ export default function AdminReservationsPage() {
                 </td>
                 <td className="p-4">
                   <div className="flex gap-2 justify-end">
-                    {r.status === "RESERVED" && (
+                    {r.status === 'RESERVED' && (
                       <>
-                        <Button size="sm" variant="success" onClick={() => handleUpdateStatus(r.id, "PRESENT")} title="Markeer als aanwezig">
+                        <Button size="sm" variant="success" onClick={() => handleUpdateStatus(r.id, 'PRESENT')} title="Markeer als aanwezig">
                           <Check size={16} />
                         </Button>
-                        <Button size="sm" variant="danger" onClick={() => handleUpdateStatus(r.id, "NO_SHOW")} title="Markeer als no-show">
+                        <Button size="sm" variant="danger" onClick={() => handleUpdateStatus(r.id, 'NO_SHOW')} title="Markeer als no-show">
                           <UserX size={16} />
                         </Button>
                         <Button size="sm" variant="secondary" onClick={() => handleCancel(r.id)} title="Annuleer reservering">
