@@ -45,7 +45,7 @@ export default function ReservationsPage() {
     date: '',
     startTime: '',
     duration: '60',
-    controllers: 1,
+    controllers: 0,
     extraController: false,
     acceptedTerms: false,
   });
