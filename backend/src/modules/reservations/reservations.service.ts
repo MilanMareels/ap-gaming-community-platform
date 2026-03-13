@@ -7,6 +7,7 @@ import {
   UpdateReservationDto,
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
+import { errorMessages } from '../../errors/errorMessages.js';
 
 @Injectable()
 export class ReservationsService {
@@ -21,10 +22,10 @@ export class ReservationsService {
     const endTime = new Date(dto.endTime);
 
     if (startTime < now) {
-      throw new BadRequestException('Cannot reserve in the past');
+      throw new BadRequestException(errorMessages.pastDate);
     }
     if (startTime > maxDate) {
-      throw new BadRequestException('Reservations can only be made up to 3 days in advance');
+      throw new BadRequestException(errorMessages.maxAdvanceDays);
     }
 
     let user = await this.prisma.user.findUnique({
