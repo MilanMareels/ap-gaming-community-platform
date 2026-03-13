@@ -44,10 +44,7 @@ describe('ReservationsService', () => {
     };
 
     const module = await Test.createTestingModule({
-      providers: [
-        ReservationsService,
-        { provide: PrismaService, useValue: mockPrisma },
-      ],
+      providers: [ReservationsService, { provide: PrismaService, useValue: mockPrisma }],
     }).compile();
 
     service = module.get(ReservationsService);
@@ -56,30 +53,22 @@ describe('ReservationsService', () => {
 
   describe('Reservation Creation', () => {
     it('should validate time constraints', async () => {
-      await expect(
-        service.create({ ...baseDto, startTime: getIsoDate(-1) } as any),
-      ).rejects.toThrow(BadRequestException);
-      await expect(
-        service.create({ ...baseDto, startTime: getIsoDate(5) } as any),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.create({ ...baseDto, startTime: getIsoDate(-1) } as any)).rejects.toThrow(BadRequestException);
+      await expect(service.create({ ...baseDto, startTime: getIsoDate(5) } as any)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw if hardware is not configured in settings', async () => {
       prisma.user.findUnique.mockResolvedValue(mockUser);
       prisma.setting.findFirst.mockResolvedValue(null);
 
-      await expect(service.create(baseDto as any)).rejects.toThrow(
-        "Hardware type 'pc' is not configured in settings.",
-      );
+      await expect(service.create(baseDto as any)).rejects.toThrow("Hardware type 'pc' is not configured in settings.");
     });
 
     it('should throw if capacity configuration is invalid', async () => {
       prisma.user.findUnique.mockResolvedValue(mockUser);
       prisma.setting.findFirst.mockResolvedValue({ value: 'invalid_string' });
 
-      await expect(service.create(baseDto as any)).rejects.toThrow(
-        "Configuration error: capacity for 'pc' is not a valid number.",
-      );
+      await expect(service.create(baseDto as any)).rejects.toThrow("Configuration error: capacity for 'pc' is not a valid number.");
     });
 
     it('should throw on conflicts for both create and adminCreate', async () => {
@@ -87,14 +76,10 @@ describe('ReservationsService', () => {
       prisma.setting.findFirst.mockResolvedValue({ value: '5' });
       prisma.reservation.count.mockResolvedValue(5);
 
-      await expect(service.create(baseDto as any)).rejects.toThrow(
-        'already reserved',
-      );
+      await expect(service.create(baseDto as any)).rejects.toThrow('already reserved');
 
       prisma.reservation.findFirst.mockResolvedValue({ id: 1 });
-      await expect(service.adminCreate(baseDto as any)).rejects.toThrow(
-        'already reserved',
-      );
+      await expect(service.adminCreate(baseDto as any)).rejects.toThrow('already reserved');
     });
 
     it('should include PRESENT status in conflict check for create', async () => {
@@ -102,9 +87,7 @@ describe('ReservationsService', () => {
       prisma.setting.findFirst.mockResolvedValue({ value: '1' });
       prisma.reservation.count.mockResolvedValue(1);
 
-      await expect(service.create(baseDto as any)).rejects.toThrow(
-        'already reserved',
-      );
+      await expect(service.create(baseDto as any)).rejects.toThrow('already reserved');
 
       expect(prisma.reservation.count).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -119,9 +102,7 @@ describe('ReservationsService', () => {
       prisma.user.findUnique.mockResolvedValue(mockUser);
       prisma.reservation.findFirst.mockResolvedValue({ id: 1 });
 
-      await expect(service.adminCreate(baseDto as any)).rejects.toThrow(
-        'already reserved',
-      );
+      await expect(service.adminCreate(baseDto as any)).rejects.toThrow('already reserved');
 
       expect(prisma.reservation.findFirst).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -191,9 +172,7 @@ describe('ReservationsService', () => {
 
     it('should throw NotFound if reservation is missing', async () => {
       prisma.reservation.findUnique.mockResolvedValue(null);
-      await expect(service.update(1, {} as any)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.update(1, {} as any)).rejects.toThrow(NotFoundException);
     });
 
     it('should handle email changes and user creation', async () => {
@@ -271,9 +250,7 @@ describe('ReservationsService', () => {
 
     it('should throw NotFound on updateStatus if missing', async () => {
       prisma.reservation.findUnique.mockResolvedValue(null);
-      await expect(
-        service.updateStatus(1, { status: ReservationStatus.PRESENT }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.updateStatus(1, { status: ReservationStatus.PRESENT })).rejects.toThrow(NotFoundException);
     });
 
     it('should remove a reservation', async () => {
@@ -286,6 +263,55 @@ describe('ReservationsService', () => {
       prisma.reservation.findMany.mockResolvedValue([]);
       await service.getNoShows();
       expect(prisma.reservation.findMany).toHaveBeenCalled();
+    });
+
+    it('should throw if user has 3 or more no-shows', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+
+      // 1e count: conflictingReservationsCount -> 0
+      // 2e count: noShowCount -> 3
+      prisma.reservation.count.mockResolvedValueOnce(0).mockResolvedValueOnce(3);
+
+      await expect(service.create(baseDto as any)).rejects.toThrow('You already have three no-shows. You can no longer make new reservations.');
+    });
+
+    it('should throw if user has an overlapping reservation', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+
+      // counts (conflict & no-show) op 0 zetten
+      prisma.reservation.count.mockResolvedValue(0);
+
+      // 1e findFirst: existingReservation -> retouneert een conflict
+      prisma.reservation.findFirst.mockResolvedValueOnce({ id: 99 });
+
+      await expect(service.create(baseDto as any)).rejects.toThrow('You already have a reservation that overlaps with this time slot');
+    });
+
+    it('should throw if user does not respect the 30-minute buffer', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+      prisma.reservation.count.mockResolvedValue(0);
+
+      // 1e findFirst: existingReservation (directe overlap) -> null
+      // 2e findFirst: bufferConflict -> retouneert een conflict
+      prisma.reservation.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 99 });
+
+      await expect(service.create(baseDto as any)).rejects.toThrow('You must have at least 30 minutes between reservations');
+    });
+
+    it('should throw if user exceeds 2 reservations per day', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+      prisma.reservation.findFirst.mockResolvedValue(null);
+
+      // 1e count: conflictingReservationsCount -> 0
+      // 2e count: noShowCount -> 0
+      // 3e count: dailyReservationsCount -> 2 (limiet bereikt)
+      prisma.reservation.count.mockResolvedValueOnce(0).mockResolvedValueOnce(0).mockResolvedValueOnce(2);
+
+      await expect(service.create(baseDto as any)).rejects.toThrow('You can only make two reservations per day');
     });
   });
 });

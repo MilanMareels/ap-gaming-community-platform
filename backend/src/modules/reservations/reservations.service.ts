@@ -80,6 +80,59 @@ export class ReservationsService {
       throw new BadRequestException('You already have three no-shows. You can no longer make new reservations.');
     }
 
+    const existingReservation = await this.prisma.reservation.findFirst({
+      where: {
+        userId: user.id,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+        startTime: { lt: endTime },
+        endTime: { gt: startTime },
+      },
+    });
+
+    if (existingReservation) {
+      throw new BadRequestException('You already have a reservation that overlaps with this time slot');
+    }
+
+    const bufferTime = 30 * 60 * 1000; // 30 minutes
+    const bufferStart = new Date(startTime.getTime() - bufferTime);
+    const bufferEnd = new Date(endTime.getTime() + bufferTime);
+
+    const bufferConflict = await this.prisma.reservation.findFirst({
+      where: {
+        userId: user.id,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+        OR: [
+          {
+            AND: [{ startTime: { lte: bufferStart } }, { endTime: { gt: bufferStart } }],
+          },
+          {
+            AND: [{ startTime: { lt: bufferEnd } }, { endTime: { gte: bufferEnd } }],
+          },
+        ],
+      },
+    });
+
+    if (bufferConflict) {
+      throw new BadRequestException('You must have at least 30 minutes between reservations');
+    }
+    const maxReservationsPerDay = 2;
+    const startOfDay = new Date(startTime);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(startTime);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const dailyReservationsCount = await this.prisma.reservation.count({
+      where: {
+        userId: user.id,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+        startTime: { gte: startOfDay, lte: endOfDay },
+      },
+    });
+
+    if (dailyReservationsCount >= maxReservationsPerDay) {
+      throw new BadRequestException('You can only make two reservations per day');
+    }
+
     return this.prisma.reservation.create({
       data: {
         userId: user.id,
