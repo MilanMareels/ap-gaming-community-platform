@@ -302,6 +302,80 @@ describe('ReservationsService', () => {
       await service.getNoShows();
       expect(prisma.reservation.findMany).toHaveBeenCalled();
     });
+
+    describe('verifyByCuid', () => {
+      it('should return mapped verification data for an active reservation', async () => {
+        const reservation = {
+          id: 12,
+          cuid: 'cm9x8k2df0000a1b2c3d4e5f6',
+          email: 'student@student.ap.be',
+          inventory: 'pc',
+          controllers: 2,
+          startTime: new Date('2026-03-20T10:00:00.000Z'),
+          endTime: new Date('2026-03-20T12:00:00.000Z'),
+          status: ReservationStatus.RESERVED,
+          user: { sNumber: 's123456' },
+        };
+
+        prisma.reservation.findFirst.mockResolvedValue(reservation);
+
+        const result = await service.verifyByCuid(reservation.cuid);
+
+        expect(prisma.reservation.findFirst).toHaveBeenCalledWith({
+          where: { cuid: reservation.cuid },
+          include: {
+            user: {
+              select: {
+                sNumber: true,
+              },
+            },
+          },
+        });
+
+        expect(result).toEqual({
+          cuid: reservation.cuid,
+          email: reservation.email,
+          sNumber: reservation.user.sNumber,
+          inventory: reservation.inventory,
+          controllers: reservation.controllers,
+          startTime: reservation.startTime,
+          endTime: reservation.endTime,
+          status: reservation.status,
+        });
+      });
+
+      it('should throw NotFoundException when reservation does not exist', async () => {
+        prisma.reservation.findFirst.mockResolvedValue(null);
+
+        await expect(service.verifyByCuid('missing-cuid')).rejects.toThrow(
+          NotFoundException,
+        );
+      });
+
+      it('should throw NotFoundException for cancelled reservations', async () => {
+        prisma.reservation.findFirst.mockResolvedValue({
+          cuid: 'cancelled-cuid',
+          status: ReservationStatus.CANCELLED,
+          user: { sNumber: 's1' },
+        });
+
+        await expect(service.verifyByCuid('cancelled-cuid')).rejects.toThrow(
+          NotFoundException,
+        );
+      });
+
+      it('should throw NotFoundException for no-show reservations', async () => {
+        prisma.reservation.findFirst.mockResolvedValue({
+          cuid: 'noshow-cuid',
+          status: ReservationStatus.NO_SHOW,
+          user: { sNumber: 's1' },
+        });
+
+        await expect(service.verifyByCuid('noshow-cuid')).rejects.toThrow(
+          NotFoundException,
+        );
+      });
+    });
   });
 
   describe('Email Confirmation', () => {
