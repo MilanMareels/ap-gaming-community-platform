@@ -319,12 +319,21 @@ describe('ReservationsService', () => {
       user: mockUser,
     };
 
+    let consoleErrorSpy: ReturnType<typeof jest.spyOn>;
+
     beforeEach(() => {
+      consoleErrorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       prisma.user.findUnique.mockResolvedValue(mockUser);
       prisma.setting.findFirst.mockResolvedValue({ value: '5' });
       prisma.reservation.count.mockResolvedValue(0);
       prisma.reservation.findFirst.mockResolvedValue(null);
       prisma.reservation.create.mockResolvedValue(mockReservation);
+    });
+
+    afterEach(() => {
+      consoleErrorSpy.mockRestore();
     });
 
     it('should send confirmation email after creating reservation', async () => {
@@ -370,6 +379,33 @@ describe('ReservationsService', () => {
       // Verify dates are formatted (contain Dutch text)
       expect(typeof emailData.startTime).toBe('string');
       expect(typeof emailData.endTime).toBe('string');
+    });
+
+    it('should format email times in UTC (not server local timezone)', async () => {
+      const dateStr = getIsoDate(1).split('T')[0];
+
+      const fixedStart = new Date(`${dateStr}T13:00:00.000Z`);
+      const fixedEnd = new Date(`${dateStr}T14:00:00.000Z`);
+
+      const fixedReservation = {
+        ...mockReservation,
+        startTime: fixedStart,
+        endTime: fixedEnd,
+      };
+      prisma.reservation.create.mockResolvedValue(fixedReservation);
+
+      await service.create({
+        ...baseDto,
+        startTime: fixedStart.toISOString(),
+        endTime: fixedEnd.toISOString(),
+      } as any);
+
+      const callArgs = mailService.sendMailWithAttachments.mock.calls[0];
+      const emailData = callArgs[3];
+
+      // Times should reflect UTC (13:00 and 14:00), not CET (14:00 and 15:00)
+      expect(emailData.startTime).toContain('13:00');
+      expect(emailData.endTime).toContain('14:00');
     });
 
     it('should capitalize inventory names correctly in email', async () => {
@@ -435,10 +471,6 @@ describe('ReservationsService', () => {
     });
 
     it('should log error when email fails but continue', async () => {
-      const consoleErrorSpy = jest
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
-
       mailService.sendMailWithAttachments.mockRejectedValue(
         new Error('Email service down'),
       );
@@ -449,8 +481,6 @@ describe('ReservationsService', () => {
         'Failed to send confirmation email:',
         expect.any(Error),
       );
-
-      consoleErrorSpy.mockRestore();
     });
 
     it('should generate QR code with reservation CUID', async () => {
