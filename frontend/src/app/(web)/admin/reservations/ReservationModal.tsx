@@ -31,13 +31,23 @@ const CONTROLLER_OPTIONS = [
 
 /** Parse an ISO date-time to a date string (YYYY-MM-DD) */
 function toDateInput(iso: string): string {
-  return iso.slice(0, 10);
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 /** Parse an ISO date-time to a time string (HH:mm) */
 function toTimeInput(iso: string): string {
   const d = new Date(iso);
-  return d.toISOString().slice(11, 16);
+  if (Number.isNaN(d.getTime())) return '';
+
+  const hours = String(d.getUTCHours()).padStart(2, '0');
+  const minutes = String(d.getUTCMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
 }
 
 export default function ReservationModal({
@@ -92,8 +102,8 @@ export default function ReservationModal({
       return;
     }
 
-    const startISO = new Date(`${date}T${startTime}:00`).toISOString();
-    const endISO = new Date(`${date}T${endTime}:00`).toISOString();
+    const startISO = `${date}T${startTime}:00.000Z`;
+    const endISO = `${date}T${endTime}:00.000Z`;
 
     if (startISO >= endISO) {
       setError('Eindtijd moet na starttijd liggen.');
@@ -187,7 +197,7 @@ export default function ReservationModal({
             onChange={(e) => setSNumber(e.target.value)}
           />
 
-          <div className='grid grid-cols-2 gap-4'>
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
             <Select
               label='Hardware *'
               options={INVENTORY_OPTIONS}
@@ -210,7 +220,7 @@ export default function ReservationModal({
             style={{ colorScheme: 'dark' }}
           />
 
-          <div className='grid grid-cols-2 gap-4'>
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
             <Input
               label='Starttijd *'
               type='time'
@@ -233,7 +243,7 @@ export default function ReservationModal({
             </div>
           )}
 
-          <div className='flex gap-3 pt-2'>
+          <div className='flex flex-col gap-3 pt-2 sm:flex-row'>
             <Button
               type='button'
               variant='secondary'

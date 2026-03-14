@@ -325,6 +325,39 @@ export class ReservationsService {
     return reservations;
   }
 
+  async verifyByCuid(cuid: string) {
+    const reservation = await this.prisma.reservation.findFirst({
+      where: { cuid },
+      include: {
+        user: {
+          select: {
+            sNumber: true,
+          },
+        },
+      },
+    });
+
+    if (
+      !reservation ||
+      [ReservationStatus.CANCELLED, ReservationStatus.NO_SHOW].includes(
+        reservation.status as ReservationStatus,
+      )
+    ) {
+      throw new NotFoundException('Reservation not found');
+    }
+
+    return {
+      cuid: reservation.cuid,
+      email: reservation.email,
+      sNumber: reservation.user.sNumber,
+      inventory: reservation.inventory,
+      controllers: reservation.controllers,
+      startTime: reservation.startTime,
+      endTime: reservation.endTime,
+      status: reservation.status,
+    };
+  }
+
   async findAll(date?: string, search?: string) {
     const where: any = {};
 
