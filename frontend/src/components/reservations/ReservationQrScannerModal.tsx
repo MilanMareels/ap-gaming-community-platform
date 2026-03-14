@@ -99,46 +99,49 @@ export default function ReservationQrScannerModal({
     setCameraReady(false);
   }, []);
 
-  const verifyCuid = useCallback(async (rawValue: string) => {
-    const cuid = extractCuid(rawValue);
-    if (!cuid) return;
+  const verifyCuid = useCallback(
+    async (rawValue: string) => {
+      const cuid = extractCuid(rawValue);
+      if (!cuid) return;
 
-    setStatus('loading');
-    setErrorMessage('');
+      setStatus('loading');
+      setErrorMessage('');
 
-    try {
-      const response = await fetch(
-        `/api/reservations/verify/${encodeURIComponent(cuid)}`,
-        {
-          method: 'GET',
-          credentials: 'include',
-        },
-      );
+      try {
+        const response = await fetch(
+          `/api/reservations/verify/${encodeURIComponent(cuid)}`,
+          {
+            method: 'GET',
+            credentials: 'include',
+          },
+        );
 
-      if (response.status === 404) {
+        if (response.status === 404) {
+          setReservation(null);
+          setStatus('not-found');
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error('Kon de reservatie niet valideren.');
+        }
+
+        const payload = (await response.json()) as VerifiedReservation;
+        setReservation(payload);
+        setStatus('found');
+        onVerified?.();
+      } catch (error) {
         setReservation(null);
-        setStatus('not-found');
-        return;
+        setStatus('error');
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : 'Onbekende fout tijdens valideren.',
+        );
       }
-
-      if (!response.ok) {
-        throw new Error('Kon de reservatie niet valideren.');
-      }
-
-      const payload = (await response.json()) as VerifiedReservation;
-      setReservation(payload);
-      setStatus('found');
-      onVerified?.();
-    } catch (error) {
-      setReservation(null);
-      setStatus('error');
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : 'Onbekende fout tijdens valideren.',
-      );
-    }
-  }, [onVerified]);
+    },
+    [onVerified],
+  );
 
   const detectWithBarcodeDetector = useCallback(async () => {
     if (!videoRef.current || !open || mode !== 'camera') return false;
