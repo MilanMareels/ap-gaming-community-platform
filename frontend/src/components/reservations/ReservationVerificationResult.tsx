@@ -1,7 +1,7 @@
 'use client';
 
 import { Calendar, CheckCircle2, XCircle } from 'lucide-react';
-import type { VerifiedReservation, VerificationStatus } from './types';
+import type { VerificationStatus, VerifiedReservation } from './types';
 
 interface ReservationVerificationResultProps {
   status: VerificationStatus;
@@ -82,7 +82,9 @@ export function ReservationVerificationResult({
           </div>
           <div className='rounded-xl border border-slate-700 bg-slate-900 p-3'>
             <p className='text-xs uppercase text-slate-400'>Email</p>
-            <p className='font-semibold text-white break-all'>{reservation.email}</p>
+            <p className='font-semibold text-white break-all'>
+              {reservation.email}
+            </p>
           </div>
           <div className='rounded-xl border border-slate-700 bg-slate-900 p-3'>
             <p className='text-xs uppercase text-slate-400'>Hardware</p>
@@ -92,7 +94,9 @@ export function ReservationVerificationResult({
           </div>
           <div className='rounded-xl border border-slate-700 bg-slate-900 p-3'>
             <p className='text-xs uppercase text-slate-400'>Controllers</p>
-            <p className='font-semibold text-white'>{reservation.controllers}</p>
+            <p className='font-semibold text-white'>
+              {reservation.controllers}
+            </p>
           </div>
           <div className='rounded-xl border border-slate-700 bg-slate-900 p-3 md:col-span-2'>
             <p className='mb-1 text-xs uppercase text-slate-400'>Tijdslot</p>

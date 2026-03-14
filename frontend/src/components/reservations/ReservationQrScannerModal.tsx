@@ -45,7 +45,9 @@ export default function ReservationQrScannerModal({
   const [mode, setMode] = useState<ScanMode>('scanner');
   const [manualValue, setManualValue] = useState('');
   const [status, setStatus] = useState<VerificationStatus>('idle');
-  const [reservation, setReservation] = useState<VerifiedReservation | null>(null);
+  const [reservation, setReservation] = useState<VerifiedReservation | null>(
+    null,
+  );
   const [errorMessage, setErrorMessage] = useState('');
   const [cameraReady, setCameraReady] = useState(false);
   const [cameraSupport, setCameraSupport] = useState(true);
@@ -60,7 +62,11 @@ export default function ReservationQrScannerModal({
 
   const tabs = useMemo(
     () => [
-      { id: 'scanner', label: 'Scan met handscanner', icon: <Keyboard size={14} /> },
+      {
+        id: 'scanner',
+        label: 'Scan met handscanner',
+        icon: <Keyboard size={14} />,
+      },
       { id: 'camera', label: 'Scan met camera', icon: <Camera size={14} /> },
     ],
     [],
@@ -99,10 +105,13 @@ export default function ReservationQrScannerModal({
     setErrorMessage('');
 
     try {
-      const response = await fetch(`/api/reservations/verify/${encodeURIComponent(cuid)}`, {
-        method: 'GET',
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `/api/reservations/verify/${encodeURIComponent(cuid)}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        },
+      );
 
       if (response.status === 404) {
         setReservation(null);
@@ -121,7 +130,9 @@ export default function ReservationQrScannerModal({
       setReservation(null);
       setStatus('error');
       setErrorMessage(
-        error instanceof Error ? error.message : 'Onbekende fout tijdens valideren.',
+        error instanceof Error
+          ? error.message
+          : 'Onbekende fout tijdens valideren.',
       );
     }
   }, []);
@@ -131,7 +142,9 @@ export default function ReservationQrScannerModal({
 
     const BarcodeDetectorCtor = window.BarcodeDetector as
       | (new (options?: { formats?: string[] }) => {
-          detect: (image: ImageBitmapSource) => Promise<Array<{ rawValue?: string }>>;
+          detect: (
+            image: ImageBitmapSource,
+          ) => Promise<Array<{ rawValue?: string }>>;
         })
       | undefined;
 
@@ -213,7 +226,9 @@ export default function ReservationQrScannerModal({
     try {
       if (!navigator.mediaDevices?.getUserMedia) {
         setCameraSupport(false);
-        setCameraError('Deze browser ondersteunt geen camera API (getUserMedia).');
+        setCameraError(
+          'Deze browser ondersteunt geen camera API (getUserMedia).',
+        );
         return;
       }
 
@@ -246,14 +261,18 @@ export default function ReservationQrScannerModal({
       setCameraSupport(false);
 
       if (error instanceof DOMException && error.name === 'NotAllowedError') {
-        setCameraError('Camera toegang geweigerd. Geef permissie in je browserinstellingen.');
+        setCameraError(
+          'Camera toegang geweigerd. Geef permissie in je browserinstellingen.',
+        );
       } else if (
         error instanceof DOMException &&
         error.name === 'NotFoundError'
       ) {
         setCameraError('Geen camera gevonden op dit toestel.');
       } else {
-        setCameraError('Camera kon niet gestart worden. Controleer HTTPS/permissies.');
+        setCameraError(
+          'Camera kon niet gestart worden. Controleer HTTPS/permissies.',
+        );
       }
 
       stopCamera();
@@ -307,7 +326,12 @@ export default function ReservationQrScannerModal({
           <h2 className='flex items-center gap-2 text-lg font-bold text-white'>
             <QrCode size={18} className='text-red-500' /> QR Verificatie
           </h2>
-          <Button variant='ghost' size='sm' onClick={onClose} aria-label='Sluiten'>
+          <Button
+            variant='ghost'
+            size='sm'
+            onClick={onClose}
+            aria-label='Sluiten'
+          >
             <X size={16} />
           </Button>
         </div>
@@ -403,7 +427,11 @@ export default function ReservationQrScannerModal({
               )}
 
               <div className='mt-3 flex gap-2'>
-                <Button variant='secondary' size='sm' onClick={() => void startCamera()}>
+                <Button
+                  variant='secondary'
+                  size='sm'
+                  onClick={() => void startCamera()}
+                >
                   Opnieuw proberen
                 </Button>
               </div>
@@ -424,7 +452,9 @@ export default function ReservationQrScannerModal({
 declare global {
   interface Window {
     BarcodeDetector?: new (options?: { formats?: string[] }) => {
-      detect: (image: ImageBitmapSource) => Promise<Array<{ rawValue?: string }>>;
+      detect: (
+        image: ImageBitmapSource,
+      ) => Promise<Array<{ rawValue?: string }>>;
     };
   }
 }

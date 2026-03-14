@@ -210,7 +210,9 @@ export default function AdminReservationsPage() {
           >
             <div className='mb-2 flex items-start justify-between gap-2'>
               <div>
-                <p className='font-bold text-white'>{r.user?.name || 'Unknown'}</p>
+                <p className='font-bold text-white'>
+                  {r.user?.name || 'Unknown'}
+                </p>
                 <p className='text-xs text-gray-400'>{r.email}</p>
                 {r.user?.sNumber && (
                   <p className='text-xs text-gray-500'>{r.user.sNumber}</p>
@@ -222,7 +224,9 @@ export default function AdminReservationsPage() {
             <div className='mb-3 grid grid-cols-2 gap-2 text-xs text-gray-300'>
               <div className='rounded-lg border border-slate-800 bg-slate-900 p-2'>
                 <p className='text-gray-500'>Datum</p>
-                <p className='font-semibold text-white'>{dateFromISO(r.startTime)}</p>
+                <p className='font-semibold text-white'>
+                  {dateFromISO(r.startTime)}
+                </p>
               </div>
               <div className='rounded-lg border border-slate-800 bg-slate-900 p-2'>
                 <p className='text-gray-500'>Tijd</p>
