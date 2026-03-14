@@ -436,6 +436,9 @@ export default function AdminReservationsPage() {
       <ReservationQrScannerModal
         open={scannerOpen}
         onClose={() => setScannerOpen(false)}
+        onVerified={() => {
+          void fetchReservations();
+        }}
       />
     </div>
   );

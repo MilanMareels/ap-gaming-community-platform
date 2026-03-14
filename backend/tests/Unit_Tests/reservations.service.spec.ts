@@ -304,7 +304,7 @@ describe('ReservationsService', () => {
     });
 
     describe('verifyByCuid', () => {
-      it('should return mapped verification data for an active reservation', async () => {
+      it('should mark a RESERVED reservation as PRESENT during verification', async () => {
         const reservation = {
           id: 12,
           cuid: 'cm9x8k2df0000a1b2c3d4e5f6',
@@ -317,7 +317,13 @@ describe('ReservationsService', () => {
           user: { sNumber: 's123456' },
         };
 
+        const updatedReservation = {
+          ...reservation,
+          status: ReservationStatus.PRESENT,
+        };
+
         prisma.reservation.findFirst.mockResolvedValue(reservation);
+        prisma.reservation.update.mockResolvedValue(updatedReservation);
 
         const result = await service.verifyByCuid(reservation.cuid);
 
@@ -332,16 +338,47 @@ describe('ReservationsService', () => {
           },
         });
 
-        expect(result).toEqual({
-          cuid: reservation.cuid,
-          email: reservation.email,
-          sNumber: reservation.user.sNumber,
-          inventory: reservation.inventory,
-          controllers: reservation.controllers,
-          startTime: reservation.startTime,
-          endTime: reservation.endTime,
-          status: reservation.status,
+        expect(prisma.reservation.update).toHaveBeenCalledWith({
+          where: { id: reservation.id },
+          data: { status: ReservationStatus.PRESENT },
+          include: {
+            user: {
+              select: {
+                sNumber: true,
+              },
+            },
+          },
         });
+
+        expect(result).toEqual({
+          cuid: updatedReservation.cuid,
+          email: updatedReservation.email,
+          sNumber: updatedReservation.user.sNumber,
+          inventory: updatedReservation.inventory,
+          controllers: updatedReservation.controllers,
+          startTime: updatedReservation.startTime,
+          endTime: updatedReservation.endTime,
+          status: ReservationStatus.PRESENT,
+        });
+      });
+
+      it('should not update when reservation is already PRESENT', async () => {
+        prisma.reservation.findFirst.mockResolvedValue({
+          id: 99,
+          cuid: 'present-cuid',
+          email: 'student@student.ap.be',
+          inventory: 'ps5',
+          controllers: 1,
+          startTime: new Date('2026-03-20T10:00:00.000Z'),
+          endTime: new Date('2026-03-20T11:00:00.000Z'),
+          status: ReservationStatus.PRESENT,
+          user: { sNumber: 's123456' },
+        });
+
+        const result = await service.verifyByCuid('present-cuid');
+
+        expect(prisma.reservation.update).not.toHaveBeenCalled();
+        expect(result.status).toBe(ReservationStatus.PRESENT);
       });
 
       it('should throw NotFoundException when reservation does not exist', async () => {

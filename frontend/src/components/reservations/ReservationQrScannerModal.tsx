@@ -13,6 +13,7 @@ type ScanMode = 'scanner' | 'camera';
 interface ReservationQrScannerModalProps {
   open: boolean;
   onClose: () => void;
+  onVerified?: () => void;
 }
 
 const SCAN_DEBOUNCE_MS = 200;
@@ -41,6 +42,7 @@ function extractCuid(scannedValue: string): string {
 export default function ReservationQrScannerModal({
   open,
   onClose,
+  onVerified,
 }: ReservationQrScannerModalProps) {
   const [mode, setMode] = useState<ScanMode>('scanner');
   const [manualValue, setManualValue] = useState('');
@@ -126,6 +128,7 @@ export default function ReservationQrScannerModal({
       const payload = (await response.json()) as VerifiedReservation;
       setReservation(payload);
       setStatus('found');
+      onVerified?.();
     } catch (error) {
       setReservation(null);
       setStatus('error');
@@ -135,7 +138,7 @@ export default function ReservationQrScannerModal({
           : 'Onbekende fout tijdens valideren.',
       );
     }
-  }, []);
+  }, [onVerified]);
 
   const detectWithBarcodeDetector = useCallback(async () => {
     if (!videoRef.current || !open || mode !== 'camera') return false;

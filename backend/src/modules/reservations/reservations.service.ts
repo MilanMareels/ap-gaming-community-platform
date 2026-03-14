@@ -346,15 +346,30 @@ export class ReservationsService {
       throw new NotFoundException('Reservation not found');
     }
 
+    const verifiedReservation =
+      reservation.status === ReservationStatus.RESERVED
+        ? await this.prisma.reservation.update({
+            where: { id: reservation.id },
+            data: { status: ReservationStatus.PRESENT },
+            include: {
+              user: {
+                select: {
+                  sNumber: true,
+                },
+              },
+            },
+          })
+        : reservation;
+
     return {
-      cuid: reservation.cuid,
-      email: reservation.email,
-      sNumber: reservation.user.sNumber,
-      inventory: reservation.inventory,
-      controllers: reservation.controllers,
-      startTime: reservation.startTime,
-      endTime: reservation.endTime,
-      status: reservation.status,
+      cuid: verifiedReservation.cuid,
+      email: verifiedReservation.email,
+      sNumber: verifiedReservation.user.sNumber,
+      inventory: verifiedReservation.inventory,
+      controllers: verifiedReservation.controllers,
+      startTime: verifiedReservation.startTime,
+      endTime: verifiedReservation.endTime,
+      status: verifiedReservation.status,
     };
   }
 
