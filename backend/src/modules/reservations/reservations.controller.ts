@@ -6,6 +6,7 @@ import {
   AdminCreateReservationDto,
   ReservationQueryDto,
   ReservationSlotDto,
+  ReservationVerificationDto,
   UpdateReservationDto,
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
@@ -43,6 +44,16 @@ export class ReservationsController {
   @ApiOkResponse({ type: [ReservationSlotDto] })
   getSlots(@Query('date') date: string) {
     return this.reservationsService.getSlots(date);
+  }
+
+  @Get('verify/:cuid')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiOperation({
+    summary: 'Verify reservation by QR code CUID (Admin only)',
+  })
+  @ApiOkResponse({ type: ReservationVerificationDto })
+  verifyByCuid(@Param('cuid') cuid: string) {
+    return this.reservationsService.verifyByCuid(cuid);
   }
 
   @Post('admin')

@@ -124,6 +124,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reservations/verify/{cuid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Verify reservation by QR code CUID (Admin only) */
+        get: operations["ReservationsController_verifyByCuid"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reservations/admin": {
         parameters: {
             query?: never;
@@ -500,6 +517,7 @@ export interface components {
         ReservationStatus: "RESERVED" | "CANCELLED" | "PRESENT" | "NO_SHOW";
         Reservation: {
             id: number;
+            cuid: string;
             userId: number;
             controllers: number;
             email: string;
@@ -525,6 +543,33 @@ export interface components {
              * @example 2026-02-28T12:00:00.000Z
              */
             endTime: string;
+        };
+        ReservationVerificationDto: {
+            /** @example cm9x8k2df0000a1b2c3d4e5f6 */
+            cuid: string;
+            /** @example student@student.ap.be */
+            email: string;
+            /** @example s123456 */
+            sNumber: string;
+            /**
+             * @example pc
+             * @enum {string}
+             */
+            inventory: "pc" | "ps5" | "switch";
+            /** @example 2 */
+            controllers: number;
+            /**
+             * Format: date-time
+             * @example 2026-02-28T10:00:00.000Z
+             */
+            startTime: string;
+            /**
+             * Format: date-time
+             * @example 2026-02-28T12:00:00.000Z
+             */
+            endTime: string;
+            /** @enum {string} */
+            status: "RESERVED" | "CANCELLED" | "PRESENT" | "NO_SHOW";
         };
         AdminCreateReservationDto: {
             /** @example s123456 */
@@ -918,6 +963,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReservationSlotDto"][];
+                };
+            };
+        };
+    };
+    ReservationsController_verifyByCuid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationVerificationDto"];
                 };
             };
         };

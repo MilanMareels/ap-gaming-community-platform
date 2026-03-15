@@ -247,12 +247,22 @@ export default function ReservationsPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-        <div className="bg-slate-900 border border-green-500/50 p-8 rounded-2xl text-center max-w-md">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Reservatie Ontvangen!</h2>
-          <p className="text-gray-400">Je hebt succesvol een slot geboekt. Zorg dat je op tijd bent.</p>
-          <button onClick={() => window.location.reload()} className="mt-6 text-red-500 hover:text-white underline">
+      <div className='min-h-screen bg-slate-950 flex items-center justify-center p-4'>
+        <div className='bg-slate-900 border border-green-500/50 p-8 rounded-2xl text-center max-w-md'>
+          <CheckCircle className='w-16 h-16 text-green-500 mx-auto mb-4' />
+          <h2 className='text-2xl font-bold text-white mb-2'>
+            Reservatie Ontvangen!
+          </h2>
+          <p className='text-gray-400 mb-4'>
+            Je hebt succesvol een slot geboekt. Zorg dat je op tijd bent.
+          </p>
+          <p className='text-gray-400'>
+            Check je mailbox voor een bevestigingsmail met je QR code!
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className='mt-6 text-red-500 hover:text-white underline'
+          >
             Nieuwe reservatie
           </button>
         </div>

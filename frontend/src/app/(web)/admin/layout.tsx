@@ -86,32 +86,38 @@ export default function AdminLayout({
     <AdminContext value={{ user }}>
       <div className='min-h-screen bg-slate-950 text-white p-4 md:p-8 pt-24'>
         <div className='max-w-7xl mx-auto'>
-          <div className='flex justify-between items-center mb-8'>
-            <h1 className='text-3xl font-black'>
+          <div className='mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-center sm:justify-between'>
+            <h1 className='text-2xl font-black sm:text-3xl'>
               ADMIN <span className='text-red-600'>PANEL</span>
             </h1>
-            <Button variant='ghost' onClick={handleLogout}>
+            <Button
+              variant='ghost'
+              onClick={handleLogout}
+              className='w-full sm:w-auto'
+            >
               <LogOut size={20} /> Uitloggen
             </Button>
           </div>
 
-          <div className='flex gap-1 border-b border-slate-800'>
-            {TABS.map((tab) => (
-              <Link
-                key={tab.id}
-                href={tab.href}
-                className={`px-6 py-3 text-sm font-semibold transition-colors ${
-                  activeTab === tab.id
-                    ? 'text-white border-b-2 border-red-600'
-                    : 'text-gray-500 hover:text-gray-300'
-                }`}
-              >
-                {tab.label}
-              </Link>
-            ))}
+          <div className='-mx-4 overflow-x-auto border-b border-slate-800 px-4 sm:mx-0 sm:px-0'>
+            <div className='flex min-w-max gap-1'>
+              {TABS.map((tab) => (
+                <Link
+                  key={tab.id}
+                  href={tab.href}
+                  className={`px-4 py-3 text-sm font-semibold whitespace-nowrap transition-colors sm:px-6 ${
+                    activeTab === tab.id
+                      ? 'text-white border-b-2 border-red-600'
+                      : 'text-gray-500 hover:text-gray-300'
+                  }`}
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </div>
           </div>
 
-          <div className='mt-8'>{children}</div>
+          <div className='mt-6 sm:mt-8'>{children}</div>
         </div>
       </div>
     </AdminContext>

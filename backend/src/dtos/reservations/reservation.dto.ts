@@ -149,3 +149,29 @@ export class ReservationQueryDto {
   @IsString()
   search?: string;
 }
+
+export class ReservationVerificationDto {
+  @ApiProperty({ example: 'cm9x8k2df0000a1b2c3d4e5f6' })
+  cuid!: string;
+
+  @ApiProperty({ example: 'student@student.ap.be' })
+  email!: string;
+
+  @ApiProperty({ example: 's123456' })
+  sNumber!: string;
+
+  @ApiProperty({ example: 'pc', enum: ['pc', 'ps5', 'switch'] })
+  inventory!: string;
+
+  @ApiProperty({ example: 2 })
+  controllers!: number;
+
+  @ApiProperty({ example: '2026-02-28T10:00:00.000Z' })
+  startTime!: Date;
+
+  @ApiProperty({ example: '2026-02-28T12:00:00.000Z' })
+  endTime!: Date;
+
+  @ApiProperty({ enum: ReservationStatus })
+  status!: ReservationStatus;
+}
