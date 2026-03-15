@@ -29,6 +29,11 @@ services:
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-https://example.com/api/auth/google/callback}
       FRONTEND_URL: ${FRONTEND_URL:-https://example.com}
       NODE_ENV: production
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
 
   frontend:
     image: ghcr.io/milanmareels/ap-gaming-hub/frontend:latest
