@@ -40,6 +40,7 @@ export type ReservationSumAggregateOutputType = {
 
 export type ReservationMinAggregateOutputType = {
   id: number | null
+  cuid: string | null
   userId: number | null
   controllers: number | null
   email: string | null
@@ -51,6 +52,7 @@ export type ReservationMinAggregateOutputType = {
 
 export type ReservationMaxAggregateOutputType = {
   id: number | null
+  cuid: string | null
   userId: number | null
   controllers: number | null
   email: string | null
@@ -62,6 +64,7 @@ export type ReservationMaxAggregateOutputType = {
 
 export type ReservationCountAggregateOutputType = {
   id: number
+  cuid: number
   userId: number
   controllers: number
   email: number
@@ -87,6 +90,7 @@ export type ReservationSumAggregateInputType = {
 
 export type ReservationMinAggregateInputType = {
   id?: true
+  cuid?: true
   userId?: true
   controllers?: true
   email?: true
@@ -98,6 +102,7 @@ export type ReservationMinAggregateInputType = {
 
 export type ReservationMaxAggregateInputType = {
   id?: true
+  cuid?: true
   userId?: true
   controllers?: true
   email?: true
@@ -109,6 +114,7 @@ export type ReservationMaxAggregateInputType = {
 
 export type ReservationCountAggregateInputType = {
   id?: true
+  cuid?: true
   userId?: true
   controllers?: true
   email?: true
@@ -207,6 +213,7 @@ export type ReservationGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 
 export type ReservationGroupByOutputType = {
   id: number
+  cuid: string
   userId: number
   controllers: number
   email: string
@@ -241,6 +248,7 @@ export type ReservationWhereInput = {
   OR?: Prisma.ReservationWhereInput[]
   NOT?: Prisma.ReservationWhereInput | Prisma.ReservationWhereInput[]
   id?: Prisma.IntFilter<"Reservation"> | number
+  cuid?: Prisma.StringFilter<"Reservation"> | string
   userId?: Prisma.IntFilter<"Reservation"> | number
   controllers?: Prisma.IntFilter<"Reservation"> | number
   email?: Prisma.StringFilter<"Reservation"> | string
@@ -253,6 +261,7 @@ export type ReservationWhereInput = {
 
 export type ReservationOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  cuid?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   controllers?: Prisma.SortOrder
   email?: Prisma.SortOrder
@@ -265,6 +274,7 @@ export type ReservationOrderByWithRelationInput = {
 
 export type ReservationWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  cuid?: string
   AND?: Prisma.ReservationWhereInput | Prisma.ReservationWhereInput[]
   OR?: Prisma.ReservationWhereInput[]
   NOT?: Prisma.ReservationWhereInput | Prisma.ReservationWhereInput[]
@@ -276,10 +286,11 @@ export type ReservationWhereUniqueInput = Prisma.AtLeast<{
   endTime?: Prisma.DateTimeFilter<"Reservation"> | Date | string
   status?: Prisma.EnumReservationStatusFilter<"Reservation"> | $Enums.ReservationStatus
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id">
+}, "id" | "cuid">
 
 export type ReservationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  cuid?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   controllers?: Prisma.SortOrder
   email?: Prisma.SortOrder
@@ -299,6 +310,7 @@ export type ReservationScalarWhereWithAggregatesInput = {
   OR?: Prisma.ReservationScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ReservationScalarWhereWithAggregatesInput | Prisma.ReservationScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Reservation"> | number
+  cuid?: Prisma.StringWithAggregatesFilter<"Reservation"> | string
   userId?: Prisma.IntWithAggregatesFilter<"Reservation"> | number
   controllers?: Prisma.IntWithAggregatesFilter<"Reservation"> | number
   email?: Prisma.StringWithAggregatesFilter<"Reservation"> | string
@@ -309,6 +321,7 @@ export type ReservationScalarWhereWithAggregatesInput = {
 }
 
 export type ReservationCreateInput = {
+  cuid?: string
   controllers: number
   email: string
   inventory: string
@@ -320,6 +333,7 @@ export type ReservationCreateInput = {
 
 export type ReservationUncheckedCreateInput = {
   id?: number
+  cuid?: string
   userId: number
   controllers: number
   email: string
@@ -330,6 +344,7 @@ export type ReservationUncheckedCreateInput = {
 }
 
 export type ReservationUpdateInput = {
+  cuid?: Prisma.StringFieldUpdateOperationsInput | string
   controllers?: Prisma.IntFieldUpdateOperationsInput | number
   email?: Prisma.StringFieldUpdateOperationsInput | string
   inventory?: Prisma.StringFieldUpdateOperationsInput | string
@@ -341,6 +356,7 @@ export type ReservationUpdateInput = {
 
 export type ReservationUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  cuid?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.IntFieldUpdateOperationsInput | number
   controllers?: Prisma.IntFieldUpdateOperationsInput | number
   email?: Prisma.StringFieldUpdateOperationsInput | string
@@ -352,6 +368,7 @@ export type ReservationUncheckedUpdateInput = {
 
 export type ReservationCreateManyInput = {
   id?: number
+  cuid?: string
   userId: number
   controllers: number
   email: string
@@ -362,6 +379,7 @@ export type ReservationCreateManyInput = {
 }
 
 export type ReservationUpdateManyMutationInput = {
+  cuid?: Prisma.StringFieldUpdateOperationsInput | string
   controllers?: Prisma.IntFieldUpdateOperationsInput | number
   email?: Prisma.StringFieldUpdateOperationsInput | string
   inventory?: Prisma.StringFieldUpdateOperationsInput | string
@@ -372,6 +390,7 @@ export type ReservationUpdateManyMutationInput = {
 
 export type ReservationUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  cuid?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.IntFieldUpdateOperationsInput | number
   controllers?: Prisma.IntFieldUpdateOperationsInput | number
   email?: Prisma.StringFieldUpdateOperationsInput | string
@@ -393,6 +412,7 @@ export type ReservationOrderByRelationAggregateInput = {
 
 export type ReservationCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  cuid?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   controllers?: Prisma.SortOrder
   email?: Prisma.SortOrder
@@ -410,6 +430,7 @@ export type ReservationAvgOrderByAggregateInput = {
 
 export type ReservationMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  cuid?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   controllers?: Prisma.SortOrder
   email?: Prisma.SortOrder
@@ -421,6 +442,7 @@ export type ReservationMaxOrderByAggregateInput = {
 
 export type ReservationMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  cuid?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   controllers?: Prisma.SortOrder
   email?: Prisma.SortOrder
@@ -487,6 +509,7 @@ export type EnumReservationStatusFieldUpdateOperationsInput = {
 }
 
 export type ReservationCreateWithoutUserInput = {
+  cuid?: string
   controllers: number
   email: string
   inventory: string
@@ -497,6 +520,7 @@ export type ReservationCreateWithoutUserInput = {
 
 export type ReservationUncheckedCreateWithoutUserInput = {
   id?: number
+  cuid?: string
   controllers: number
   email: string
   inventory: string
@@ -536,6 +560,7 @@ export type ReservationScalarWhereInput = {
   OR?: Prisma.ReservationScalarWhereInput[]
   NOT?: Prisma.ReservationScalarWhereInput | Prisma.ReservationScalarWhereInput[]
   id?: Prisma.IntFilter<"Reservation"> | number
+  cuid?: Prisma.StringFilter<"Reservation"> | string
   userId?: Prisma.IntFilter<"Reservation"> | number
   controllers?: Prisma.IntFilter<"Reservation"> | number
   email?: Prisma.StringFilter<"Reservation"> | string
@@ -547,6 +572,7 @@ export type ReservationScalarWhereInput = {
 
 export type ReservationCreateManyUserInput = {
   id?: number
+  cuid?: string
   controllers: number
   email: string
   inventory: string
@@ -556,6 +582,7 @@ export type ReservationCreateManyUserInput = {
 }
 
 export type ReservationUpdateWithoutUserInput = {
+  cuid?: Prisma.StringFieldUpdateOperationsInput | string
   controllers?: Prisma.IntFieldUpdateOperationsInput | number
   email?: Prisma.StringFieldUpdateOperationsInput | string
   inventory?: Prisma.StringFieldUpdateOperationsInput | string
@@ -566,6 +593,7 @@ export type ReservationUpdateWithoutUserInput = {
 
 export type ReservationUncheckedUpdateWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  cuid?: Prisma.StringFieldUpdateOperationsInput | string
   controllers?: Prisma.IntFieldUpdateOperationsInput | number
   email?: Prisma.StringFieldUpdateOperationsInput | string
   inventory?: Prisma.StringFieldUpdateOperationsInput | string
@@ -576,6 +604,7 @@ export type ReservationUncheckedUpdateWithoutUserInput = {
 
 export type ReservationUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  cuid?: Prisma.StringFieldUpdateOperationsInput | string
   controllers?: Prisma.IntFieldUpdateOperationsInput | number
   email?: Prisma.StringFieldUpdateOperationsInput | string
   inventory?: Prisma.StringFieldUpdateOperationsInput | string
@@ -588,6 +617,7 @@ export type ReservationUncheckedUpdateManyWithoutUserInput = {
 
 export type ReservationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  cuid?: boolean
   userId?: boolean
   controllers?: boolean
   email?: boolean
@@ -600,6 +630,7 @@ export type ReservationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
 
 export type ReservationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  cuid?: boolean
   userId?: boolean
   controllers?: boolean
   email?: boolean
@@ -612,6 +643,7 @@ export type ReservationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
 
 export type ReservationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  cuid?: boolean
   userId?: boolean
   controllers?: boolean
   email?: boolean
@@ -624,6 +656,7 @@ export type ReservationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
 
 export type ReservationSelectScalar = {
   id?: boolean
+  cuid?: boolean
   userId?: boolean
   controllers?: boolean
   email?: boolean
@@ -633,7 +666,7 @@ export type ReservationSelectScalar = {
   status?: boolean
 }
 
-export type ReservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "controllers" | "email" | "inventory" | "startTime" | "endTime" | "status", ExtArgs["result"]["reservation"]>
+export type ReservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "cuid" | "userId" | "controllers" | "email" | "inventory" | "startTime" | "endTime" | "status", ExtArgs["result"]["reservation"]>
 export type ReservationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -651,6 +684,7 @@ export type $ReservationPayload<ExtArgs extends runtime.Types.Extensions.Interna
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
+    cuid: string
     userId: number
     controllers: number
     email: string
@@ -1083,6 +1117,7 @@ export interface Prisma__ReservationClient<T, Null = never, ExtArgs extends runt
  */
 export interface ReservationFieldRefs {
   readonly id: Prisma.FieldRef<"Reservation", 'Int'>
+  readonly cuid: Prisma.FieldRef<"Reservation", 'String'>
   readonly userId: Prisma.FieldRef<"Reservation", 'Int'>
   readonly controllers: Prisma.FieldRef<"Reservation", 'Int'>
   readonly email: Prisma.FieldRef<"Reservation", 'String'>

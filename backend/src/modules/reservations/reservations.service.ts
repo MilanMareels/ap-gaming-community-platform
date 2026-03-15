@@ -4,6 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { MailService } from '../mail/mail.service.js';
 import {
   AdminCreateReservationDto,
   CreateReservationDto,
@@ -14,7 +15,71 @@ import {
 
 @Injectable()
 export class ReservationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailService: MailService,
+  ) {}
+
+  private formatDateTimeDutch(date: Date): string {
+    return new Intl.DateTimeFormat('nl-NL', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'UTC',
+    }).format(date);
+  }
+
+  private capitalizeInventory(inventory: string): string {
+    const mapping: Record<string, string> = {
+      pc: 'PC',
+      ps5: 'PlayStation 5',
+      switch: 'Nintendo Switch',
+    };
+    return mapping[inventory.toLowerCase()] || inventory;
+  }
+
+  private async sendConfirmationEmail(
+    email: string,
+    sNumber: string,
+    reservationCuid: string,
+    inventory: string,
+    controllers: number,
+    startTime: Date,
+    endTime: Date,
+  ): Promise<void> {
+    try {
+      const qrCodeBuffer =
+        await this.mailService.generateQRCode(reservationCuid);
+
+      await this.mailService.sendMailWithAttachments(
+        email,
+        'Reservatie Bevestiging - AP Gaming Hub',
+        'reservation/confirmation',
+        {
+          sNumber,
+          reservationId: reservationCuid,
+          inventory: this.capitalizeInventory(inventory),
+          controllers,
+          startTime: this.formatDateTimeDutch(startTime),
+          endTime: this.formatDateTimeDutch(endTime),
+          email,
+        },
+        [
+          {
+            filename: 'qrcode.png',
+            content: qrCodeBuffer,
+            cid: 'qrcode',
+          },
+        ],
+      );
+    } catch (error) {
+      // Log error but don't fail the reservation creation
+      console.error('Failed to send confirmation email:', error);
+    }
+  }
 
   async create(dto: CreateReservationDto) {
     const now = new Date();
@@ -81,7 +146,7 @@ export class ReservationsService {
       );
     }
 
-    return this.prisma.reservation.create({
+    const reservation = await this.prisma.reservation.create({
       data: {
         userId: user.id,
         inventory: dto.inventory,
@@ -95,6 +160,19 @@ export class ReservationsService {
         user: true,
       },
     });
+
+    // Send confirmation email
+    await this.sendConfirmationEmail(
+      dto.email,
+      dto.sNumber,
+      reservation.cuid,
+      dto.inventory,
+      dto.controllers,
+      startTime,
+      endTime,
+    );
+
+    return reservation;
   }
 
   async adminCreate(dto: AdminCreateReservationDto) {
@@ -138,20 +216,36 @@ export class ReservationsService {
       throw new BadRequestException('This time slot is already reserved');
     }
 
-    return this.prisma.reservation.create({
+    const startTime = new Date(dto.startTime);
+    const endTime = new Date(dto.endTime);
+
+    const reservation = await this.prisma.reservation.create({
       data: {
         userId: user.id,
         inventory: dto.inventory,
         controllers: dto.controllers,
         email: dto.email,
-        startTime: new Date(dto.startTime),
-        endTime: new Date(dto.endTime),
+        startTime: startTime,
+        endTime: endTime,
         status: ReservationStatus.RESERVED,
       },
       include: {
         user: true,
       },
     });
+
+    // Send confirmation email
+    await this.sendConfirmationEmail(
+      dto.email,
+      dto.sNumber || 'N/A',
+      reservation.cuid,
+      dto.inventory,
+      dto.controllers,
+      startTime,
+      endTime,
+    );
+
+    return reservation;
   }
 
   async update(id: number, dto: UpdateReservationDto) {
@@ -229,6 +323,54 @@ export class ReservationsService {
     });
 
     return reservations;
+  }
+
+  async verifyByCuid(cuid: string) {
+    const reservation = await this.prisma.reservation.findFirst({
+      where: { cuid },
+      include: {
+        user: {
+          select: {
+            sNumber: true,
+          },
+        },
+      },
+    });
+
+    if (
+      !reservation ||
+      [ReservationStatus.CANCELLED, ReservationStatus.NO_SHOW].includes(
+        reservation.status as ReservationStatus,
+      )
+    ) {
+      throw new NotFoundException('Reservation not found');
+    }
+
+    const verifiedReservation =
+      reservation.status === ReservationStatus.RESERVED
+        ? await this.prisma.reservation.update({
+            where: { id: reservation.id },
+            data: { status: ReservationStatus.PRESENT },
+            include: {
+              user: {
+                select: {
+                  sNumber: true,
+                },
+              },
+            },
+          })
+        : reservation;
+
+    return {
+      cuid: verifiedReservation.cuid,
+      email: verifiedReservation.email,
+      sNumber: verifiedReservation.user.sNumber,
+      inventory: verifiedReservation.inventory,
+      controllers: verifiedReservation.controllers,
+      startTime: verifiedReservation.startTime,
+      endTime: verifiedReservation.endTime,
+      status: verifiedReservation.status,
+    };
   }
 
   async findAll(date?: string, search?: string) {

@@ -327,8 +327,11 @@ export default function ReservationsPage() {
           <h2 className='text-2xl font-bold text-white mb-2'>
             Reservatie Ontvangen!
           </h2>
-          <p className='text-gray-400'>
+          <p className='text-gray-400 mb-4'>
             Je hebt succesvol een slot geboekt. Zorg dat je op tijd bent.
+          </p>
+          <p className='text-gray-400'>
+            Check je mailbox voor een bevestigingsmail met je QR code!
           </p>
           <button
             onClick={() => window.location.reload()}

@@ -18,6 +18,8 @@ export type AdminUser = ApiSchemas['AdminUser'];
 export type CreateReservationDto = ApiSchemas['CreateReservationDto'];
 export type AdminCreateReservationDto = ApiSchemas['AdminCreateReservationDto'];
 export type UpdateReservationDto = ApiSchemas['UpdateReservationDto'];
+export type ReservationVerificationDto =
+  ApiSchemas['ReservationVerificationDto'];
 export type CreateRosterGameDto = ApiSchemas['CreateRosterGameDto'];
 export type CreateRosterEntryDto = ApiSchemas['CreateRosterEntryDto'];
 export type CreateTimeTableEntryDto = ApiSchemas['CreateTimeTableEntryDto'];
