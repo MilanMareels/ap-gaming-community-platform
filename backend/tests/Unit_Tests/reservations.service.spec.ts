@@ -118,9 +118,7 @@ describe('ReservationsService', () => {
       expect(prisma.reservation.count).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            status: {
-              in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT],
-            },
+            status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
           }),
         }),
       );
@@ -137,9 +135,7 @@ describe('ReservationsService', () => {
       expect(prisma.reservation.findFirst).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            status: {
-              in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT],
-            },
+            status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
           }),
         }),
       );
@@ -267,9 +263,7 @@ describe('ReservationsService', () => {
       expect(prisma.reservation.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            status: {
-              in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT],
-            },
+            status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
           }),
         }),
       );
