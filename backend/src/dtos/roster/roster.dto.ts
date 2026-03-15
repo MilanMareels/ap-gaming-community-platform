@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateRosterGameDto {
@@ -29,10 +29,10 @@ export class CreateRosterEntryDto {
   @IsNotEmpty()
   rank!: string;
 
-  @ApiProperty({ example: 'Support' })
+  @ApiPropertyOptional({ example: 'Support', nullable: true })
   @IsString()
   @IsOptional()
-  role?: string;
+  role?: string | null;
 
   @ApiProperty({ example: 1 })
   @IsNotEmpty()
