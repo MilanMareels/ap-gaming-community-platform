@@ -1,9 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import {
-  CreateAdminDto,
-  UpdateSettingDto,
-} from '../../dtos/admin/admin.dto.js';
+import { CreateAdminDto, UpdateSettingDto } from '../../dtos/admin/admin.dto.js';
 
 @Injectable()
 export class SettingsService {
@@ -21,13 +18,7 @@ export class SettingsService {
   }
 
   async getInventorySettings() {
-    const inventoryKeys = [
-      'pc',
-      'ps5',
-      'switch',
-      'controller',
-      'Nintendo Controllers',
-    ];
+    const inventoryKeys = ['pc', 'ps5', 'switch', 'controller', 'Nintendo Controllers'];
     return this.prisma.setting.findMany({
       where: { key: { in: inventoryKeys } },
     });

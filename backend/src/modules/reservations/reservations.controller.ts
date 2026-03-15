@@ -1,26 +1,12 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiCreatedResponse,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { ReservationsService } from './reservations.service.js';
 import {
   CreateReservationDto,
   AdminCreateReservationDto,
   ReservationQueryDto,
   ReservationSlotDto,
+  ReservationVerificationDto,
   UpdateReservationDto,
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
@@ -60,6 +46,16 @@ export class ReservationsController {
     return this.reservationsService.getSlots(date);
   }
 
+  @Get('verify/:cuid')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiOperation({
+    summary: 'Verify reservation by QR code CUID (Admin only)',
+  })
+  @ApiOkResponse({ type: ReservationVerificationDto })
+  verifyByCuid(@Param('cuid') cuid: string) {
+    return this.reservationsService.verifyByCuid(cuid);
+  }
+
   @Post('admin')
   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiOperation({
@@ -78,14 +74,19 @@ export class ReservationsController {
     return this.reservationsService.getNoShows();
   }
 
+  @Patch(':userId/no-show')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiOperation({ summary: 'Unblock user from reservations (Admin only)' })
+  @ApiOkResponse({ type: PrismaModel.Reservation })
+  unBlockUser(@Param('userId') userId: string) {
+    return this.reservationsService.unBlockUser(+userId);
+  }
+
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiOperation({ summary: 'Update reservation status (Admin only)' })
   @ApiOkResponse({ type: PrismaModel.Reservation })
-  updateStatus(
-    @Param('id') id: string,
-    @Body() dto: UpdateReservationStatusDto,
-  ) {
+  updateStatus(@Param('id') id: string, @Body() dto: UpdateReservationStatusDto) {
     return this.reservationsService.updateStatus(+id, dto);
   }
 

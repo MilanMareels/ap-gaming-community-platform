@@ -27,23 +27,16 @@ export default () => ({
     clientSecret:
       process.env.GOOGLE_CLIENT_SECRET ||
       (() => {
-        throw new Error(
-          'GOOGLE_CLIENT_SECRET environment variable is required',
-        );
+        throw new Error('GOOGLE_CLIENT_SECRET environment variable is required');
       })(),
     redirectUri:
       process.env.GOOGLE_REDIRECT_URI ||
       (() => {
         throw new Error('GOOGLE_REDIRECT_URI environment variable is required');
       })(),
-    authUrl:
-      process.env.GOOGLE_AUTH_URL ||
-      'https://accounts.google.com/o/oauth2/v2/auth',
-    tokenUrl:
-      process.env.GOOGLE_TOKEN_URL || 'https://oauth2.googleapis.com/token',
-    userInfoUrl:
-      process.env.GOOGLE_USERINFO_URL ||
-      'https://openidconnect.googleapis.com/v1/userinfo',
+    authUrl: process.env.GOOGLE_AUTH_URL || 'https://accounts.google.com/o/oauth2/v2/auth',
+    tokenUrl: process.env.GOOGLE_TOKEN_URL || 'https://oauth2.googleapis.com/token',
+    userInfoUrl: process.env.GOOGLE_USERINFO_URL || 'https://openidconnect.googleapis.com/v1/userinfo',
   },
   auth: {
     cookieMaxAgeMs: Number(process.env.AUTH_COOKIE_MAX_AGE_MS || 86400000),

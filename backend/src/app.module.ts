@@ -8,15 +8,7 @@ import { SettingsModule } from './modules/settings/settings.module.js';
 import { EventsModule } from './modules/events/events.module.js';
 
 @Module({
-  imports: [
-    PrismaModule,
-    AuthModule,
-    ReservationsModule,
-    RosterModule,
-    TimetableModule,
-    SettingsModule,
-    EventsModule,
-  ],
+  imports: [PrismaModule, AuthModule, ReservationsModule, RosterModule, TimetableModule, SettingsModule, EventsModule],
   controllers: [],
   providers: [],
 })

@@ -82,14 +82,16 @@ export default function AdminRosterPage() {
     )
       return;
     try {
+      const trimmedRole = newPlayer.role.trim();
+
       await apiClient.POST('/roster/entries', {
         body: {
           name: newPlayer.name,
           sNumber: newPlayer.sNumber,
           handle: newPlayer.handle,
-          role: newPlayer.role,
           rank: newPlayer.rank,
           gameId: selectedGameId,
+          ...(trimmedRole ? { role: trimmedRole } : {}),
         },
       });
       setNewPlayer({ name: '', sNumber: '', handle: '', role: '', rank: '' });
@@ -216,7 +218,7 @@ export default function AdminRosterPage() {
               <div className='grid grid-cols-2 gap-2'>
                 <input
                   className='bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-red-500 transition-colors'
-                  placeholder='Rol'
+                  placeholder='Rol (optioneel)'
                   value={newPlayer.role}
                   onChange={(e) =>
                     setNewPlayer({ ...newPlayer, role: e.target.value })
