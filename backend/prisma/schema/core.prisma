@@ -22,5 +22,5 @@ model RosterEntry {
 
   handle String
   rank   String
-  role   String
+  role   String?
 }

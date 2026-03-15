@@ -1,19 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Delete,
-  Param,
-  UseGuards,
-  Patch,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, UseGuards, Patch } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { SettingsService } from './settings.service.js';
-import {
-  CreateAdminDto,
-  UpdateSettingDto,
-} from '../../dtos/admin/admin.dto.js';
+import { CreateAdminDto, UpdateSettingDto } from '../../dtos/admin/admin.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { AdminGuard } from '../../guards/admin.guard.js';
 import { PrismaModel } from '../../_gen/prisma-class/index.js';

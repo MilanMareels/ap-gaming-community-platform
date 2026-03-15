@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class RosterEntry {
 
@@ -17,6 +17,6 @@ export class RosterEntry {
   @ApiProperty({ type: String })
   rank: string;
 
-  @ApiProperty({ type: String })
-  role: string;
+  @ApiPropertyOptional({ type: String })
+  role: string | null;
 }

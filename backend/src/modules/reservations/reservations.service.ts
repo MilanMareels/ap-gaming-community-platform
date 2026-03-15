@@ -48,8 +48,7 @@ export class ReservationsService {
     endTime: Date,
   ): Promise<void> {
     try {
-      const qrCodeBuffer =
-        await this.mailService.generateQRCode(reservationCuid);
+      const qrCodeBuffer = await this.mailService.generateQRCode(reservationCuid);
 
       await this.mailService.sendMailWithAttachments(
         email,
@@ -215,15 +214,7 @@ export class ReservationsService {
     });
 
     // Send confirmation email
-    await this.sendConfirmationEmail(
-      dto.email,
-      dto.sNumber,
-      reservation.cuid,
-      dto.inventory,
-      dto.controllers,
-      startTime,
-      endTime,
-    );
+    await this.sendConfirmationEmail(dto.email, dto.sNumber, reservation.cuid, dto.inventory, dto.controllers, startTime, endTime);
 
     return reservation;
   }
@@ -282,15 +273,7 @@ export class ReservationsService {
     });
 
     // Send confirmation email
-    await this.sendConfirmationEmail(
-      dto.email,
-      dto.sNumber || 'N/A',
-      reservation.cuid,
-      dto.inventory,
-      dto.controllers,
-      startTime,
-      endTime,
-    );
+    await this.sendConfirmationEmail(dto.email, dto.sNumber || 'N/A', reservation.cuid, dto.inventory, dto.controllers, startTime, endTime);
 
     return reservation;
   }
@@ -384,12 +367,7 @@ export class ReservationsService {
       },
     });
 
-    if (
-      !reservation ||
-      [ReservationStatus.CANCELLED, ReservationStatus.NO_SHOW].includes(
-        reservation.status as ReservationStatus,
-      )
-    ) {
+    if (!reservation || [ReservationStatus.CANCELLED, ReservationStatus.NO_SHOW].includes(reservation.status as ReservationStatus)) {
       throw new NotFoundException('Reservation not found');
     }
 

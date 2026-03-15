@@ -27,26 +27,15 @@ export class MailService implements OnModuleInit {
     this.logger.log('SMTP connection established');
   }
 
-  async sendMail(
-    to: string,
-    subject: string,
-    templateName: string,
-    data: Record<string, any>,
-  ) {
-    const templatePath = path.join(
-      process.cwd(),
-      'src/mail-templates',
-      `${templateName}.mjml`,
-    );
+  async sendMail(to: string, subject: string, templateName: string, data: Record<string, any>) {
+    const templatePath = path.join(process.cwd(), 'src/mail-templates', `${templateName}.mjml`);
 
     const mjmlTemplate = await readFile(templatePath, 'utf-8');
     const template = await this.liquid.parseAndRender(mjmlTemplate, data);
     const { html, errors } = mjml(template);
 
     if (errors && errors.length > 0) {
-      throw new Error(
-        `MJML template error: ${errors.map((e) => e.formattedMessage).join(', ')}`,
-      );
+      throw new Error(`MJML template error: ${errors.map((e) => e.formattedMessage).join(', ')}`);
     }
 
     await this.transporter.sendMail({
@@ -70,20 +59,14 @@ export class MailService implements OnModuleInit {
       cid?: string;
     }>,
   ) {
-    const templatePath = path.join(
-      process.cwd(),
-      'src/mail-templates',
-      `${templateName}.mjml`,
-    );
+    const templatePath = path.join(process.cwd(), 'src/mail-templates', `${templateName}.mjml`);
 
     const mjmlTemplate = await readFile(templatePath, 'utf-8');
     const template = await this.liquid.parseAndRender(mjmlTemplate, data);
     const { html, errors } = mjml(template);
 
     if (errors && errors.length > 0) {
-      throw new Error(
-        `MJML template error: ${errors.map((e) => e.formattedMessage).join(', ')}`,
-      );
+      throw new Error(`MJML template error: ${errors.map((e) => e.formattedMessage).join(', ')}`);
     }
 
     await this.transporter.sendMail({

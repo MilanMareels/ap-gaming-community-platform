@@ -30,6 +30,13 @@ describe('ReservationsService', () => {
   let mailService: any;
 
   beforeEach(async () => {
+    baseDto.email = mockUser.email;
+    baseDto.sNumber = mockUser.sNumber;
+    baseDto.inventory = 'pc';
+    baseDto.controllers = 1;
+    baseDto.startTime = getIsoDate(1);
+    baseDto.endTime = getIsoDate(1);
+
     const mockPrisma = {
       user: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn() },
       reservation: {
@@ -52,7 +59,7 @@ describe('ReservationsService', () => {
     };
 
     const module = await Test.createTestingModule({
-      providers: [ReservationsService, { provide: PrismaService, useValue: mockPrisma }],
+      providers: [ReservationsService, { provide: PrismaService, useValue: mockPrisma }, { provide: MailService, useValue: mockMailService }],
     }).compile();
 
     service = module.get(ReservationsService);
@@ -240,7 +247,7 @@ describe('ReservationsService', () => {
     });
 
     afterEach(() => {
-      consoleErrorSpy.mockRestore();
+      consoleErrorSpy?.mockRestore();
     });
 
     it('should send confirmation email after creating reservation', async () => {
