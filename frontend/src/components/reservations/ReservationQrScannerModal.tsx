@@ -7,6 +7,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { Button } from '@/components/ui/Button';
 import { ReservationVerificationResult } from './ReservationVerificationResult';
 import type { VerifiedReservation, VerificationStatus } from './types';
+import { useHttpService } from '@/api';
 
 type ScanMode = 'scanner' | 'camera';
 
@@ -44,6 +45,7 @@ export default function ReservationQrScannerModal({
   onClose,
   onVerified,
 }: ReservationQrScannerModalProps) {
+  const { get } = useHttpService();
   const [mode, setMode] = useState<ScanMode>('scanner');
   const [manualValue, setManualValue] = useState('');
   const [status, setStatus] = useState<VerificationStatus>('idle');
@@ -108,15 +110,11 @@ export default function ReservationQrScannerModal({
       setErrorMessage('');
 
       try {
-        const response = await fetch(
-          `/api/reservations/verify/${encodeURIComponent(cuid)}`,
-          {
-            method: 'GET',
-            credentials: 'include',
-          },
-        );
+        const { data, response } = await get('/reservations/verify/{cuid}', {
+          params: { path: { cuid } },
+        });
 
-        if (response.status === 404) {
+        if (response.status === 404 || !data) {
           setReservation(null);
           setStatus('not-found');
           return;
@@ -126,8 +124,7 @@ export default function ReservationQrScannerModal({
           throw new Error('Kon de reservatie niet valideren.');
         }
 
-        const payload = (await response.json()) as VerifiedReservation;
-        setReservation(payload);
+        setReservation(data);
         setStatus('found');
         onVerified?.();
       } catch (error) {
@@ -140,7 +137,7 @@ export default function ReservationQrScannerModal({
         );
       }
     },
-    [onVerified],
+    [get, onVerified],
   );
 
   const detectWithBarcodeDetector = useCallback(async () => {
