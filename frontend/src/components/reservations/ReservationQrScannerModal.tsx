@@ -40,18 +40,13 @@ function extractCuid(scannedValue: string): string {
   return raw;
 }
 
-export default function ReservationQrScannerModal({
-  open,
-  onClose,
-  onVerified,
-}: ReservationQrScannerModalProps) {
+export default function ReservationQrScannerModal({ open, onClose, onVerified }: ReservationQrScannerModalProps) {
   const { get } = useHttpService();
+  const onVerifiedRef = useRef(onVerified);
   const [mode, setMode] = useState<ScanMode>('scanner');
   const [manualValue, setManualValue] = useState('');
   const [status, setStatus] = useState<VerificationStatus>('idle');
-  const [reservation, setReservation] = useState<VerifiedReservation | null>(
-    null,
-  );
+  const [reservation, setReservation] = useState<VerifiedReservation | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [cameraReady, setCameraReady] = useState(false);
   const [cameraSupport, setCameraSupport] = useState(true);
@@ -101,6 +96,10 @@ export default function ReservationQrScannerModal({
     setCameraReady(false);
   }, []);
 
+  useEffect(() => {
+    onVerifiedRef.current = onVerified;
+  }, [onVerified]);
+
   const verifyCuid = useCallback(
     async (rawValue: string) => {
       const cuid = extractCuid(rawValue);
@@ -126,18 +125,14 @@ export default function ReservationQrScannerModal({
 
         setReservation(data);
         setStatus('found');
-        onVerified?.();
+        onVerifiedRef.current?.();
       } catch (error) {
         setReservation(null);
         setStatus('error');
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : 'Onbekende fout tijdens valideren.',
-        );
+        setErrorMessage(error instanceof Error ? error.message : 'Onbekende fout tijdens valideren.');
       }
     },
-    [get, onVerified],
+    [get],
   );
 
   const detectWithBarcodeDetector = useCallback(async () => {
@@ -145,9 +140,7 @@ export default function ReservationQrScannerModal({
 
     const BarcodeDetectorCtor = window.BarcodeDetector as
       | (new (options?: { formats?: string[] }) => {
-          detect: (
-            image: ImageBitmapSource,
-          ) => Promise<Array<{ rawValue?: string }>>;
+          detect: (image: ImageBitmapSource) => Promise<Array<{ rawValue?: string }>>;
         })
       | undefined;
 
@@ -198,19 +191,15 @@ export default function ReservationQrScannerModal({
 
     try {
       const reader = new BrowserQRCodeReader();
-      const controls = await reader.decodeFromVideoDevice(
-        undefined,
-        videoRef.current,
-        (result) => {
-          const text = result?.getText()?.trim();
-          if (!text) return;
+      const controls = await reader.decodeFromVideoDevice(undefined, videoRef.current, (result) => {
+        const text = result?.getText()?.trim();
+        if (!text) return;
 
-          void (async () => {
-            await verifyCuid(text);
-            stopCamera();
-          })();
-        },
-      );
+        void (async () => {
+          await verifyCuid(text);
+          stopCamera();
+        })();
+      });
 
       zxingControlsRef.current = controls;
       return true;
@@ -229,9 +218,7 @@ export default function ReservationQrScannerModal({
     try {
       if (!navigator.mediaDevices?.getUserMedia) {
         setCameraSupport(false);
-        setCameraError(
-          'Deze browser ondersteunt geen camera API (getUserMedia).',
-        );
+        setCameraError('Deze browser ondersteunt geen camera API (getUserMedia).');
         return;
       }
 
@@ -256,38 +243,22 @@ export default function ReservationQrScannerModal({
       if (usedFallback) return;
 
       setCameraSupport(false);
-      setCameraError(
-        'QR detectie wordt niet ondersteund in deze browser. Gebruik handscanner of een recente Chrome/Edge.',
-      );
+      setCameraError('QR detectie wordt niet ondersteund in deze browser. Gebruik handscanner of een recente Chrome/Edge.');
       stopCamera();
     } catch (error) {
       setCameraSupport(false);
 
       if (error instanceof DOMException && error.name === 'NotAllowedError') {
-        setCameraError(
-          'Camera toegang geweigerd. Geef permissie in je browserinstellingen.',
-        );
-      } else if (
-        error instanceof DOMException &&
-        error.name === 'NotFoundError'
-      ) {
+        setCameraError('Camera toegang geweigerd. Geef permissie in je browserinstellingen.');
+      } else if (error instanceof DOMException && error.name === 'NotFoundError') {
         setCameraError('Geen camera gevonden op dit toestel.');
       } else {
-        setCameraError(
-          'Camera kon niet gestart worden. Controleer HTTPS/permissies.',
-        );
+        setCameraError('Camera kon niet gestart worden. Controleer HTTPS/permissies.');
       }
 
       stopCamera();
     }
-  }, [
-    detectWithBarcodeDetector,
-    detectWithZXing,
-    mode,
-    open,
-    resetResult,
-    stopCamera,
-  ]);
+  }, [detectWithBarcodeDetector, detectWithZXing, mode, open, resetResult, stopCamera]);
 
   useEffect(() => {
     if (!open) {
@@ -323,34 +294,23 @@ export default function ReservationQrScannerModal({
   if (!open) return null;
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4'>
-      <div className='w-full max-w-2xl rounded-2xl border border-slate-700 bg-slate-950 shadow-2xl'>
-        <div className='flex items-center justify-between border-b border-slate-800 p-4'>
-          <h2 className='flex items-center gap-2 text-lg font-bold text-white'>
-            <QrCode size={18} className='text-red-500' /> QR Verificatie
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+      <div className="w-full max-w-2xl rounded-2xl border border-slate-700 bg-slate-950 shadow-2xl">
+        <div className="flex items-center justify-between border-b border-slate-800 p-4">
+          <h2 className="flex items-center gap-2 text-lg font-bold text-white">
+            <QrCode size={18} className="text-red-500" /> QR Verificatie
           </h2>
-          <Button
-            variant='ghost'
-            size='sm'
-            onClick={onClose}
-            aria-label='Sluiten'
-          >
+          <Button variant="ghost" size="sm" onClick={onClose} aria-label="Sluiten">
             <X size={16} />
           </Button>
         </div>
 
-        <div className='p-4 md:p-6'>
-          <Tabs
-            tabs={tabs}
-            activeTab={mode}
-            onChange={(tabId) => setMode(tabId as ScanMode)}
-          />
+        <div className="p-4 md:p-6">
+          <Tabs tabs={tabs} activeTab={mode} onChange={(tabId) => setMode(tabId as ScanMode)} />
 
           {mode === 'scanner' && (
-            <div className='space-y-3'>
-              <label className='block text-sm text-slate-300'>
-                Scan de QR code met handscanner of plak handmatig de code.
-              </label>
+            <div className="space-y-3">
+              <label className="block text-sm text-slate-300">Scan de QR code met handscanner of plak handmatig de code.</label>
               <input
                 autoFocus
                 value={manualValue}
@@ -372,27 +332,27 @@ export default function ReservationQrScannerModal({
                     void verifyCuid(manualValue);
                   }
                 }}
-                className='w-full rounded-xl border border-slate-700 bg-slate-900 p-3 text-white outline-none focus:border-red-500'
-                placeholder='Scanwaarde of CUID'
+                className="w-full rounded-xl border border-slate-700 bg-slate-900 p-3 text-white outline-none focus:border-red-500"
+                placeholder="Scanwaarde of CUID"
               />
-              <div className='flex gap-2'>
+              <div className="flex gap-2">
                 <Button
-                  variant='primary'
-                  size='sm'
+                  variant="primary"
+                  size="sm"
                   onClick={() => void verifyCuid(manualValue)}
                   disabled={!manualValue.trim() || status === 'loading'}
                 >
                   {status === 'loading' ? (
                     <>
-                      <Loader2 size={14} className='animate-spin' /> Controleren
+                      <Loader2 size={14} className="animate-spin" /> Controleren
                     </>
                   ) : (
                     'Controleer code'
                   )}
                 </Button>
                 <Button
-                  variant='secondary'
-                  size='sm'
+                  variant="secondary"
+                  size="sm"
                   onClick={() => {
                     setManualValue('');
                     resetResult();
@@ -407,15 +367,10 @@ export default function ReservationQrScannerModal({
           {mode === 'camera' && (
             <div>
               {status !== 'found' && (
-                <div className='relative overflow-hidden rounded-xl border border-slate-700 bg-black'>
-                  <video
-                    ref={videoRef}
-                    playsInline
-                    muted
-                    className='h-64 w-full object-cover md:h-80'
-                  />
+                <div className="relative overflow-hidden rounded-xl border border-slate-700 bg-black">
+                  <video ref={videoRef} playsInline muted className="h-64 w-full object-cover md:h-80" />
                   {!cameraReady && (
-                    <div className='absolute inset-0 flex items-center justify-center bg-slate-900/70 text-sm text-slate-300'>
+                    <div className="absolute inset-0 flex items-center justify-center bg-slate-900/70 text-sm text-slate-300">
                       Camera opstarten...
                     </div>
                   )}
@@ -423,29 +378,20 @@ export default function ReservationQrScannerModal({
               )}
 
               {!cameraSupport && (
-                <p className='mt-3 rounded-xl border border-amber-700/50 bg-amber-950/20 p-3 text-sm text-amber-100'>
-                  {cameraError ||
-                    'Camera-QR detectie is niet beschikbaar op dit toestel of browser. Gebruik de handscanner tab.'}
+                <p className="mt-3 rounded-xl border border-amber-700/50 bg-amber-950/20 p-3 text-sm text-amber-100">
+                  {cameraError || 'Camera-QR detectie is niet beschikbaar op dit toestel of browser. Gebruik de handscanner tab.'}
                 </p>
               )}
 
-              <div className='mt-3 flex gap-2'>
-                <Button
-                  variant='secondary'
-                  size='sm'
-                  onClick={() => void startCamera()}
-                >
+              <div className="mt-3 flex gap-2">
+                <Button variant="secondary" size="sm" onClick={() => void startCamera()}>
                   Opnieuw proberen
                 </Button>
               </div>
             </div>
           )}
 
-          <ReservationVerificationResult
-            status={status}
-            reservation={reservation}
-            errorMessage={errorMessage}
-          />
+          <ReservationVerificationResult status={status} reservation={reservation} errorMessage={errorMessage} />
         </div>
       </div>
     </div>
@@ -455,9 +401,7 @@ export default function ReservationQrScannerModal({
 declare global {
   interface Window {
     BarcodeDetector?: new (options?: { formats?: string[] }) => {
-      detect: (
-        image: ImageBitmapSource,
-      ) => Promise<Array<{ rawValue?: string }>>;
+      detect: (image: ImageBitmapSource) => Promise<Array<{ rawValue?: string }>>;
     };
   }
 }

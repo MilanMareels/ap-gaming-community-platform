@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { MailService } from '../mail/mail.service.js';
 import {
@@ -12,6 +8,7 @@ import {
   UpdateReservationDto,
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
+import { errorMessages } from '../../errors/errorMessages.js';
 
 @Injectable()
 export class ReservationsService {
@@ -90,12 +87,10 @@ export class ReservationsService {
     const endTime = new Date(dto.endTime);
 
     if (startTime < now) {
-      throw new BadRequestException('Cannot reserve in the past');
+      throw new BadRequestException(errorMessages.pastDate);
     }
     if (startTime > maxDate) {
-      throw new BadRequestException(
-        'Reservations can only be made up to 3 days in advance',
-      );
+      throw new BadRequestException(errorMessages.maxAdvanceDays);
     }
 
     let user = await this.prisma.user.findUnique({
@@ -118,17 +113,13 @@ export class ReservationsService {
     });
 
     if (!settingRecord) {
-      throw new BadRequestException(
-        `Hardware type '${dto.inventory}' is not configured in settings.`,
-      );
+      throw new BadRequestException(`Hardware type '${dto.inventory}' is not configured in settings.`);
     }
 
     const maxCapacity = parseInt(settingRecord.value, 10);
 
     if (isNaN(maxCapacity)) {
-      throw new BadRequestException(
-        `Configuration error: capacity for '${dto.inventory}' is not a valid number.`,
-      );
+      throw new BadRequestException(`Configuration error: capacity for '${dto.inventory}' is not a valid number.`);
     }
 
     const conflictingReservationsCount = await this.prisma.reservation.count({
@@ -141,9 +132,71 @@ export class ReservationsService {
     });
 
     if (conflictingReservationsCount >= maxCapacity) {
-      throw new BadRequestException(
-        `All ${dto.inventory}s are already reserved for this time slot`,
-      );
+      throw new BadRequestException(`All ${dto.inventory}s are already reserved for this time slot`);
+    }
+
+    const noShowCount = await this.prisma.reservation.count({
+      where: {
+        userId: user.id,
+        status: ReservationStatus.NO_SHOW,
+      },
+    });
+
+    if (noShowCount >= 3) {
+      throw new BadRequestException('You already have three no-shows. You can no longer make new reservations.');
+    }
+
+    const existingReservation = await this.prisma.reservation.findFirst({
+      where: {
+        userId: user.id,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+        startTime: { lt: endTime },
+        endTime: { gt: startTime },
+      },
+    });
+
+    if (existingReservation) {
+      throw new BadRequestException('You already have a reservation that overlaps with this time slot');
+    }
+
+    const bufferTime = 30 * 60 * 1000; // 30 minutes
+    const bufferStart = new Date(startTime.getTime() - bufferTime);
+    const bufferEnd = new Date(endTime.getTime() + bufferTime);
+
+    const bufferConflict = await this.prisma.reservation.findFirst({
+      where: {
+        userId: user.id,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+        OR: [
+          {
+            AND: [{ startTime: { lte: bufferStart } }, { endTime: { gt: bufferStart } }],
+          },
+          {
+            AND: [{ startTime: { lt: bufferEnd } }, { endTime: { gte: bufferEnd } }],
+          },
+        ],
+      },
+    });
+
+    if (bufferConflict) {
+      throw new BadRequestException('You must have at least 30 minutes between reservations');
+    }
+    const maxReservationsPerDay = 2;
+    const startOfDay = new Date(startTime);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(startTime);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const dailyReservationsCount = await this.prisma.reservation.count({
+      where: {
+        userId: user.id,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+        startTime: { gte: startOfDay, lte: endOfDay },
+      },
+    });
+
+    if (dailyReservationsCount >= maxReservationsPerDay) {
+      throw new BadRequestException('You can only make two reservations per day');
     }
 
     const reservation = await this.prisma.reservation.create({
@@ -197,16 +250,10 @@ export class ReservationsService {
         status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
         OR: [
           {
-            AND: [
-              { startTime: { lte: new Date(dto.startTime) } },
-              { endTime: { gt: new Date(dto.startTime) } },
-            ],
+            AND: [{ startTime: { lte: new Date(dto.startTime) } }, { endTime: { gt: new Date(dto.startTime) } }],
           },
           {
-            AND: [
-              { startTime: { lt: new Date(dto.endTime) } },
-              { endTime: { gte: new Date(dto.endTime) } },
-            ],
+            AND: [{ startTime: { lt: new Date(dto.endTime) } }, { endTime: { gte: new Date(dto.endTime) } }],
           },
         ],
       },
@@ -389,10 +436,7 @@ export class ReservationsService {
     }
 
     if (search) {
-      where.OR = [
-        { email: { contains: search, mode: 'insensitive' } },
-        { user: { sNumber: { contains: search, mode: 'insensitive' } } },
-      ];
+      where.OR = [{ email: { contains: search, mode: 'insensitive' } }, { user: { sNumber: { contains: search, mode: 'insensitive' } } }];
     }
 
     return this.prisma.reservation.findMany({
@@ -401,7 +445,7 @@ export class ReservationsService {
         user: true,
       },
       orderBy: {
-        startTime: 'desc',
+        startTime: 'asc',
       },
     });
   }
@@ -438,5 +482,25 @@ export class ReservationsService {
         startTime: 'desc',
       },
     });
+  }
+
+  async unBlockUser(userId: number) {
+    const noShowReservations = await this.prisma.reservation.findMany({
+      where: {
+        userId,
+        status: ReservationStatus.NO_SHOW,
+      },
+    });
+
+    if (noShowReservations.length === 0) {
+      throw new NotFoundException('No no-shows found for this user');
+    }
+
+    for (const reservation of noShowReservations) {
+      await this.prisma.reservation.update({
+        where: { id: reservation.id },
+        data: { status: ReservationStatus.CANCELLED }, // Andere status nodig voor deblock??
+      });
+    }
   }
 }

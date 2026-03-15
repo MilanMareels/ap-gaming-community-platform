@@ -1,20 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiCreatedResponse,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { ReservationsService } from './reservations.service.js';
 import {
   CreateReservationDto,
@@ -89,14 +74,19 @@ export class ReservationsController {
     return this.reservationsService.getNoShows();
   }
 
+  @Patch(':userId/no-show')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiOperation({ summary: 'Unblock user from reservations (Admin only)' })
+  @ApiOkResponse({ type: PrismaModel.Reservation })
+  unBlockUser(@Param('userId') userId: string) {
+    return this.reservationsService.unBlockUser(+userId);
+  }
+
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiOperation({ summary: 'Update reservation status (Admin only)' })
   @ApiOkResponse({ type: PrismaModel.Reservation })
-  updateStatus(
-    @Param('id') id: string,
-    @Body() dto: UpdateReservationStatusDto,
-  ) {
+  updateStatus(@Param('id') id: string, @Body() dto: UpdateReservationStatusDto) {
     return this.reservationsService.updateStatus(+id, dto);
   }
 
