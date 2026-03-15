@@ -635,7 +635,7 @@ export interface components {
             /** @example Diamond */
             rank: string;
             /** @example Support */
-            role: string;
+            role?: string | null;
             /** @example 1 */
             gameId: number;
         };
