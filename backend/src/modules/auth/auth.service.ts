@@ -97,9 +97,7 @@ export class AuthService {
 
   private async fetchGoogleProfile(tokenResponse: GoogleTokenResponse) {
     if (!tokenResponse.access_token) {
-      throw new UnauthorizedException(
-        'Google OAuth token did not include access token',
-      );
+      throw new UnauthorizedException('Google OAuth token did not include access token');
     }
 
     const response = await fetch(this.config.google.userInfoUrl, {

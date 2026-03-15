@@ -188,7 +188,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** unblock user from reservations (Admin only) */
+        /** Unblock user from reservations (Admin only) */
         patch: operations["ReservationsController_unBlockUser"];
         trace?: never;
     };
@@ -623,7 +623,7 @@ export interface components {
             gameId: number;
             handle: string;
             rank: string;
-            role: string;
+            role?: string;
         };
         CreateRosterEntryDto: {
             /** @example John Doe */
