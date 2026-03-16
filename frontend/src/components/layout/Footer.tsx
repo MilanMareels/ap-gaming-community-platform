@@ -1,96 +1,109 @@
 import Link from 'next/link';
-import { Gamepad2 } from 'lucide-react';
+import { Gamepad2, Instagram, Twitch, MessageCircle, ChevronRight, ExternalLink, Clock, FileText, Mail } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className='bg-slate-950 border-t border-slate-800 text-gray-400 py-8'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-          <div>
-            <div className='flex items-center mb-4'>
-              <Gamepad2 className='h-6 w-6 text-red-500' />
-              <span className='ml-2 text-xl font-black italic tracking-tighter text-white'>
-                AP<span className='text-red-500'>GAMING</span>
-              </span>
-            </div>
-            <p className='text-sm'>
-              De gaming hub van AP Hogeschool. Reserveer PC&apos;s en consoles
-              voor jouw gaming sessies.
+    <footer className="border-t border-white/10 bg-[#020618] relative overflow-hidden">
+      {/* Subtle gradient line at top of footer */}
+      <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-[#d42422]/50 to-transparent"></div>
+
+      <div className="max-w-7xl mx-auto px-6 pt-20 pb-10">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-16">
+          <div className="md:col-span-5">
+            <Link href="/" className="text-3xl font-semibold tracking-tight text-[#ffffff] flex items-center gap-2 mb-6">
+              <Gamepad2 className="text-[#d42422] w-8 h-8" strokeWidth={1.5} />
+              AP <span className="text-[#d42422]">Gaming</span>
+            </Link>
+            <p className="text-lg text-gray-400 max-w-sm mb-8 leading-relaxed">
+              De officiële gaming en esports vereniging van de AP Hogeschool Antwerpen. Play, Compete, Connect.
             </p>
+            <div className="flex gap-4">
+              <a
+                href="#"
+                className="bg-white/5 border border-white/10 p-3 rounded-xl text-gray-400 hover:text-white hover:border-[#d42422] hover:bg-[#d42422]/10 transition-all"
+              >
+                <Instagram className="w-5 h-5" strokeWidth={1.5} />
+              </a>
+              <a
+                href="#"
+                className="bg-white/5 border border-white/10 p-3 rounded-xl text-gray-400 hover:text-white hover:border-[#d42422] hover:bg-[#d42422]/10 transition-all"
+              >
+                <Twitch className="w-5 h-5" strokeWidth={1.5} />
+              </a>
+              <a
+                href="#"
+                className="bg-white/5 border border-white/10 p-3 rounded-xl text-gray-400 hover:text-white hover:border-[#d42422] hover:bg-[#d42422]/10 transition-all"
+              >
+                <MessageCircle className="w-5 h-5" strokeWidth={1.5} />
+              </a>
+            </div>
           </div>
 
-          <div>
-            <h3 className='text-white font-bold mb-3'>Navigatie</h3>
-            <ul className='space-y-2 text-sm'>
+          <div className="md:col-span-3 md:col-start-7">
+            <h4 className="text-xl font-semibold tracking-tight text-white mb-6">Ontdek</h4>
+            <ul className="space-y-4 text-lg text-gray-400">
               <li>
-                <Link
-                  href='/reservations'
-                  className='hover:text-white transition-colors'
-                >
-                  Reserveren
+                <Link href="/#hub" className="hover:text-[#d42422] transition-colors flex items-center gap-2">
+                  <ChevronRight className="w-4 h-4" strokeWidth={1.5} /> De Gaming Hub
                 </Link>
               </li>
               <li>
-                <Link
-                  href='/schedule'
-                  className='hover:text-white transition-colors'
-                >
-                  Openingsuren
+                <Link href="/roster" className="hover:text-[#d42422] transition-colors flex items-center gap-2">
+                  <ChevronRight className="w-4 h-4" strokeWidth={1.5} /> Esports Teams
                 </Link>
               </li>
               <li>
-                <Link
-                  href='/info'
-                  className='hover:text-white transition-colors'
-                >
-                  Huisregels
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href='/privacy'
-                  className='hover:text-white transition-colors'
-                >
-                  Privacybeleid
+                <Link href="/events" className="hover:text-[#d42422] transition-colors flex items-center gap-2">
+                  <ChevronRight className="w-4 h-4" strokeWidth={1.5} /> Evenementen
                 </Link>
               </li>
             </ul>
           </div>
 
-          <div>
-            <h3 className='text-white font-bold mb-3'>Contact</h3>
-            <p className='text-sm'>
-              AP Hogeschool Antwerpen
-              <br />
-              Gaming Hub
-              <br />
-            </p>
+          <div className="md:col-span-3">
+            <h4 className="text-xl font-semibold tracking-tight text-white mb-6">Praktisch</h4>
+            <ul className="space-y-4 text-lg text-gray-400">
+              <li>
+                <Link href="/reservations" className="hover:text-white transition-colors flex items-center gap-2">
+                  <ExternalLink className="w-4 h-4" strokeWidth={1.5} /> Reserveer Hub
+                </Link>
+              </li>
+              <li>
+                <Link href="/schedule" className="hover:text-white transition-colors flex items-center gap-2">
+                  <Clock className="w-4 h-4" strokeWidth={1.5} /> Openingsuren
+                </Link>
+              </li>
+              <li>
+                <Link href="/info" className="hover:text-white transition-colors flex items-center gap-2">
+                  <FileText className="w-4 h-4" strokeWidth={1.5} /> Reglement
+                </Link>
+              </li>
+              <li>
+                <Link href="/info" className="hover:text-white transition-colors flex items-center gap-2">
+                  <Mail className="w-4 h-4" strokeWidth={1.5} /> Contact
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
 
-        <div className='mt-8 pt-8 border-t border-slate-800 text-center text-sm'>
-          <p>
-            &copy; {new Date().getFullYear()} AP Gaming Hub. Alle rechten
-            voorbehouden.
-          </p>
-          <p>
-            Ontwikkeld door{' '}
-            <a
-              href='https://milanmareels.be/'
-              className='text-red-500 hover:underline'
-              target='_blank'
-            >
-              Milan Mareels
-            </a>{' '}
-            en{' '}
-            <a
-              href='https://www.linkedin.com/in/stijn-voeten-237941103/'
-              className='text-red-500 hover:underline'
-              target='_blank'
-            >
-              Stijn Voeten
-            </a>
-          </p>
+        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-gray-500 text-base">
+          <p>&copy; {new Date().getFullYear()} AP Gaming Community. Alle rechten voorbehouden.</p>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="hover:text-white transition-colors">
+              Privacy
+            </Link>
+          </div>
+        </div>
+        <div className="mt-4 text-center md:text-left text-sm text-gray-600">
+          Ontwikkeld door{' '}
+          <a href="https://milanmareels.be/" className="text-[#d42422] hover:underline" target="_blank">
+            Milan Mareels
+          </a>{' '}
+          en{' '}
+          <a href="https://www.linkedin.com/in/stijn-voeten-237941103/" className="text-[#d42422] hover:underline" target="_blank">
+            Stijn Voeten
+          </a>
         </div>
       </div>
     </footer>

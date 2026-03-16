@@ -247,13 +247,17 @@ export default function ReservationsPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-        <div className="bg-slate-900 border border-green-500/50 p-8 rounded-2xl text-center max-w-md">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Reservatie Ontvangen!</h2>
-          <p className="text-gray-400 mb-4">Je hebt succesvol een slot geboekt. Zorg dat je op tijd bent.</p>
-          <p className="text-gray-400">Check je mailbox voor een bevestigingsmail met je QR code!</p>
-          <button onClick={() => window.location.reload()} className="mt-6 text-red-500 hover:text-white underline">
+      <div className="min-h-screen bg-transparent flex items-center justify-center px-6 relative">
+        <div className="bg-[#020618] border border-green-500/30 p-10 rounded-[2rem] text-center max-w-md relative overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-green-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6 relative z-10" strokeWidth={1.5} />
+          <h2 className="text-3xl font-semibold tracking-tight text-white mb-3 relative z-10">Reservatie Ontvangen!</h2>
+          <p className="text-lg text-gray-400 mb-6 leading-relaxed relative z-10">Je hebt succesvol een slot geboekt. Zorg dat je op tijd bent.</p>
+          <p className="text-lg text-gray-400 relative z-10">Check je mailbox voor een bevestigingsmail met je QR code!</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-8 text-[#d42422] font-medium hover:text-white transition-colors relative z-10"
+          >
             Nieuwe reservatie
           </button>
         </div>
@@ -262,17 +266,24 @@ export default function ReservationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 py-24 px-4 text-white">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-black mb-2">
-          RESERVEER <span className="text-red-600">GEAR</span>
-        </h1>
-        <p className="text-gray-400 mb-8">Boek een PC of PS5. Let op de regels.</p>
+    <div className="min-h-screen bg-transparent py-24 px-6 relative">
+      <div className="max-w-2xl mx-auto relative z-10">
+        <div className="relative mb-12">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-[#d42422] rounded-full blur-[100px] md:blur-[150px] opacity-20 pointer-events-none"></div>
+          <h1 className="text-5xl md:text-6xl font-semibold tracking-tight text-center mb-4 relative z-10">
+            Reserveer <span className="text-[#d42422]">Gear</span>
+          </h1>
+          <p className="text-lg text-gray-400 text-center relative z-10">Boek een PC of console. Let op de regels.</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 p-4 md:p-8 rounded-3xl space-y-6 shadow-xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-[#020618] border border-white/10 p-6 md:p-10 rounded-[2rem] space-y-8 shadow-2xl relative overflow-hidden"
+        >
+          <div className="absolute -left-20 -top-20 w-64 h-64 bg-[#d42422] rounded-full blur-[100px] opacity-10 pointer-events-none"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">S-Nummer</label>
+              <label className="block text-sm font-medium text-gray-400 mb-2">S-Nummer</label>
               <input
                 required
                 type="text"
@@ -284,29 +295,29 @@ export default function ReservationsPage() {
                     setFormData({ ...formData, sNumber: val.toLowerCase() });
                   }
                 }}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 outline-none focus:border-red-500"
+                className="w-full bg-[#0a0f25] border border-white/10 rounded-xl p-3.5 text-white outline-none focus:border-[#d42422] transition-colors"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">AP Email</label>
+              <label className="block text-sm font-medium text-gray-400 mb-2">AP Email</label>
               <input
                 required
                 type="email"
                 placeholder="naam@student.ap.be"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 outline-none focus:border-red-500"
+                className="w-full bg-[#0a0f25] border border-white/10 rounded-xl p-3.5 text-white outline-none focus:border-[#d42422] transition-colors"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Kies Hardware</label>
+            <label className="block text-sm font-medium text-gray-400 mb-4">Kies Hardware</label>
             <div className="grid grid-cols-3 gap-4">
               {[
-                { id: 'pc', label: 'PC', icon: Monitor, color: 'red' },
-                { id: 'ps5', label: 'PS5', icon: Gamepad2, color: 'blue' },
-                { id: 'switch', label: 'Switch', icon: Gamepad, color: 'red' },
+                { id: 'pc', label: 'PC', icon: Monitor },
+                { id: 'ps5', label: 'PS5', icon: Gamepad2 },
+                { id: 'switch', label: 'Switch', icon: Gamepad },
               ].map((item) => (
                 <button
                   key={item.id}
@@ -318,25 +329,25 @@ export default function ReservationsPage() {
                       startTime: '',
                     })
                   }
-                  className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${
+                  className={`p-6 rounded-[1.5rem] border flex flex-col items-center gap-3 transition-all duration-300 ${
                     formData.inventory === item.id
-                      ? `bg-${item.color}-600 border-${item.color}-500 text-white`
-                      : 'bg-slate-950 border-slate-800 text-gray-400 hover:border-gray-600'
+                      ? `bg-[#d42422] border-[#d42422] text-white shadow-[0_0_20px_rgba(212,36,34,0.3)] scale-[1.02]`
+                      : 'bg-[#0a0f25] border-white/10 text-gray-400 hover:border-white/20 hover:bg-white/10'
                   }`}
                 >
-                  <item.icon size={28} />
-                  <span className="font-bold text-sm">{item.label}</span>
+                  <item.icon size={32} strokeWidth={1.5} />
+                  <span className="font-semibold text-lg">{item.label}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {(formData.inventory === 'ps5' || formData.inventory === 'switch') && (
-            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-              <label className="block text-xs font-bold text-gray-500 uppercase mb-2 items-center gap-2">
-                <Users size={14} /> Aantal Spelers (Controllers)
+            <div className="bg-[#0a0f25] p-6 rounded-[1.5rem] border border-white/10">
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-400 mb-4">
+                <Users size={18} strokeWidth={1.5} /> Aantal Spelers (Controllers)
               </label>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 {Array.from({
                   length: Math.min(4, formData.inventory === 'switch' ? inventory['Nintendo Controllers'] || 0 : inventory.controller || 0),
                 }).map((_, i) => {
@@ -354,12 +365,12 @@ export default function ReservationsPage() {
                           startTime: '',
                         })
                       }
-                      className={`flex-1 py-2 rounded-lg font-bold border transition-all ${
+                      className={`flex-1 py-3 rounded-xl font-semibold border transition-all text-lg ${
                         formData.controllers === n
-                          ? 'bg-blue-600 border-blue-500 text-white'
+                          ? 'bg-[#d42422] border-[#d42422] text-white shadow-[0_0_15px_rgba(212,36,34,0.3)]'
                           : isAvailable
-                            ? 'bg-slate-900 border-slate-700 text-gray-400 hover:border-gray-600'
-                            : 'bg-slate-900 border-slate-800 text-gray-600 cursor-not-allowed opacity-50'
+                            ? 'bg-[#020618] border-white/10 text-gray-300 hover:border-white/30 hover:bg-white/5'
+                            : 'bg-[#020618]/50 border-white/5 text-gray-600 cursor-not-allowed opacity-50'
                       }`}
                     >
                       {n}
@@ -368,39 +379,37 @@ export default function ReservationsPage() {
                 })}
               </div>
               {formData.date && !checkAvailability(1) && (
-                <p className="text-xs text-red-500 mt-2">Geen controllers meer beschikbaar op deze datum.</p>
+                <p className="text-sm text-red-500 mt-3 font-medium">Geen controllers meer beschikbaar op deze datum.</p>
               )}
             </div>
           )}
 
           {formData.inventory === 'pc' && (
-            <div className="flex items-center gap-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <div
+              className="flex items-center justify-between bg-[#0a0f25] p-6 rounded-[1.5rem] border border-white/10 cursor-pointer"
+              onClick={() => setFormData({ ...formData, extraController: !formData.extraController, startTime: '' })}
+            >
+              <span className="text-base text-gray-300 font-semibold flex items-center gap-3">
+                <Gamepad2 size={24} className="text-[#d42422]" strokeWidth={1.5} /> Ik wil ook een controller gebruiken
+              </span>
               <button
                 type="button"
-                onClick={() =>
-                  setFormData({
-                    ...formData,
-                    extraController: !formData.extraController,
-                    startTime: '',
-                  })
-                }
-                className={`w-10 h-6 rounded-full p-1 transition-colors ${formData.extraController ? 'bg-red-600' : 'bg-slate-700'}`}
+                className={`w-14 h-8 rounded-full p-1 transition-colors duration-300 ${formData.extraController ? 'bg-[#d42422]' : 'bg-gray-700'}`}
               >
-                <div className={`w-4 h-4 bg-white rounded-full transition-transform ${formData.extraController ? 'translate-x-4' : ''}`} />
+                <div
+                  className={`w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300 ${formData.extraController ? 'translate-x-6' : ''}`}
+                />
               </button>
-              <span className="text-sm text-gray-300 font-bold flex items-center gap-2">
-                <Gamepad2 size={16} /> Ik wil ook een controller gebruiken
-              </span>
             </div>
           )}
 
-          <div className="p-4 bg-slate-950 rounded-xl border border-slate-800">
+          <div className="p-6 bg-[#0a0f25] border border-white/10 rounded-[1.5rem]">
             <h3 className="font-bold text-gray-300 mb-4 flex items-center gap-2">
               <Calendar size={18} /> Planning
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="min-w-0">
-                <label className="text-xs text-gray-500">Datum</label>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Datum</label>
                 <input
                   required
                   type="date"
@@ -413,14 +422,14 @@ export default function ReservationsPage() {
                     if (val < todayStr && val !== '') val = todayStr;
                     setFormData({ ...formData, date: val, startTime: '' });
                   }}
-                  className="w-90 max-w-full bg-slate-900 border border-slate-700 rounded-lg p-2 mt-1 text-white"
+                  className="w-full bg-[#020618] border border-white/10 rounded-xl p-3 text-white outline-none focus:border-[#d42422] transition-colors"
                   style={{ colorScheme: 'dark' }}
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500">Duur</label>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Duur</label>
                 <select
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 mt-1 text-white"
+                  className="w-full bg-[#020618] border border-white/10 rounded-xl p-3 text-white outline-none focus:border-[#d42422] transition-colors"
                   value={formData.duration}
                   onChange={(e) =>
                     setFormData({
@@ -436,17 +445,17 @@ export default function ReservationsPage() {
                 </select>
               </div>
               <div>
-                <label className="text-xs text-gray-500">Start Tijd</label>
-                <div className="grid grid-cols-3 gap-2 mt-1">
+                <label className="block text-sm font-medium text-gray-400 mb-2">Start Tijd</label>
+                <div className="grid grid-cols-3 gap-2">
                   {availableStartTimes.map((t) => (
                     <button
                       key={t}
                       type="button"
                       onClick={() => setFormData({ ...formData, startTime: t })}
-                      className={`py-2 rounded-lg text-sm font-bold border transition-all ${
+                      className={`py-2 rounded-xl text-sm font-bold border transition-all ${
                         formData.startTime === t
-                          ? 'bg-red-600 border-red-500 text-white'
-                          : 'bg-slate-900 border-slate-700 text-gray-400 hover:border-gray-600'
+                          ? 'bg-[#d42422] border-[#d42422] text-white shadow-[0_0_15px_rgba(212,36,34,0.3)]'
+                          : 'bg-[#020618] border-white/10 text-gray-400 hover:border-white/30'
                       }`}
                     >
                       {t}
@@ -460,18 +469,18 @@ export default function ReservationsPage() {
             )}
           </div>
 
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-4 p-4 rounded-xl bg-[#0a0f25] border border-white/10">
             <input
               type="checkbox"
               required
               id="terms"
               checked={formData.acceptedTerms}
               onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-              className="mt-1 w-5 h-5 accent-red-600"
+              className="mt-1 w-5 h-5 accent-[#d42422] rounded cursor-pointer"
             />
-            <label htmlFor="terms" className="text-sm text-gray-400">
+            <label htmlFor="terms" className="text-sm text-gray-400 cursor-pointer select-none">
               Ik ga akkoord met de{' '}
-              <a href="/info" className="text-red-500 underline">
+              <a href="/info" className="text-[#d42422] font-medium hover:text-white transition-colors underline underline-offset-2">
                 huisregels
               </a>
               . Ik draag zorg voor het materiaal en laat de plek netjes achter. Bij schade wordt mijn studentenaccount belast.
@@ -479,7 +488,7 @@ export default function ReservationsPage() {
           </div>
 
           {error && (
-            <div className="bg-red-900/20 border border-red-500/50 text-red-200 p-4 rounded-xl flex items-center gap-3">
+            <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl flex items-center gap-3">
               <AlertTriangle size={20} /> {error}
             </div>
           )}
@@ -487,7 +496,7 @@ export default function ReservationsPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-white text-slate-950 font-black py-4 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50"
+            className="w-full relative group inline-flex items-center justify-center gap-3 bg-linear-to-r from-[#d42422] to-red-600 hover:from-red-600 hover:to-red-500 text-white font-semibold py-4 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(212,36,34,0.3)] hover:shadow-[0_0_30px_rgba(212,36,34,0.5)] tracking-wide border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Bezig met controleren...' : 'RESERVEER NU'}
           </button>
