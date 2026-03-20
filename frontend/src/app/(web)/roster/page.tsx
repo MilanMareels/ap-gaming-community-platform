@@ -117,7 +117,7 @@ export default function RosterPage() {
                       <div className="absolute inset-x-0 bottom-0 p-6 z-20 flex flex-col justify-end h-full">
                         <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                           <h3
-                            className="text-2xl md:text-4xl font-black italic tracking-tighter text-white uppercase drop-shadow-lg mb-1"
+                            className="text-2xl md:text-4xl font-black italic tracking-tighter text-white uppercase drop-shadow-lg mb-1 wrap-break-word"
                             title={entry.handle}
                           >
                             {entry.handle}

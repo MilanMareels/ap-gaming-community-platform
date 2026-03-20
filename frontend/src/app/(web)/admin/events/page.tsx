@@ -81,12 +81,9 @@ export default function AdminEventsPage() {
   const handleDeleteEvent = async (id: number) => {
     if (!confirm('Weet je zeker dat je dit event wilt verwijderen?')) return;
     try {
-      await apiClient.DELETE(
-        '/events/{id}',
-        {
-          params: { path: { id: id.toString() } },
-        },
-      );
+      await apiClient.DELETE('/events/{id}', {
+        params: { path: { id: id.toString() } },
+      });
       await fetchEvents();
     } catch (err) {
       console.error('Failed to delete event:', err);
