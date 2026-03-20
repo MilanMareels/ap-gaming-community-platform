@@ -22,8 +22,7 @@ export function HeroSection() {
         </Link>
 
         <h1 className="text-6xl md:text-8xl font-semibold tracking-tight leading-[1.1] mb-8">
-          Jouw <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d42422] to-orange-500">AP-sist</span>
-          <br /> in Gaming &amp; Esports.
+          Where <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d42422] to-orange-500">AP Gamers</span> Connect.
         </h1>
 
         <p className="text-xl md:text-2xl text-gray-400 max-w-3xl mb-12 font-medium leading-relaxed">
