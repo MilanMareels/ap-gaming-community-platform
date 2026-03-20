@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Gamepad2, Instagram, Twitch, MessageCircle, ChevronRight, ExternalLink, Clock, FileText, Mail } from 'lucide-react';
+import { Gamepad2, MessageCircle, ChevronRight, ExternalLink, Clock, FileText, Mail } from 'lucide-react';
+import { SiInstagram, SiTwitch } from '@icons-pack/react-simple-icons';
 
 export function Footer() {
   return (
@@ -19,19 +20,19 @@ export function Footer() {
             </p>
             <div className="flex gap-4">
               <a
-                href="#"
+                href="https://www.instagram.com/ap.gaming.community/"
                 className="bg-white/5 border border-white/10 p-3 rounded-xl text-gray-400 hover:text-white hover:border-[#d42422] hover:bg-[#d42422]/10 transition-all"
               >
-                <Instagram className="w-5 h-5" strokeWidth={1.5} />
+                <SiInstagram className="w-5 h-5" strokeWidth={1.5} />
               </a>
               <a
-                href="#"
+                href="https://www.twitch.tv/ap_gamingbe"
                 className="bg-white/5 border border-white/10 p-3 rounded-xl text-gray-400 hover:text-white hover:border-[#d42422] hover:bg-[#d42422]/10 transition-all"
               >
-                <Twitch className="w-5 h-5" strokeWidth={1.5} />
+                <SiTwitch className="w-5 h-5" strokeWidth={1.5} />
               </a>
               <a
-                href="#"
+                href="https://discord.gg/N5adyu3kXf"
                 className="bg-white/5 border border-white/10 p-3 rounded-xl text-gray-400 hover:text-white hover:border-[#d42422] hover:bg-[#d42422]/10 transition-all"
               >
                 <MessageCircle className="w-5 h-5" strokeWidth={1.5} />
