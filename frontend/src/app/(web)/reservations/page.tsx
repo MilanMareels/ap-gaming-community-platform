@@ -339,8 +339,9 @@ export default function ReservationsPage() {
         },
       });
 
+      // Explicitly check for error in response
       if (res.error) {
-        throw new Error((res.error as any).message || 'Reservatie mislukt');
+        throw new Error(Array.isArray(res.error.message) ? res.error.message.join(', ') : res.error.message || 'Reservatie mislukt');
       }
 
       setSuccess(true);

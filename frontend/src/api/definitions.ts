@@ -528,6 +528,18 @@ export interface components {
             endTime: string;
             status: components["schemas"]["ReservationStatus"];
         };
+        ErrorResponseDto: {
+            /** @example 400 */
+            statusCode: number;
+            /**
+             * @example [
+             *       "Validation failed"
+             *     ]
+             */
+            message: string[];
+            /** @example Bad Request */
+            error: string;
+        };
         ReservationSlotDto: {
             /** @example pc */
             inventory: string;
@@ -942,6 +954,14 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Reservation"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
                 };
             };
         };

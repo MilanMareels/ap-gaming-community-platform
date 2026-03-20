@@ -37,7 +37,7 @@ export function StepHardware({ data, updateData, availability, maxControllersFn 
             disabled={!item.available}
             onClick={() => {
               updateData({
-                inventory: item.id as any,
+                inventory: item.id as 'pc' | 'ps5' | 'switch',
                 controllers: 0,
                 extraController: false,
               });

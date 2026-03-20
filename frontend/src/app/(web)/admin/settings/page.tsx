@@ -52,7 +52,7 @@ export default function AdminSettingsPage() {
           email: newAdminEmail,
           sNumber: newAdminSNumber,
           gmailEmail: newAdminGmail,
-        } as never,
+        },
       });
       setNewAdminEmail('');
       setNewAdminSNumber('');

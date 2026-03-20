@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiBadRequestResponse } from '@nestjs/swagger';
 import { ReservationsService } from './reservations.service.js';
 import {
   CreateReservationDto,
@@ -10,6 +10,7 @@ import {
   UpdateReservationDto,
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
+import { ErrorResponseDto } from '../../common/dto/error.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { AdminGuard } from '../../guards/admin.guard.js';
 import { Public } from '../auth/public.decorator.js';
@@ -24,6 +25,7 @@ export class ReservationsController {
   @Post()
   @ApiOperation({ summary: 'Create a new reservation' })
   @ApiCreatedResponse({ type: PrismaModel.Reservation })
+  @ApiBadRequestResponse({ type: ErrorResponseDto })
   create(@Body() dto: CreateReservationDto) {
     return this.reservationsService.create(dto);
   }
