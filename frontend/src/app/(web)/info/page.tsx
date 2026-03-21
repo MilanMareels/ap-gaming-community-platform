@@ -71,7 +71,7 @@ export default function InfoPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#020618] py-24 px-6 relative overflow-hidden font-sans">
+    <div className="min-h-screen py-24 px-6 relative overflow-hidden font-sans">
       <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-[#d42422] rounded-full blur-[150px] opacity-10 pointer-events-none mix-blend-screen"></div>
 
       <div className="container mx-auto max-w-6xl relative z-10">

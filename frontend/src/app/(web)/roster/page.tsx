@@ -37,14 +37,14 @@ export default function RosterPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#020618] flex items-center justify-center text-white relative z-10">
+      <div className="min-h-screen flex items-center justify-center text-white relative z-10">
         <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#d42422]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#020618] py-24 px-6 relative overflow-hidden font-sans">
+    <div className="min-h-screen py-24 px-6 relative overflow-hidden font-sans">
       <div className="absolute top-0 inset-x-0 w-full h-[600px] bg-gradient-to-b from-[#d42422]/10 to-transparent pointer-events-none"></div>
 
       <div className="container mx-auto max-w-7xl relative z-10">

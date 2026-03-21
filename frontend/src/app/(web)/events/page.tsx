@@ -125,7 +125,7 @@ export default function EventsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white bg-[#020618]">
+      <div className="min-h-screen flex items-center justify-center text-white">
         <div className="animate-pulse flex items-center gap-4">
           <Activity className="text-[#d42422] animate-bounce" size={32} />
           <span className="text-xl font-black italic tracking-widest">LOADING SATELLITE...</span>
@@ -142,7 +142,7 @@ export default function EventsPage() {
   const heroCountdown = heroEvent ? getCountdown(heroEvent, nowMs) : null;
 
   return (
-    <div className="min-h-screen bg-[#020618] py-24 px-6 relative overflow-hidden font-sans">
+    <div className="min-h-screen py-24 px-6 relative overflow-hidden font-sans">
       <div className="absolute -top-[400px] -right-[400px] w-[800px] h-[800px] bg-[#d42422]/10 blur-[150px] rounded-full pointer-events-none"></div>
 
       <div className="container mx-auto max-w-6xl relative z-10">
