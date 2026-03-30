@@ -100,7 +100,13 @@ export default function ReservationsPage() {
   });
 
   const updateFormData = (updates: Partial<ReservationFormData>) => {
-    setFormData((prev) => ({ ...prev, ...updates }));
+    setFormData((prev) => {
+      // Reset date/time when hardware changes, since available slots depend on it
+      if (updates.inventory && updates.inventory !== prev.inventory) {
+        return { ...prev, ...updates, date: '', startTime: '' };
+      }
+      return { ...prev, ...updates };
+    });
   };
 
   // --- Data Fetching ---
@@ -155,7 +161,7 @@ export default function ReservationsPage() {
 
   // --- Logic ---
 
-  // Check if ANY hardware is available at a given time slot (used for Time Grid)
+  // Check if a specific hardware type (or any) is available at a given time slot
   const isTimeSlotValid = useCallback(
     (startTimeMins: number, durationMins: number, checkInventoryType?: string) => {
       const endMins = startTimeMins + durationMins;
@@ -178,7 +184,7 @@ export default function ReservationsPage() {
   );
 
   const calculateAvailableStartTimes = useCallback(
-    (date: string, duration: string) => {
+    (date: string, duration: string, inventoryType?: string) => {
       if (!date) return [];
 
       const dateObj = new Date(date + 'T00:00:00');
@@ -210,7 +216,8 @@ export default function ReservationsPage() {
             continue;
           }
 
-          if (isTimeSlotValid(currentMins, requiredDuration)) {
+          // Filter by selected hardware type if provided
+          if (isTimeSlotValid(currentMins, requiredDuration, inventoryType)) {
             availableTimes.push(minsToTime(currentMins));
           }
           currentMins += 30;
@@ -223,39 +230,15 @@ export default function ReservationsPage() {
   );
 
   const availableStartTimes = useMemo(() => {
-    return calculateAvailableStartTimes(formData.date, formData.duration || '60');
-  }, [calculateAvailableStartTimes, formData.date, formData.duration]);
+    return calculateAvailableStartTimes(formData.date, formData.duration || '60', formData.inventory || undefined);
+  }, [calculateAvailableStartTimes, formData.date, formData.duration, formData.inventory]);
 
-  // Specific hardware availability check used in StepHardware
-  const getHardwareAvailability = (type: string) => {
-    if (!formData.date || !formData.startTime) return false;
-    const startMins = timeToMins(formData.startTime);
-    const duration = parseInt(formData.duration);
-    return isTimeSlotValid(startMins, duration, type);
-  };
-
-  const getMaxControllers = (type: string) => {
-    if (!formData.date || !formData.startTime) return 0;
-    const startMins = timeToMins(formData.startTime);
-    const duration = parseInt(formData.duration);
-    const endMins = startMins + duration;
-
-    let maxPool = 0;
-    let usedPool = 0;
-
+  // Max controllers for hardware step (no date selected yet, show total pool)
+  const getMaxControllersForHardwareStep = (type: string) => {
     if (type === 'switch') {
-      maxPool = inventory['Nintendo Controllers'] || 0;
-      usedPool = existingReservations
-        .filter((r) => r.inventory === 'switch' && timeToMins(r.startTime) < endMins && timeToMins(r.endTime) > startMins)
-        .reduce((sum, r) => sum + (r.controllers || 0), 0);
-    } else {
-      maxPool = inventory.controller || 0;
-      usedPool = existingReservations
-        .filter((r) => r.inventory !== 'switch' && timeToMins(r.startTime) < endMins && timeToMins(r.endTime) > startMins)
-        .reduce((sum, r) => sum + (r.controllers || 0), 0);
+      return inventory['Nintendo Controllers'] || 0;
     }
-
-    return Math.max(0, maxPool - usedPool);
+    return inventory.controller || 0;
   };
 
   // --- Step Navigation ---
@@ -273,11 +256,11 @@ export default function ReservationsPage() {
         if (!formData.email.endsWith('@student.ap.be')) return false;
         return true;
       case 2:
-        return !!formData.date && !!formData.startTime;
-      case 3:
         if (!formData.inventory) return false;
         if ((formData.inventory === 'ps5' || formData.inventory === 'switch') && formData.controllers === 0) return false;
         return true;
+      case 3:
+        return !!formData.date && !!formData.startTime;
       case 4:
         return formData.acceptedTerms;
       default:
@@ -295,12 +278,12 @@ export default function ReservationsPage() {
         if (!formData.email.endsWith('@student.ap.be')) errors.push('Gebruik je AP studenten email');
       }
       if (currentStep === 2) {
-        if (!formData.date) errors.push('Selecteer een datum');
-        else if (!formData.startTime) errors.push('Selecteer een starttijd');
-      }
-      if (currentStep === 3) {
         if (!formData.inventory) errors.push('Kies een platform');
         if ((formData.inventory === 'ps5' || formData.inventory === 'switch') && formData.controllers === 0) errors.push('Kies aantal spelers');
+      }
+      if (currentStep === 3) {
+        if (!formData.date) errors.push('Selecteer een datum');
+        else if (!formData.startTime) errors.push('Selecteer een starttijd');
       }
       if (errors.length > 0) setError(errors.join(', '));
       else setError('Vul alle velden in');
@@ -434,8 +417,8 @@ export default function ReservationsPage() {
               className="text-2xl font-bold text-white tracking-tight"
             >
               {currentStep === 1 && 'Start'}
-              {currentStep === 2 && 'Wanneer wil je komen?'}
-              {currentStep === 3 && 'Kies je hardware'}
+              {currentStep === 2 && 'Kies je hardware'}
+              {currentStep === 3 && 'Wanneer wil je komen?'}
               {currentStep === 4 && 'Bevestigen'}
             </motion.h2>
             <span className="text-xs font-bold text-gray-400 bg-white/5 px-2.5 py-1 rounded-full uppercase tracking-wider border border-white/5">
@@ -458,21 +441,21 @@ export default function ReservationsPage() {
                 }}
                 className="absolute inset-0 overflow-y-auto custom-scrollbar pr-1 pb-2"
               >
-                {currentStep === 1 && <StepIdentity data={formData} updateData={updateFormData} setError={setError} error={error} />}
+                {currentStep === 1 && <StepIdentity data={formData} updateData={updateFormData} setError={setError} error={error} onNext={handleNext} />}
                 {currentStep === 2 && (
-                  <StepDateTime data={formData} updateData={updateFormData} availableStartTimes={availableStartTimes} timetable={timetable} />
-                )}
-                {currentStep === 3 && (
                   <StepHardware
                     data={formData}
                     updateData={updateFormData}
                     availability={{
-                      pc: getHardwareAvailability('pc'),
-                      ps5: getHardwareAvailability('ps5'),
-                      switch: getHardwareAvailability('switch'),
+                      pc: (inventory.pc || 0) > 0,
+                      ps5: (inventory.ps5 || 0) > 0,
+                      switch: (inventory.switch || 0) > 0,
                     }}
-                    maxControllersFn={getMaxControllers}
+                    maxControllersFn={getMaxControllersForHardwareStep}
                   />
+                )}
+                {currentStep === 3 && (
+                  <StepDateTime data={formData} updateData={updateFormData} availableStartTimes={availableStartTimes} timetable={timetable} />
                 )}
                 {currentStep === 4 && <StepConfirmation data={formData} updateData={updateFormData} error={error} />}
               </motion.div>
@@ -502,9 +485,9 @@ export default function ReservationsPage() {
                 )}
                 disabled={
                   (currentStep === 1 && (!formData.sNumber || !formData.email)) ||
-                  (currentStep === 2 && (!formData.date || !formData.startTime)) ||
-                  (currentStep === 3 &&
-                    (!formData.inventory || ((formData.inventory === 'ps5' || formData.inventory === 'switch') && formData.controllers === 0)))
+                  (currentStep === 2 &&
+                    (!formData.inventory || ((formData.inventory === 'ps5' || formData.inventory === 'switch') && formData.controllers === 0))) ||
+                  (currentStep === 3 && (!formData.date || !formData.startTime))
                 }
               >
                 Volgende <ChevronRight size={18} />

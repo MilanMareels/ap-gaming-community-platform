@@ -8,9 +8,17 @@ interface StepIdentityProps {
   updateData: (updates: Partial<ReservationFormData>) => void;
   setError: (msg: string) => void;
   error?: string;
+  onNext: () => void;
 }
 
-export function StepIdentity({ data, updateData, setError, error }: StepIdentityProps) {
+export function StepIdentity({ data, updateData, setError, error, onNext }: StepIdentityProps) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      onNext();
+    }
+  };
+
   return (
     <div className="space-y-6">
       {error && <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-lg text-red-400 text-sm mb-4">{error}</div>}
@@ -22,6 +30,7 @@ export function StepIdentity({ data, updateData, setError, error }: StepIdentity
             type="text"
             placeholder="s123456"
             value={data.sNumber}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               const val = e.target.value;
               // Allow typing s/S and numbers
@@ -39,6 +48,7 @@ export function StepIdentity({ data, updateData, setError, error }: StepIdentity
             type="email"
             placeholder="naam@student.ap.be"
             value={data.email}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               updateData({ email: e.target.value });
               setError('');
