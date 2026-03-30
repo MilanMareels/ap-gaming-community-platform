@@ -107,6 +107,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reservations/cancel/{cuid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Cancel a reservation using the unique CUID from email */
+        patch: operations["ReservationsController_cancelByCuid"];
+        trace?: never;
+    };
     "/reservations/slots": {
         parameters: {
             query?: never;
@@ -528,15 +545,11 @@ export interface components {
             endTime: string;
             status: components["schemas"]["ReservationStatus"];
         };
-        ErrorResponseDto: {
+        HttpExceptionDto: {
             /** @example 400 */
             statusCode: number;
-            /**
-             * @example [
-             *       "Validation failed"
-             *     ]
-             */
-            message: string[];
+            /** @example Validation or business rule violation */
+            message: string | string[];
             /** @example Bad Request */
             error: string;
         };
@@ -956,12 +969,52 @@ export interface operations {
                     "application/json": components["schemas"]["Reservation"];
                 };
             };
+            /** @description Validation or business rule violation */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    ReservationsController_cancelByCuid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+            /** @description Reservation is already cancelled or has already started */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+            /** @description Reservation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
                 };
             };
         };
@@ -1006,6 +1059,15 @@ export interface operations {
                     "application/json": components["schemas"]["ReservationVerificationDto"];
                 };
             };
+            /** @description Reservation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
         };
     };
     ReservationsController_adminCreate: {
@@ -1027,6 +1089,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Reservation"];
+                };
+            };
+            /** @description Time slot is already reserved */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
                 };
             };
         };
@@ -1069,6 +1140,15 @@ export interface operations {
                     "application/json": components["schemas"]["Reservation"];
                 };
             };
+            /** @description No no-shows found for this user */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
         };
     };
     ReservationsController_updateStatus: {
@@ -1092,6 +1172,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Reservation"];
+                };
+            };
+            /** @description Reservation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
                 };
             };
         };
@@ -1136,6 +1225,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Reservation"];
+                };
+            };
+            /** @description Reservation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
                 };
             };
         };

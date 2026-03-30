@@ -7,6 +7,7 @@ import type { TimeTableEntry, ReservationSlot, Setting } from '@/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { getApiErrorMessage } from '@/util/api-error';
 
 // Sub-components
 import { StepIdentity } from './_components/StepIdentity';
@@ -322,9 +323,12 @@ export default function ReservationsPage() {
         },
       });
 
-      // Explicitly check for error in response
       if (res.error) {
-        throw new Error(Array.isArray(res.error.message) ? res.error.message.join(', ') : res.error.message || 'Reservatie mislukt');
+        throw new Error(getApiErrorMessage(res.error, 'Failed to create reservation'));
+      }
+
+      if (!res.data) {
+        throw new Error('Failed to create reservation');
       }
 
       setSuccess(true);
@@ -441,7 +445,9 @@ export default function ReservationsPage() {
                 }}
                 className="absolute inset-0 overflow-y-auto custom-scrollbar pr-1 pb-2"
               >
-                {currentStep === 1 && <StepIdentity data={formData} updateData={updateFormData} setError={setError} error={error} onNext={handleNext} />}
+                {currentStep === 1 && (
+                  <StepIdentity data={formData} updateData={updateFormData} setError={setError} error={error} onNext={handleNext} />
+                )}
                 {currentStep === 2 && (
                   <StepHardware
                     data={formData}
