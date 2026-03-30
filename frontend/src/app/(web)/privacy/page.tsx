@@ -6,14 +6,15 @@ import { ScrollReveal } from '@/components/ui/ScrollReveal';
 export default function PrivacyPage() {
   return (
     <ScrollReveal direction='up'>
-      <div className='min-h-screen bg-slate-950 py-24 px-4 text-white'>
-        <div className='container mx-auto max-w-4xl'>
+      <div className='min-h-screen py-24 px-4 text-white relative overflow-hidden font-sans'>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#d42422]/10 blur-[120px] rounded-full pointer-events-none"></div>
+        <div className='container mx-auto max-w-4xl relative z-10'>
           <h1 className='text-5xl font-black mb-12 text-center'>
             PRIVACY <span className='text-red-600'>BELEID</span>
           </h1>
 
           <div className='space-y-8 text-gray-300 leading-relaxed'>
-            <section className='bg-slate-900 border border-slate-800 p-8 rounded-3xl hover:border-slate-700 transition-colors'>
+            <section className='bg-[#0a0f25]/80 backdrop-blur-md border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-colors'>
               <h2 className='text-2xl font-bold text-white mb-4 flex items-center gap-3'>
                 <Eye className='text-red-500' /> Welke gegevens verzamelen we?
               </h2>
@@ -42,7 +43,7 @@ export default function PrivacyPage() {
               </ul>
             </section>
 
-            <section className='bg-slate-900 border border-slate-800 p-8 rounded-3xl hover:border-slate-700 transition-colors'>
+            <section className='bg-[#0a0f25]/80 backdrop-blur-md border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-colors'>
               <h2 className='text-2xl font-bold text-white mb-4 flex items-center gap-3'>
                 <FileText className='text-red-500' /> Waarom hebben we deze
                 gegevens nodig?
@@ -67,7 +68,7 @@ export default function PrivacyPage() {
               </ul>
             </section>
 
-            <section className='bg-slate-900 border border-slate-800 p-8 rounded-3xl hover:border-slate-700 transition-colors'>
+            <section className='bg-[#0a0f25]/80 backdrop-blur-md border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-colors'>
               <h2 className='text-2xl font-bold text-white mb-4 flex items-center gap-3'>
                 <Lock className='text-red-500' /> Opslag en Beveiliging
               </h2>
@@ -80,7 +81,7 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section className='bg-slate-900 border border-slate-800 p-8 rounded-3xl hover:border-slate-700 transition-colors'>
+            <section className='bg-[#0a0f25]/80 backdrop-blur-md border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-colors'>
               <h2 className='text-2xl font-bold text-white mb-4 flex items-center gap-3'>
                 <Shield className='text-red-500' /> Jouw Rechten & Contact
               </h2>
@@ -90,7 +91,7 @@ export default function PrivacyPage() {
                 meer wilt gebruiken.
               </p>
 
-              <div className='bg-slate-950 p-6 rounded-xl border border-slate-800 flex items-start gap-4'>
+              <div className='bg-black/40 p-6 rounded-xl border border-white/10 flex items-start gap-4'>
                 <div className='bg-red-600/10 p-3 rounded-full'>
                   <Mail className='text-red-500' size={24} />
                 </div>

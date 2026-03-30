@@ -1,10 +1,29 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Calendar, Monitor, Gamepad2, CheckCircle, AlertTriangle, Users, Gamepad } from 'lucide-react';
+import { CheckCircle, Clock, ChevronRight, ChevronLeft } from 'lucide-react';
 import { apiClient } from '@/api';
 import type { TimeTableEntry, ReservationSlot, Setting } from '@/api';
+import { motion, AnimatePresence } from 'framer-motion';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 import { getApiErrorMessage } from '@/util/api-error';
+
+// Sub-components
+import { StepIdentity } from './_components/StepIdentity';
+import { StepDateTime } from './_components/StepDateTime';
+import { StepHardware } from './_components/StepHardware';
+import { StepConfirmation } from './_components/StepConfirmation';
+import type { ReservationFormData } from './_components/types';
+
+// --- Types ---
+// Removed local interface definition in favor of import
+
+// --- Utility Functions ---
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 /** Convert ISO datetime or HH:mm string to minutes since midnight */
 const timeToMins = (t: string) => {
@@ -12,7 +31,6 @@ const timeToMins = (t: string) => {
     const [h, m] = t.split(':').map(Number);
     return h * 60 + m;
   }
-  // ISO datetime string — parse and extract UTC hours/minutes
   const d = new Date(t);
   return d.getUTCHours() * 60 + d.getUTCMinutes();
 };
@@ -23,11 +41,37 @@ const minsToTime = (m: number) => {
   return `${h.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
 };
 
+// --- Animations ---
+const slideVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 50 : -50,
+    opacity: 0,
+  }),
+  center: {
+    zIndex: 1,
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    zIndex: 0,
+    x: direction < 0 ? 50 : -50,
+    opacity: 0,
+  }),
+};
+
+const containerVariants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const } },
+};
+
+// --- Main Component ---
+
 export default function ReservationsPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
+  // Data State
   const [timetable, setTimetable] = useState<TimeTableEntry[]>([]);
   const [existingReservations, setExistingReservations] = useState<ReservationSlot[]>([]);
   const [inventory, setInventory] = useState<Record<string, number>>({
@@ -38,11 +82,16 @@ export default function ReservationsPage() {
     'Nintendo Controllers': 4,
   });
 
-  const [formData, setFormData] = useState({
+  // Wizard State
+  const [currentStep, setCurrentStep] = useState(1);
+  const [direction, setDirection] = useState(0);
+  const totalSteps = 4;
+
+  const [formData, setFormData] = useState<ReservationFormData>({
     sNumber: '',
     name: '',
     email: '',
-    inventory: 'pc',
+    inventory: '',
     date: '',
     startTime: '',
     duration: '60',
@@ -51,7 +100,18 @@ export default function ReservationsPage() {
     acceptedTerms: false,
   });
 
-  // Fetch data on mount
+  const updateFormData = (updates: Partial<ReservationFormData>) => {
+    setFormData((prev) => {
+      // Reset date/time when hardware changes, since available slots depend on it
+      if (updates.inventory && updates.inventory !== prev.inventory) {
+        return { ...prev, ...updates, date: '', startTime: '' };
+      }
+      return { ...prev, ...updates };
+    });
+  };
+
+  // --- Data Fetching ---
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -70,7 +130,7 @@ export default function ReservationsPage() {
             }
           });
           if (Object.keys(inventorySettings).length > 0) {
-            setInventory({ ...inventory, ...inventorySettings });
+            setInventory((prev) => ({ ...prev, ...inventorySettings }));
           }
         }
       } catch (err) {
@@ -81,7 +141,6 @@ export default function ReservationsPage() {
     fetchData();
   }, []);
 
-  // Fetch reservations when date changes
   useEffect(() => {
     if (!formData.date) return;
 
@@ -101,8 +160,32 @@ export default function ReservationsPage() {
     fetchReservations();
   }, [formData.date]);
 
+  // --- Logic ---
+
+  // Check if a specific hardware type (or any) is available at a given time slot
+  const isTimeSlotValid = useCallback(
+    (startTimeMins: number, durationMins: number, checkInventoryType?: string) => {
+      const endMins = startTimeMins + durationMins;
+
+      const checkType = (type: string) => {
+        const max = inventory[type] || 0;
+        const count = existingReservations.filter(
+          (r) => r.inventory === type && timeToMins(r.startTime) < endMins && timeToMins(r.endTime) > startTimeMins,
+        ).length;
+        return count < max;
+      };
+
+      if (checkInventoryType) {
+        return checkType(checkInventoryType);
+      }
+
+      return checkType('pc') || checkType('ps5') || checkType('switch');
+    },
+    [existingReservations, inventory],
+  );
+
   const calculateAvailableStartTimes = useCallback(
-    (date: string, duration: string, inventoryType: string, controllers: number, extraController: boolean) => {
+    (date: string, duration: string, inventoryType?: string) => {
       if (!date) return [];
 
       const dateObj = new Date(date + 'T00:00:00');
@@ -115,7 +198,13 @@ export default function ReservationsPage() {
       const requiredDuration = parseInt(duration);
 
       const now = new Date();
-      const isToday = date === now.toISOString().split('T')[0];
+      // Format local date as YYYY-MM-DD to match the picker
+      const localYear = now.getFullYear();
+      const localMonth = String(now.getMonth() + 1).padStart(2, '0');
+      const localDay = String(now.getDate()).padStart(2, '0');
+      const localDateStr = `${localYear}-${localMonth}-${localDay}`;
+
+      const isToday = date === localDateStr;
       const currentTimeMins = now.getHours() * 60 + now.getMinutes();
 
       daySchedule.forEach((slot) => {
@@ -128,80 +217,98 @@ export default function ReservationsPage() {
             continue;
           }
 
-          const startStr = minsToTime(currentMins);
-          const endStr = minsToTime(currentMins + requiredDuration);
-          const endMinsCalc = currentMins + requiredDuration;
-
-          const hardwareCount = existingReservations.filter(
-            (r) => r.inventory === inventoryType && timeToMins(r.startTime) < endMinsCalc && timeToMins(r.endTime) > currentMins,
-          ).length;
-
-          const maxHardware = inventory[inventoryType] || 0;
-
-          let controllersNeeded = 0;
-          let maxControllers = 0;
-          let controllersInUse = 0;
-
-          if (inventoryType === 'switch') {
-            controllersNeeded = controllers;
-            maxControllers = inventory['Nintendo Controllers'] || 0;
-            controllersInUse = existingReservations
-              .filter((r) => r.inventory === 'switch' && timeToMins(r.startTime) < endMinsCalc && timeToMins(r.endTime) > currentMins)
-              .reduce((sum, r) => sum + (r.controllers || 0), 0);
-          } else {
-            controllersNeeded = inventoryType === 'ps5' ? controllers : extraController ? 1 : 0;
-            maxControllers = inventory.controller || 0;
-            controllersInUse = existingReservations
-              .filter((r) => r.inventory !== 'switch' && timeToMins(r.startTime) < endMinsCalc && timeToMins(r.endTime) > currentMins)
-              .reduce((sum, r) => sum + (r.controllers || 0), 0);
+          // Filter by selected hardware type if provided
+          if (isTimeSlotValid(currentMins, requiredDuration, inventoryType)) {
+            availableTimes.push(minsToTime(currentMins));
           }
-
-          if (hardwareCount < maxHardware && (controllersNeeded === 0 || controllersInUse + controllersNeeded <= maxControllers)) {
-            availableTimes.push(startStr);
-          }
-
           currentMins += 30;
         }
       });
 
       return availableTimes;
     },
-    [timetable, existingReservations, inventory],
+    [timetable, isTimeSlotValid],
   );
 
   const availableStartTimes = useMemo(() => {
-    return calculateAvailableStartTimes(formData.date, formData.duration || '60', formData.inventory, formData.controllers, formData.extraController);
-  }, [calculateAvailableStartTimes, formData.date, formData.duration, formData.inventory, formData.controllers, formData.extraController]);
+    return calculateAvailableStartTimes(formData.date, formData.duration || '60', formData.inventory || undefined);
+  }, [calculateAvailableStartTimes, formData.date, formData.duration, formData.inventory]);
 
-  const checkAvailability = useCallback(
-    (count: number) => {
-      if (!formData.date) return true;
-      return calculateAvailableStartTimes(formData.date, formData.duration || '60', formData.inventory, count, formData.extraController).length > 0;
-    },
-    [calculateAvailableStartTimes, formData.date, formData.duration, formData.inventory, formData.extraController],
-  );
+  // Max controllers for hardware step (no date selected yet, show total pool)
+  const getMaxControllersForHardwareStep = (type: string) => {
+    if (type === 'switch') {
+      return inventory['Nintendo Controllers'] || 0;
+    }
+    return inventory.controller || 0;
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // --- Step Navigation ---
+
+  const goToStep = (step: number) => {
+    if (step < 1 || step > totalSteps) return;
+    setDirection(step > currentStep ? 1 : -1);
+    setCurrentStep(step);
+  };
+
+  const validateStep = (step: number) => {
+    switch (step) {
+      case 1:
+        if (!/^s[0-9]+$/.test(formData.sNumber.toLowerCase())) return false;
+        if (!formData.email.endsWith('@student.ap.be')) return false;
+        return true;
+      case 2:
+        if (!formData.inventory) return false;
+        if ((formData.inventory === 'ps5' || formData.inventory === 'switch') && formData.controllers === 0) return false;
+        return true;
+      case 3:
+        return !!formData.date && !!formData.startTime;
+      case 4:
+        return formData.acceptedTerms;
+      default:
+        return true;
+    }
+  };
+
+  const handleNext = () => {
+    if (validateStep(currentStep)) {
+      goToStep(currentStep + 1);
+    } else {
+      const errors = [];
+      if (currentStep === 1) {
+        if (!/^s[0-9]+$/.test(formData.sNumber.toLowerCase())) errors.push('Gebruik een geldig s-nummer (s123...)');
+        if (!formData.email.endsWith('@student.ap.be')) errors.push('Gebruik je AP studenten email');
+      }
+      if (currentStep === 2) {
+        if (!formData.inventory) errors.push('Kies een platform');
+        if ((formData.inventory === 'ps5' || formData.inventory === 'switch') && formData.controllers === 0) errors.push('Kies aantal spelers');
+      }
+      if (currentStep === 3) {
+        if (!formData.date) errors.push('Selecteer een datum');
+        else if (!formData.startTime) errors.push('Selecteer een starttijd');
+      }
+      if (errors.length > 0) setError(errors.join(', '));
+      else setError('Vul alle velden in');
+    }
+  };
+
+  const handleBack = () => {
+    setError('');
+    goToStep(currentStep - 1);
+  };
+
+  const handleSubmit = async () => {
     setError('');
     setLoading(true);
 
     try {
-      if (!/^s[0-9]+$/.test(formData.sNumber.toLowerCase())) {
-        throw new Error('Gebruik een geldig s-nummer (s + cijfers).');
-      }
-      if (!formData.email.endsWith('@student.ap.be')) {
-        throw new Error('Gebruik je officiële AP email.');
-      }
-      if (!formData.startTime) {
-        throw new Error('Selecteer een starttijd.');
+      if (!formData.acceptedTerms) {
+        throw new Error('Je moet de huisregels accepteren.');
       }
 
       const startMins = timeToMins(formData.startTime);
       const duration = parseInt(formData.duration || '60');
       const endMins = startMins + duration;
 
-      // Build proper ISO datetime strings for start and end
       const startISO = `${formData.date}T${formData.startTime}:00.000Z`;
       const endISO = `${formData.date}T${minsToTime(endMins)}:00.000Z`;
 
@@ -226,273 +333,186 @@ export default function ReservationsPage() {
 
       setSuccess(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to create reservation');
+      setError(err instanceof Error ? err.message : 'Reservatie mislukt');
     } finally {
       setLoading(false);
     }
   };
 
-  const today = new Date();
-  const getLocalDateString = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-  const todayStr = getLocalDateString(today);
-
-  const maxDate = new Date();
-  maxDate.setDate(maxDate.getDate() + 3);
-  const maxDateStr = getLocalDateString(maxDate);
-
+  // --- Final Success View ---
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-        <div className="bg-slate-900 border border-green-500/50 p-8 rounded-2xl text-center max-w-md">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Reservatie Ontvangen!</h2>
-          <p className="text-gray-400 mb-4">Je hebt succesvol een slot geboekt. Zorg dat je op tijd bent.</p>
-          <p className="text-gray-400">Check je mailbox voor een bevestigingsmail met je QR code!</p>
-          <button onClick={() => window.location.reload()} className="mt-6 text-red-500 hover:text-white underline">
-            Nieuwe reservatie
+      <div className="min-h-screen pt-20 flex items-center justify-center px-4 relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-green-500 rounded-full blur-[150px] opacity-[0.05] pointer-events-none"></div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.5, type: 'spring' }}
+          className="bg-[#020618] border border-green-500/30 p-8 md:p-12 rounded-4xl text-center max-w-md w-full relative overflow-hidden shadow-2xl shadow-green-900/10"
+        >
+          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-green-500/50 to-transparent"></div>
+
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: 'spring' }}
+            className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6 ring-1 ring-green-500/20"
+          >
+            <CheckCircle className="w-10 h-10 text-green-500" strokeWidth={2} />
+          </motion.div>
+
+          <h2 className="text-3xl font-bold tracking-tight text-white mb-3 relative z-10">Reservatie Ontvangen!</h2>
+          <p className="text-gray-400 mb-8 relative z-10 leading-relaxed">
+            Je hebt succesvol een slot geboekt. Check je mailbox voor de bevestiging en je QR code.
+          </p>
+
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full py-4 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium transition-colors border border-white/10 hover:border-white/20"
+          >
+            Nieuwe Reservatie
           </button>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
+  // --- Main Layout ---
   return (
-    <div className="min-h-screen bg-slate-950 py-24 px-4 text-white">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-black mb-2">
-          RESERVEER <span className="text-red-600">GEAR</span>
+    <div className="min-h-screen pt-28 pb-12 px-4 md:px-6 relative overflow-hidden flex flex-col items-center justify-start">
+      <div className="fixed top-20 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[#d42422] rounded-full blur-[180px] opacity-[0.08] pointer-events-none z-[-1]"></div>
+
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center mb-10 relative z-10"
+      >
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-3">
+          Reserveer <span className="text-[#d42422]">Gear</span>
         </h1>
-        <p className="text-gray-400 mb-8">Boek een PC of PS5. Let op de regels.</p>
+        <p className="text-gray-400 max-w-md mx-auto">Boek een High-end PC of Console sessie.</p>
+      </motion.div>
 
-        <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 p-4 md:p-8 rounded-3xl space-y-6 shadow-xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">S-Nummer</label>
-              <input
-                required
-                type="text"
-                placeholder="s123456"
-                value={formData.sNumber}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === '' || /^[sS][0-9]*$/.test(val)) {
-                    setFormData({ ...formData, sNumber: val.toLowerCase() });
-                  }
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full max-w-2xl bg-[#020618]/80 backdrop-blur-xl border border-white/10 rounded-4xl shadow-2xl relative overflow-hidden flex flex-col min-h-[580px]"
+      >
+        {/* Progress Bar */}
+        <div className="h-1 w-full bg-white/5 flex relative overflow-hidden">
+          <motion.div
+            className="h-full bg-linear-to-r from-red-600 to-[#d42422] shadow-[0_0_10px_#d42422]"
+            initial={{ width: 0 }}
+            animate={{ width: `${(currentStep / totalSteps) * 100}%` }}
+            transition={{ duration: 0.4, ease: 'easeInOut' }}
+          />
+        </div>
+
+        {/* Content Area */}
+        <div className="p-6 md:p-10 flex-1 flex flex-col">
+          <div className="mb-6 flex items-center justify-between">
+            <motion.h2
+              key={currentStep}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="text-2xl font-bold text-white tracking-tight"
+            >
+              {currentStep === 1 && 'Start'}
+              {currentStep === 2 && 'Kies je hardware'}
+              {currentStep === 3 && 'Wanneer wil je komen?'}
+              {currentStep === 4 && 'Bevestigen'}
+            </motion.h2>
+            <span className="text-xs font-bold text-gray-400 bg-white/5 px-2.5 py-1 rounded-full uppercase tracking-wider border border-white/5">
+              Stap {currentStep} <span className="text-gray-600">/</span> {totalSteps}
+            </span>
+          </div>
+
+          <div className="relative flex-1">
+            <AnimatePresence initial={false} mode="wait" custom={direction}>
+              <motion.div
+                key={currentStep}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  x: { type: 'spring', stiffness: 300, damping: 30 },
+                  opacity: { duration: 0.2 },
                 }}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 outline-none focus:border-red-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">AP Email</label>
-              <input
-                required
-                type="email"
-                placeholder="naam@student.ap.be"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 outline-none focus:border-red-500"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Kies Hardware</label>
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { id: 'pc', label: 'PC', icon: Monitor, color: 'red' },
-                { id: 'ps5', label: 'PS5', icon: Gamepad2, color: 'blue' },
-                { id: 'switch', label: 'Switch', icon: Gamepad, color: 'red' },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() =>
-                    setFormData({
-                      ...formData,
-                      inventory: item.id,
-                      startTime: '',
-                    })
-                  }
-                  className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${
-                    formData.inventory === item.id
-                      ? `bg-${item.color}-600 border-${item.color}-500 text-white`
-                      : 'bg-slate-950 border-slate-800 text-gray-400 hover:border-gray-600'
-                  }`}
-                >
-                  <item.icon size={28} />
-                  <span className="font-bold text-sm">{item.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {(formData.inventory === 'ps5' || formData.inventory === 'switch') && (
-            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-              <label className="block text-xs font-bold text-gray-500 uppercase mb-2 items-center gap-2">
-                <Users size={14} /> Aantal Spelers (Controllers)
-              </label>
-              <div className="flex gap-2">
-                {Array.from({
-                  length: Math.min(4, formData.inventory === 'switch' ? inventory['Nintendo Controllers'] || 0 : inventory.controller || 0),
-                }).map((_, i) => {
-                  const n = i + 1;
-                  const isAvailable = checkAvailability(n);
-                  return (
-                    <button
-                      key={n}
-                      type="button"
-                      disabled={!isAvailable}
-                      onClick={() =>
-                        setFormData({
-                          ...formData,
-                          controllers: n,
-                          startTime: '',
-                        })
-                      }
-                      className={`flex-1 py-2 rounded-lg font-bold border transition-all ${
-                        formData.controllers === n
-                          ? 'bg-blue-600 border-blue-500 text-white'
-                          : isAvailable
-                            ? 'bg-slate-900 border-slate-700 text-gray-400 hover:border-gray-600'
-                            : 'bg-slate-900 border-slate-800 text-gray-600 cursor-not-allowed opacity-50'
-                      }`}
-                    >
-                      {n}
-                    </button>
-                  );
-                })}
-              </div>
-              {formData.date && !checkAvailability(1) && (
-                <p className="text-xs text-red-500 mt-2">Geen controllers meer beschikbaar op deze datum.</p>
-              )}
-            </div>
-          )}
-
-          {formData.inventory === 'pc' && (
-            <div className="flex items-center gap-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
-              <button
-                type="button"
-                onClick={() =>
-                  setFormData({
-                    ...formData,
-                    extraController: !formData.extraController,
-                    startTime: '',
-                  })
-                }
-                className={`w-10 h-6 rounded-full p-1 transition-colors ${formData.extraController ? 'bg-red-600' : 'bg-slate-700'}`}
+                className="absolute inset-0 overflow-y-auto custom-scrollbar pr-1 pb-2"
               >
-                <div className={`w-4 h-4 bg-white rounded-full transition-transform ${formData.extraController ? 'translate-x-4' : ''}`} />
-              </button>
-              <span className="text-sm text-gray-300 font-bold flex items-center gap-2">
-                <Gamepad2 size={16} /> Ik wil ook een controller gebruiken
-              </span>
-            </div>
-          )}
+                {currentStep === 1 && (
+                  <StepIdentity data={formData} updateData={updateFormData} setError={setError} error={error} onNext={handleNext} />
+                )}
+                {currentStep === 2 && (
+                  <StepHardware
+                    data={formData}
+                    updateData={updateFormData}
+                    availability={{
+                      pc: (inventory.pc || 0) > 0,
+                      ps5: (inventory.ps5 || 0) > 0,
+                      switch: (inventory.switch || 0) > 0,
+                    }}
+                    maxControllersFn={getMaxControllersForHardwareStep}
+                  />
+                )}
+                {currentStep === 3 && (
+                  <StepDateTime data={formData} updateData={updateFormData} availableStartTimes={availableStartTimes} timetable={timetable} />
+                )}
+                {currentStep === 4 && <StepConfirmation data={formData} updateData={updateFormData} error={error} />}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
 
-          <div className="p-4 bg-slate-950 rounded-xl border border-slate-800">
-            <h3 className="font-bold text-gray-300 mb-4 flex items-center gap-2">
-              <Calendar size={18} /> Planning
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="min-w-0">
-                <label className="text-xs text-gray-500">Datum</label>
-                <input
-                  required
-                  type="date"
-                  min={todayStr}
-                  max={maxDateStr}
-                  value={formData.date}
-                  onChange={(e) => {
-                    let val = e.target.value;
-                    if (val > maxDateStr) val = maxDateStr;
-                    if (val < todayStr && val !== '') val = todayStr;
-                    setFormData({ ...formData, date: val, startTime: '' });
-                  }}
-                  className="w-90 max-w-full bg-slate-900 border border-slate-700 rounded-lg p-2 mt-1 text-white"
-                  style={{ colorScheme: 'dark' }}
-                />
-              </div>
-              <div>
-                <label className="text-xs text-gray-500">Duur</label>
-                <select
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 mt-1 text-white"
-                  value={formData.duration}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      duration: e.target.value,
-                      startTime: '',
-                    })
-                  }
-                >
-                  <option value="60">1 Uur</option>
-                  <option value="90">1.5 Uur</option>
-                  <option value="120">2 Uur</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-xs text-gray-500">Start Tijd</label>
-                <div className="grid grid-cols-3 gap-2 mt-1">
-                  {availableStartTimes.map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, startTime: t })}
-                      className={`py-2 rounded-lg text-sm font-bold border transition-all ${
-                        formData.startTime === t
-                          ? 'bg-red-600 border-red-500 text-white'
-                          : 'bg-slate-900 border-slate-700 text-gray-400 hover:border-gray-600'
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-            {formData.date && availableStartTimes.length === 0 && (
-              <p className="text-xs text-red-400 mt-2">Geen beschikbare sloten voor deze selectie.</p>
+        {/* Footer Navigation */}
+        <div className="p-6 md:px-10 border-t border-white/5 bg-white/[0.02] flex items-center justify-between mt-auto backdrop-blur-sm">
+          <button
+            onClick={handleBack}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-white transition-colors text-sm font-medium',
+              currentStep === 1 && 'opacity-0 pointer-events-none',
+            )}
+          >
+            <ChevronLeft size={18} /> Vorige
+          </button>
+
+          <div className="flex gap-4">
+            {currentStep < totalSteps && (
+              <button
+                onClick={handleNext}
+                className={cn(
+                  'flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all shadow-lg active:scale-95',
+                  'bg-white text-black hover:bg-gray-100 shadow-white/5 disabled:opacity-50 disabled:cursor-not-allowed',
+                )}
+                disabled={
+                  (currentStep === 1 && (!formData.sNumber || !formData.email)) ||
+                  (currentStep === 2 &&
+                    (!formData.inventory || ((formData.inventory === 'ps5' || formData.inventory === 'switch') && formData.controllers === 0))) ||
+                  (currentStep === 3 && (!formData.date || !formData.startTime))
+                }
+              >
+                Volgende <ChevronRight size={18} />
+              </button>
+            )}
+
+            {currentStep === totalSteps && (
+              <button
+                onClick={handleSubmit}
+                disabled={loading || !formData.acceptedTerms}
+                className="flex items-center gap-2 px-8 py-3 rounded-xl font-semibold bg-[#d42422] text-white hover:bg-red-600 transition-all shadow-[0_0_20px_rgba(212,36,34,0.4)] hover:shadow-[0_0_30px_rgba(212,36,34,0.6)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? <Clock className="animate-spin" size={20} /> : <CheckCircle size={20} />}
+                {loading ? 'Bezig...' : 'Reserveren'}
+              </button>
             )}
           </div>
-
-          <div className="flex items-start gap-3">
-            <input
-              type="checkbox"
-              required
-              id="terms"
-              checked={formData.acceptedTerms}
-              onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-              className="mt-1 w-5 h-5 accent-red-600"
-            />
-            <label htmlFor="terms" className="text-sm text-gray-400">
-              Ik ga akkoord met de{' '}
-              <a href="/info" className="text-red-500 underline">
-                huisregels
-              </a>
-              . Ik draag zorg voor het materiaal en laat de plek netjes achter. Bij schade wordt mijn studentenaccount belast.
-            </label>
-          </div>
-
-          {error && (
-            <div className="bg-red-900/20 border border-red-500/50 text-red-200 p-4 rounded-xl flex items-center gap-3">
-              <AlertTriangle size={20} /> {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-white text-slate-950 font-black py-4 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50"
-          >
-            {loading ? 'Bezig met controleren...' : 'RESERVEER NU'}
-          </button>
-        </form>
-      </div>
+        </div>
+      </motion.div>
     </div>
   );
 }
