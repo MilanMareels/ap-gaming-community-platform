@@ -50,6 +50,8 @@ export class ReservationsService {
     try {
       const qrCodeBuffer = await this.mailService.generateQRCode(reservationCuid);
 
+      const cancelUrl = `${process.env.FRONTEND_URL}/cancel-reservation/${reservationCuid}`;
+
       await this.mailService.sendMailWithAttachments(
         email,
         'Reservatie Bevestiging - AP Gaming Hub',
@@ -62,6 +64,7 @@ export class ReservationsService {
           startTime: this.formatDateTimeDutch(startTime),
           endTime: this.formatDateTimeDutch(endTime),
           email,
+          cancelUrl,
         },
         [
           {
@@ -480,5 +483,29 @@ export class ReservationsService {
         data: { status: ReservationStatus.CANCELLED }, // Andere status nodig voor deblock??
       });
     }
+  }
+
+  async cancelByCuid(cuid: string) {
+    const reservation = await this.prisma.reservation.findFirst({
+      where: { cuid },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Reservation not found');
+    }
+
+    if (reservation.status === ReservationStatus.CANCELLED) {
+      throw new BadRequestException('Reservation is already cancelled');
+    }
+
+    if (new Date(reservation.startTime) <= new Date()) {
+      throw new BadRequestException('You cannot cancel a reservation that has already started or passed');
+    }
+
+    return this.prisma.reservation.update({
+      where: { id: reservation.id },
+      data: { status: ReservationStatus.CANCELLED },
+      include: { user: true },
+    });
   }
 }

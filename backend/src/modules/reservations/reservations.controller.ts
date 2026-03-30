@@ -28,6 +28,14 @@ export class ReservationsController {
     return this.reservationsService.create(dto);
   }
 
+  @Public()
+  @Patch('cancel/:cuid')
+  @ApiOperation({ summary: 'Cancel a reservation using the unique CUID from email' })
+  @ApiOkResponse({ type: PrismaModel.Reservation })
+  cancelByCuid(@Param('cuid') cuid: string) {
+    return this.reservationsService.cancelByCuid(cuid);
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiOperation({ summary: 'Get all reservations (Admin only)' })
