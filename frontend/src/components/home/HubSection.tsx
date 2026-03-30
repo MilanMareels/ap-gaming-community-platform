@@ -9,7 +9,6 @@ const GALLERY_IMAGES = [
   { src: '/_FLE3042.jpg', alt: 'Sfeerbeeld Hub' },
   { src: '/_FLE3045.jpg', alt: 'Community' },
   { src: '/_FLE3046.jpg', alt: 'Gaming Setup' },
-  { src: '/_FLE3051.jpg', alt: 'Sfeerbeeld Hub' },
   { src: '/_FLE3056.jpg', alt: 'Community' },
 ];
 
@@ -127,7 +126,7 @@ export function HubSection() {
                 className="aspect-[4/5] rounded-3xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 group hover:border-[#d42422]/50 transition-all hover:-translate-y-2 relative overflow-hidden cursor-pointer"
               >
                 <Image
-                  src="/_FLE3051.jpg"
+                  src="/_FLE3045.jpg"
                   alt="Sfeerbeeld Hub"
                   fill
                   className="object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
