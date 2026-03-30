@@ -107,6 +107,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reservations/cancel/{cuid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Cancel a reservation using the unique CUID from email */
+        patch: operations["ReservationsController_cancelByCuid"];
+        trace?: never;
+    };
     "/reservations/slots": {
         parameters: {
             query?: never;
@@ -116,6 +133,23 @@ export interface paths {
         };
         /** Get occupied time slots for a date (public, no PII) */
         get: operations["ReservationsController_getSlots"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reservations/verify/{cuid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Verify reservation by QR code CUID (Admin only) */
+        get: operations["ReservationsController_verifyByCuid"];
         put?: never;
         post?: never;
         delete?: never;
@@ -156,6 +190,23 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/reservations/{userId}/no-show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Unblock user from reservations (Admin only) */
+        patch: operations["ReservationsController_unBlockUser"];
         trace?: never;
     };
     "/reservations/{id}/status": {
@@ -483,6 +534,7 @@ export interface components {
         ReservationStatus: "RESERVED" | "CANCELLED" | "PRESENT" | "NO_SHOW";
         Reservation: {
             id: number;
+            cuid: string;
             userId: number;
             controllers: number;
             email: string;
@@ -492,6 +544,14 @@ export interface components {
             /** Format: date-time */
             endTime: string;
             status: components["schemas"]["ReservationStatus"];
+        };
+        HttpExceptionDto: {
+            /** @example 400 */
+            statusCode: number;
+            /** @example Validation or business rule violation */
+            message: string | string[];
+            /** @example Bad Request */
+            error: string;
         };
         ReservationSlotDto: {
             /** @example pc */
@@ -508,6 +568,33 @@ export interface components {
              * @example 2026-02-28T12:00:00.000Z
              */
             endTime: string;
+        };
+        ReservationVerificationDto: {
+            /** @example cm9x8k2df0000a1b2c3d4e5f6 */
+            cuid: string;
+            /** @example student@student.ap.be */
+            email: string;
+            /** @example s123456 */
+            sNumber: string;
+            /**
+             * @example pc
+             * @enum {string}
+             */
+            inventory: "pc" | "ps5" | "switch";
+            /** @example 2 */
+            controllers: number;
+            /**
+             * Format: date-time
+             * @example 2026-02-28T10:00:00.000Z
+             */
+            startTime: string;
+            /**
+             * Format: date-time
+             * @example 2026-02-28T12:00:00.000Z
+             */
+            endTime: string;
+            /** @enum {string} */
+            status: "RESERVED" | "CANCELLED" | "PRESENT" | "NO_SHOW";
         };
         AdminCreateReservationDto: {
             /** @example s123456 */
@@ -561,7 +648,7 @@ export interface components {
             gameId: number;
             handle: string;
             rank: string;
-            role: string;
+            role?: string;
         };
         CreateRosterEntryDto: {
             /** @example John Doe */
@@ -573,7 +660,7 @@ export interface components {
             /** @example Diamond */
             rank: string;
             /** @example Support */
-            role: string;
+            role?: string | null;
             /** @example 1 */
             gameId: number;
         };
@@ -882,6 +969,54 @@ export interface operations {
                     "application/json": components["schemas"]["Reservation"];
                 };
             };
+            /** @description Validation or business rule violation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    ReservationsController_cancelByCuid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+            /** @description Reservation is already cancelled or has already started */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+            /** @description Reservation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
         };
     };
     ReservationsController_getSlots: {
@@ -901,6 +1036,36 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReservationSlotDto"][];
+                };
+            };
+        };
+    };
+    ReservationsController_verifyByCuid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationVerificationDto"];
+                };
+            };
+            /** @description Reservation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
                 };
             };
         };
@@ -926,6 +1091,15 @@ export interface operations {
                     "application/json": components["schemas"]["Reservation"];
                 };
             };
+            /** @description Time slot is already reserved */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
         };
     };
     ReservationsController_getNoShows: {
@@ -943,6 +1117,36 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Reservation"][];
+                };
+            };
+        };
+    };
+    ReservationsController_unBlockUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+            /** @description No no-shows found for this user */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
                 };
             };
         };
@@ -968,6 +1172,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Reservation"];
+                };
+            };
+            /** @description Reservation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
                 };
             };
         };
@@ -1012,6 +1225,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Reservation"];
+                };
+            };
+            /** @description Reservation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
                 };
             };
         };

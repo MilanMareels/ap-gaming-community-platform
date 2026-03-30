@@ -1,19 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Body,
-  Delete,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiCreatedResponse,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Patch, Body, Delete, Param, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { EventsService } from './events.service.js';
 import { CreateEventDto, UpdateEventDto } from '../../dtos/events/event.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';

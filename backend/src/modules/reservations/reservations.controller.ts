@@ -1,26 +1,12 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiCreatedResponse,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { ReservationsService } from './reservations.service.js';
 import {
   CreateReservationDto,
   AdminCreateReservationDto,
   ReservationQueryDto,
   ReservationSlotDto,
+  ReservationVerificationDto,
   UpdateReservationDto,
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
@@ -28,6 +14,7 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { AdminGuard } from '../../guards/admin.guard.js';
 import { Public } from '../auth/public.decorator.js';
 import { PrismaModel } from '../../_gen/prisma-class/index.js';
+import { HttpExceptionDto } from '../../dtos/http-exception.dto.js';
 
 @ApiTags('Reservations')
 @Controller('reservations')
@@ -38,8 +25,19 @@ export class ReservationsController {
   @Post()
   @ApiOperation({ summary: 'Create a new reservation' })
   @ApiCreatedResponse({ type: PrismaModel.Reservation })
+  @ApiBadRequestResponse({ description: 'Validation or business rule violation', type: HttpExceptionDto })
   create(@Body() dto: CreateReservationDto) {
     return this.reservationsService.create(dto);
+  }
+
+  @Public()
+  @Patch('cancel/:cuid')
+  @ApiOperation({ summary: 'Cancel a reservation using the unique CUID from email' })
+  @ApiOkResponse({ type: PrismaModel.Reservation })
+  @ApiNotFoundResponse({ description: 'Reservation not found', type: HttpExceptionDto })
+  @ApiBadRequestResponse({ description: 'Reservation is already cancelled or has already started', type: HttpExceptionDto })
+  cancelByCuid(@Param('cuid') cuid: string) {
+    return this.reservationsService.cancelByCuid(cuid);
   }
 
   @Get()
@@ -60,12 +58,24 @@ export class ReservationsController {
     return this.reservationsService.getSlots(date);
   }
 
+  @Get('verify/:cuid')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiOperation({
+    summary: 'Verify reservation by QR code CUID (Admin only)',
+  })
+  @ApiOkResponse({ type: ReservationVerificationDto })
+  @ApiNotFoundResponse({ description: 'Reservation not found', type: HttpExceptionDto })
+  verifyByCuid(@Param('cuid') cuid: string) {
+    return this.reservationsService.verifyByCuid(cuid);
+  }
+
   @Post('admin')
   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiOperation({
     summary: 'Create a reservation as admin (no date restrictions)',
   })
   @ApiCreatedResponse({ type: PrismaModel.Reservation })
+  @ApiBadRequestResponse({ description: 'Time slot is already reserved', type: HttpExceptionDto })
   adminCreate(@Body() dto: AdminCreateReservationDto) {
     return this.reservationsService.adminCreate(dto);
   }
@@ -78,14 +88,21 @@ export class ReservationsController {
     return this.reservationsService.getNoShows();
   }
 
+  @Patch(':userId/no-show')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiOperation({ summary: 'Unblock user from reservations (Admin only)' })
+  @ApiOkResponse({ type: PrismaModel.Reservation })
+  @ApiNotFoundResponse({ description: 'No no-shows found for this user', type: HttpExceptionDto })
+  unBlockUser(@Param('userId') userId: string) {
+    return this.reservationsService.unBlockUser(+userId);
+  }
+
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiOperation({ summary: 'Update reservation status (Admin only)' })
   @ApiOkResponse({ type: PrismaModel.Reservation })
-  updateStatus(
-    @Param('id') id: string,
-    @Body() dto: UpdateReservationStatusDto,
-  ) {
+  @ApiNotFoundResponse({ description: 'Reservation not found', type: HttpExceptionDto })
+  updateStatus(@Param('id') id: string, @Body() dto: UpdateReservationStatusDto) {
     return this.reservationsService.updateStatus(+id, dto);
   }
 
@@ -93,6 +110,7 @@ export class ReservationsController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiOperation({ summary: 'Update a reservation (Admin only)' })
   @ApiOkResponse({ type: PrismaModel.Reservation })
+  @ApiNotFoundResponse({ description: 'Reservation not found', type: HttpExceptionDto })
   update(@Param('id') id: string, @Body() dto: UpdateReservationDto) {
     return this.reservationsService.update(+id, dto);
   }

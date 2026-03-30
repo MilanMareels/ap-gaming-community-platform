@@ -1,23 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Delete,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiCreatedResponse,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Delete, Param, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { RosterService } from './roster.service.js';
-import {
-  CreateRosterEntryDto,
-  CreateRosterGameDto,
-} from '../../dtos/roster/roster.dto.js';
+import { CreateRosterEntryDto, CreateRosterGameDto } from '../../dtos/roster/roster.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { AdminGuard } from '../../guards/admin.guard.js';
 import { Public } from '../auth/public.decorator.js';

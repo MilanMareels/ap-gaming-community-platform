@@ -31,11 +31,7 @@ async function bootstrap() {
   );
 
   if (process.env.SWAGGER_ENABLED === 'true') {
-    const swaggerConfig = new DocumentBuilder()
-      .setTitle('API Documentation')
-      .addServer('/api')
-      .setDescription('API Documentation')
-      .build();
+    const swaggerConfig = new DocumentBuilder().setTitle('API Documentation').addServer('/api').setDescription('API Documentation').build();
 
     const document = SwaggerModule.createDocument(app, swaggerConfig, {
       ignoreGlobalPrefix: true,

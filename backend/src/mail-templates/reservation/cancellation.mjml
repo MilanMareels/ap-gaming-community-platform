@@ -1,0 +1,63 @@
+<mjml>
+  <mj-head>
+    <mj-title>Annulatie Bevestiging - AP Gaming Hub</mj-title>
+    <mj-attributes>
+      <mj-all font-family="Arial, sans-serif" />
+      <mj-text font-size="14px" color="#333333" line-height="1.6" />
+      <mj-button background-color="#DC2626" color="#ffffff" border-radius="4px" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f4">
+    <mj-section background-color="#DC2626" padding="30px 0">
+      <mj-column>
+        <mj-text align="center" font-size="32px" font-weight="bold" color="#ffffff"> AP Gaming Hub </mj-text>
+        <mj-text align="center" font-size="18px" color="#ffffff"> Annulatie Bevestiging </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#ffffff" padding="40px 30px">
+      <mj-column>
+        <mj-text font-size="16px" color="#1f2937"> Beste {{ sNumber }}, </mj-text>
+        <mj-text font-size="14px" color="#4b5563">
+          Je reservatie is succesvol geannuleerd. Je plek is nu weer vrijgegeven voor andere studenten. Hieronder vind je de details van de
+          geannuleerde reservatie:
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#ffffff" padding="0 30px">
+      <mj-column>
+        <mj-text font-size="14px" font-weight="bold" color="#DC2626" padding-bottom="10px"> Details Geannuleerde Reservatie </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#f9fafb" padding="20px 30px" border-radius="8px">
+      <mj-column>
+        <mj-text font-size="14px" color="#1f2937" line-height="1.8">
+          <strong>Reservatie ID:</strong> {{ reservationId }}<br />
+          <strong>Apparatuur:</strong> {{ inventory }}<br />
+          <strong>Controllers:</strong> {{ controllers }}<br />
+          <strong>Start tijd:</strong> {{ startTime }}<br />
+          <strong>Eind tijd:</strong> {{ endTime }}<br />
+          <strong>E-mail:</strong> {{ email }}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#ffffff" padding="30px 30px">
+      <mj-column>
+        <mj-text font-size="14px" color="#4b5563" padding-bottom="15px">
+          Bedankt dat je de moeite hebt genomen om je reservatie te annuleren! We hopen je snel weer te zien.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#1f2937" padding="30px 30px">
+      <mj-column>
+        <mj-text align="center" font-size="13px" color="#9ca3af" line-height="1.6"> Voor vragen, neem contact met ons op. </mj-text>
+        <mj-divider border-color="#374151" padding="20px 0"></mj-divider>
+        <mj-text align="center" font-size="11px" color="#6b7280"> © 2026 AP Gaming Hub. Alle rechten voorbehouden. </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

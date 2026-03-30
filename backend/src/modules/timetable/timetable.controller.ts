@@ -1,24 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiCreatedResponse,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { TimetableService } from './timetable.service.js';
-import {
-  CreateTimeTableEntryDto,
-  UpdateTimeTableEntryDto,
-} from '../../dtos/timetable/timetable.dto.js';
+import { CreateTimeTableEntryDto, UpdateTimeTableEntryDto } from '../../dtos/timetable/timetable.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { AdminGuard } from '../../guards/admin.guard.js';
 import { Public } from '../auth/public.decorator.js';

@@ -10,11 +10,17 @@
     "struct": "openapi-typescript http://localhost:3001/swagger-json --output src/api/definitions.ts"
   },
   "dependencies": {
+    "@icons-pack/react-simple-icons": "^13.13.0",
+    "@next/third-parties": "^16.1.6",
+    "@zxing/browser": "^0.1.5",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.38.0",
     "lucide-react": "^0.575.0",
     "next": "16.1.6",
     "openapi-fetch": "^0.17.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

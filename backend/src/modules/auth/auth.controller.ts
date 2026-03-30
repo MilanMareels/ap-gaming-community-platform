@@ -1,19 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Query,
-  Req,
-  Res,
-  UnauthorizedException,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import configuration from '../../common/config.js';
 import { AuthProfileResponseDto } from '../../dtos/auth/auth-profile-response.dto.js';
@@ -23,11 +9,7 @@ import { GoogleLoginQueryDto } from '../../dtos/auth/google-login-query.dto.js';
 import { LogoutResponseDto } from '../../dtos/auth/logout-response.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { AuthService } from './auth.service.js';
-import {
-  AUTH_COOKIE_NAME,
-  AUTH_DEFAULT_RETURN_URL,
-  AUTH_UNKNOWN_USER_PATH,
-} from './constants/auth.constants.js';
+import { AUTH_COOKIE_NAME, AUTH_DEFAULT_RETURN_URL, AUTH_LEGACY_COOKIE_NAME, AUTH_UNKNOWN_USER_PATH } from './constants/auth.constants.js';
 import { Public } from './public.decorator.js';
 
 @ApiTags('Auth')
@@ -41,9 +23,7 @@ export class AuthController {
   @Get('google/url')
   @ApiOperation({ summary: 'Get Google login URL' })
   @ApiOkResponse({ type: GoogleAuthUrlResponseDto })
-  async googleAuthUrl(
-    @Query() query: GoogleLoginQueryDto,
-  ): Promise<GoogleAuthUrlResponseDto> {
+  async googleAuthUrl(@Query() query: GoogleLoginQueryDto): Promise<GoogleAuthUrlResponseDto> {
     return {
       url: await this.authService.buildGoogleLoginUrl(query.returnUrl),
     };
@@ -60,19 +40,14 @@ export class AuthController {
   @Public()
   @Get('google/callback')
   @ApiOperation({ summary: 'Google OAuth callback and session creation' })
-  async googleCallback(
-    @Query() query: GoogleCallbackQueryDto,
-    @Res() res: Response,
-  ) {
-    const callbackResult = await this.authService.handleGoogleCallback(
-      query.code,
-    );
+  async googleCallback(@Query() query: GoogleCallbackQueryDto, @Res() res: Response) {
+    const callbackResult = await this.authService.handleGoogleCallback(query.code);
 
     if (!callbackResult.token) {
-      return res.redirect(
-        `${this.config.frontend.url}${AUTH_UNKNOWN_USER_PATH}`,
-      );
+      return res.redirect(`${this.config.frontend.url}${AUTH_UNKNOWN_USER_PATH}`);
     }
+
+    this.clearAuthCookies(res);
 
     res.cookie(AUTH_COOKIE_NAME, callbackResult.token, {
       httpOnly: true,
@@ -91,12 +66,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Clear auth cookie and logout' })
   @ApiOkResponse({ type: LogoutResponseDto })
   logout(@Res({ passthrough: true }) res: Response): LogoutResponseDto {
-    res.clearCookie(AUTH_COOKIE_NAME, {
-      httpOnly: true,
-      secure: this.config.nodeEnv === 'production',
-      sameSite: 'lax',
-      path: '/',
-    });
+    this.clearAuthCookies(res);
 
     return { success: true };
   }
@@ -107,12 +77,28 @@ export class AuthController {
   @ApiOkResponse({ type: AuthProfileResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async profile(@Req() req: Request): Promise<AuthProfileResponseDto> {
-    const token = req.cookies?.[AUTH_COOKIE_NAME] as string | undefined;
+    const token = (req.cookies?.[AUTH_COOKIE_NAME] as string | undefined) || (req.cookies?.[AUTH_LEGACY_COOKIE_NAME] as string | undefined);
 
     if (!token) {
       throw new UnauthorizedException('Unauthorized');
     }
 
     return this.authService.getProfileFromToken(token);
+  }
+
+  private clearAuthCookies(res: Response) {
+    const cookieNames = [AUTH_COOKIE_NAME, AUTH_LEGACY_COOKIE_NAME];
+    const cookiePaths = ['/', '/api'];
+
+    for (const cookieName of cookieNames) {
+      for (const path of cookiePaths) {
+        res.clearCookie(cookieName, {
+          httpOnly: true,
+          secure: this.config.nodeEnv === 'production',
+          sameSite: 'lax',
+          path,
+        });
+      }
+    }
   }
 }

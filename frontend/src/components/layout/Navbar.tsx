@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Gamepad2, Lock, Menu, X } from 'lucide-react';
+import { Gamepad2, Lock, Menu, X, ArrowRight } from 'lucide-react';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,81 +10,74 @@ export function Navbar() {
   const navItems = [
     { label: 'Home', href: '/' },
     { label: 'Events', href: '/events' },
-    { label: 'Reservations', href: '/reservations' },
     { label: 'Roster', href: '/roster' },
     { label: 'Schedule', href: '/schedule' },
     { label: 'Info', href: '/info' },
   ];
 
   return (
-    <nav className='w-full bg-slate-950 border-b border-red-600/20 fixed top-0 left-0 right-0 z-50'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='flex items-center justify-between h-20'>
+    <nav className="fixed w-full top-0 z-50 bg-[#020618]/80 backdrop-blur-md border-b border-white/10">
+      <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+        <div className="flex items-center">
           <Link
-            href='/'
-            className='flex items-center group cursor-pointer'
+            href="/"
+            className="text-2xl font-semibold tracking-tight text-[#ffffff] flex items-center gap-2 group"
             onClick={() => setIsOpen(false)}
           >
-            <div className='relative'>
-              <div className='absolute inset-0 bg-red-500 blur-lg opacity-20 group-hover:opacity-40 transition-opacity'></div>
-              <Gamepad2 className='h-8 w-8 text-red-500 relative z-10' />
-            </div>
-            <span className='ml-3 text-2xl font-black italic tracking-tighter text-white'>
-              AP<span className='text-red-500'>GAMING</span>
-            </span>
+            <Gamepad2 className="h-8 w-8 text-[#d42422] group-hover:rotate-12 transition-transform duration-300" strokeWidth={1.5} />
+            AP <span className="text-[#d42422]">Gaming</span>
           </Link>
+        </div>
 
-          <div className='hidden md:flex ml-10 items-center space-x-1'>
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className='relative px-4 py-2 rounded-lg text-sm font-bold text-gray-300 hover:text-white hover:bg-white/5 transition-all group'
-              >
-                {item.label}
-                <span className='absolute bottom-0 left-0 w-0 h-0.5 bg-red-500 transition-all group-hover:w-full'></span>
-              </Link>
-            ))}
+        <div className="hidden md:flex gap-8 text-lg text-gray-300 font-medium items-center">
+          {navItems.map((item) => (
             <Link
-              href='/admin'
-              className='text-gray-500 hover:text-white p-2 ml-4'
+              key={item.href}
+              href={item.href}
+              className="hover:text-[#ffffff] transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-[#d42422] hover:after:w-full after:transition-all"
             >
-              <Lock size={20} />
+              {item.label}
             </Link>
-          </div>
+          ))}
+          <Link href="/admin" className="text-gray-500 hover:text-white p-2">
+            <Lock size={20} strokeWidth={1.5} />
+          </Link>
+        </div>
 
-          <div className='md:hidden flex items-center'>
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className='text-gray-300 hover:text-white focus:outline-none p-2'
-            >
-              {isOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
-          </div>
+        <div className="hidden md:flex flex-shrink-0 items-center pl-6">
+          <Link
+            href="/reservations"
+            className="bg-[#d42422] text-[#ffffff] px-6 py-2.5 rounded-full text-lg font-medium hover:bg-red-700 transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2 shadow-[0_0_15px_rgba(212,36,34,0.4)]"
+          >
+            Reserveer <ArrowRight className="w-5 h-5" strokeWidth={1.5} />
+          </Link>
+        </div>
+
+        <div className="md:hidden flex items-center gap-4">
+          <Link href="/admin" className="text-gray-500 hover:text-white p-2">
+            <Lock size={20} strokeWidth={1.5} />
+          </Link>
+          <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 hover:text-white focus:outline-none p-2">
+            {isOpen ? <X size={28} strokeWidth={1.5} /> : <Menu size={28} strokeWidth={1.5} />}
+          </button>
         </div>
       </div>
 
       {isOpen && (
-        <div className='md:hidden bg-slate-950 border-b border-red-600/20 absolute left-0 top-20 w-full max-h-[calc(100vh-5rem)] overflow-y-auto shadow-2xl'>
-          <div className='px-4 pt-2 pb-6 space-y-2'>
+        <div className="md:hidden bg-[#020618] border-b border-white/10 absolute left-0 top-[72px] w-full max-h-[calc(100vh-4.5rem)] overflow-y-auto shadow-2xl">
+          <div className="px-4 pt-2 pb-6 space-y-4">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
-                className='block px-3 py-3 rounded-md text-base font-bold text-gray-300 hover:text-white hover:bg-red-600/10 hover:border-l-4 hover:border-red-500 transition-all'
+                className="block px-3 py-2 rounded-md text-lg font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all"
               >
                 {item.label}
               </Link>
             ))}
-            <Link
-              href='/admin'
-              onClick={() => setIsOpen(false)}
-              className='block px-3 py-3 rounded-md text-base font-bold text-gray-500 hover:text-white'
-            >
-              <div className='flex items-center gap-2'>
-                <Lock size={16} /> Admin
-              </div>
+            <Link href="/reservations" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-[#d42422] font-medium text-lg">
+              Reserveer
             </Link>
           </div>
         </div>

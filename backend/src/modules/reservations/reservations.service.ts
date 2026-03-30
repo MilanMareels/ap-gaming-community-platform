@@ -1,9 +1,6 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { MailService } from '../mail/mail.service.js';
 import {
   AdminCreateReservationDto,
   CreateReservationDto,
@@ -11,29 +8,118 @@ import {
   UpdateReservationDto,
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
+import { errorMessages } from '../../errors/errorMessages.js';
 
 @Injectable()
 export class ReservationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailService: MailService,
+  ) {}
+
+  private formatDateTimeDutch(date: Date): string {
+    return new Intl.DateTimeFormat('nl-NL', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'UTC',
+    }).format(date);
+  }
+
+  private capitalizeInventory(inventory: string): string {
+    const mapping: Record<string, string> = {
+      pc: 'PC',
+      ps5: 'PlayStation 5',
+      switch: 'Nintendo Switch',
+    };
+    return mapping[inventory.toLowerCase()] || inventory;
+  }
+
+  private async sendReservationCancelationConfirmationEmail(
+    email: string,
+    sNumber: string,
+    reservationCuid: string,
+    inventory: string,
+    controllers: number,
+    startTime: Date,
+    endTime: Date,
+  ): Promise<void> {
+    try {
+      await this.mailService.sendMail(email, 'Annulatie Reservatie Bevestiging - AP Gaming Hub', 'reservation/cancellation', {
+        sNumber,
+        reservationId: reservationCuid,
+        inventory: this.capitalizeInventory(inventory),
+        controllers,
+        startTime: this.formatDateTimeDutch(startTime),
+        endTime: this.formatDateTimeDutch(endTime),
+        email,
+      });
+    } catch (error) {
+      // Log error but don't fail the cancellation process
+      console.error('Failed to send cancellation email:', error);
+    }
+  }
+
+  private async sendConfirmationEmail(
+    email: string,
+    sNumber: string,
+    reservationCuid: string,
+    inventory: string,
+    controllers: number,
+    startTime: Date,
+    endTime: Date,
+  ): Promise<void> {
+    try {
+      const qrCodeBuffer = await this.mailService.generateQRCode(reservationCuid);
+
+      const cancelUrl = `${process.env.FRONTEND_URL}/cancel-reservation/${reservationCuid}`;
+
+      await this.mailService.sendMailWithAttachments(
+        email,
+        'Reservatie Bevestiging - AP Gaming Hub',
+        'reservation/confirmation',
+        {
+          sNumber,
+          reservationId: reservationCuid,
+          inventory: this.capitalizeInventory(inventory),
+          controllers,
+          startTime: this.formatDateTimeDutch(startTime),
+          endTime: this.formatDateTimeDutch(endTime),
+          email,
+          cancelUrl,
+        },
+        [
+          {
+            filename: 'qrcode.png',
+            content: qrCodeBuffer,
+            cid: 'qrcode',
+          },
+        ],
+      );
+    } catch (error) {
+      // Log error but don't fail the reservation creation
+      console.error('Failed to send confirmation email:', error);
+    }
+  }
 
   async create(dto: CreateReservationDto) {
-    // Validate date is not more than 3 days ahead
     const now = new Date();
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + 3);
     maxDate.setHours(23, 59, 59, 999);
     const startTime = new Date(dto.startTime);
+    const endTime = new Date(dto.endTime);
 
     if (startTime < now) {
-      throw new BadRequestException('Cannot reserve in the past');
+      throw new BadRequestException(errorMessages.pastDate);
     }
     if (startTime > maxDate) {
-      throw new BadRequestException(
-        'Reservations can only be made up to 3 days in advance',
-      );
+      throw new BadRequestException(errorMessages.maxAdvanceDays);
     }
 
-    // Find or create user
     let user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -47,46 +133,118 @@ export class ReservationsService {
       });
     }
 
-    // Check for conflicts
-    const conflictingReservation = await this.prisma.reservation.findFirst({
+    const hardwareKey = dto.inventory.toLowerCase();
+
+    const settingRecord = await this.prisma.setting.findFirst({
+      where: { key: hardwareKey },
+    });
+
+    if (!settingRecord) {
+      throw new BadRequestException(`Hardware type '${dto.inventory}' is not configured in settings.`);
+    }
+
+    const maxCapacity = parseInt(settingRecord.value, 10);
+
+    if (isNaN(maxCapacity)) {
+      throw new BadRequestException(`Configuration error: capacity for '${dto.inventory}' is not a valid number.`);
+    }
+
+    const conflictingReservationsCount = await this.prisma.reservation.count({
       where: {
         inventory: dto.inventory,
-        status: ReservationStatus.RESERVED,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+        startTime: { lt: endTime },
+        endTime: { gt: startTime },
+      },
+    });
+
+    if (conflictingReservationsCount >= maxCapacity) {
+      throw new BadRequestException(`All ${dto.inventory}s are already reserved for this time slot`);
+    }
+
+    const noShowCount = await this.prisma.reservation.count({
+      where: {
+        userId: user.id,
+        status: ReservationStatus.NO_SHOW,
+      },
+    });
+
+    if (noShowCount >= 3) {
+      throw new BadRequestException('You already have three no-shows. You can no longer make new reservations.');
+    }
+
+    const existingReservation = await this.prisma.reservation.findFirst({
+      where: {
+        userId: user.id,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+        startTime: { lt: endTime },
+        endTime: { gt: startTime },
+      },
+    });
+
+    if (existingReservation) {
+      throw new BadRequestException('You already have a reservation that overlaps with this time slot');
+    }
+
+    const bufferTime = 30 * 60 * 1000; // 30 minutes
+    const bufferStart = new Date(startTime.getTime() - bufferTime);
+    const bufferEnd = new Date(endTime.getTime() + bufferTime);
+
+    const bufferConflict = await this.prisma.reservation.findFirst({
+      where: {
+        userId: user.id,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
         OR: [
           {
-            AND: [
-              { startTime: { lte: new Date(dto.startTime) } },
-              { endTime: { gt: new Date(dto.startTime) } },
-            ],
+            AND: [{ startTime: { lte: bufferStart } }, { endTime: { gt: bufferStart } }],
           },
           {
-            AND: [
-              { startTime: { lt: new Date(dto.endTime) } },
-              { endTime: { gte: new Date(dto.endTime) } },
-            ],
+            AND: [{ startTime: { lt: bufferEnd } }, { endTime: { gte: bufferEnd } }],
           },
         ],
       },
     });
 
-    if (conflictingReservation) {
-      throw new BadRequestException('This time slot is already reserved');
+    if (bufferConflict) {
+      throw new BadRequestException('You must have at least 30 minutes between reservations');
+    }
+    const maxReservationsPerDay = 2;
+    const startOfDay = new Date(startTime);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(startTime);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const dailyReservationsCount = await this.prisma.reservation.count({
+      where: {
+        userId: user.id,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+        startTime: { gte: startOfDay, lte: endOfDay },
+      },
+    });
+
+    if (dailyReservationsCount >= maxReservationsPerDay) {
+      throw new BadRequestException('You can only make two reservations per day');
     }
 
-    return this.prisma.reservation.create({
+    const reservation = await this.prisma.reservation.create({
       data: {
         userId: user.id,
         inventory: dto.inventory,
         controllers: dto.controllers,
         email: dto.email,
-        startTime: new Date(dto.startTime),
-        endTime: new Date(dto.endTime),
+        startTime: startTime,
+        endTime: endTime,
         status: ReservationStatus.RESERVED,
       },
       include: {
         user: true,
       },
     });
+
+    // Send confirmation email
+    await this.sendConfirmationEmail(dto.email, dto.sNumber, reservation.cuid, dto.inventory, dto.controllers, startTime, endTime);
+
+    return reservation;
   }
 
   async adminCreate(dto: AdminCreateReservationDto) {
@@ -108,19 +266,13 @@ export class ReservationsService {
     const conflictingReservation = await this.prisma.reservation.findFirst({
       where: {
         inventory: dto.inventory,
-        status: ReservationStatus.RESERVED,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
         OR: [
           {
-            AND: [
-              { startTime: { lte: new Date(dto.startTime) } },
-              { endTime: { gt: new Date(dto.startTime) } },
-            ],
+            AND: [{ startTime: { lte: new Date(dto.startTime) } }, { endTime: { gt: new Date(dto.startTime) } }],
           },
           {
-            AND: [
-              { startTime: { lt: new Date(dto.endTime) } },
-              { endTime: { gte: new Date(dto.endTime) } },
-            ],
+            AND: [{ startTime: { lt: new Date(dto.endTime) } }, { endTime: { gte: new Date(dto.endTime) } }],
           },
         ],
       },
@@ -130,20 +282,28 @@ export class ReservationsService {
       throw new BadRequestException('This time slot is already reserved');
     }
 
-    return this.prisma.reservation.create({
+    const startTime = new Date(dto.startTime);
+    const endTime = new Date(dto.endTime);
+
+    const reservation = await this.prisma.reservation.create({
       data: {
         userId: user.id,
         inventory: dto.inventory,
         controllers: dto.controllers,
         email: dto.email,
-        startTime: new Date(dto.startTime),
-        endTime: new Date(dto.endTime),
+        startTime: startTime,
+        endTime: endTime,
         status: ReservationStatus.RESERVED,
       },
       include: {
         user: true,
       },
     });
+
+    // Send confirmation email
+    await this.sendConfirmationEmail(dto.email, dto.sNumber || 'N/A', reservation.cuid, dto.inventory, dto.controllers, startTime, endTime);
+
+    return reservation;
   }
 
   async update(id: number, dto: UpdateReservationDto) {
@@ -208,7 +368,7 @@ export class ReservationsService {
 
     const reservations = await this.prisma.reservation.findMany({
       where: {
-        status: ReservationStatus.RESERVED,
+        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
         startTime: { gte: startOfDay, lte: endOfDay },
       },
       select: {
@@ -221,6 +381,49 @@ export class ReservationsService {
     });
 
     return reservations;
+  }
+
+  async verifyByCuid(cuid: string) {
+    const reservation = await this.prisma.reservation.findFirst({
+      where: { cuid },
+      include: {
+        user: {
+          select: {
+            sNumber: true,
+          },
+        },
+      },
+    });
+
+    if (!reservation || [ReservationStatus.CANCELLED, ReservationStatus.NO_SHOW].includes(reservation.status as ReservationStatus)) {
+      throw new NotFoundException('Reservation not found');
+    }
+
+    const verifiedReservation =
+      reservation.status === ReservationStatus.RESERVED
+        ? await this.prisma.reservation.update({
+            where: { id: reservation.id },
+            data: { status: ReservationStatus.PRESENT },
+            include: {
+              user: {
+                select: {
+                  sNumber: true,
+                },
+              },
+            },
+          })
+        : reservation;
+
+    return {
+      cuid: verifiedReservation.cuid,
+      email: verifiedReservation.email,
+      sNumber: verifiedReservation.user.sNumber,
+      inventory: verifiedReservation.inventory,
+      controllers: verifiedReservation.controllers,
+      startTime: verifiedReservation.startTime,
+      endTime: verifiedReservation.endTime,
+      status: verifiedReservation.status,
+    };
   }
 
   async findAll(date?: string, search?: string) {
@@ -239,10 +442,7 @@ export class ReservationsService {
     }
 
     if (search) {
-      where.OR = [
-        { email: { contains: search, mode: 'insensitive' } },
-        { user: { sNumber: { contains: search, mode: 'insensitive' } } },
-      ];
+      where.OR = [{ email: { contains: search, mode: 'insensitive' } }, { user: { sNumber: { contains: search, mode: 'insensitive' } } }];
     }
 
     return this.prisma.reservation.findMany({
@@ -251,7 +451,7 @@ export class ReservationsService {
         user: true,
       },
       orderBy: {
-        startTime: 'desc',
+        startTime: 'asc',
       },
     });
   }
@@ -288,5 +488,61 @@ export class ReservationsService {
         startTime: 'desc',
       },
     });
+  }
+
+  async unBlockUser(userId: number) {
+    const noShowReservations = await this.prisma.reservation.findMany({
+      where: {
+        userId,
+        status: ReservationStatus.NO_SHOW,
+      },
+    });
+
+    if (noShowReservations.length === 0) {
+      throw new NotFoundException('No no-shows found for this user');
+    }
+
+    for (const reservation of noShowReservations) {
+      await this.prisma.reservation.update({
+        where: { id: reservation.id },
+        data: { status: ReservationStatus.CANCELLED }, // Andere status nodig voor deblock??
+      });
+    }
+  }
+
+  async cancelByCuid(cuid: string) {
+    const reservation = await this.prisma.reservation.findFirst({
+      where: { cuid },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Reservation not found');
+    }
+
+    if (reservation.status === ReservationStatus.CANCELLED) {
+      throw new BadRequestException('Reservation is already cancelled');
+    }
+
+    if (new Date(reservation.startTime) <= new Date()) {
+      throw new BadRequestException('You cannot cancel a reservation that has already started or passed');
+    }
+
+    const updatedReservation = await this.prisma.reservation.update({
+      where: { id: reservation.id },
+      data: { status: ReservationStatus.CANCELLED },
+      include: { user: true },
+    });
+
+    await this.sendReservationCancelationConfirmationEmail(
+      updatedReservation.email,
+      updatedReservation.user.sNumber,
+      updatedReservation.cuid,
+      updatedReservation.inventory,
+      updatedReservation.controllers,
+      updatedReservation.startTime,
+      updatedReservation.endTime,
+    );
+
+    return updatedReservation;
   }
 }
