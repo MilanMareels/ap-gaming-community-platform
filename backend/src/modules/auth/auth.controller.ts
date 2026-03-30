@@ -9,7 +9,7 @@ import { GoogleLoginQueryDto } from '../../dtos/auth/google-login-query.dto.js';
 import { LogoutResponseDto } from '../../dtos/auth/logout-response.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { AuthService } from './auth.service.js';
-import { AUTH_COOKIE_NAME, AUTH_DEFAULT_RETURN_URL, AUTH_UNKNOWN_USER_PATH } from './constants/auth.constants.js';
+import { AUTH_COOKIE_NAME, AUTH_DEFAULT_RETURN_URL, AUTH_LEGACY_COOKIE_NAME, AUTH_UNKNOWN_USER_PATH } from './constants/auth.constants.js';
 import { Public } from './public.decorator.js';
 
 @ApiTags('Auth')
@@ -47,6 +47,8 @@ export class AuthController {
       return res.redirect(`${this.config.frontend.url}${AUTH_UNKNOWN_USER_PATH}`);
     }
 
+    this.clearAuthCookies(res);
+
     res.cookie(AUTH_COOKIE_NAME, callbackResult.token, {
       httpOnly: true,
       secure: this.config.nodeEnv === 'production',
@@ -64,12 +66,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Clear auth cookie and logout' })
   @ApiOkResponse({ type: LogoutResponseDto })
   logout(@Res({ passthrough: true }) res: Response): LogoutResponseDto {
-    res.clearCookie(AUTH_COOKIE_NAME, {
-      httpOnly: true,
-      secure: this.config.nodeEnv === 'production',
-      sameSite: 'lax',
-      path: '/',
-    });
+    this.clearAuthCookies(res);
 
     return { success: true };
   }
@@ -80,12 +77,28 @@ export class AuthController {
   @ApiOkResponse({ type: AuthProfileResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async profile(@Req() req: Request): Promise<AuthProfileResponseDto> {
-    const token = req.cookies?.[AUTH_COOKIE_NAME] as string | undefined;
+    const token = (req.cookies?.[AUTH_COOKIE_NAME] as string | undefined) || (req.cookies?.[AUTH_LEGACY_COOKIE_NAME] as string | undefined);
 
     if (!token) {
       throw new UnauthorizedException('Unauthorized');
     }
 
     return this.authService.getProfileFromToken(token);
+  }
+
+  private clearAuthCookies(res: Response) {
+    const cookieNames = [AUTH_COOKIE_NAME, AUTH_LEGACY_COOKIE_NAME];
+    const cookiePaths = ['/', '/api'];
+
+    for (const cookieName of cookieNames) {
+      for (const path of cookiePaths) {
+        res.clearCookie(cookieName, {
+          httpOnly: true,
+          secure: this.config.nodeEnv === 'production',
+          sameSite: 'lax',
+          path,
+        });
+      }
+    }
   }
 }

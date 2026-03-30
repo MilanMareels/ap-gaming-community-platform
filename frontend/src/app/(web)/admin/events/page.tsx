@@ -51,33 +51,20 @@ export default function AdminEventsPage() {
   }, []);
 
   const handleAddEvent = async () => {
-    if (
-      !newEvent.title.trim() ||
-      !newEvent.date ||
-      !newEvent.startTime ||
-      !newEvent.endTime
-    )
-      return;
+    if (!newEvent.title.trim() || !newEvent.date || !newEvent.startTime || !newEvent.endTime) return;
 
-    const startTime = new Date(
-      `${newEvent.date}T${newEvent.startTime}:00`,
-    ).toISOString();
-    const endTime = new Date(
-      `${newEvent.date}T${newEvent.endTime}:00`,
-    ).toISOString();
+    const startTime = new Date(`${newEvent.date}T${newEvent.startTime}:00`).toISOString();
+    const endTime = new Date(`${newEvent.date}T${newEvent.endTime}:00`).toISOString();
 
     try {
-      await apiClient.POST(
-        '/events' as never,
-        {
-          body: {
-            title: newEvent.title,
-            startTime,
-            endTime,
-            type: newEvent.type,
-          },
-        } as never,
-      );
+      await apiClient.POST('/events', {
+        body: {
+          title: newEvent.title,
+          startTime,
+          endTime,
+          type: newEvent.type,
+        },
+      });
       setNewEvent({
         title: '',
         date: '',
@@ -94,12 +81,9 @@ export default function AdminEventsPage() {
   const handleDeleteEvent = async (id: number) => {
     if (!confirm('Weet je zeker dat je dit event wilt verwijderen?')) return;
     try {
-      await apiClient.DELETE(
-        '/events/{id}' as never,
-        {
-          params: { path: { id: id.toString() } },
-        } as never,
-      );
+      await apiClient.DELETE('/events/{id}', {
+        params: { path: { id: id.toString() } },
+      });
       await fetchEvents();
     } catch (err) {
       console.error('Failed to delete event:', err);
@@ -107,62 +91,52 @@ export default function AdminEventsPage() {
   };
 
   return (
-    <div className='grid lg:grid-cols-3 gap-8'>
+    <div className="grid lg:grid-cols-3 gap-8">
       {/* Left: Add Event Form */}
-      <div className='bg-slate-900 p-6 rounded-xl border border-slate-800 h-fit'>
-        <h3 className='font-bold mb-4'>Event Toevoegen &amp; Inplannen</h3>
-        <div className='space-y-3'>
+      <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 h-fit">
+        <h3 className="font-bold mb-4">Event Toevoegen &amp; Inplannen</h3>
+        <div className="space-y-3">
           <input
             required
-            className='w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-red-500 transition-colors'
-            placeholder='Titel'
+            className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-red-500 transition-colors"
+            placeholder="Titel"
             value={newEvent.title}
-            onChange={(e) =>
-              setNewEvent({ ...newEvent, title: e.target.value })
-            }
+            onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
           />
 
           <input
             required
-            type='date'
-            className='w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-red-500 transition-colors [&::-webkit-calendar-picker-indicator]:invert'
+            type="date"
+            className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-red-500 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
             value={newEvent.date}
             onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
           />
 
-          <div className='grid grid-cols-2 gap-2'>
+          <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className='text-[10px] uppercase text-gray-500 font-bold'>
-                Starttijd
-              </label>
+              <label className="text-[10px] uppercase text-gray-500 font-bold">Starttijd</label>
               <input
                 required
-                type='time'
-                className='w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-red-500 transition-colors [&::-webkit-calendar-picker-indicator]:invert'
+                type="time"
+                className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-red-500 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
                 value={newEvent.startTime}
-                onChange={(e) =>
-                  setNewEvent({ ...newEvent, startTime: e.target.value })
-                }
+                onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
               />
             </div>
             <div>
-              <label className='text-[10px] uppercase text-gray-500 font-bold'>
-                Eindtijd
-              </label>
+              <label className="text-[10px] uppercase text-gray-500 font-bold">Eindtijd</label>
               <input
                 required
-                type='time'
-                className='w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-red-500 transition-colors [&::-webkit-calendar-picker-indicator]:invert'
+                type="time"
+                className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-red-500 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
                 value={newEvent.endTime}
-                onChange={(e) =>
-                  setNewEvent({ ...newEvent, endTime: e.target.value })
-                }
+                onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
               />
             </div>
           </div>
 
           <select
-            className='w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-red-500 transition-colors'
+            className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-red-500 transition-colors"
             value={newEvent.type}
             onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}
           >
@@ -173,39 +147,26 @@ export default function AdminEventsPage() {
             ))}
           </select>
 
-          <button
-            onClick={handleAddEvent}
-            className='w-full bg-green-600 font-bold py-3 rounded-xl hover:bg-green-500 transition-colors'
-          >
+          <button onClick={handleAddEvent} className="w-full bg-green-600 font-bold py-3 rounded-xl hover:bg-green-500 transition-colors">
             Opslaan in Agenda
           </button>
         </div>
       </div>
 
       {/* Right: Events List */}
-      <div className='lg:col-span-2 space-y-2'>
+      <div className="lg:col-span-2 space-y-2">
         {events.length === 0 ? (
-          <div className='text-center text-gray-500 italic py-8 bg-slate-900 rounded-xl border border-slate-800'>
-            Geen events gepland.
-          </div>
+          <div className="text-center text-gray-500 italic py-8 bg-slate-900 rounded-xl border border-slate-800">Geen events gepland.</div>
         ) : (
           events.map((ev) => (
-            <div
-              key={ev.id}
-              className='flex justify-between items-center bg-slate-900 p-4 rounded-xl border border-slate-800'
-            >
+            <div key={ev.id} className="flex justify-between items-center bg-slate-900 p-4 rounded-xl border border-slate-800">
               <div>
-                <div className='font-bold'>{ev.title}</div>
-                <div className='text-xs text-gray-400'>
-                  {formatDate(ev.startTime)} | {formatTime(ev.startTime)} -{' '}
-                  {formatTime(ev.endTime)} ({ev.type})
+                <div className="font-bold">{ev.title}</div>
+                <div className="text-xs text-gray-400">
+                  {formatDate(ev.startTime)} | {formatTime(ev.startTime)} - {formatTime(ev.endTime)} ({ev.type})
                 </div>
               </div>
-              <Button
-                size='sm'
-                variant='danger'
-                onClick={() => handleDeleteEvent(ev.id)}
-              >
+              <Button size="sm" variant="danger" onClick={() => handleDeleteEvent(ev.id)}>
                 <Trash2 size={16} />
               </Button>
             </div>

@@ -38,6 +38,31 @@ export class ReservationsService {
     return mapping[inventory.toLowerCase()] || inventory;
   }
 
+  private async sendReservationCancelationConfirmationEmail(
+    email: string,
+    sNumber: string,
+    reservationCuid: string,
+    inventory: string,
+    controllers: number,
+    startTime: Date,
+    endTime: Date,
+  ): Promise<void> {
+    try {
+      await this.mailService.sendMail(email, 'Annulatie Reservatie Bevestiging - AP Gaming Hub', 'reservation/cancellation', {
+        sNumber,
+        reservationId: reservationCuid,
+        inventory: this.capitalizeInventory(inventory),
+        controllers,
+        startTime: this.formatDateTimeDutch(startTime),
+        endTime: this.formatDateTimeDutch(endTime),
+        email,
+      });
+    } catch (error) {
+      // Log error but don't fail the cancellation process
+      console.error('Failed to send cancellation email:', error);
+    }
+  }
+
   private async sendConfirmationEmail(
     email: string,
     sNumber: string,
@@ -49,6 +74,8 @@ export class ReservationsService {
   ): Promise<void> {
     try {
       const qrCodeBuffer = await this.mailService.generateQRCode(reservationCuid);
+
+      const cancelUrl = `${process.env.FRONTEND_URL}/cancel-reservation/${reservationCuid}`;
 
       await this.mailService.sendMailWithAttachments(
         email,
@@ -62,6 +89,7 @@ export class ReservationsService {
           startTime: this.formatDateTimeDutch(startTime),
           endTime: this.formatDateTimeDutch(endTime),
           email,
+          cancelUrl,
         },
         [
           {
@@ -480,5 +508,41 @@ export class ReservationsService {
         data: { status: ReservationStatus.CANCELLED }, // Andere status nodig voor deblock??
       });
     }
+  }
+
+  async cancelByCuid(cuid: string) {
+    const reservation = await this.prisma.reservation.findFirst({
+      where: { cuid },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Reservation not found');
+    }
+
+    if (reservation.status === ReservationStatus.CANCELLED) {
+      throw new BadRequestException('Reservation is already cancelled');
+    }
+
+    if (new Date(reservation.startTime) <= new Date()) {
+      throw new BadRequestException('You cannot cancel a reservation that has already started or passed');
+    }
+
+    const updatedReservation = await this.prisma.reservation.update({
+      where: { id: reservation.id },
+      data: { status: ReservationStatus.CANCELLED },
+      include: { user: true },
+    });
+
+    await this.sendReservationCancelationConfirmationEmail(
+      updatedReservation.email,
+      updatedReservation.user.sNumber,
+      updatedReservation.cuid,
+      updatedReservation.inventory,
+      updatedReservation.controllers,
+      updatedReservation.startTime,
+      updatedReservation.endTime,
+    );
+
+    return updatedReservation;
   }
 }
