@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Calendar, Monitor, Gamepad2, CheckCircle, AlertTriangle, Users, Gamepad } from 'lucide-react';
 import { apiClient } from '@/api';
 import type { TimeTableEntry, ReservationSlot, Setting } from '@/api';
+import { getApiErrorMessage } from '@/util/api-error';
 
 /** Convert ISO datetime or HH:mm string to minutes since midnight */
 const timeToMins = (t: string) => {
@@ -215,9 +216,8 @@ export default function ReservationsPage() {
         },
       });
 
-      const response = res as any;
-      if (response.error) {
-        throw new Error(response.error.message || 'Failed to create reservation');
+      if (res.error) {
+        throw new Error(getApiErrorMessage(res.error, 'Failed to create reservation'));
       }
 
       if (!res.data) {
