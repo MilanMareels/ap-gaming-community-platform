@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { apiClient } from '@/api';
+import { getApiErrorMessage } from '@/util/api-error';
 import { CheckCircle, AlertTriangle, Loader2, XCircle, Info } from 'lucide-react';
 import Link from 'next/link';
 
@@ -26,16 +27,15 @@ export default function CancelReservationPage() {
         },
       });
 
-      const response = res as any;
-      if (response.error) {
-        const errMsg = response.error.message;
+      if (res.error) {
+        const errMsg = getApiErrorMessage(res.error, 'Er is iets misgegaan bij het annuleren.');
 
         if (errMsg === 'Reservation is already cancelled') {
           setStatus('already-cancelled');
           return;
         }
 
-        throw new Error(errMsg || 'Er is iets misgegaan bij het annuleren.');
+        throw new Error(errMsg);
       }
 
       setStatus('success');
