@@ -47,7 +47,7 @@ export default function RosterPage() {
     <div className="min-h-screen py-24 px-6 relative overflow-hidden font-sans">
       <div className="absolute top-0 inset-x-0 w-full h-[600px] bg-gradient-to-b from-[#d42422]/10 to-transparent pointer-events-none"></div>
 
-      <div className="container mx-auto max-w-7xl relative z-10">
+      <div className="container mx-auto w-full max-w-[1800px] px-4 relative z-10">
         <ScrollReveal direction="up">
           <div className="text-center mb-16 relative">
             <h1 className="text-7xl md:text-8xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400 to-gray-500 uppercase">
@@ -62,7 +62,7 @@ export default function RosterPage() {
 
         {games.length === 0 ? (
           <div className="text-center text-gray-500 py-24 bg-[#0a0f25] border border-white/10 rounded-3xl max-w-2xl mx-auto backdrop-blur-sm">
-            No active rosters at the moment.
+            Momenteel zijn er geen actieve selecties.
           </div>
         ) : (
           <>
@@ -90,10 +90,10 @@ export default function RosterPage() {
             </div>
 
             {/* Character-Select Style Roster Layout */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 justify-center">
               {players.length === 0 ? (
                 <div className="col-span-full text-center text-gray-400 italic bg-[#0a0f25]/80 backdrop-blur-xl border border-white/10 p-12 rounded-2xl">
-                  No players recruited yet.
+                  Er zijn nog geen spelers.
                 </div>
               ) : (
                 players.map((entry, idx) => (

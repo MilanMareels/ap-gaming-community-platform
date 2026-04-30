@@ -384,6 +384,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/settings/form": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the single form */
+        get: operations["SettingsController_getForm"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update the single form */
+        patch: operations["SettingsController_updateForm"];
+        trace?: never;
+    };
     "/settings": {
         parameters: {
             query?: never;
@@ -706,6 +724,10 @@ export interface components {
             key: string;
             value: string;
         };
+        UpdateFormDto: {
+            title?: string;
+            url?: string;
+        };
         UpdateSettingDto: {
             /** @example googleFormUrl */
             key: string;
@@ -777,6 +799,7 @@ export interface components {
             user: components["schemas"]["User"];
         };
         SettingRelations: Record<string, never>;
+        FormRelations: Record<string, never>;
         RosterGameRelations: {
             rosterEntries: components["schemas"]["RosterEntry"][];
         };
@@ -789,6 +812,11 @@ export interface components {
         };
         TimeTableEntryRelations: Record<string, never>;
         EventRelations: Record<string, never>;
+        Form: {
+            id: number;
+            title: string;
+            url: string;
+        };
         Event: {
             id: number;
             title: string;
@@ -1481,6 +1509,44 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Setting"][];
                 };
+            };
+        };
+    };
+    SettingsController_getForm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SettingsController_updateForm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateFormDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

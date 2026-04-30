@@ -1,9 +1,10 @@
 'use client';
 
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
-import { ShieldAlert, Terminal, Cpu, Users, Gamepad2, Zap, Lock, MessageCircle, ChevronDown, ChevronUp, ClipboardList } from 'lucide-react';
+import { ShieldAlert, Terminal, Cpu, Users, Gamepad2, Zap, Lock, ChevronDown, ChevronUp, ClipboardList, Info } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/api';
+import DiscordIcon from '@/components/ui/DiscordIcon';
 
 const FAQS = [
   {
@@ -47,15 +48,18 @@ export default function InfoPage() {
   const [activeTab, setActiveTab] = useState('conduct');
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [formUrl, setFormUrl] = useState('');
+  const [formTitle, setFormTitle] = useState('Formulier');
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await apiClient.GET('/settings/public');
+        const res = await apiClient.GET('/settings/form');
         if (res.data) {
-          const settings = res.data;
-          const formSetting = settings.find((s) => s.key === 'googleFormUrl');
-          if (formSetting) setFormUrl(formSetting.value);
+          const formData = res.data as unknown as { title: string; url: string };
+          if (formData.url && formData.url.trim() !== '') {
+            setFormUrl(formData.url);
+          }
+          setFormTitle(formData.title || 'Aanvraag / Feedback');
         }
       } catch {
         // ignore
@@ -78,7 +82,7 @@ export default function InfoPage() {
         <ScrollReveal direction="up">
           <div className="mb-16 flex flex-col items-center">
             <div className="inline-flex items-center justify-center p-4 bg-white/5 rounded-full mb-6 border border-white/10">
-              <Terminal size={48} className="text-[#d42422]" />
+              <Info size={48} className="text-[#d42422]" />
             </div>
             <h1 className="text-5xl md:text-8xl font-black italic tracking-tighter text-white uppercase text-center drop-shadow-lg">
               HUB <span className="text-[#d42422]">PROTOCOLS</span>
@@ -240,7 +244,7 @@ export default function InfoPage() {
           <ScrollReveal direction="left">
             <div className="h-full bg-[#0a0f25] border border-white/10 p-8 rounded-[1.5rem] flex flex-col items-center text-center hover:border-[#d42422]/60 transition-all relative overflow-hidden group">
               <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-[#d42422] rounded-full blur-[70px] opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none"></div>
-              <MessageCircle size={42} className="text-[#d42422] mb-5" strokeWidth={1.5} />
+              <DiscordIcon size={42} className="text-[#d42422] mb-5" />
               <h2 className="text-2xl font-bold italic uppercase mb-3 text-white tracking-wider">Word lid van Discord</h2>
               <p className="text-gray-400 mb-7 text-base font-medium">Chat met andere studenten, vind teammates en blijf op de hoogte van events.</p>
               <a
@@ -259,7 +263,7 @@ export default function InfoPage() {
               <div className="h-full bg-gradient-to-br from-[#d42422] to-[#990000] p-8 rounded-[1.5rem] flex flex-col items-center text-center hover:scale-[1.01] transition-transform relative overflow-hidden group">
                 <div className="absolute -left-10 -top-10 w-40 h-40 bg-white rounded-full blur-[70px] opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none"></div>
                 <ClipboardList size={42} className="text-white mb-5" strokeWidth={1.5} />
-                <h2 className="text-2xl font-bold italic uppercase mb-3 text-white tracking-wider">Aanvraag / Feedback</h2>
+                <h2 className="text-2xl font-bold italic uppercase mb-3 text-white tracking-wider">{formTitle}</h2>
                 <p className="text-white/90 mb-7 text-base font-medium">Suggesties of hulp nodig? Dien een formulier in voor de beheerders.</p>
                 <a
                   href={formUrl}

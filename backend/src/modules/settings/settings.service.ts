@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateAdminDto, UpdateSettingDto } from '../../dtos/admin/admin.dto.js';
+import { UpdateFormDto } from '~/dtos/form/from.dto.js';
 
 @Injectable()
 export class SettingsService {
@@ -40,6 +41,28 @@ export class SettingsService {
       data: {
         key: dto.key,
         value: dto.value,
+      },
+    });
+  }
+
+  async getForm() {
+    return this.prisma.form.findFirst();
+  }
+
+  async updateForm(dto: UpdateFormDto) {
+    const existing = await this.prisma.form.findFirst();
+
+    if (existing) {
+      return this.prisma.form.update({
+        where: { id: existing.id },
+        data: { title: dto.title, url: dto.url },
+      });
+    }
+
+    return this.prisma.form.create({
+      data: {
+        title: dto.title,
+        url: dto.url,
       },
     });
   }

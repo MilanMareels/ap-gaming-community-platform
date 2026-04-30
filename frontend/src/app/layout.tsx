@@ -8,8 +8,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'AP Gaming Hub',
-  description: 'De gaming hub van AP Hogeschool',
+  title: 'AP Gaming Hub | Reserve. Play. Repeat.',
+  description:
+    'Jouw toegang tot de AP Gaming Hub. Boek je gaming station, check beschikbaarheid en ontdek alles over de gaming faciliteiten van AP Hogeschool.',
 };
 
 export default function RootLayout({
