@@ -1,7 +1,7 @@
 'use client';
 
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
-import { ShieldAlert, Terminal, Cpu, Users, Gamepad2, Zap, Lock, MessageCircle, ChevronDown, ChevronUp, ClipboardList } from 'lucide-react';
+import { ShieldAlert, Terminal, Cpu, Users, Gamepad2, Zap, Lock, ChevronDown, ChevronUp, ClipboardList, Info } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/api';
 import DiscordIcon from '@/components/ui/DiscordIcon';
@@ -79,7 +79,7 @@ export default function InfoPage() {
         <ScrollReveal direction="up">
           <div className="mb-16 flex flex-col items-center">
             <div className="inline-flex items-center justify-center p-4 bg-white/5 rounded-full mb-6 border border-white/10">
-              <Terminal size={48} className="text-[#d42422]" />
+              <Info size={48} className="text-[#d42422]" />
             </div>
             <h1 className="text-5xl md:text-8xl font-black italic tracking-tighter text-white uppercase text-center drop-shadow-lg">
               HUB <span className="text-[#d42422]">PROTOCOLS</span>
