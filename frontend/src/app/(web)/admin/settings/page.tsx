@@ -1,10 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Lock } from 'lucide-react';
+import { Plus, Trash2, Lock, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { apiClient } from '@/api';
 import type { Setting, AdminUserWithUser } from '@/api';
+
+export interface Form {
+  id: number;
+  title: string;
+  url: string;
+}
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Setting[]>([]);
@@ -13,13 +19,26 @@ export default function AdminSettingsPage() {
   const [newAdminSNumber, setNewAdminSNumber] = useState('');
   const [newAdminGmail, setNewAdminGmail] = useState('');
 
+  const [formTitle, setFormTitle] = useState('');
+  const [formUrl, setFormUrl] = useState('');
+
   async function fetchData() {
     try {
-      const [settingsRes, adminsRes] = await Promise.all([apiClient.GET('/settings', {}), apiClient.GET('/settings/admins', {})]);
+      const [settingsRes, adminsRes, formRes] = await Promise.all([
+        apiClient.GET('/settings', {}),
+        apiClient.GET('/settings/admins', {}),
+        apiClient.GET('/settings/form', {}),
+      ]);
+
       if (settingsRes.data) setSettings(settingsRes.data as Setting[]);
       if (adminsRes.data) setAdminUsers(adminsRes.data as AdminUserWithUser[]);
+      if (formRes.data) {
+        const formData = formRes.data as unknown as Form;
+        setFormTitle(formData.title || '');
+        setFormUrl(formData.url || '');
+      }
     } catch (err) {
-      console.error('Failed to fetch settings:', err);
+      console.error('Failed to fetch data:', err);
     }
   }
 
@@ -33,6 +52,16 @@ export default function AdminSettingsPage() {
       await fetchData();
     } catch (err) {
       console.error('Failed to update setting:', err);
+    }
+  };
+
+  const handleSaveForm = async () => {
+    try {
+      await apiClient.PATCH('/settings/form', {
+        body: { title: formTitle, url: formUrl },
+      });
+    } catch (err) {
+      console.error('Failed to save form:', err);
     }
   };
 
@@ -69,18 +98,34 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="space-y-8">
-      {/* General Settings */}
+      {/* Formulier Instellingen */}
       <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
-        <h2 className="text-xl font-bold mb-4">Algemene Instellingen</h2>
-        <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">Google Form URL</label>
-          <input
-            type="url"
-            placeholder="https://docs.google.com/forms/..."
-            className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white mt-1"
-            value={settings.find((s) => s.key === 'googleFormUrl')?.value || ''}
-            onChange={(e) => handleUpdateSetting('googleFormUrl', e.target.value)}
-          />
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <FileText size={20} /> Formulier Instellingen
+        </h2>
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="w-full md:w-1/3">
+            <label className="text-xs font-bold text-gray-500 uppercase">Titel van het formulier</label>
+            <input
+              type="text"
+              placeholder="Bijv. Inschrijfformulier"
+              className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white mt-1"
+              value={formTitle}
+              onChange={(e) => setFormTitle(e.target.value)}
+              onBlur={handleSaveForm}
+            />
+          </div>
+          <div className="w-full md:flex-1">
+            <label className="text-xs font-bold text-gray-500 uppercase">Google Form URL</label>
+            <input
+              type="url"
+              placeholder="https://docs.google.com/forms/..."
+              className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white mt-1"
+              value={formUrl}
+              onChange={(e) => setFormUrl(e.target.value)}
+              onBlur={handleSaveForm}
+            />
+          </div>
         </div>
       </div>
 

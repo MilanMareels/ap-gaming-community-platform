@@ -48,15 +48,18 @@ export default function InfoPage() {
   const [activeTab, setActiveTab] = useState('conduct');
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [formUrl, setFormUrl] = useState('');
+  const [formTitle, setFormTitle] = useState('Formulier');
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await apiClient.GET('/settings/public');
+        const res = await apiClient.GET('/settings/form');
         if (res.data) {
-          const settings = res.data;
-          const formSetting = settings.find((s) => s.key === 'googleFormUrl');
-          if (formSetting) setFormUrl(formSetting.value);
+          const formData = res.data as unknown as { title: string; url: string };
+          if (formData.url && formData.url.trim() !== '') {
+            setFormUrl(formData.url);
+          }
+          setFormTitle(formData.title || 'Aanvraag / Feedback');
         }
       } catch {
         // ignore
@@ -260,7 +263,7 @@ export default function InfoPage() {
               <div className="h-full bg-gradient-to-br from-[#d42422] to-[#990000] p-8 rounded-[1.5rem] flex flex-col items-center text-center hover:scale-[1.01] transition-transform relative overflow-hidden group">
                 <div className="absolute -left-10 -top-10 w-40 h-40 bg-white rounded-full blur-[70px] opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none"></div>
                 <ClipboardList size={42} className="text-white mb-5" strokeWidth={1.5} />
-                <h2 className="text-2xl font-bold italic uppercase mb-3 text-white tracking-wider">Aanvraag / Feedback</h2>
+                <h2 className="text-2xl font-bold italic uppercase mb-3 text-white tracking-wider">{formTitle}</h2>
                 <p className="text-white/90 mb-7 text-base font-medium">Suggesties of hulp nodig? Dien een formulier in voor de beheerders.</p>
                 <a
                   href={formUrl}
