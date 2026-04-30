@@ -4,6 +4,7 @@ import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { ShieldAlert, Terminal, Cpu, Users, Gamepad2, Zap, Lock, MessageCircle, ChevronDown, ChevronUp, ClipboardList } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/api';
+import DiscordIcon from '@/components/ui/DiscordIcon';
 
 const FAQS = [
   {
@@ -240,7 +241,7 @@ export default function InfoPage() {
           <ScrollReveal direction="left">
             <div className="h-full bg-[#0a0f25] border border-white/10 p-8 rounded-[1.5rem] flex flex-col items-center text-center hover:border-[#d42422]/60 transition-all relative overflow-hidden group">
               <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-[#d42422] rounded-full blur-[70px] opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none"></div>
-              <MessageCircle size={42} className="text-[#d42422] mb-5" strokeWidth={1.5} />
+              <DiscordIcon size={42} className="text-[#d42422] mb-5" />
               <h2 className="text-2xl font-bold italic uppercase mb-3 text-white tracking-wider">Word lid van Discord</h2>
               <p className="text-gray-400 mb-7 text-base font-medium">Chat met andere studenten, vind teammates en blijf op de hoogte van events.</p>
               <a
