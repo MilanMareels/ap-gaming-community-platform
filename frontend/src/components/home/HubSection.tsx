@@ -183,15 +183,17 @@ export function HubSection() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* key forces re-mount so slide animation re-plays on every navigation */}
-            <div key={animKey} className={`absolute inset-0 ${slideDir === 'right' ? 'animate-slide-from-right' : 'animate-slide-from-left'}`}>
-              <Image
-                src={GALLERY_IMAGES[carouselIndex].src}
-                alt={GALLERY_IMAGES[carouselIndex].alt}
-                fill
-                className="object-contain select-none"
-                priority
-              />
-            </div>
+            {GALLERY_IMAGES[carouselIndex] && (
+              <div key={animKey} className={`absolute inset-0 ${slideDir === 'right' ? 'animate-slide-from-right' : 'animate-slide-from-left'}`}>
+                <Image
+                  src={GALLERY_IMAGES[carouselIndex].src}
+                  alt={GALLERY_IMAGES[carouselIndex].alt}
+                  fill
+                  className="object-contain select-none"
+                  priority
+                />
+              </div>
+            )}
           </div>
 
           {/* Close button */}

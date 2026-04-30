@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useState, useEffect } from 'react';
-import { Clock, Gamepad2, CalendarDays, Terminal, Activity } from 'lucide-react';
+import { Clock, Gamepad2, CalendarDays, Terminal, Activity, Calendars, Loader } from 'lucide-react';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { apiClient } from '@/api';
 import type { Event } from '@/api';
@@ -127,8 +127,8 @@ export default function EventsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center text-white">
         <div className="animate-pulse flex items-center gap-4">
-          <Activity className="text-[#d42422] animate-bounce" size={32} />
-          <span className="text-xl font-black italic tracking-widest">LOADING SATELLITE...</span>
+          <Loader className="text-[#d42422] animate-bounce" size={32} />
+          <span className="text-xl font-black italic tracking-widest">EVENEMENTEN LADEN...</span>
         </div>
       </div>
     );
@@ -149,17 +149,17 @@ export default function EventsPage() {
         <ScrollReveal direction="up">
           <div className="mb-16">
             <h1 className="text-4xl md:text-8xl font-black italic tracking-tighter text-white uppercase flex items-center gap-4">
-              <Terminal size={64} className="text-[#d42422]" />
-              Operations
+              <Calendars size={64} className="text-[#d42422]" />
+              Evenementen
             </h1>
-            <p className="text-[#d42422] tracking-[0.3em] font-bold text-sm mt-2 uppercase">// Active Operational Directives</p>
+            <p className="text-[#d42422] tracking-[0.3em] font-bold text-sm mt-2 uppercase">// Aankomende evenementen</p>
           </div>
         </ScrollReveal>
 
         {events.length === 0 ? (
           <div className="text-center text-gray-400 py-32 border border-white/5 bg-[#0a0f25]/50 backdrop-blur-sm rounded-[2rem]">
-            <Terminal size={48} className="mx-auto mb-4 opacity-50" />
-            <p className="text-xl tracking-widest uppercase">No operations scheduled.</p>
+            <Calendars size={48} className="mx-auto mb-4 opacity-50" />
+            <p className="text-xl tracking-widest uppercase">Geen evenementen gepland.</p>
           </div>
         ) : (
           <div className="space-y-12">

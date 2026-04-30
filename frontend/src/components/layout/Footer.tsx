@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Gamepad2, MessageCircle, ChevronRight, ExternalLink, Clock, FileText, Mail } from 'lucide-react';
 import { SiInstagram, SiTwitch } from '@icons-pack/react-simple-icons';
+import DiscordIcon from '../ui/DiscordIcon';
 
 export function Footer() {
   return (
@@ -35,7 +36,7 @@ export function Footer() {
                 href="https://discord.gg/N5adyu3kXf"
                 className="bg-white/5 border border-white/10 p-3 rounded-xl text-gray-400 hover:text-white hover:border-[#d42422] hover:bg-[#d42422]/10 transition-all"
               >
-                <MessageCircle className="w-5 h-5" strokeWidth={1.5} />
+                <DiscordIcon size={20} />
               </a>
             </div>
           </div>
