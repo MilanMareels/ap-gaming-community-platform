@@ -6,6 +6,7 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { AdminGuard } from '../../guards/admin.guard.js';
 import { PrismaModel } from '../../_gen/prisma-class/index.js';
 import { Public } from '../auth/public.decorator.js';
+import { UpdateFormDto } from '../../dtos/form/from.dto.js';
 
 @ApiTags('Settings')
 @Controller('settings')
@@ -27,6 +28,19 @@ export class SettingsController {
   @ApiOkResponse({ type: [PrismaModel.Setting] })
   getInventorySettings() {
     return this.settingsService.getInventorySettings();
+  }
+
+  @Public()
+  @Get('form')
+  @ApiOperation({ summary: 'Get the single form' })
+  getForm() {
+    return this.settingsService.getForm();
+  }
+
+  @Patch('form')
+  @ApiOperation({ summary: 'Update the single form' })
+  updateForm(@Body() dto: UpdateFormDto) {
+    return this.settingsService.updateForm(dto);
   }
 
   @Get()

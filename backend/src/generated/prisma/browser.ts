@@ -38,6 +38,11 @@ export type GoogleSSOUser = Prisma.GoogleSSOUserModel
  */
 export type Setting = Prisma.SettingModel
 /**
+ * Model Form
+ * 
+ */
+export type Form = Prisma.FormModel
+/**
  * Model RosterGame
  * 
  */

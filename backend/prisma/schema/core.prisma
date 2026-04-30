@@ -5,6 +5,12 @@ model Setting {
   value String
 }
 
+model Form {
+  id    Int    @id @default(autoincrement())
+  title String
+  url   String
+}
+
 model RosterGame {
   id            Int           @id @default(autoincrement())
   name          String

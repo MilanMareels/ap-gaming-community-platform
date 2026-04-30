@@ -55,6 +55,7 @@ export const ModelName = {
   AdminUser: 'AdminUser',
   GoogleSSOUser: 'GoogleSSOUser',
   Setting: 'Setting',
+  Form: 'Form',
   RosterGame: 'RosterGame',
   RosterEntry: 'RosterEntry',
   Reservation: 'Reservation',
@@ -112,6 +113,15 @@ export const SettingScalarFieldEnum = {
 } as const
 
 export type SettingScalarFieldEnum = (typeof SettingScalarFieldEnum)[keyof typeof SettingScalarFieldEnum]
+
+
+export const FormScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  url: 'url'
+} as const
+
+export type FormScalarFieldEnum = (typeof FormScalarFieldEnum)[keyof typeof FormScalarFieldEnum]
 
 
 export const RosterGameScalarFieldEnum = {
