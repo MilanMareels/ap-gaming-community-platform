@@ -62,7 +62,7 @@ export default function RosterPage() {
 
         {games.length === 0 ? (
           <div className="text-center text-gray-500 py-24 bg-[#0a0f25] border border-white/10 rounded-3xl max-w-2xl mx-auto backdrop-blur-sm">
-            No active rosters at the moment.
+            Momenteel zijn er geen actieve selecties.
           </div>
         ) : (
           <>
