@@ -64,7 +64,7 @@ export class RosterService {
     return this.prisma.rosterEntry.create({
       data: {
         userId: user.id,
-        gameId: Number(dto.gameId),
+        gameId: dto.gameId,
         handle: dto.handle,
         rank: dto.rank,
         role: dto.role,
