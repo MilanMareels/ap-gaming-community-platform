@@ -289,7 +289,7 @@ export interface paths {
         /** Get all roster entries */
         get: operations["RosterController_findAllEntries"];
         put?: never;
-        /** Add a roster entry (Admin only) */
+        /** Add a roster entry with optional image (Admin only) */
         post: operations["RosterController_createEntry"];
         delete?: never;
         options?: never;
@@ -667,6 +667,7 @@ export interface components {
             handle: string;
             rank: string;
             role?: string;
+            imageUrl?: string;
         };
         CreateRosterEntryDto: {
             /** @example John Doe */
@@ -1355,7 +1356,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateRosterEntryDto"];
+                "multipart/form-data": components["schemas"]["CreateRosterEntryDto"];
             };
         };
         responses: {

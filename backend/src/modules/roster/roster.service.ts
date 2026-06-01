@@ -29,7 +29,6 @@ export class RosterService {
     await this.prisma.rosterGame.delete({ where: { id } });
   }
 
-  // Roster Entries
   async findAllEntries() {
     return this.prisma.rosterEntry.findMany({
       include: {
@@ -42,8 +41,7 @@ export class RosterService {
     });
   }
 
-  async createEntry(dto: CreateRosterEntryDto) {
-    // Find or create user
+  async createEntry(dto: CreateRosterEntryDto, imagePath: string | null) {
     let user = await this.prisma.user.findFirst({
       where: { sNumber: dto.sNumber },
     });
@@ -57,7 +55,6 @@ export class RosterService {
         },
       });
     } else if (dto.name) {
-      // Keep the user name up-to-date with what the admin entered
       user = await this.prisma.user.update({
         where: { id: user.id },
         data: { name: dto.name },
@@ -67,10 +64,11 @@ export class RosterService {
     return this.prisma.rosterEntry.create({
       data: {
         userId: user.id,
-        gameId: dto.gameId,
+        gameId: Number(dto.gameId),
         handle: dto.handle,
         rank: dto.rank,
         role: dto.role,
+        imageUrl: imagePath,
       },
       include: {
         user: true,
