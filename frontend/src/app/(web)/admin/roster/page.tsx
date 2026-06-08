@@ -11,10 +11,8 @@ export default function AdminRosterPage() {
   const [entries, setEntries] = useState<RosterEntryWithRelations[]>([]);
   const [newGame, setNewGame] = useState('');
 
-  // Currently selected game for the roster view + add-player form
   const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
 
-  // New player form state
   const [newPlayer, setNewPlayer] = useState({
     name: '',
     sNumber: '',
@@ -23,13 +21,15 @@ export default function AdminRosterPage() {
     rank: '',
   });
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [fileInputKey, setFileInputKey] = useState<number>(Date.now());
+
   async function fetchData() {
     try {
       const [gamesRes, entriesRes] = await Promise.all([apiClient.GET('/roster/games', {}), apiClient.GET('/roster/entries', {})]);
       if (gamesRes.data) {
         const g = gamesRes.data as RosterGame[];
         setGames(g);
-        // Auto-select first game if nothing selected yet
         if (g.length > 0 && selectedGameId === null) {
           setSelectedGameId(g[0].id);
         }
@@ -72,19 +72,30 @@ export default function AdminRosterPage() {
   const handleAddPlayer = async () => {
     if (!selectedGameId || !newPlayer.name.trim() || !newPlayer.sNumber.trim() || !newPlayer.handle.trim()) return;
     try {
+      const formData = new FormData();
+      formData.append('name', newPlayer.name);
+      formData.append('sNumber', newPlayer.sNumber);
+      formData.append('handle', newPlayer.handle);
+      formData.append('rank', newPlayer.rank);
+      formData.append('gameId', selectedGameId.toString());
+
       const trimmedRole = newPlayer.role.trim();
+      if (trimmedRole) {
+        formData.append('role', trimmedRole);
+      }
+
+      if (imageFile) {
+        formData.append('image', imageFile);
+      }
 
       await apiClient.POST('/roster/entries', {
-        body: {
-          name: newPlayer.name,
-          sNumber: newPlayer.sNumber,
-          handle: newPlayer.handle,
-          rank: newPlayer.rank,
-          gameId: selectedGameId,
-          ...(trimmedRole ? { role: trimmedRole } : {}),
-        },
+        body: formData as any,
       });
+
       setNewPlayer({ name: '', sNumber: '', handle: '', role: '', rank: '' });
+      setImageFile(null);
+      setFileInputKey(Date.now());
+
       await fetchData();
     } catch (err) {
       console.error('Failed to add player:', err);
@@ -103,14 +114,11 @@ export default function AdminRosterPage() {
     }
   };
 
-  // Entries filtered by the currently selected game
   const filteredEntries = entries.filter((e) => e.game.id === selectedGameId);
-
   const selectedGame = games.find((g) => g.id === selectedGameId);
 
   return (
     <div className="space-y-8">
-      {/* Games Management */}
       <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
         <h2 className="text-xl font-bold mb-4">Roster Games</h2>
         <div className="flex gap-2 mb-4">
@@ -154,10 +162,8 @@ export default function AdminRosterPage() {
         </div>
       </div>
 
-      {/* Roster: Add Player + Player List (following old design grid) */}
       {selectedGame && (
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left: Add Player Form */}
           <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 h-fit">
             <h3 className="font-bold mb-4">Speler Toevoegen</h3>
             <div className="space-y-3">
@@ -207,13 +213,34 @@ export default function AdminRosterPage() {
                   onChange={(e) => setNewPlayer({ ...newPlayer, rank: e.target.value })}
                 />
               </div>
-              <button onClick={handleAddPlayer} className="w-full bg-blue-600 font-bold py-3 rounded-xl hover:bg-blue-500 transition-colors">
+
+              <div className="pt-2">
+                <label className="block text-[10px] uppercase text-gray-500 font-bold mb-1">Profielfoto (Optioneel)</label>
+                <input
+                  key={fileInputKey}
+                  type="file"
+                  accept="image/png, image/jpeg, image/jpg, image/webp"
+                  className="w-full text-sm text-gray-400
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-xl file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-slate-800 file:text-white
+                    hover:file:bg-slate-700
+                    cursor-pointer"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setImageFile(e.target.files[0]);
+                    }
+                  }}
+                />
+              </div>
+
+              <button onClick={handleAddPlayer} className="w-full bg-blue-600 font-bold py-3 mt-2 rounded-xl hover:bg-blue-500 transition-colors">
                 Toevoegen
               </button>
             </div>
           </div>
 
-          {/* Right: Roster List for selected game */}
           <div className="lg:col-span-2 space-y-3">
             <h3 className="text-xl font-bold text-red-500 mb-2">{selectedGame.name} Roster</h3>
             {filteredEntries.length === 0 ? (
@@ -221,13 +248,27 @@ export default function AdminRosterPage() {
             ) : (
               filteredEntries.map((entry) => (
                 <div key={entry.id} className="flex justify-between items-center bg-slate-900 p-4 rounded-xl border border-slate-800">
-                  <div>
-                    <span className="font-bold text-white">{entry.handle}</span>{' '}
-                    <span className="text-gray-500 text-sm">
-                      ({entry.user.name || entry.user.sNumber}
-                      {entry.role ? ` — ${entry.role}` : ''})
-                    </span>
-                    {entry.rank && <span className="ml-2 text-xs text-red-400 bg-red-900/20 px-2 py-0.5 rounded">{entry.rank}</span>}
+                  <div className="flex items-center gap-4">
+                    {entry.imageUrl ? (
+                      <img
+                        src={`/api/${entry.imageUrl}`}
+                        alt={entry.handle}
+                        className="w-10 h-10 rounded-full object-cover border border-slate-700"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-xs text-gray-500 font-bold">
+                        {entry.handle.slice(0, 2).toUpperCase()}
+                      </div>
+                    )}
+
+                    <div>
+                      <span className="font-bold text-white">{entry.handle}</span>{' '}
+                      <span className="text-gray-500 text-sm">
+                        ({entry.user.name || entry.user.sNumber}
+                        {entry.role ? ` — ${entry.role}` : ''})
+                      </span>
+                      {entry.rank && <span className="ml-2 text-xs text-red-400 bg-red-900/20 px-2 py-0.5 rounded">{entry.rank}</span>}
+                    </div>
                   </div>
                   <button onClick={() => handleDeleteEntry(entry.id)} className="text-red-500 hover:bg-red-900/20 p-2 rounded transition-colors">
                     <Trash2 size={16} />

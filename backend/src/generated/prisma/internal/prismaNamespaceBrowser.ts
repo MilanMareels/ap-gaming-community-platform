@@ -138,7 +138,8 @@ export const RosterEntryScalarFieldEnum = {
   gameId: 'gameId',
   handle: 'handle',
   rank: 'rank',
-  role: 'role'
+  role: 'role',
+  imageUrl: 'imageUrl'
 } as const
 
 export type RosterEntryScalarFieldEnum = (typeof RosterEntryScalarFieldEnum)[keyof typeof RosterEntryScalarFieldEnum]
