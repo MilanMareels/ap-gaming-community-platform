@@ -9,7 +9,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-apgaming}']
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-apgaming}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,6 +34,8 @@ services:
       SMTP_USER: ${SMTP_USER}
       SMTP_PASS: ${SMTP_PASS}
       SMTP_FROM: ${SMTP_FROM}
+    volumes:
+      - ./uploads:/usr/src/app/uploads
 
   frontend:
     image: ghcr.io/milanmareels/ap-gaming-hub/frontend:latest
@@ -51,7 +53,7 @@ services:
       - frontend
       - backend
     ports:
-      - '${PORT:-80}:80'
+      - "${PORT:-80}:80"
 
 volumes:
   postgres-data:

@@ -105,12 +105,21 @@ export default function RosterPage() {
 
                       {/* Faux Player Image / Graphic */}
                       <div className="absolute top-0 inset-x-0 h-[250px] bg-white/5 flex items-center justify-center overflow-hidden">
-                        <div className="text-[200px] text-white/5 absolute -bottom-10 -right-10 font-black italic">{idx + 1}</div>
-                        <User
-                          size={120}
-                          className="text-white/20 group-hover:scale-110 group-hover:text-[#d42422]/40 transition-all duration-700"
-                          strokeWidth={1}
-                        />
+                        <div className="text-[200px] text-white/5 absolute -bottom-10 -right-10 font-black italic z-0">{idx + 1}</div>
+
+                        {entry.imageUrl ? (
+                          <img
+                            src={`api/${entry.imageUrl}`}
+                            alt={entry.handle}
+                            className="w-full h-full object-cover object-top relative z-10 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                          />
+                        ) : (
+                          <User
+                            size={120}
+                            className="relative z-10 text-white/20 group-hover:scale-110 group-hover:text-[#d42422]/40 transition-all duration-700"
+                            strokeWidth={1}
+                          />
+                        )}
                       </div>
 
                       {/* Content overlay */}

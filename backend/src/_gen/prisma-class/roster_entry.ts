@@ -19,4 +19,7 @@ export class RosterEntry {
 
   @ApiPropertyOptional({ type: String })
   role: string | null;
+
+  @ApiPropertyOptional({ type: String })
+  imageUrl: string | null;
 }
