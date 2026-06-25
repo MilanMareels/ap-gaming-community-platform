@@ -16,16 +16,6 @@ export class ReservationSlotDto {
 }
 
 export class CreateReservationDto {
-  @ApiProperty({ example: 's123456' })
-  @IsString()
-  @IsNotEmpty()
-  sNumber!: string;
-
-  @ApiProperty({ example: 'student@student.ap.be' })
-  @IsEmail()
-  @IsNotEmpty()
-  email!: string;
-
   @ApiProperty({ example: 'pc', enum: ['pc', 'ps5', 'switch'] })
   @IsEnum(['pc', 'ps5', 'switch'])
   @IsNotEmpty()

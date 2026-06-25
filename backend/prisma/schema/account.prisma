@@ -5,10 +5,11 @@ model User {
   email   String  @unique
   sNumber String
 
-  reservations   Reservation[]
-  adminUsers     AdminUser[]
-  googleSSOUsers GoogleSSOUser[]
-  rosterEntries  RosterEntry[]
+  reservations      Reservation[]
+  adminUsers        AdminUser[]
+  googleSSOUsers    GoogleSSOUser[]
+  microsoftSSOUsers MicrosoftSSOUser[]
+  rosterEntries     RosterEntry[]
 }
 
 model AdminUser {
@@ -18,6 +19,13 @@ model AdminUser {
 }
 
 model GoogleSSOUser {
+  id     Int    @id @default(autoincrement())
+  ssoId  String @unique
+  userId Int
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model MicrosoftSSOUser {
   id     Int    @id @default(autoincrement())
   ssoId  String @unique
   userId Int

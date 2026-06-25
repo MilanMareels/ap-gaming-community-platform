@@ -54,6 +54,7 @@ export const ModelName = {
   User: 'User',
   AdminUser: 'AdminUser',
   GoogleSSOUser: 'GoogleSSOUser',
+  MicrosoftSSOUser: 'MicrosoftSSOUser',
   Setting: 'Setting',
   Form: 'Form',
   RosterGame: 'RosterGame',
@@ -104,6 +105,15 @@ export const GoogleSSOUserScalarFieldEnum = {
 } as const
 
 export type GoogleSSOUserScalarFieldEnum = (typeof GoogleSSOUserScalarFieldEnum)[keyof typeof GoogleSSOUserScalarFieldEnum]
+
+
+export const MicrosoftSSOUserScalarFieldEnum = {
+  id: 'id',
+  ssoId: 'ssoId',
+  userId: 'userId'
+} as const
+
+export type MicrosoftSSOUserScalarFieldEnum = (typeof MicrosoftSSOUserScalarFieldEnum)[keyof typeof MicrosoftSSOUserScalarFieldEnum]
 
 
 export const SettingScalarFieldEnum = {
