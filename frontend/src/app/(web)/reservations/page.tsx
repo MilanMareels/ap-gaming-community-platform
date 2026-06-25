@@ -283,7 +283,6 @@ export default function ReservationsPage() {
       const endISO = `${formData.date}T${minsToTime(endMins)}:00.000Z`;
 
       const res = await apiClient.POST('/reservations', {
-        // @ts-expect-error — backend now derives email/sNumber from JWT; run `npm run struct` against a running backend to refresh types.
         body: {
           startTime: startISO,
           endTime: endISO,
