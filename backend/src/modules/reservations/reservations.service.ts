@@ -105,7 +105,7 @@ export class ReservationsService {
     }
   }
 
-  async create(dto: CreateReservationDto) {
+  async createForUser(userId: number, dto: CreateReservationDto) {
     const now = new Date();
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + 3);
@@ -120,17 +120,12 @@ export class ReservationsService {
       throw new BadRequestException(errorMessages.maxAdvanceDays);
     }
 
-    let user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
     });
 
     if (!user) {
-      user = await this.prisma.user.create({
-        data: {
-          email: dto.email,
-          sNumber: dto.sNumber,
-        },
-      });
+      throw new BadRequestException('Authenticated user not found');
     }
 
     const hardwareKey = dto.inventory.toLowerCase();
@@ -231,7 +226,7 @@ export class ReservationsService {
         userId: user.id,
         inventory: dto.inventory,
         controllers: dto.controllers,
-        email: dto.email,
+        email: user.email,
         startTime: startTime,
         endTime: endTime,
         status: ReservationStatus.RESERVED,
@@ -242,7 +237,7 @@ export class ReservationsService {
     });
 
     // Send confirmation email
-    await this.sendConfirmationEmail(dto.email, dto.sNumber, reservation.cuid, dto.inventory, dto.controllers, startTime, endTime);
+    await this.sendConfirmationEmail(user.email, user.sNumber, reservation.cuid, dto.inventory, dto.controllers, startTime, endTime);
 
     return reservation;
   }

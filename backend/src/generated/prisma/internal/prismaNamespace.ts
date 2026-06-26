@@ -387,6 +387,7 @@ export const ModelName = {
   User: 'User',
   AdminUser: 'AdminUser',
   GoogleSSOUser: 'GoogleSSOUser',
+  MicrosoftSSOUser: 'MicrosoftSSOUser',
   Setting: 'Setting',
   Form: 'Form',
   RosterGame: 'RosterGame',
@@ -409,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "adminUser" | "googleSSOUser" | "setting" | "form" | "rosterGame" | "rosterEntry" | "reservation" | "timeTableEntry" | "event"
+    modelProps: "user" | "adminUser" | "googleSSOUser" | "microsoftSSOUser" | "setting" | "form" | "rosterGame" | "rosterEntry" | "reservation" | "timeTableEntry" | "event"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -632,6 +633,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.GoogleSSOUserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.GoogleSSOUserCountAggregateOutputType> | number
+        }
+      }
+    }
+    MicrosoftSSOUser: {
+      payload: Prisma.$MicrosoftSSOUserPayload<ExtArgs>
+      fields: Prisma.MicrosoftSSOUserFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MicrosoftSSOUserFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MicrosoftSSOUserPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MicrosoftSSOUserFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MicrosoftSSOUserPayload>
+        }
+        findFirst: {
+          args: Prisma.MicrosoftSSOUserFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MicrosoftSSOUserPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MicrosoftSSOUserFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MicrosoftSSOUserPayload>
+        }
+        findMany: {
+          args: Prisma.MicrosoftSSOUserFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MicrosoftSSOUserPayload>[]
+        }
+        create: {
+          args: Prisma.MicrosoftSSOUserCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MicrosoftSSOUserPayload>
+        }
+        createMany: {
+          args: Prisma.MicrosoftSSOUserCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MicrosoftSSOUserCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MicrosoftSSOUserPayload>[]
+        }
+        delete: {
+          args: Prisma.MicrosoftSSOUserDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MicrosoftSSOUserPayload>
+        }
+        update: {
+          args: Prisma.MicrosoftSSOUserUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MicrosoftSSOUserPayload>
+        }
+        deleteMany: {
+          args: Prisma.MicrosoftSSOUserDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MicrosoftSSOUserUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MicrosoftSSOUserUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MicrosoftSSOUserPayload>[]
+        }
+        upsert: {
+          args: Prisma.MicrosoftSSOUserUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MicrosoftSSOUserPayload>
+        }
+        aggregate: {
+          args: Prisma.MicrosoftSSOUserAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMicrosoftSSOUser>
+        }
+        groupBy: {
+          args: Prisma.MicrosoftSSOUserGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MicrosoftSSOUserGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MicrosoftSSOUserCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MicrosoftSSOUserCountAggregateOutputType> | number
         }
       }
     }
@@ -1219,6 +1294,15 @@ export const GoogleSSOUserScalarFieldEnum = {
 export type GoogleSSOUserScalarFieldEnum = (typeof GoogleSSOUserScalarFieldEnum)[keyof typeof GoogleSSOUserScalarFieldEnum]
 
 
+export const MicrosoftSSOUserScalarFieldEnum = {
+  id: 'id',
+  ssoId: 'ssoId',
+  userId: 'userId'
+} as const
+
+export type MicrosoftSSOUserScalarFieldEnum = (typeof MicrosoftSSOUserScalarFieldEnum)[keyof typeof MicrosoftSSOUserScalarFieldEnum]
+
+
 export const SettingScalarFieldEnum = {
   id: 'id',
   key: 'key',
@@ -1508,6 +1592,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   adminUser?: Prisma.AdminUserOmit
   googleSSOUser?: Prisma.GoogleSSOUserOmit
+  microsoftSSOUser?: Prisma.MicrosoftSSOUserOmit
   setting?: Prisma.SettingOmit
   form?: Prisma.FormOmit
   rosterGame?: Prisma.RosterGameOmit

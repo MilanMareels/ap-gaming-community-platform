@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
+import type { Request } from 'express';
 import { ReservationsService } from './reservations.service.js';
 import {
   CreateReservationDto,
@@ -13,6 +14,7 @@ import {
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { AdminGuard } from '../../guards/admin.guard.js';
 import { Public } from '../auth/public.decorator.js';
+import type { JwtPayload } from '../auth/types/jwt-payload.type.js';
 import { PrismaModel } from '../../_gen/prisma-class/index.js';
 import { HttpExceptionDto } from '../../dtos/http-exception.dto.js';
 
@@ -21,13 +23,15 @@ import { HttpExceptionDto } from '../../dtos/http-exception.dto.js';
 export class ReservationsController {
   constructor(private readonly reservationsService: ReservationsService) {}
 
-  @Public()
   @Post()
-  @ApiOperation({ summary: 'Create a new reservation' })
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Create a new reservation (authenticated user)' })
   @ApiCreatedResponse({ type: PrismaModel.Reservation })
   @ApiBadRequestResponse({ description: 'Validation or business rule violation', type: HttpExceptionDto })
-  create(@Body() dto: CreateReservationDto) {
-    return this.reservationsService.create(dto);
+  create(@Body() dto: CreateReservationDto, @Req() req: Request) {
+    const user = (req as Request & { user?: JwtPayload }).user;
+    if (!user) throw new UnauthorizedException('Unauthorized');
+    return this.reservationsService.createForUser(user.sub, dto);
   }
 
   @Public()

@@ -33,6 +33,11 @@ export type AdminUser = Prisma.AdminUserModel
  */
 export type GoogleSSOUser = Prisma.GoogleSSOUserModel
 /**
+ * Model MicrosoftSSOUser
+ * 
+ */
+export type MicrosoftSSOUser = Prisma.MicrosoftSSOUserModel
+/**
  * Model Setting
  * 
  */
