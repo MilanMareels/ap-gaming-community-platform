@@ -11,6 +11,7 @@
 export type * from './models/User.js'
 export type * from './models/AdminUser.js'
 export type * from './models/GoogleSSOUser.js'
+export type * from './models/MicrosoftSSOUser.js'
 export type * from './models/Setting.js'
 export type * from './models/Form.js'
 export type * from './models/RosterGame.js'

@@ -17,16 +17,6 @@ export function StepConfirmation({ data, updateData, error }: StepConfirmationPr
         <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Overzicht</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
           <div>
-            <span className="block text-gray-500 text-xs mb-1">Student</span>
-            <span className="text-white font-medium text-base block truncate">{data.sNumber}</span>
-          </div>
-          <div className="overflow-hidden">
-            <span className="block text-gray-500 text-xs mb-1">Email</span>
-            <span className="text-white font-medium text-base block truncate" title={data.email}>
-              {data.email}
-            </span>
-          </div>
-          <div>
             <span className="block text-gray-500 text-xs mb-1">Wanneer</span>
             <span className="text-white font-medium text-base block">{data.date}</span>
             <span className="text-[#d42422] font-mono text-base">{data.startTime}</span>

@@ -1,6 +1,7 @@
 import { UserRelations as _UserRelations } from './user_relations.js';
 import { AdminUserRelations as _AdminUserRelations } from './admin_user_relations.js';
 import { GoogleSSOUserRelations as _GoogleSSOUserRelations } from './google_s_s_o_user_relations.js';
+import { MicrosoftSSOUserRelations as _MicrosoftSSOUserRelations } from './microsoft_s_s_o_user_relations.js';
 import { SettingRelations as _SettingRelations } from './setting_relations.js';
 import { FormRelations as _FormRelations } from './form_relations.js';
 import { RosterGameRelations as _RosterGameRelations } from './roster_game_relations.js';
@@ -11,6 +12,7 @@ import { EventRelations as _EventRelations } from './event_relations.js';
 import { User as _User } from './user.js';
 import { AdminUser as _AdminUser } from './admin_user.js';
 import { GoogleSSOUser as _GoogleSSOUser } from './google_s_s_o_user.js';
+import { MicrosoftSSOUser as _MicrosoftSSOUser } from './microsoft_s_s_o_user.js';
 import { Setting as _Setting } from './setting.js';
 import { Form as _Form } from './form.js';
 import { RosterGame as _RosterGame } from './roster_game.js';
@@ -23,6 +25,7 @@ export namespace PrismaModel {
   export class UserRelations extends _UserRelations {}
   export class AdminUserRelations extends _AdminUserRelations {}
   export class GoogleSSOUserRelations extends _GoogleSSOUserRelations {}
+  export class MicrosoftSSOUserRelations extends _MicrosoftSSOUserRelations {}
   export class SettingRelations extends _SettingRelations {}
   export class FormRelations extends _FormRelations {}
   export class RosterGameRelations extends _RosterGameRelations {}
@@ -33,6 +36,7 @@ export namespace PrismaModel {
   export class User extends _User {}
   export class AdminUser extends _AdminUser {}
   export class GoogleSSOUser extends _GoogleSSOUser {}
+  export class MicrosoftSSOUser extends _MicrosoftSSOUser {}
   export class Setting extends _Setting {}
   export class Form extends _Form {}
   export class RosterGame extends _RosterGame {}
@@ -45,6 +49,7 @@ export namespace PrismaModel {
     UserRelations,
     AdminUserRelations,
     GoogleSSOUserRelations,
+    MicrosoftSSOUserRelations,
     SettingRelations,
     FormRelations,
     RosterGameRelations,
@@ -55,6 +60,7 @@ export namespace PrismaModel {
     User,
     AdminUser,
     GoogleSSOUser,
+    MicrosoftSSOUser,
     Setting,
     Form,
     RosterGame,
