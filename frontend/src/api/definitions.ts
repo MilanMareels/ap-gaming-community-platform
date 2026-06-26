@@ -55,6 +55,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/microsoft/url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Microsoft login URL */
+        get: operations["AuthController_microsoftAuthUrl"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/microsoft/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Redirect to Microsoft login page */
+        get: operations["AuthController_microsoftLogin"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/microsoft/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Microsoft OAuth callback and session creation */
+        get: operations["AuthController_microsoftCallback"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List linked SSO providers for the current user */
+        get: operations["AuthController_listLinks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/links/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Unlink an SSO provider from the current user */
+        delete: operations["AuthController_unlinkProvider"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/logout": {
         parameters: {
             query?: never;
@@ -99,7 +184,7 @@ export interface paths {
         /** Get all reservations (Admin only) */
         get: operations["ReservationsController_findAll"];
         put?: never;
-        /** Create a new reservation */
+        /** Create a new reservation (authenticated user) */
         post: operations["ReservationsController_create"];
         delete?: never;
         options?: never;
@@ -508,6 +593,128 @@ export interface paths {
         patch: operations["EventsController_update"];
         trace?: never;
     };
+    "/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List users with filters (Admin only) */
+        get: operations["UsersController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/whitelist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List pending SSO whitelist entries (Admin only) */
+        get: operations["UsersController_listWhitelist"];
+        put?: never;
+        /** Pre-authorize an external SSO email for a user (Admin only) */
+        post: operations["UsersController_createWhitelist"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/whitelist/{email}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a whitelist entry (Admin only) */
+        delete: operations["UsersController_deleteWhitelist"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get user detail (Admin only) */
+        get: operations["UsersController_getById"];
+        put?: never;
+        post?: never;
+        /** Delete a user and cascade their reservations (Admin only) */
+        delete: operations["UsersController_delete"];
+        options?: never;
+        head?: never;
+        /** Update a user (Admin only) */
+        patch: operations["UsersController_update"];
+        trace?: never;
+    };
+    "/users/{id}/promote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Promote user to admin (Admin only) */
+        post: operations["UsersController_promote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{id}/admin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Demote user from admin (Admin only) */
+        delete: operations["UsersController_demote"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{id}/sso/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Unlink an SSO provider from a user (Admin only) */
+        delete: operations["UsersController_unlinkSso"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -518,6 +725,21 @@ export interface components {
              * @example https://accounts.google.com/o/oauth2/v2/auth?...
              */
             url: string;
+        };
+        MicrosoftAuthUrlResponseDto: {
+            /**
+             * @description Microsoft OAuth login URL
+             * @example https://login.microsoftonline.com/.../oauth2/v2.0/authorize?...
+             */
+            url: string;
+        };
+        LinkedProviderDto: {
+            id: number;
+            ssoId: string;
+        };
+        LinkedProvidersResponseDto: {
+            google: components["schemas"]["LinkedProviderDto"][];
+            microsoft: components["schemas"]["LinkedProviderDto"][];
         };
         LogoutResponseDto: {
             /** @example true */
@@ -532,10 +754,6 @@ export interface components {
             isAdmin: boolean;
         };
         CreateReservationDto: {
-            /** @example s123456 */
-            sNumber: string;
-            /** @example student@student.ap.be */
-            email: string;
             /**
              * @example pc
              * @enum {string}
@@ -776,7 +994,71 @@ export interface components {
             /** @example Casual */
             type?: string;
         };
+        UserListItemDto: {
+            id: number;
+            name: string | null;
+            email: string;
+            sNumber: string;
+            isAdmin: boolean;
+            googleLinked: boolean;
+            microsoftLinked: boolean;
+            reservationCount: number;
+            noShowCount: number;
+        };
+        WhitelistEntryDto: {
+            email: string;
+            userId: number;
+            userEmail: string | null;
+        };
+        CreateWhitelistDto: {
+            /**
+             * @description External SSO email to pre-authorize
+             * @example someone@gmail.com
+             */
+            email: string;
+            /**
+             * @description Target user id this email should link to once they sign in
+             * @example 1
+             */
+            userId: number;
+        };
+        UserSsoLinkDto: {
+            id: number;
+            ssoId: string;
+        };
+        UserRecentReservationDto: {
+            id: number;
+            cuid: string;
+            inventory: string;
+            /** Format: date-time */
+            startTime: string;
+            /** Format: date-time */
+            endTime: string;
+            status: string;
+        };
+        UserDetailDto: {
+            id: number;
+            name: string | null;
+            email: string;
+            sNumber: string;
+            isAdmin: boolean;
+            googleLinks: components["schemas"]["UserSsoLinkDto"][];
+            microsoftLinks: components["schemas"]["UserSsoLinkDto"][];
+            reservationCount: number;
+            noShowCount: number;
+            recentReservations: components["schemas"]["UserRecentReservationDto"][];
+        };
+        UpdateUserDto: {
+            name?: string;
+            sNumber?: string;
+            email?: string;
+        };
         GoogleSSOUser: {
+            id: number;
+            ssoId: string;
+            userId: number;
+        };
+        MicrosoftSSOUser: {
             id: number;
             ssoId: string;
             userId: number;
@@ -785,6 +1067,7 @@ export interface components {
             reservations: components["schemas"]["Reservation"][];
             adminUsers: components["schemas"]["AdminUser"][];
             googleSSOUsers: components["schemas"]["GoogleSSOUser"][];
+            microsoftSSOUsers: components["schemas"]["MicrosoftSSOUser"][];
             rosterEntries: components["schemas"]["RosterEntry"][];
         };
         User: {
@@ -797,6 +1080,9 @@ export interface components {
             user: components["schemas"]["User"];
         };
         GoogleSSOUserRelations: {
+            user: components["schemas"]["User"];
+        };
+        MicrosoftSSOUserRelations: {
             user: components["schemas"]["User"];
         };
         SettingRelations: Record<string, never>;
@@ -862,10 +1148,7 @@ export interface operations {
     };
     AuthController_googleLogin: {
         parameters: {
-            query?: {
-                /** @description Frontend return URL path to preserve after login */
-                returnUrl?: string;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -907,6 +1190,116 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    AuthController_microsoftAuthUrl: {
+        parameters: {
+            query?: {
+                /** @description Frontend return URL path to preserve after login */
+                returnUrl?: string;
+                /** @description If true, treat callback as a link-account flow for the currently authenticated user */
+                linkMode?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MicrosoftAuthUrlResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_microsoftLogin: {
+        parameters: {
+            query?: {
+                /** @description Frontend return URL path to preserve after login */
+                returnUrl?: string;
+                /** @description If true, treat callback as a link-account flow for the currently authenticated user */
+                linkMode?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_microsoftCallback: {
+        parameters: {
+            query: {
+                /** @description OAuth authorization code returned by Microsoft */
+                code: string;
+                /** @description Opaque state value sent during login request (base64 JSON: { returnUrl, linkMode }) */
+                state?: string;
+                /** @description Session state from Microsoft */
+                session_state?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_listLinks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LinkedProvidersResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_unlinkProvider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LinkedProvidersResponseDto"];
+                };
             };
         };
     };
@@ -1756,6 +2149,212 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["CreateEventDto"];
                 };
+            };
+        };
+    };
+    UsersController_list: {
+        parameters: {
+            query?: {
+                /** @description Search by name, email or sNumber */
+                search?: string;
+                /** @description Only return admin users when "true" */
+                adminOnly?: string;
+                /** @description Only return users with active no-shows when "true" */
+                noShowsOnly?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserListItemDto"][];
+                };
+            };
+        };
+    };
+    UsersController_listWhitelist: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WhitelistEntryDto"][];
+                };
+            };
+        };
+    };
+    UsersController_createWhitelist: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateWhitelistDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_deleteWhitelist: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_getById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDetailDto"];
+                };
+            };
+        };
+    };
+    UsersController_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_promote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_demote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_unlinkSso: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

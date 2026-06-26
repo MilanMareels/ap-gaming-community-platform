@@ -13,9 +13,16 @@ const getIsoDate = (offset = 0) => {
   return d.toISOString();
 };
 
-const mockUser = { id: 1, email: 'test@student.ap.be', sNumber: 's123456' };
+const mockUser = { id: 1, email: 'test@student.ap.be', sNumber: 's123456', name: null };
 
 const baseDto: CreateReservationDto = {
+  inventory: 'pc',
+  controllers: 1,
+  startTime: getIsoDate(1),
+  endTime: getIsoDate(1),
+};
+
+const baseAdminDto = {
   email: mockUser.email,
   sNumber: mockUser.sNumber,
   inventory: 'pc',
@@ -30,12 +37,17 @@ describe('ReservationsService', () => {
   let mailService: any;
 
   beforeEach(async () => {
-    baseDto.email = mockUser.email;
-    baseDto.sNumber = mockUser.sNumber;
     baseDto.inventory = 'pc';
     baseDto.controllers = 1;
     baseDto.startTime = getIsoDate(1);
     baseDto.endTime = getIsoDate(1);
+
+    baseAdminDto.email = mockUser.email;
+    baseAdminDto.sNumber = mockUser.sNumber;
+    baseAdminDto.inventory = 'pc';
+    baseAdminDto.controllers = 1;
+    baseAdminDto.startTime = getIsoDate(1);
+    baseAdminDto.endTime = getIsoDate(1);
 
     const mockPrisma = {
       user: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn() },
@@ -69,8 +81,7 @@ describe('ReservationsService', () => {
 
   describe('Reservation Creation', () => {
     it('should create a reservation successfully', async () => {
-      prisma.user.findUnique.mockResolvedValue(null);
-      prisma.user.create.mockResolvedValue(mockUser);
+      prisma.user.findUnique.mockResolvedValue(mockUser);
       prisma.setting.findFirst.mockResolvedValue({ value: '5' });
       prisma.reservation.count.mockResolvedValue(0);
       prisma.reservation.findFirst.mockResolvedValue(null);
@@ -80,7 +91,7 @@ describe('ReservationsService', () => {
         userId: mockUser.id,
         inventory: baseDto.inventory,
         controllers: baseDto.controllers,
-        email: baseDto.email,
+        email: mockUser.email,
         startTime: new Date(baseDto.startTime),
         endTime: new Date(baseDto.endTime),
         status: ReservationStatus.RESERVED,
@@ -89,29 +100,34 @@ describe('ReservationsService', () => {
 
       prisma.reservation.create.mockResolvedValue(mockCreatedReservation);
 
-      const res = await service.create(baseDto);
+      const res = await service.createForUser(mockUser.id, baseDto);
 
       expect(res).toEqual(mockCreatedReservation);
     });
 
+    it('should throw BadRequestException when the authenticated user no longer exists', async () => {
+      prisma.user.findUnique.mockResolvedValue(null);
+      await expect(service.createForUser(999, baseDto)).rejects.toThrow(BadRequestException);
+    });
+
     it('should throw an BadRequestException when trying to create an reservation when is in the past', async () => {
       baseDto.startTime = getIsoDate(-1);
-      await expect(service.create(baseDto)).rejects.toThrow(BadRequestException);
+      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw an BadRequestException when trying to create an reservation 3 days in the future', async () => {
       baseDto.startTime = getIsoDate(5);
-      await expect(service.create(baseDto)).rejects.toThrow(BadRequestException);
+      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(BadRequestException);
     });
 
     it('should return corrct error message when trying to create an reservation when is in the past', async () => {
       baseDto.startTime = getIsoDate(-1);
-      await expect(service.create(baseDto)).rejects.toThrow(errorMessages.pastDate);
+      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.pastDate);
     });
 
     it('should return corrct error message when trying to create an reservation 3 days in the future', async () => {
       baseDto.startTime = getIsoDate(5);
-      await expect(service.create(baseDto)).rejects.toThrow(errorMessages.maxAdvanceDays);
+      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.maxAdvanceDays);
     });
 
     describe('verifyByCuid', () => {
@@ -226,7 +242,7 @@ describe('ReservationsService', () => {
       id: 123,
       cuid: mockCuid,
       userId: 1,
-      email: baseDto.email,
+      email: mockUser.email,
       inventory: baseDto.inventory,
       controllers: baseDto.controllers,
       startTime: new Date(baseDto.startTime),
@@ -251,17 +267,17 @@ describe('ReservationsService', () => {
     });
 
     it('should send confirmation email after creating reservation', async () => {
-      await service.create(baseDto as any);
+      await service.createForUser(mockUser.id, baseDto);
 
       expect(mailService.generateQRCode).toHaveBeenCalledWith(mockCuid);
       expect(mailService.sendMailWithAttachments).toHaveBeenCalledWith(
-        baseDto.email,
+        mockUser.email,
         'Reservatie Bevestiging - AP Gaming Hub',
         'reservation/confirmation',
         expect.objectContaining({
-          sNumber: baseDto.sNumber,
+          sNumber: mockUser.sNumber,
           reservationId: mockCuid,
-          email: baseDto.email,
+          email: mockUser.email,
           controllers: baseDto.controllers,
         }),
         expect.arrayContaining([
@@ -274,7 +290,7 @@ describe('ReservationsService', () => {
     });
 
     it('should include formatted Dutch dates in email', async () => {
-      await service.create(baseDto as any);
+      await service.createForUser(mockUser.id, baseDto);
 
       expect(mailService.sendMailWithAttachments).toHaveBeenCalledWith(
         expect.any(String),
@@ -308,11 +324,11 @@ describe('ReservationsService', () => {
       };
       prisma.reservation.create.mockResolvedValue(fixedReservation);
 
-      await service.create({
+      await service.createForUser(mockUser.id, {
         ...baseDto,
         startTime: fixedStart.toISOString(),
         endTime: fixedEnd.toISOString(),
-      } as any);
+      });
 
       const callArgs = mailService.sendMailWithAttachments.mock.calls[0];
       const emailData = callArgs[3];
@@ -336,10 +352,10 @@ describe('ReservationsService', () => {
           inventory: testCase.inventory,
         });
 
-        await service.create({
+        await service.createForUser(mockUser.id, {
           ...baseDto,
           inventory: testCase.inventory,
-        } as any);
+        });
 
         const lastCall = mailService.sendMailWithAttachments.mock.calls[mailService.sendMailWithAttachments.mock.calls.length - 1];
         expect(lastCall[3].inventory).toBe(testCase.expected);
@@ -347,14 +363,14 @@ describe('ReservationsService', () => {
     });
 
     it('should send confirmation email for admin-created reservations', async () => {
-      await service.adminCreate(baseDto as any);
+      await service.adminCreate(baseAdminDto as any);
 
       expect(mailService.generateQRCode).toHaveBeenCalledWith(mockCuid);
       expect(mailService.sendMailWithAttachments).toHaveBeenCalled();
     });
 
     it('should handle admin reservations without sNumber', async () => {
-      const dtoWithoutSNumber = { ...baseDto };
+      const dtoWithoutSNumber = { ...baseAdminDto };
       delete (dtoWithoutSNumber as any).sNumber;
 
       await service.adminCreate(dtoWithoutSNumber as any);
@@ -373,7 +389,7 @@ describe('ReservationsService', () => {
     it('should not fail reservation creation if email sending fails', async () => {
       mailService.sendMailWithAttachments.mockRejectedValue(new Error('SMTP error'));
 
-      const result = await service.create(baseDto as any);
+      const result = await service.createForUser(mockUser.id, baseDto);
 
       expect(result).toEqual(mockReservation);
       expect(prisma.reservation.create).toHaveBeenCalled();
@@ -382,13 +398,13 @@ describe('ReservationsService', () => {
     it('should log error when email fails but continue', async () => {
       mailService.sendMailWithAttachments.mockRejectedValue(new Error('Email service down'));
 
-      await service.create(baseDto as any);
+      await service.createForUser(mockUser.id, baseDto);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to send confirmation email:', expect.any(Error));
     });
 
     it('should generate QR code with reservation CUID', async () => {
-      await service.create(baseDto as any);
+      await service.createForUser(mockUser.id, baseDto);
 
       expect(mailService.generateQRCode).toHaveBeenCalledWith(expect.stringMatching(/^c[a-z0-9]+$/));
     });
@@ -397,7 +413,7 @@ describe('ReservationsService', () => {
       const qrBuffer = Buffer.from('test-qr-data');
       mailService.generateQRCode.mockResolvedValue(qrBuffer);
 
-      await service.create(baseDto as any);
+      await service.createForUser(mockUser.id, baseDto);
 
       expect(mailService.sendMailWithAttachments).toHaveBeenCalledWith(
         expect.any(String),
@@ -414,12 +430,14 @@ describe('ReservationsService', () => {
       );
     });
 
-    it('should send email to the correct recipient', async () => {
-      const testEmail = 'specific@student.ap.be';
-      await service.create({ ...baseDto, email: testEmail } as any);
+    it('should send email to the authenticated user', async () => {
+      const customUser = { ...mockUser, email: 'specific@student.ap.be' };
+      prisma.user.findUnique.mockResolvedValue(customUser);
+
+      await service.createForUser(customUser.id, baseDto);
 
       expect(mailService.sendMailWithAttachments).toHaveBeenCalledWith(
-        testEmail,
+        customUser.email,
         expect.any(String),
         expect.any(String),
         expect.any(Object),
@@ -428,7 +446,7 @@ describe('ReservationsService', () => {
     });
 
     it('should use correct email template path', async () => {
-      await service.create(baseDto as any);
+      await service.createForUser(mockUser.id, baseDto);
 
       expect(mailService.sendMailWithAttachments).toHaveBeenCalledWith(
         expect.any(String),
@@ -440,7 +458,7 @@ describe('ReservationsService', () => {
     });
 
     it('should include all required data in email template', async () => {
-      await service.create(baseDto as any);
+      await service.createForUser(mockUser.id, baseDto);
 
       const callArgs = mailService.sendMailWithAttachments.mock.calls[0];
       const emailData = callArgs[3];

@@ -211,6 +211,7 @@ export type UserWhereInput = {
   reservations?: Prisma.ReservationListRelationFilter
   adminUsers?: Prisma.AdminUserListRelationFilter
   googleSSOUsers?: Prisma.GoogleSSOUserListRelationFilter
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserListRelationFilter
   rosterEntries?: Prisma.RosterEntryListRelationFilter
 }
 
@@ -222,6 +223,7 @@ export type UserOrderByWithRelationInput = {
   reservations?: Prisma.ReservationOrderByRelationAggregateInput
   adminUsers?: Prisma.AdminUserOrderByRelationAggregateInput
   googleSSOUsers?: Prisma.GoogleSSOUserOrderByRelationAggregateInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserOrderByRelationAggregateInput
   rosterEntries?: Prisma.RosterEntryOrderByRelationAggregateInput
 }
 
@@ -236,6 +238,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   reservations?: Prisma.ReservationListRelationFilter
   adminUsers?: Prisma.AdminUserListRelationFilter
   googleSSOUsers?: Prisma.GoogleSSOUserListRelationFilter
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserListRelationFilter
   rosterEntries?: Prisma.RosterEntryListRelationFilter
 }, "id" | "email">
 
@@ -268,6 +271,7 @@ export type UserCreateInput = {
   reservations?: Prisma.ReservationCreateNestedManyWithoutUserInput
   adminUsers?: Prisma.AdminUserCreateNestedManyWithoutUserInput
   googleSSOUsers?: Prisma.GoogleSSOUserCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserCreateNestedManyWithoutUserInput
   rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutUserInput
 }
 
@@ -279,6 +283,7 @@ export type UserUncheckedCreateInput = {
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutUserInput
   adminUsers?: Prisma.AdminUserUncheckedCreateNestedManyWithoutUserInput
   googleSSOUsers?: Prisma.GoogleSSOUserUncheckedCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedCreateNestedManyWithoutUserInput
   rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -289,6 +294,7 @@ export type UserUpdateInput = {
   reservations?: Prisma.ReservationUpdateManyWithoutUserNestedInput
   adminUsers?: Prisma.AdminUserUpdateManyWithoutUserNestedInput
   googleSSOUsers?: Prisma.GoogleSSOUserUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUpdateManyWithoutUserNestedInput
   rosterEntries?: Prisma.RosterEntryUpdateManyWithoutUserNestedInput
 }
 
@@ -300,6 +306,7 @@ export type UserUncheckedUpdateInput = {
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutUserNestedInput
   adminUsers?: Prisma.AdminUserUncheckedUpdateManyWithoutUserNestedInput
   googleSSOUsers?: Prisma.GoogleSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedUpdateManyWithoutUserNestedInput
   rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -401,6 +408,20 @@ export type UserUpdateOneRequiredWithoutGoogleSSOUsersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutGoogleSSOUsersInput, Prisma.UserUpdateWithoutGoogleSSOUsersInput>, Prisma.UserUncheckedUpdateWithoutGoogleSSOUsersInput>
 }
 
+export type UserCreateNestedOneWithoutMicrosoftSSOUsersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMicrosoftSSOUsersInput, Prisma.UserUncheckedCreateWithoutMicrosoftSSOUsersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMicrosoftSSOUsersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutMicrosoftSSOUsersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMicrosoftSSOUsersInput, Prisma.UserUncheckedCreateWithoutMicrosoftSSOUsersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMicrosoftSSOUsersInput
+  upsert?: Prisma.UserUpsertWithoutMicrosoftSSOUsersInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMicrosoftSSOUsersInput, Prisma.UserUpdateWithoutMicrosoftSSOUsersInput>, Prisma.UserUncheckedUpdateWithoutMicrosoftSSOUsersInput>
+}
+
 export type UserCreateNestedOneWithoutRosterEntriesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutRosterEntriesInput, Prisma.UserUncheckedCreateWithoutRosterEntriesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutRosterEntriesInput
@@ -435,6 +456,7 @@ export type UserCreateWithoutAdminUsersInput = {
   sNumber: string
   reservations?: Prisma.ReservationCreateNestedManyWithoutUserInput
   googleSSOUsers?: Prisma.GoogleSSOUserCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserCreateNestedManyWithoutUserInput
   rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutUserInput
 }
 
@@ -445,6 +467,7 @@ export type UserUncheckedCreateWithoutAdminUsersInput = {
   sNumber: string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutUserInput
   googleSSOUsers?: Prisma.GoogleSSOUserUncheckedCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedCreateNestedManyWithoutUserInput
   rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -470,6 +493,7 @@ export type UserUpdateWithoutAdminUsersInput = {
   sNumber?: Prisma.StringFieldUpdateOperationsInput | string
   reservations?: Prisma.ReservationUpdateManyWithoutUserNestedInput
   googleSSOUsers?: Prisma.GoogleSSOUserUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUpdateManyWithoutUserNestedInput
   rosterEntries?: Prisma.RosterEntryUpdateManyWithoutUserNestedInput
 }
 
@@ -480,6 +504,7 @@ export type UserUncheckedUpdateWithoutAdminUsersInput = {
   sNumber?: Prisma.StringFieldUpdateOperationsInput | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutUserNestedInput
   googleSSOUsers?: Prisma.GoogleSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedUpdateManyWithoutUserNestedInput
   rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -489,6 +514,7 @@ export type UserCreateWithoutGoogleSSOUsersInput = {
   sNumber: string
   reservations?: Prisma.ReservationCreateNestedManyWithoutUserInput
   adminUsers?: Prisma.AdminUserCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserCreateNestedManyWithoutUserInput
   rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutUserInput
 }
 
@@ -499,6 +525,7 @@ export type UserUncheckedCreateWithoutGoogleSSOUsersInput = {
   sNumber: string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutUserInput
   adminUsers?: Prisma.AdminUserUncheckedCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedCreateNestedManyWithoutUserInput
   rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -524,6 +551,7 @@ export type UserUpdateWithoutGoogleSSOUsersInput = {
   sNumber?: Prisma.StringFieldUpdateOperationsInput | string
   reservations?: Prisma.ReservationUpdateManyWithoutUserNestedInput
   adminUsers?: Prisma.AdminUserUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUpdateManyWithoutUserNestedInput
   rosterEntries?: Prisma.RosterEntryUpdateManyWithoutUserNestedInput
 }
 
@@ -534,6 +562,65 @@ export type UserUncheckedUpdateWithoutGoogleSSOUsersInput = {
   sNumber?: Prisma.StringFieldUpdateOperationsInput | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutUserNestedInput
   adminUsers?: Prisma.AdminUserUncheckedUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutMicrosoftSSOUsersInput = {
+  name?: string | null
+  email: string
+  sNumber: string
+  reservations?: Prisma.ReservationCreateNestedManyWithoutUserInput
+  adminUsers?: Prisma.AdminUserCreateNestedManyWithoutUserInput
+  googleSSOUsers?: Prisma.GoogleSSOUserCreateNestedManyWithoutUserInput
+  rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutMicrosoftSSOUsersInput = {
+  id?: number
+  name?: string | null
+  email: string
+  sNumber: string
+  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutUserInput
+  adminUsers?: Prisma.AdminUserUncheckedCreateNestedManyWithoutUserInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUncheckedCreateNestedManyWithoutUserInput
+  rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutMicrosoftSSOUsersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutMicrosoftSSOUsersInput, Prisma.UserUncheckedCreateWithoutMicrosoftSSOUsersInput>
+}
+
+export type UserUpsertWithoutMicrosoftSSOUsersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutMicrosoftSSOUsersInput, Prisma.UserUncheckedUpdateWithoutMicrosoftSSOUsersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutMicrosoftSSOUsersInput, Prisma.UserUncheckedCreateWithoutMicrosoftSSOUsersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutMicrosoftSSOUsersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutMicrosoftSSOUsersInput, Prisma.UserUncheckedUpdateWithoutMicrosoftSSOUsersInput>
+}
+
+export type UserUpdateWithoutMicrosoftSSOUsersInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  sNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  reservations?: Prisma.ReservationUpdateManyWithoutUserNestedInput
+  adminUsers?: Prisma.AdminUserUpdateManyWithoutUserNestedInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUpdateManyWithoutUserNestedInput
+  rosterEntries?: Prisma.RosterEntryUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutMicrosoftSSOUsersInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  sNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutUserNestedInput
+  adminUsers?: Prisma.AdminUserUncheckedUpdateManyWithoutUserNestedInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUncheckedUpdateManyWithoutUserNestedInput
   rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -544,6 +631,7 @@ export type UserCreateWithoutRosterEntriesInput = {
   reservations?: Prisma.ReservationCreateNestedManyWithoutUserInput
   adminUsers?: Prisma.AdminUserCreateNestedManyWithoutUserInput
   googleSSOUsers?: Prisma.GoogleSSOUserCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRosterEntriesInput = {
@@ -554,6 +642,7 @@ export type UserUncheckedCreateWithoutRosterEntriesInput = {
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutUserInput
   adminUsers?: Prisma.AdminUserUncheckedCreateNestedManyWithoutUserInput
   googleSSOUsers?: Prisma.GoogleSSOUserUncheckedCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRosterEntriesInput = {
@@ -579,6 +668,7 @@ export type UserUpdateWithoutRosterEntriesInput = {
   reservations?: Prisma.ReservationUpdateManyWithoutUserNestedInput
   adminUsers?: Prisma.AdminUserUpdateManyWithoutUserNestedInput
   googleSSOUsers?: Prisma.GoogleSSOUserUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRosterEntriesInput = {
@@ -589,6 +679,7 @@ export type UserUncheckedUpdateWithoutRosterEntriesInput = {
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutUserNestedInput
   adminUsers?: Prisma.AdminUserUncheckedUpdateManyWithoutUserNestedInput
   googleSSOUsers?: Prisma.GoogleSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReservationsInput = {
@@ -597,6 +688,7 @@ export type UserCreateWithoutReservationsInput = {
   sNumber: string
   adminUsers?: Prisma.AdminUserCreateNestedManyWithoutUserInput
   googleSSOUsers?: Prisma.GoogleSSOUserCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserCreateNestedManyWithoutUserInput
   rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutUserInput
 }
 
@@ -607,6 +699,7 @@ export type UserUncheckedCreateWithoutReservationsInput = {
   sNumber: string
   adminUsers?: Prisma.AdminUserUncheckedCreateNestedManyWithoutUserInput
   googleSSOUsers?: Prisma.GoogleSSOUserUncheckedCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedCreateNestedManyWithoutUserInput
   rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -632,6 +725,7 @@ export type UserUpdateWithoutReservationsInput = {
   sNumber?: Prisma.StringFieldUpdateOperationsInput | string
   adminUsers?: Prisma.AdminUserUpdateManyWithoutUserNestedInput
   googleSSOUsers?: Prisma.GoogleSSOUserUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUpdateManyWithoutUserNestedInput
   rosterEntries?: Prisma.RosterEntryUpdateManyWithoutUserNestedInput
 }
 
@@ -642,6 +736,7 @@ export type UserUncheckedUpdateWithoutReservationsInput = {
   sNumber?: Prisma.StringFieldUpdateOperationsInput | string
   adminUsers?: Prisma.AdminUserUncheckedUpdateManyWithoutUserNestedInput
   googleSSOUsers?: Prisma.GoogleSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedUpdateManyWithoutUserNestedInput
   rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -654,6 +749,7 @@ export type UserCountOutputType = {
   reservations: number
   adminUsers: number
   googleSSOUsers: number
+  microsoftSSOUsers: number
   rosterEntries: number
 }
 
@@ -661,6 +757,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   reservations?: boolean | UserCountOutputTypeCountReservationsArgs
   adminUsers?: boolean | UserCountOutputTypeCountAdminUsersArgs
   googleSSOUsers?: boolean | UserCountOutputTypeCountGoogleSSOUsersArgs
+  microsoftSSOUsers?: boolean | UserCountOutputTypeCountMicrosoftSSOUsersArgs
   rosterEntries?: boolean | UserCountOutputTypeCountRosterEntriesArgs
 }
 
@@ -698,6 +795,13 @@ export type UserCountOutputTypeCountGoogleSSOUsersArgs<ExtArgs extends runtime.T
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountMicrosoftSSOUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MicrosoftSSOUserWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountRosterEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.RosterEntryWhereInput
 }
@@ -711,6 +815,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   reservations?: boolean | Prisma.User$reservationsArgs<ExtArgs>
   adminUsers?: boolean | Prisma.User$adminUsersArgs<ExtArgs>
   googleSSOUsers?: boolean | Prisma.User$googleSSOUsersArgs<ExtArgs>
+  microsoftSSOUsers?: boolean | Prisma.User$microsoftSSOUsersArgs<ExtArgs>
   rosterEntries?: boolean | Prisma.User$rosterEntriesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -741,6 +846,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   reservations?: boolean | Prisma.User$reservationsArgs<ExtArgs>
   adminUsers?: boolean | Prisma.User$adminUsersArgs<ExtArgs>
   googleSSOUsers?: boolean | Prisma.User$googleSSOUsersArgs<ExtArgs>
+  microsoftSSOUsers?: boolean | Prisma.User$microsoftSSOUsersArgs<ExtArgs>
   rosterEntries?: boolean | Prisma.User$rosterEntriesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -753,6 +859,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     reservations: Prisma.$ReservationPayload<ExtArgs>[]
     adminUsers: Prisma.$AdminUserPayload<ExtArgs>[]
     googleSSOUsers: Prisma.$GoogleSSOUserPayload<ExtArgs>[]
+    microsoftSSOUsers: Prisma.$MicrosoftSSOUserPayload<ExtArgs>[]
     rosterEntries: Prisma.$RosterEntryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1157,6 +1264,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   reservations<T extends Prisma.User$reservationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reservationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReservationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   adminUsers<T extends Prisma.User$adminUsersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminUsersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminUserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   googleSSOUsers<T extends Prisma.User$googleSSOUsersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$googleSSOUsersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GoogleSSOUserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  microsoftSSOUsers<T extends Prisma.User$microsoftSSOUsersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$microsoftSSOUsersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MicrosoftSSOUserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   rosterEntries<T extends Prisma.User$rosterEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$rosterEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RosterEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1648,6 +1756,30 @@ export type User$googleSSOUsersArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.GoogleSSOUserScalarFieldEnum | Prisma.GoogleSSOUserScalarFieldEnum[]
+}
+
+/**
+ * User.microsoftSSOUsers
+ */
+export type User$microsoftSSOUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MicrosoftSSOUser
+   */
+  select?: Prisma.MicrosoftSSOUserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MicrosoftSSOUser
+   */
+  omit?: Prisma.MicrosoftSSOUserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MicrosoftSSOUserInclude<ExtArgs> | null
+  where?: Prisma.MicrosoftSSOUserWhereInput
+  orderBy?: Prisma.MicrosoftSSOUserOrderByWithRelationInput | Prisma.MicrosoftSSOUserOrderByWithRelationInput[]
+  cursor?: Prisma.MicrosoftSSOUserWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MicrosoftSSOUserScalarFieldEnum | Prisma.MicrosoftSSOUserScalarFieldEnum[]
 }
 
 /**

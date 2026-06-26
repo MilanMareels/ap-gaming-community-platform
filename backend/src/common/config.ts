@@ -38,6 +38,31 @@ export default () => ({
     tokenUrl: process.env.GOOGLE_TOKEN_URL || 'https://oauth2.googleapis.com/token',
     userInfoUrl: process.env.GOOGLE_USERINFO_URL || 'https://openidconnect.googleapis.com/v1/userinfo',
   },
+  microsoft: {
+    clientId:
+      process.env.MICROSOFT_CLIENT_ID ||
+      (() => {
+        throw new Error('MICROSOFT_CLIENT_ID environment variable is required');
+      })(),
+    clientSecret:
+      process.env.MICROSOFT_CLIENT_SECRET ||
+      (() => {
+        throw new Error('MICROSOFT_CLIENT_SECRET environment variable is required');
+      })(),
+    tenantId:
+      process.env.MICROSOFT_TENANT_ID ||
+      (() => {
+        throw new Error('MICROSOFT_TENANT_ID environment variable is required');
+      })(),
+    redirectUri:
+      process.env.MICROSOFT_REDIRECT_URI ||
+      (() => {
+        throw new Error('MICROSOFT_REDIRECT_URI environment variable is required');
+      })(),
+    authUrl: process.env.MICROSOFT_AUTH_URL || `https://login.microsoftonline.com/${process.env.MICROSOFT_TENANT_ID}/oauth2/v2.0/authorize`,
+    tokenUrl: process.env.MICROSOFT_TOKEN_URL || `https://login.microsoftonline.com/${process.env.MICROSOFT_TENANT_ID}/oauth2/v2.0/token`,
+    graphMeUrl: process.env.MICROSOFT_GRAPH_ME_URL || 'https://graph.microsoft.com/v1.0/me',
+  },
   auth: {
     cookieMaxAgeMs: Number(process.env.AUTH_COOKIE_MAX_AGE_MS || 86400000),
   },

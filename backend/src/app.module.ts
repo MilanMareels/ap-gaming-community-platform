@@ -6,9 +6,10 @@ import { RosterModule } from './modules/roster/roster.module.js';
 import { TimetableModule } from './modules/timetable/timetable.module.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
 import { EventsModule } from './modules/events/events.module.js';
+import { UsersModule } from './modules/users/users.module.js';
 
 @Module({
-  imports: [PrismaModule, AuthModule, ReservationsModule, RosterModule, TimetableModule, SettingsModule, EventsModule],
+  imports: [PrismaModule, AuthModule, ReservationsModule, RosterModule, TimetableModule, SettingsModule, EventsModule, UsersModule],
   controllers: [],
   providers: [],
 })

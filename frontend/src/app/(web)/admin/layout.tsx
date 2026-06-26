@@ -27,6 +27,7 @@ const TABS = [
   { id: 'noshows', label: 'No-Shows', href: '/admin/noshows' },
   { id: 'roster', label: 'Teams', href: '/admin/roster' },
   { id: 'timetable', label: 'Openingsuren', href: '/admin/timetable' },
+  { id: 'users', label: 'Gebruikers', href: '/admin/users' },
   { id: 'settings', label: 'Instellingen', href: '/admin/settings' },
 ];
 
@@ -49,12 +50,12 @@ export default function AdminLayout({
     try {
       const res = await apiClient.GET('/auth/profile', {});
       if (res.error || !res.data || !res.data.isAdmin) {
-        window.location.href = `/api/auth/google/login?returnUrl=${encodeURIComponent(pathname)}`;
+        window.location.href = `/login?returnUrl=${encodeURIComponent(pathname)}`;
         return;
       }
       setUser(res.data);
     } catch {
-      window.location.href = `/api/auth/google/login?returnUrl=${encodeURIComponent(pathname)}`;
+      window.location.href = `/login?returnUrl=${encodeURIComponent(pathname)}`;
     } finally {
       setLoading(false);
     }
