@@ -997,7 +997,7 @@ export interface paths {
         patch: operations["TimeTrialsController_updateStatus"];
         trace?: never;
     };
-    "/events/{eventId}/time-trial/entries": {
+    "/events/{eventId}/time-trial/participants": {
         parameters: {
             query?: never;
             header?: never;
@@ -1006,32 +1006,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Add entry to time trial (Admin only) */
-        post: operations["TimeTrialsController_addEntry"];
+        /** Add participant to time trial (Admin only) */
+        post: operations["TimeTrialsController_addParticipant"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/events/{eventId}/time-trial/entries/import": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Import entries from event registrations (Admin only) */
-        post: operations["TimeTrialsController_importEntries"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/events/{eventId}/time-trial/entries/{entryId}": {
+    "/events/{eventId}/time-trial/participants/{participantId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1041,31 +1024,32 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** Remove entry from time trial (Admin only) */
-        delete: operations["TimeTrialsController_removeEntry"];
+        /** Remove participant and all runs (Admin only) */
+        delete: operations["TimeTrialsController_removeParticipant"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/events/{eventId}/time-trial/entries/{entryId}/time": {
+    "/events/{eventId}/time-trial/participants/{participantId}/runs": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Get run history for a participant (public) */
+        get: operations["TimeTrialsController_getRuns"];
         put?: never;
-        post?: never;
+        /** Submit a new run time (Admin only) */
+        post: operations["TimeTrialsController_addRun"];
         delete?: never;
         options?: never;
         head?: never;
-        /** Set or update entry time (Admin only) */
-        patch: operations["TimeTrialsController_updateTime"];
+        patch?: never;
         trace?: never;
     };
-    "/events/{eventId}/time-trial/entries/batch-time": {
+    "/events/{eventId}/time-trial/runs/{runId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1075,11 +1059,100 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        /** Delete a specific run (Admin only) */
+        delete: operations["TimeTrialsController_deleteRun"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/point-trial": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get point trial for an event (public) */
+        get: operations["PointTrialsController_findByEvent"];
+        put?: never;
+        /** Create a point trial for an event (Admin only) */
+        post: operations["PointTrialsController_create"];
+        /** Delete point trial for an event (Admin only) */
+        delete: operations["PointTrialsController_delete"];
+        options?: never;
+        head?: never;
+        /** Update point trial status (Admin only) */
+        patch: operations["PointTrialsController_updateStatus"];
+        trace?: never;
+    };
+    "/events/{eventId}/point-trial/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add participant to point trial (Admin only) */
+        post: operations["PointTrialsController_addParticipant"];
         delete?: never;
         options?: never;
         head?: never;
-        /** Bulk update entry times (Admin only) */
-        patch: operations["TimeTrialsController_batchUpdateTime"];
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/point-trial/participants/{participantId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove participant and all entries (Admin only) */
+        delete: operations["PointTrialsController_removeParticipant"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/point-trial/participants/{participantId}/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get entry history for a participant (public) */
+        get: operations["PointTrialsController_getEntries"];
+        put?: never;
+        /** Submit a new point entry (Admin only) */
+        post: operations["PointTrialsController_addEntry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/point-trial/entries/{entryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a specific entry (Admin only) */
+        delete: operations["PointTrialsController_deleteEntry"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
 }
@@ -1350,7 +1423,7 @@ export interface components {
              * @example SINGLE_DAY
              * @enum {string}
              */
-            category: "SINGLE_DAY" | "MULTI_DAY" | "TOURNAMENT_BRACKET" | "TOURNAMENT_TIMED";
+            category: "SINGLE_DAY" | "MULTI_DAY" | "TOURNAMENT_BRACKET" | "TOURNAMENT_TIMED" | "TOURNAMENT_POINTS";
             /** @example 2026-03-15T18:00:00.000Z */
             startTime: string;
             /** @example 2026-03-15T22:00:00.000Z */
@@ -1369,7 +1442,7 @@ export interface components {
              * @example MULTI_DAY
              * @enum {string}
              */
-            category?: "SINGLE_DAY" | "MULTI_DAY" | "TOURNAMENT_BRACKET" | "TOURNAMENT_TIMED";
+            category?: "SINGLE_DAY" | "MULTI_DAY" | "TOURNAMENT_BRACKET" | "TOURNAMENT_TIMED" | "TOURNAMENT_POINTS";
             /** @example 2026-03-16T18:00:00.000Z */
             startTime?: string;
             /** @example 2026-03-16T22:00:00.000Z */
@@ -1559,12 +1632,12 @@ export interface components {
         };
         UpdateTimeTrialStatusDto: {
             /**
-             * @example ACTIVE
+             * @example COMPLETED
              * @enum {string}
              */
-            status: "DRAFT" | "ACTIVE" | "COMPLETED";
+            status: "ACTIVE" | "COMPLETED";
         };
-        AddTimeTrialEntryDto: {
+        AddTimeTrialParticipantDto: {
             /** @example John Doe */
             name: string;
             /** @example john@example.com */
@@ -1572,24 +1645,34 @@ export interface components {
             /** @example 1 */
             userId?: number;
         };
-        UpdateEntryTimeDto: {
+        AddRunDto: {
             /**
              * @description Time in milliseconds
              * @example 83456
              */
             timeMs: number;
         };
-        BatchTimeEntry: {
-            /** @example 1 */
-            entryId: number;
+        UpdatePointTrialStatusDto: {
             /**
-             * @description Time in milliseconds, or null to clear
-             * @example 83456
+             * @example COMPLETED
+             * @enum {string}
              */
-            timeMs?: number;
+            status: "ACTIVE" | "COMPLETED";
         };
-        BatchUpdateTimeDto: {
-            entries: components["schemas"]["BatchTimeEntry"][];
+        AddPointTrialParticipantDto: {
+            /** @example John Doe */
+            name: string;
+            /** @example john@example.com */
+            email?: string;
+            /** @example 1 */
+            userId?: number;
+        };
+        AddPointEntryDto: {
+            /**
+             * @description Points scored
+             * @example 150
+             */
+            points: number;
         };
         GoogleSSOUser: {
             id: number;
@@ -1618,13 +1701,23 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
-        TimeTrialEntry: {
+        TimeTrialParticipant: {
             id: number;
             timeTrialId: number;
             name: string;
             email?: string;
             userId?: number;
-            timeMs?: number;
+            bestTimeMs?: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        PointTrialParticipant: {
+            id: number;
+            pointTrialId: number;
+            name: string;
+            email?: string;
+            userId?: number;
+            bestPoints?: number;
             /** Format: date-time */
             createdAt: string;
         };
@@ -1636,7 +1729,8 @@ export interface components {
             rosterEntries: components["schemas"]["RosterEntry"][];
             eventRegistrations: components["schemas"]["EventRegistration"][];
             bracketParticipants: components["schemas"]["BracketParticipant"][];
-            timeTrialEntries: components["schemas"]["TimeTrialEntry"][];
+            timeTrialParticipants: components["schemas"]["TimeTrialParticipant"][];
+            pointTrialParticipants: components["schemas"]["PointTrialParticipant"][];
         };
         User: {
             id: number;
@@ -1689,7 +1783,7 @@ export interface components {
             updatedAt: string;
         };
         /** @enum {string} */
-        TimeTrialStatus: "DRAFT" | "ACTIVE" | "COMPLETED";
+        TimeTrialStatus: "ACTIVE" | "COMPLETED";
         TimeTrial: {
             id: number;
             eventId: number;
@@ -1699,13 +1793,25 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
         };
+        /** @enum {string} */
+        PointTrialStatus: "ACTIVE" | "COMPLETED";
+        PointTrial: {
+            id: number;
+            eventId: number;
+            status: components["schemas"]["PointTrialStatus"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
         EventRelations: {
             registrations: components["schemas"]["EventRegistration"][];
             bracket?: components["schemas"]["Bracket"];
             timeTrial?: components["schemas"]["TimeTrial"];
+            pointTrial?: components["schemas"]["PointTrial"];
         };
         /** @enum {string} */
-        EventCategory: "SINGLE_DAY" | "MULTI_DAY" | "TOURNAMENT_BRACKET" | "TOURNAMENT_TIMED";
+        EventCategory: "SINGLE_DAY" | "MULTI_DAY" | "TOURNAMENT_BRACKET" | "TOURNAMENT_TIMED" | "TOURNAMENT_POINTS";
         Event: {
             id: number;
             title: string;
@@ -1768,11 +1874,41 @@ export interface components {
         };
         TimeTrialRelations: {
             event: components["schemas"]["Event"];
-            entries: components["schemas"]["TimeTrialEntry"][];
+            participants: components["schemas"]["TimeTrialParticipant"][];
         };
-        TimeTrialEntryRelations: {
+        TimeTrialRun: {
+            id: number;
+            participantId: number;
+            timeMs: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        TimeTrialParticipantRelations: {
             timeTrial: components["schemas"]["TimeTrial"];
             user?: components["schemas"]["User"];
+            runs: components["schemas"]["TimeTrialRun"][];
+        };
+        TimeTrialRunRelations: {
+            participant: components["schemas"]["TimeTrialParticipant"];
+        };
+        PointTrialRelations: {
+            event: components["schemas"]["Event"];
+            participants: components["schemas"]["PointTrialParticipant"][];
+        };
+        PointTrialEntry: {
+            id: number;
+            participantId: number;
+            points: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        PointTrialParticipantRelations: {
+            pointTrial: components["schemas"]["PointTrial"];
+            user?: components["schemas"]["User"];
+            entries: components["schemas"]["PointTrialEntry"][];
+        };
+        PointTrialEntryRelations: {
+            participant: components["schemas"]["PointTrialParticipant"];
         };
         Form: {
             id: number;
@@ -3647,7 +3783,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Time trial with entries */
+            /** @description Time trial with participants and best times */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -3756,7 +3892,7 @@ export interface operations {
             };
         };
     };
-    TimeTrialsController_addEntry: {
+    TimeTrialsController_addParticipant: {
         parameters: {
             query?: never;
             header?: never;
@@ -3767,77 +3903,39 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AddTimeTrialEntryDto"];
+                "application/json": components["schemas"]["AddTimeTrialParticipantDto"];
             };
         };
         responses: {
-            /** @description Entry added */
+            /** @description Participant added */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Can only add in DRAFT status */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HttpExceptionDto"];
-                };
-            };
         };
     };
-    TimeTrialsController_importEntries: {
+    TimeTrialsController_removeParticipant: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 eventId: string;
+                participantId: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Entries imported */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Can only import in DRAFT status */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HttpExceptionDto"];
-                };
-            };
-        };
-    };
-    TimeTrialsController_removeEntry: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                eventId: string;
-                entryId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Entry removed */
+            /** @description Participant removed */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Entry not found */
+            /** @description Participant not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3848,30 +3946,201 @@ export interface operations {
             };
         };
     };
-    TimeTrialsController_updateTime: {
+    TimeTrialsController_getRuns: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 eventId: string;
-                entryId: string;
+                participantId: string;
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateEntryTimeDto"];
-            };
-        };
+        requestBody?: never;
         responses: {
-            /** @description Time updated */
+            /** @description List of runs sorted by time */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Time trial must be ACTIVE or COMPLETED */
+        };
+    };
+    TimeTrialsController_addRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+                participantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddRunDto"];
+            };
+        };
+        responses: {
+            /** @description Run recorded */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Participant not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    TimeTrialsController_deleteRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+                runId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Run deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Run not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    PointTrialsController_findByEvent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Point trial with participants and best scores */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PointTrialsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Point trial created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Event already has a point trial or invalid category */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+            /** @description Event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    PointTrialsController_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Point trial deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Point trial not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    PointTrialsController_updateStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePointTrialStatusDto"];
+            };
+        };
+        responses: {
+            /** @description Point trial status updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid status transition */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3882,7 +4151,7 @@ export interface operations {
             };
         };
     };
-    TimeTrialsController_batchUpdateTime: {
+    PointTrialsController_addParticipant: {
         parameters: {
             query?: never;
             header?: never;
@@ -3893,19 +4162,125 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["BatchUpdateTimeDto"];
+                "application/json": components["schemas"]["AddPointTrialParticipantDto"];
             };
         };
         responses: {
-            /** @description Times updated */
+            /** @description Participant added */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PointTrialsController_removeParticipant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+                participantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Participant removed */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Time trial must be ACTIVE or COMPLETED */
-            400: {
+            /** @description Participant not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    PointTrialsController_getEntries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+                participantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of entries sorted by points */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PointTrialsController_addEntry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+                participantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddPointEntryDto"];
+            };
+        };
+        responses: {
+            /** @description Entry recorded */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Participant not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    PointTrialsController_deleteEntry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+                entryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Entry deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Entry not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
