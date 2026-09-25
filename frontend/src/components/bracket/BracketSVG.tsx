@@ -569,10 +569,14 @@ export function BracketSVG({
         }
       }
 
+      // Center the winner group so the name card's center aligns with the connector line.
+      // Name card center is at offset 39 (normal) or 49 (kiosk) within the group.
+      const nameCardCenterOffset = mode === 'kiosk' ? 49 : 39;
+
       winner = {
         name: winnerName,
         x: winnerX,
-        y: winnerCenterY - 32,
+        y: winnerCenterY - nameCardCenterOffset,
         centerY: winnerCenterY,
         fromX: finalsPos.x + cfg.matchWidth,
         fromY: finalsPos.centerY,
@@ -591,8 +595,10 @@ export function BracketSVG({
       maxY = Math.max(maxY, y + matchHeight);
     });
     if (winner) {
+      // Name card bottom: y=54 (normal), y=68 (kiosk)
+      const cardBottom = mode === 'kiosk' ? 68 : 54;
       maxX = Math.max(maxX, winner.x + cfg.matchWidth);
-      maxY = Math.max(maxY, winner.y + 64);
+      maxY = Math.max(maxY, winner.y + cardBottom);
     }
 
     const svgWidth = maxX + identifierOffset + 20;
