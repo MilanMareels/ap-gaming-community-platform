@@ -24,7 +24,8 @@ import {
   AddRunDto,
 } from '../../dtos/time-trials/time-trial-entry.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
-import { AdminGuard } from '../../guards/admin.guard.js';
+import { PermissionGuard } from '../../guards/permission.guard.js';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { Public } from '../auth/public.decorator.js';
 import { HttpExceptionDto } from '../../dtos/http-exception.dto.js';
 
@@ -47,7 +48,8 @@ export class TimeTrialsController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('time-trials.manage')
   @ApiOperation({ summary: 'Create a time trial for an event (Admin only)' })
   @ApiCreatedResponse({ description: 'Time trial created' })
   @ApiBadRequestResponse({
@@ -63,7 +65,8 @@ export class TimeTrialsController {
   }
 
   @Patch()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('time-trials.manage')
   @ApiOperation({ summary: 'Update time trial status (Admin only)' })
   @ApiOkResponse({ description: 'Time trial status updated' })
   @ApiBadRequestResponse({
@@ -78,7 +81,8 @@ export class TimeTrialsController {
   }
 
   @Delete()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('time-trials.manage')
   @ApiOperation({ summary: 'Delete time trial for an event (Admin only)' })
   @ApiOkResponse({ description: 'Time trial deleted' })
   @ApiNotFoundResponse({
@@ -92,7 +96,8 @@ export class TimeTrialsController {
   // --- Participant management ---
 
   @Post('participants')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('time-trials.manage')
   @ApiOperation({ summary: 'Add participant to time trial (Admin only)' })
   @ApiCreatedResponse({ description: 'Participant added' })
   addParticipant(
@@ -103,7 +108,8 @@ export class TimeTrialsController {
   }
 
   @Delete('participants/:participantId')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('time-trials.manage')
   @ApiOperation({
     summary: 'Remove participant and all runs (Admin only)',
   })
@@ -133,7 +139,8 @@ export class TimeTrialsController {
   }
 
   @Post('participants/:participantId/runs')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('time-trials.manage')
   @ApiOperation({ summary: 'Submit a new run time (Admin only)' })
   @ApiCreatedResponse({ description: 'Run recorded' })
   @ApiNotFoundResponse({
@@ -149,7 +156,8 @@ export class TimeTrialsController {
   }
 
   @Delete('runs/:runId')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('time-trials.manage')
   @ApiOperation({ summary: 'Delete a specific run (Admin only)' })
   @ApiOkResponse({ description: 'Run deleted' })
   @ApiNotFoundResponse({

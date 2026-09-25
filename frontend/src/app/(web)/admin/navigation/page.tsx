@@ -23,10 +23,11 @@ import { Badge } from '@/components/ui/Badge';
 import { apiClient } from '@/api';
 import type { NavLink } from '@/api';
 import { getApiErrorMessage } from '@/util/api-error';
+import { revalidateNavigation } from './actions';
 
 type NavLinkTree = NavLink & { children: NavLink[] };
 
-const VISIBILITY_OPTIONS = [
+const BASE_VISIBILITY_OPTIONS = [
   { value: 'public', label: 'Publiek' },
   { value: 'authenticated', label: 'Ingelogd' },
   { value: 'admin', label: 'Admin' },
@@ -38,12 +39,23 @@ const VISIBILITY_VARIANT: Record<string, 'default' | 'info' | 'warning'> = {
   admin: 'warning',
 };
 
+function getVisibilityLabel(visibility: string, roleOptions: { value: string; label: string }[]) {
+  const opt = [...BASE_VISIBILITY_OPTIONS, ...roleOptions].find((v) => v.value === visibility);
+  return opt?.label ?? visibility;
+}
+
+function getVisibilityVariant(visibility: string): 'default' | 'info' | 'warning' {
+  if (visibility.startsWith('role:')) return 'info';
+  return VISIBILITY_VARIANT[visibility] ?? 'default';
+}
+
 export default function AdminNavigationPage() {
   const [navItems, setNavItems] = useState<NavLinkTree[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [expandedDropdowns, setExpandedDropdowns] = useState<Set<number>>(new Set());
+  const [roleVisibilityOptions, setRoleVisibilityOptions] = useState<{ value: string; label: string }[]>([]);
 
   // Form state for creating/editing
   const [formMode, setFormMode] = useState<'none' | 'createLink' | 'createDropdown' | 'createChild' | 'edit'>('none');
@@ -69,9 +81,26 @@ export default function AdminNavigationPage() {
     }
   }, []);
 
+  const fetchRoles = useCallback(async () => {
+    try {
+      const res = await apiClient.GET('/rbac/roles');
+      if (res.data) {
+        setRoleVisibilityOptions(
+          (res.data as { name: string }[]).map((r) => ({
+            value: `role:${r.name}`,
+            label: `Rol: ${r.name}`,
+          })),
+        );
+      }
+    } catch {
+      // Non-critical, roles dropdown just won't show
+    }
+  }, []);
+
   useEffect(() => {
     fetchNavItems();
-  }, [fetchNavItems]);
+    fetchRoles();
+  }, [fetchNavItems, fetchRoles]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -109,6 +138,7 @@ export default function AdminNavigationPage() {
       await apiClient.PATCH('/navigation/reorder', {
         body: { items: reorderPayload },
       });
+      await revalidateNavigation();
     } catch {
       // Revert on failure
       await fetchNavItems();
@@ -155,7 +185,7 @@ export default function AdminNavigationPage() {
             label: formData.label,
             href: formData.href || undefined,
             icon: formData.icon || undefined,
-            visibility: formData.visibility as 'public' | 'authenticated' | 'admin',
+            visibility: formData.visibility,
             isCta: formData.isCta,
             openInNewTab: formData.openInNewTab,
           },
@@ -177,7 +207,7 @@ export default function AdminNavigationPage() {
             icon: formData.icon || undefined,
             parentId: parentId ?? undefined,
             position: nextPosition,
-            visibility: formData.visibility as 'public' | 'authenticated' | 'admin',
+            visibility: formData.visibility,
             isCta: formData.isCta,
             openInNewTab: formData.openInNewTab,
           },
@@ -186,6 +216,7 @@ export default function AdminNavigationPage() {
 
       resetForm();
       await fetchNavItems();
+      await revalidateNavigation();
     } catch (err) {
       setError(getApiErrorMessage(err as { message?: string | string[] }, 'Opslaan mislukt'));
     }
@@ -199,6 +230,7 @@ export default function AdminNavigationPage() {
       });
       resetForm();
       await fetchNavItems();
+      await revalidateNavigation();
     } catch (err) {
       setError(getApiErrorMessage(err as { message?: string | string[] }, 'Verwijderen mislukt'));
     }
@@ -251,6 +283,7 @@ export default function AdminNavigationPage() {
           isDropdown={formMode === 'createDropdown'}
           isChild={false}
           submitLabel="Toevoegen"
+          roleVisibilityOptions={roleVisibilityOptions}
         />
       )}
 
@@ -276,6 +309,7 @@ export default function AdminNavigationPage() {
                   hasChildren={item.children && item.children.length > 0}
                   isExpanded={expandedDropdowns.has(item.id)}
                   onToggleExpand={() => toggleExpand(item.id)}
+                  roleVisibilityOptions={roleVisibilityOptions}
                 />
 
                 {/* Children (dropdown items) */}
@@ -299,6 +333,7 @@ export default function AdminNavigationPage() {
                             onDelete={() => handleDelete(child.id)}
                             onSubmitEdit={handleSubmit}
                             onCancelEdit={resetForm}
+                            roleVisibilityOptions={roleVisibilityOptions}
                           />
                         ))}
                       </SortableContext>
@@ -315,6 +350,7 @@ export default function AdminNavigationPage() {
                           isDropdown={false}
                           isChild
                           submitLabel="Toevoegen"
+                          roleVisibilityOptions={roleVisibilityOptions}
                         />
                       </div>
                     )}
@@ -345,6 +381,7 @@ export default function AdminNavigationPage() {
                           isDropdown={false}
                           isChild
                           submitLabel="Toevoegen"
+                          roleVisibilityOptions={roleVisibilityOptions}
                         />
                       </div>
                     ) : (
@@ -382,6 +419,7 @@ interface SortableNavItemProps {
   hasChildren?: boolean;
   isExpanded?: boolean;
   onToggleExpand?: () => void;
+  roleVisibilityOptions?: { value: string; label: string }[];
 }
 
 function SortableNavItem({
@@ -397,6 +435,7 @@ function SortableNavItem({
   hasChildren,
   isExpanded,
   onToggleExpand,
+  roleVisibilityOptions,
 }: SortableNavItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
 
@@ -419,6 +458,7 @@ function SortableNavItem({
           isDropdown={isDropdownParent}
           isChild={!!isChild}
           submitLabel="Opslaan"
+          roleVisibilityOptions={roleVisibilityOptions}
         />
       </div>
     );
@@ -465,8 +505,8 @@ function SortableNavItem({
       </div>
 
       {/* Visibility */}
-      <Badge variant={VISIBILITY_VARIANT[item.visibility] ?? 'default'}>
-        {VISIBILITY_OPTIONS.find((v) => v.value === item.visibility)?.label ?? item.visibility}
+      <Badge variant={getVisibilityVariant(item.visibility)}>
+        {getVisibilityLabel(item.visibility, roleVisibilityOptions ?? [])}
       </Badge>
 
       {/* Actions */}
@@ -492,9 +532,11 @@ interface NavLinkFormProps {
   isDropdown: boolean;
   isChild: boolean;
   submitLabel: string;
+  roleVisibilityOptions?: { value: string; label: string }[];
 }
 
-function NavLinkForm({ formData, setFormData, onSubmit, onCancel, isDropdown, isChild, submitLabel }: NavLinkFormProps) {
+function NavLinkForm({ formData, setFormData, onSubmit, onCancel, isDropdown, isChild, submitLabel, roleVisibilityOptions = [] }: NavLinkFormProps) {
+  const visibilityOptions = [...BASE_VISIBILITY_OPTIONS, ...roleVisibilityOptions];
   return (
     <div className="bg-slate-950 rounded-lg border border-slate-700 p-4 space-y-3">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -541,7 +583,7 @@ function NavLinkForm({ formData, setFormData, onSubmit, onCancel, isDropdown, is
             value={formData.visibility}
             onChange={(e) => setFormData((prev) => ({ ...prev, visibility: e.target.value }))}
           >
-            {VISIBILITY_OPTIONS.map((opt) => (
+            {visibilityOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>

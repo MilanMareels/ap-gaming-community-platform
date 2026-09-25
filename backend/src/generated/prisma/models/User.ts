@@ -217,6 +217,7 @@ export type UserWhereInput = {
   bracketParticipants?: Prisma.BracketParticipantListRelationFilter
   timeTrialParticipants?: Prisma.TimeTrialParticipantListRelationFilter
   pointTrialParticipants?: Prisma.PointTrialParticipantListRelationFilter
+  userRoles?: Prisma.UserRoleListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -233,6 +234,7 @@ export type UserOrderByWithRelationInput = {
   bracketParticipants?: Prisma.BracketParticipantOrderByRelationAggregateInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantOrderByRelationAggregateInput
   pointTrialParticipants?: Prisma.PointTrialParticipantOrderByRelationAggregateInput
+  userRoles?: Prisma.UserRoleOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -252,6 +254,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   bracketParticipants?: Prisma.BracketParticipantListRelationFilter
   timeTrialParticipants?: Prisma.TimeTrialParticipantListRelationFilter
   pointTrialParticipants?: Prisma.PointTrialParticipantListRelationFilter
+  userRoles?: Prisma.UserRoleListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -289,6 +292,7 @@ export type UserCreateInput = {
   bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -305,6 +309,7 @@ export type UserUncheckedCreateInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -320,6 +325,7 @@ export type UserUpdateInput = {
   bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -336,6 +342,7 @@ export type UserUncheckedUpdateInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -455,6 +462,20 @@ export type UserUpdateOneRequiredWithoutMicrosoftSSOUsersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMicrosoftSSOUsersInput, Prisma.UserUpdateWithoutMicrosoftSSOUsersInput>, Prisma.UserUncheckedUpdateWithoutMicrosoftSSOUsersInput>
 }
 
+export type UserCreateNestedOneWithoutUserRolesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUserRolesInput, Prisma.UserUncheckedCreateWithoutUserRolesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUserRolesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutUserRolesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUserRolesInput, Prisma.UserUncheckedCreateWithoutUserRolesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUserRolesInput
+  upsert?: Prisma.UserUpsertWithoutUserRolesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUserRolesInput, Prisma.UserUpdateWithoutUserRolesInput>, Prisma.UserUncheckedUpdateWithoutUserRolesInput>
+}
+
 export type UserCreateNestedOneWithoutRosterEntriesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutRosterEntriesInput, Prisma.UserUncheckedCreateWithoutRosterEntriesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutRosterEntriesInput
@@ -557,6 +578,7 @@ export type UserCreateWithoutAdminUsersInput = {
   bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAdminUsersInput = {
@@ -572,6 +594,7 @@ export type UserUncheckedCreateWithoutAdminUsersInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAdminUsersInput = {
@@ -602,6 +625,7 @@ export type UserUpdateWithoutAdminUsersInput = {
   bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdminUsersInput = {
@@ -617,6 +641,7 @@ export type UserUncheckedUpdateWithoutAdminUsersInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutGoogleSSOUsersInput = {
@@ -631,6 +656,7 @@ export type UserCreateWithoutGoogleSSOUsersInput = {
   bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutGoogleSSOUsersInput = {
@@ -646,6 +672,7 @@ export type UserUncheckedCreateWithoutGoogleSSOUsersInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutGoogleSSOUsersInput = {
@@ -676,6 +703,7 @@ export type UserUpdateWithoutGoogleSSOUsersInput = {
   bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGoogleSSOUsersInput = {
@@ -691,6 +719,7 @@ export type UserUncheckedUpdateWithoutGoogleSSOUsersInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMicrosoftSSOUsersInput = {
@@ -705,6 +734,7 @@ export type UserCreateWithoutMicrosoftSSOUsersInput = {
   bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMicrosoftSSOUsersInput = {
@@ -720,6 +750,7 @@ export type UserUncheckedCreateWithoutMicrosoftSSOUsersInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMicrosoftSSOUsersInput = {
@@ -750,6 +781,7 @@ export type UserUpdateWithoutMicrosoftSSOUsersInput = {
   bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMicrosoftSSOUsersInput = {
@@ -760,6 +792,85 @@ export type UserUncheckedUpdateWithoutMicrosoftSSOUsersInput = {
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutUserNestedInput
   adminUsers?: Prisma.AdminUserUncheckedUpdateManyWithoutUserNestedInput
   googleSSOUsers?: Prisma.GoogleSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutUserNestedInput
+  eventRegistrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+  bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutUserRolesInput = {
+  name?: string | null
+  email: string
+  sNumber: string
+  reservations?: Prisma.ReservationCreateNestedManyWithoutUserInput
+  adminUsers?: Prisma.AdminUserCreateNestedManyWithoutUserInput
+  googleSSOUsers?: Prisma.GoogleSSOUserCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserCreateNestedManyWithoutUserInput
+  rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutUserInput
+  eventRegistrations?: Prisma.EventRegistrationCreateNestedManyWithoutUserInput
+  bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutUserRolesInput = {
+  id?: number
+  name?: string | null
+  email: string
+  sNumber: string
+  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutUserInput
+  adminUsers?: Prisma.AdminUserUncheckedCreateNestedManyWithoutUserInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUncheckedCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedCreateNestedManyWithoutUserInput
+  rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutUserInput
+  eventRegistrations?: Prisma.EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+  bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutUserRolesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUserRolesInput, Prisma.UserUncheckedCreateWithoutUserRolesInput>
+}
+
+export type UserUpsertWithoutUserRolesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUserRolesInput, Prisma.UserUncheckedUpdateWithoutUserRolesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUserRolesInput, Prisma.UserUncheckedCreateWithoutUserRolesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutUserRolesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUserRolesInput, Prisma.UserUncheckedUpdateWithoutUserRolesInput>
+}
+
+export type UserUpdateWithoutUserRolesInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  sNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  reservations?: Prisma.ReservationUpdateManyWithoutUserNestedInput
+  adminUsers?: Prisma.AdminUserUpdateManyWithoutUserNestedInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUpdateManyWithoutUserNestedInput
+  rosterEntries?: Prisma.RosterEntryUpdateManyWithoutUserNestedInput
+  eventRegistrations?: Prisma.EventRegistrationUpdateManyWithoutUserNestedInput
+  bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUserRolesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  sNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutUserNestedInput
+  adminUsers?: Prisma.AdminUserUncheckedUpdateManyWithoutUserNestedInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedUpdateManyWithoutUserNestedInput
   rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutUserNestedInput
   eventRegistrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
   bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -779,6 +890,7 @@ export type UserCreateWithoutRosterEntriesInput = {
   bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRosterEntriesInput = {
@@ -794,6 +906,7 @@ export type UserUncheckedCreateWithoutRosterEntriesInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRosterEntriesInput = {
@@ -824,6 +937,7 @@ export type UserUpdateWithoutRosterEntriesInput = {
   bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRosterEntriesInput = {
@@ -839,6 +953,7 @@ export type UserUncheckedUpdateWithoutRosterEntriesInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReservationsInput = {
@@ -853,6 +968,7 @@ export type UserCreateWithoutReservationsInput = {
   bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReservationsInput = {
@@ -868,6 +984,7 @@ export type UserUncheckedCreateWithoutReservationsInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReservationsInput = {
@@ -898,6 +1015,7 @@ export type UserUpdateWithoutReservationsInput = {
   bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReservationsInput = {
@@ -913,6 +1031,7 @@ export type UserUncheckedUpdateWithoutReservationsInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBracketParticipantsInput = {
@@ -927,6 +1046,7 @@ export type UserCreateWithoutBracketParticipantsInput = {
   eventRegistrations?: Prisma.EventRegistrationCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBracketParticipantsInput = {
@@ -942,6 +1062,7 @@ export type UserUncheckedCreateWithoutBracketParticipantsInput = {
   eventRegistrations?: Prisma.EventRegistrationUncheckedCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBracketParticipantsInput = {
@@ -972,6 +1093,7 @@ export type UserUpdateWithoutBracketParticipantsInput = {
   eventRegistrations?: Prisma.EventRegistrationUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBracketParticipantsInput = {
@@ -987,6 +1109,7 @@ export type UserUncheckedUpdateWithoutBracketParticipantsInput = {
   eventRegistrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEventRegistrationsInput = {
@@ -1001,6 +1124,7 @@ export type UserCreateWithoutEventRegistrationsInput = {
   bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEventRegistrationsInput = {
@@ -1016,6 +1140,7 @@ export type UserUncheckedCreateWithoutEventRegistrationsInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEventRegistrationsInput = {
@@ -1046,6 +1171,7 @@ export type UserUpdateWithoutEventRegistrationsInput = {
   bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEventRegistrationsInput = {
@@ -1061,6 +1187,7 @@ export type UserUncheckedUpdateWithoutEventRegistrationsInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTimeTrialParticipantsInput = {
@@ -1075,6 +1202,7 @@ export type UserCreateWithoutTimeTrialParticipantsInput = {
   eventRegistrations?: Prisma.EventRegistrationCreateNestedManyWithoutUserInput
   bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTimeTrialParticipantsInput = {
@@ -1090,6 +1218,7 @@ export type UserUncheckedCreateWithoutTimeTrialParticipantsInput = {
   eventRegistrations?: Prisma.EventRegistrationUncheckedCreateNestedManyWithoutUserInput
   bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTimeTrialParticipantsInput = {
@@ -1120,6 +1249,7 @@ export type UserUpdateWithoutTimeTrialParticipantsInput = {
   eventRegistrations?: Prisma.EventRegistrationUpdateManyWithoutUserNestedInput
   bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTimeTrialParticipantsInput = {
@@ -1135,6 +1265,7 @@ export type UserUncheckedUpdateWithoutTimeTrialParticipantsInput = {
   eventRegistrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
   bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPointTrialParticipantsInput = {
@@ -1149,6 +1280,7 @@ export type UserCreateWithoutPointTrialParticipantsInput = {
   eventRegistrations?: Prisma.EventRegistrationCreateNestedManyWithoutUserInput
   bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPointTrialParticipantsInput = {
@@ -1164,6 +1296,7 @@ export type UserUncheckedCreateWithoutPointTrialParticipantsInput = {
   eventRegistrations?: Prisma.EventRegistrationUncheckedCreateNestedManyWithoutUserInput
   bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPointTrialParticipantsInput = {
@@ -1194,6 +1327,7 @@ export type UserUpdateWithoutPointTrialParticipantsInput = {
   eventRegistrations?: Prisma.EventRegistrationUpdateManyWithoutUserNestedInput
   bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPointTrialParticipantsInput = {
@@ -1209,6 +1343,7 @@ export type UserUncheckedUpdateWithoutPointTrialParticipantsInput = {
   eventRegistrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
   bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1226,6 +1361,7 @@ export type UserCountOutputType = {
   bracketParticipants: number
   timeTrialParticipants: number
   pointTrialParticipants: number
+  userRoles: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1238,6 +1374,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   bracketParticipants?: boolean | UserCountOutputTypeCountBracketParticipantsArgs
   timeTrialParticipants?: boolean | UserCountOutputTypeCountTimeTrialParticipantsArgs
   pointTrialParticipants?: boolean | UserCountOutputTypeCountPointTrialParticipantsArgs
+  userRoles?: boolean | UserCountOutputTypeCountUserRolesArgs
 }
 
 /**
@@ -1313,6 +1450,13 @@ export type UserCountOutputTypeCountPointTrialParticipantsArgs<ExtArgs extends r
   where?: Prisma.PointTrialParticipantWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountUserRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserRoleWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1328,6 +1472,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   bracketParticipants?: boolean | Prisma.User$bracketParticipantsArgs<ExtArgs>
   timeTrialParticipants?: boolean | Prisma.User$timeTrialParticipantsArgs<ExtArgs>
   pointTrialParticipants?: boolean | Prisma.User$pointTrialParticipantsArgs<ExtArgs>
+  userRoles?: boolean | Prisma.User$userRolesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1363,6 +1508,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   bracketParticipants?: boolean | Prisma.User$bracketParticipantsArgs<ExtArgs>
   timeTrialParticipants?: boolean | Prisma.User$timeTrialParticipantsArgs<ExtArgs>
   pointTrialParticipants?: boolean | Prisma.User$pointTrialParticipantsArgs<ExtArgs>
+  userRoles?: boolean | Prisma.User$userRolesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1380,6 +1526,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     bracketParticipants: Prisma.$BracketParticipantPayload<ExtArgs>[]
     timeTrialParticipants: Prisma.$TimeTrialParticipantPayload<ExtArgs>[]
     pointTrialParticipants: Prisma.$PointTrialParticipantPayload<ExtArgs>[]
+    userRoles: Prisma.$UserRolePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1789,6 +1936,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   bracketParticipants<T extends Prisma.User$bracketParticipantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bracketParticipantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BracketParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   timeTrialParticipants<T extends Prisma.User$timeTrialParticipantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$timeTrialParticipantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TimeTrialParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pointTrialParticipants<T extends Prisma.User$pointTrialParticipantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pointTrialParticipantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PointTrialParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  userRoles<T extends Prisma.User$userRolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$userRolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2423,6 +2571,30 @@ export type User$pointTrialParticipantsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.PointTrialParticipantScalarFieldEnum | Prisma.PointTrialParticipantScalarFieldEnum[]
+}
+
+/**
+ * User.userRoles
+ */
+export type User$userRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserRole
+   */
+  select?: Prisma.UserRoleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserRole
+   */
+  omit?: Prisma.UserRoleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserRoleInclude<ExtArgs> | null
+  where?: Prisma.UserRoleWhereInput
+  orderBy?: Prisma.UserRoleOrderByWithRelationInput | Prisma.UserRoleOrderByWithRelationInput[]
+  cursor?: Prisma.UserRoleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserRoleScalarFieldEnum | Prisma.UserRoleScalarFieldEnum[]
 }
 
 /**

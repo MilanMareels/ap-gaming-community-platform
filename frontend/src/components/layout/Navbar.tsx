@@ -17,7 +17,7 @@ export async function Navbar() {
 
   try {
     const res = await fetch(`${BACKEND_URL}/api/navigation`, {
-      next: { revalidate: 60 },
+      next: { revalidate: 60, tags: ['navigation'] },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     navItems = await res.json();

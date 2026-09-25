@@ -2,6 +2,10 @@ import { UserRelations as _UserRelations } from './user_relations.js';
 import { AdminUserRelations as _AdminUserRelations } from './admin_user_relations.js';
 import { GoogleSSOUserRelations as _GoogleSSOUserRelations } from './google_s_s_o_user_relations.js';
 import { MicrosoftSSOUserRelations as _MicrosoftSSOUserRelations } from './microsoft_s_s_o_user_relations.js';
+import { RoleRelations as _RoleRelations } from './role_relations.js';
+import { PermissionRelations as _PermissionRelations } from './permission_relations.js';
+import { RolePermissionRelations as _RolePermissionRelations } from './role_permission_relations.js';
+import { UserRoleRelations as _UserRoleRelations } from './user_role_relations.js';
 import { SettingRelations as _SettingRelations } from './setting_relations.js';
 import { FormRelations as _FormRelations } from './form_relations.js';
 import { NavLinkRelations as _NavLinkRelations } from './nav_link_relations.js';
@@ -25,6 +29,10 @@ import { User as _User } from './user.js';
 import { AdminUser as _AdminUser } from './admin_user.js';
 import { GoogleSSOUser as _GoogleSSOUser } from './google_s_s_o_user.js';
 import { MicrosoftSSOUser as _MicrosoftSSOUser } from './microsoft_s_s_o_user.js';
+import { Role as _Role } from './role.js';
+import { Permission as _Permission } from './permission.js';
+import { RolePermission as _RolePermission } from './role_permission.js';
+import { UserRole as _UserRole } from './user_role.js';
 import { Setting as _Setting } from './setting.js';
 import { Form as _Form } from './form.js';
 import { NavLink as _NavLink } from './nav_link.js';
@@ -50,6 +58,10 @@ export namespace PrismaModel {
   export class AdminUserRelations extends _AdminUserRelations {}
   export class GoogleSSOUserRelations extends _GoogleSSOUserRelations {}
   export class MicrosoftSSOUserRelations extends _MicrosoftSSOUserRelations {}
+  export class RoleRelations extends _RoleRelations {}
+  export class PermissionRelations extends _PermissionRelations {}
+  export class RolePermissionRelations extends _RolePermissionRelations {}
+  export class UserRoleRelations extends _UserRoleRelations {}
   export class SettingRelations extends _SettingRelations {}
   export class FormRelations extends _FormRelations {}
   export class NavLinkRelations extends _NavLinkRelations {}
@@ -73,6 +85,10 @@ export namespace PrismaModel {
   export class AdminUser extends _AdminUser {}
   export class GoogleSSOUser extends _GoogleSSOUser {}
   export class MicrosoftSSOUser extends _MicrosoftSSOUser {}
+  export class Role extends _Role {}
+  export class Permission extends _Permission {}
+  export class RolePermission extends _RolePermission {}
+  export class UserRole extends _UserRole {}
   export class Setting extends _Setting {}
   export class Form extends _Form {}
   export class NavLink extends _NavLink {}
@@ -98,6 +114,10 @@ export namespace PrismaModel {
     AdminUserRelations,
     GoogleSSOUserRelations,
     MicrosoftSSOUserRelations,
+    RoleRelations,
+    PermissionRelations,
+    RolePermissionRelations,
+    UserRoleRelations,
     SettingRelations,
     FormRelations,
     NavLinkRelations,
@@ -121,6 +141,10 @@ export namespace PrismaModel {
     AdminUser,
     GoogleSSOUser,
     MicrosoftSSOUser,
+    Role,
+    Permission,
+    RolePermission,
+    UserRole,
     Setting,
     Form,
     NavLink,

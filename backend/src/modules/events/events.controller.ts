@@ -5,7 +5,8 @@ import { EventsService } from './events.service.js';
 import { EventRegistrationsService } from './event-registrations.service.js';
 import { CreateEventDto, UpdateEventDto } from '../../dtos/events/event.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
-import { AdminGuard } from '../../guards/admin.guard.js';
+import { PermissionGuard } from '../../guards/permission.guard.js';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { Public } from '../auth/public.decorator.js';
 import type { JwtPayload } from '../auth/types/jwt-payload.type.js';
 import { HttpExceptionDto } from '../../dtos/http-exception.dto.js';
@@ -27,7 +28,8 @@ export class EventsController {
   }
 
   @Get('all')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('events.manage')
   @ApiOperation({ summary: 'Get all events (Admin only)' })
   @ApiOkResponse({ type: [CreateEventDto] })
   findAll() {
@@ -44,7 +46,8 @@ export class EventsController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('events.manage')
   @ApiOperation({ summary: 'Create a new event (Admin only)' })
   @ApiCreatedResponse({ type: CreateEventDto })
   create(@Body() dto: CreateEventDto) {
@@ -52,7 +55,8 @@ export class EventsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('events.manage')
   @ApiOperation({ summary: 'Update an event (Admin only)' })
   @ApiOkResponse({ type: CreateEventDto })
   update(@Param('id') id: string, @Body() dto: UpdateEventDto) {
@@ -60,7 +64,8 @@ export class EventsController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('events.manage')
   @ApiOperation({ summary: 'Delete an event (Admin only)' })
   delete(@Param('id') id: string) {
     return this.eventsService.delete(+id);
@@ -102,7 +107,8 @@ export class EventsController {
   }
 
   @Get(':id/registrations')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('events.manage', 'events.registrations.view')
   @ApiOperation({ summary: 'Get all registrations for an event (Admin only)' })
   @ApiOkResponse({ description: 'List of registrations' })
   @ApiNotFoundResponse({ description: 'Event not found', type: HttpExceptionDto })

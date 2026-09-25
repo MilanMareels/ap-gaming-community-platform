@@ -3,7 +3,8 @@ import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiConsumes }
 import { RosterService } from './roster.service.js';
 import { CreateRosterEntryDto, CreateRosterGameDto } from '../../dtos/roster/roster.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
-import { AdminGuard } from '../../guards/admin.guard.js';
+import { PermissionGuard } from '../../guards/permission.guard.js';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { Public } from '../auth/public.decorator.js';
 import { PrismaModel } from '../../_gen/prisma-class/index.js';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -25,7 +26,8 @@ export class RosterController {
   }
 
   @Post('games')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('roster.manage')
   @ApiOperation({ summary: 'Create a new roster game (Admin only)' })
   @ApiCreatedResponse({ type: PrismaModel.RosterGame })
   createGame(@Body() dto: CreateRosterGameDto) {
@@ -33,7 +35,8 @@ export class RosterController {
   }
 
   @Delete('games/:id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('roster.manage')
   @ApiOperation({ summary: 'Delete a roster game (Admin only)' })
   deleteGame(@Param('id') id: string) {
     return this.rosterService.deleteGame(+id);
@@ -48,7 +51,8 @@ export class RosterController {
   }
 
   @Post('entries')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('roster.manage')
   @ApiOperation({ summary: 'Add a roster entry with optional image (Admin only)' })
   @ApiConsumes('multipart/form-data')
   @ApiCreatedResponse({ type: PrismaModel.RosterEntry })
@@ -75,7 +79,8 @@ export class RosterController {
   }
 
   @Delete('entries/:id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('roster.manage')
   @ApiOperation({ summary: 'Delete a roster entry (Admin only)' })
   deleteEntry(@Param('id') id: string) {
     return this.rosterService.deleteEntry(+id);

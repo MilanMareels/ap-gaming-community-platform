@@ -24,7 +24,8 @@ import {
   AddPointEntryDto,
 } from '../../dtos/point-trials/point-trial-entry.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
-import { AdminGuard } from '../../guards/admin.guard.js';
+import { PermissionGuard } from '../../guards/permission.guard.js';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { Public } from '../auth/public.decorator.js';
 import { HttpExceptionDto } from '../../dtos/http-exception.dto.js';
 
@@ -47,7 +48,8 @@ export class PointTrialsController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('point-trials.manage')
   @ApiOperation({ summary: 'Create a point trial for an event (Admin only)' })
   @ApiCreatedResponse({ description: 'Point trial created' })
   @ApiBadRequestResponse({
@@ -63,7 +65,8 @@ export class PointTrialsController {
   }
 
   @Patch()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('point-trials.manage')
   @ApiOperation({ summary: 'Update point trial status (Admin only)' })
   @ApiOkResponse({ description: 'Point trial status updated' })
   @ApiBadRequestResponse({
@@ -78,7 +81,8 @@ export class PointTrialsController {
   }
 
   @Delete()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('point-trials.manage')
   @ApiOperation({ summary: 'Delete point trial for an event (Admin only)' })
   @ApiOkResponse({ description: 'Point trial deleted' })
   @ApiNotFoundResponse({
@@ -92,7 +96,8 @@ export class PointTrialsController {
   // --- Participant management ---
 
   @Post('participants')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('point-trials.manage')
   @ApiOperation({ summary: 'Add participant to point trial (Admin only)' })
   @ApiCreatedResponse({ description: 'Participant added' })
   addParticipant(
@@ -103,7 +108,8 @@ export class PointTrialsController {
   }
 
   @Delete('participants/:participantId')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('point-trials.manage')
   @ApiOperation({
     summary: 'Remove participant and all entries (Admin only)',
   })
@@ -133,7 +139,8 @@ export class PointTrialsController {
   }
 
   @Post('participants/:participantId/entries')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('point-trials.manage')
   @ApiOperation({ summary: 'Submit a new point entry (Admin only)' })
   @ApiCreatedResponse({ description: 'Entry recorded' })
   @ApiNotFoundResponse({
@@ -149,7 +156,8 @@ export class PointTrialsController {
   }
 
   @Delete('entries/:entryId')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('point-trials.manage')
   @ApiOperation({ summary: 'Delete a specific entry (Admin only)' })
   @ApiOkResponse({ description: 'Entry deleted' })
   @ApiNotFoundResponse({

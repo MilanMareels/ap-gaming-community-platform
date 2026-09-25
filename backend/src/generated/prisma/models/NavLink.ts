@@ -556,14 +556,6 @@ export type NavLinkUncheckedCreateNestedManyWithoutParentInput = {
   connect?: Prisma.NavLinkWhereUniqueInput | Prisma.NavLinkWhereUniqueInput[]
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
 export type NavLinkUpdateOneWithoutChildrenNestedInput = {
   create?: Prisma.XOR<Prisma.NavLinkCreateWithoutChildrenInput, Prisma.NavLinkUncheckedCreateWithoutChildrenInput>
   connectOrCreate?: Prisma.NavLinkCreateOrConnectWithoutChildrenInput

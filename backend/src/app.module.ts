@@ -11,11 +11,13 @@ import { NavigationModule } from './modules/navigation/navigation.module.js';
 import { BracketsModule } from './modules/brackets/brackets.module.js';
 import { TimeTrialsModule } from './modules/time-trials/time-trials.module.js';
 import { PointTrialsModule } from './modules/point-trials/point-trials.module.js';
+import { RbacModule } from './modules/rbac/rbac.module.js';
 
 @Module({
   imports: [
     PrismaModule,
     AuthModule,
+    RbacModule,
     ReservationsModule,
     RosterModule,
     TimetableModule,

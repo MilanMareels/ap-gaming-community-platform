@@ -3,7 +3,8 @@ import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse } from '@nestj
 import { NavigationService } from './navigation.service.js';
 import { CreateNavLinkDto, UpdateNavLinkDto, ReorderNavLinksDto } from '../../dtos/navigation/navigation.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
-import { AdminGuard } from '../../guards/admin.guard.js';
+import { PermissionGuard } from '../../guards/permission.guard.js';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { Public } from '../auth/public.decorator.js';
 import { PrismaModel } from '../../_gen/prisma-class/index.js';
 
@@ -21,7 +22,8 @@ export class NavigationController {
   }
 
   @Get('admin')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('navigation.manage')
   @ApiOperation({ summary: 'Get all nav links flat (Admin only)' })
   @ApiOkResponse({ type: [PrismaModel.NavLink] })
   getAllFlat() {
@@ -29,7 +31,8 @@ export class NavigationController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('navigation.manage')
   @ApiOperation({ summary: 'Create a nav link (Admin only)' })
   @ApiCreatedResponse({ type: PrismaModel.NavLink })
   create(@Body() dto: CreateNavLinkDto) {
@@ -37,14 +40,16 @@ export class NavigationController {
   }
 
   @Patch('reorder')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('navigation.manage')
   @ApiOperation({ summary: 'Reorder nav links (Admin only)' })
   reorder(@Body() dto: ReorderNavLinksDto) {
     return this.navigationService.reorder(dto);
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('navigation.manage')
   @ApiOperation({ summary: 'Update a nav link (Admin only)' })
   @ApiOkResponse({ type: PrismaModel.NavLink })
   update(@Param('id') id: string, @Body() dto: UpdateNavLinkDto) {
@@ -52,7 +57,8 @@ export class NavigationController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('navigation.manage')
   @ApiOperation({ summary: 'Delete a nav link (Admin only)' })
   delete(@Param('id') id: string) {
     return this.navigationService.delete(+id);

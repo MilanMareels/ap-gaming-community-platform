@@ -20,6 +20,8 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
   const [openDropdown, setOpenDropdown] = useState<number | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<number | null>(null);
   const [userRole, setUserRole] = useState<UserRole>('public');
+  const [userRoles, setUserRoles] = useState<string[]>([]);
+  const [hasAnyPermission, setHasAnyPermission] = useState(false);
   const dropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
 
@@ -38,8 +40,11 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
         return res.json();
       })
       .then((data) => {
-        if (data?.isAdmin) setUserRole('admin');
-        else if (data?.id) setUserRole('authenticated');
+        if (!data?.id) return;
+        if (data.isAdmin) setUserRole('admin');
+        else setUserRole('authenticated');
+        if (data.roles) setUserRoles(data.roles);
+        if (data.permissions?.length > 0) setHasAnyPermission(true);
       })
       .catch(() => {});
   }, []);
@@ -49,9 +54,13 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
       if (visibility === 'public') return true;
       if (visibility === 'authenticated') return userRole !== 'public';
       if (visibility === 'admin') return userRole === 'admin';
+      if (visibility.startsWith('role:')) {
+        const roleName = visibility.slice(5);
+        return userRoles.includes(roleName);
+      }
       return true;
     },
-    [userRole],
+    [userRole, userRoles],
   );
 
   const visibleItems = navItems.filter(
@@ -146,9 +155,11 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
               </Link>
             ),
           )}
-          <Link href="/admin" className="text-gray-500 hover:text-white p-2">
-            <Lock size={20} strokeWidth={1.5} />
-          </Link>
+          {hasAnyPermission && (
+            <Link href="/admin" className="text-gray-500 hover:text-white p-2">
+              <Lock size={20} strokeWidth={1.5} />
+            </Link>
+          )}
         </div>
 
         {/* Desktop CTA */}
@@ -170,9 +181,11 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
 
         {/* Mobile controls */}
         <div className="md:hidden flex items-center gap-4">
-          <Link href="/admin" className="text-gray-500 hover:text-white p-2">
-            <Lock size={20} strokeWidth={1.5} />
-          </Link>
+          {hasAnyPermission && (
+            <Link href="/admin" className="text-gray-500 hover:text-white p-2">
+              <Lock size={20} strokeWidth={1.5} />
+            </Link>
+          )}
           <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 hover:text-white focus:outline-none p-2">
             {isOpen ? <X size={28} strokeWidth={1.5} /> : <Menu size={28} strokeWidth={1.5} />}
           </button>

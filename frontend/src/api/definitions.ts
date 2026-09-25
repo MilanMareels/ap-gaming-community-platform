@@ -174,6 +174,95 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/rbac/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all roles */
+        get: operations["RbacController_listRoles"];
+        put?: never;
+        /** Create a new role */
+        post: operations["RbacController_createRole"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rbac/roles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get role details with assigned users */
+        get: operations["RbacController_getRole"];
+        put?: never;
+        post?: never;
+        /** Delete a role */
+        delete: operations["RbacController_deleteRole"];
+        options?: never;
+        head?: never;
+        /** Update a role */
+        patch: operations["RbacController_updateRole"];
+        trace?: never;
+    };
+    "/rbac/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all available permissions */
+        get: operations["RbacController_listPermissions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rbac/users/{userId}/roles/{roleId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Assign a role to a user */
+        post: operations["RbacController_assignRole"];
+        /** Remove a role from a user */
+        delete: operations["RbacController_removeRole"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rbac/users/{userId}/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get roles assigned to a user */
+        get: operations["RbacController_getUserRoles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reservations": {
         parameters: {
             query?: never;
@@ -1192,6 +1281,60 @@ export interface components {
             sNumber: string;
             /** @description Whether the authenticated user is an admin user */
             isAdmin: boolean;
+            /** @description Role names assigned to the user */
+            roles: string[];
+            /** @description Permission keys the user has */
+            permissions: string[];
+        };
+        RoleResponseDto: {
+            id: number;
+            name: string;
+            description?: string;
+            isSystem: boolean;
+            permissions: string[];
+            userCount: number;
+        };
+        RoleDetailResponseDto: {
+            id: number;
+            name: string;
+            description?: string;
+            isSystem: boolean;
+            permissions: string[];
+        };
+        CreateRoleDto: {
+            /** @example Event Manager */
+            name: string;
+            /** @example Can manage events and registrations */
+            description?: string;
+            /**
+             * @example [
+             *       "events.manage",
+             *       "events.registrations.view"
+             *     ]
+             */
+            permissions: string[];
+        };
+        UpdateRoleDto: {
+            /** @example Event Manager */
+            name?: string;
+            /** @example Can manage events and registrations */
+            description?: string;
+            /**
+             * @example [
+             *       "events.manage",
+             *       "events.registrations.view"
+             *     ]
+             */
+            permissions?: string[];
+        };
+        SuccessResponseDto: {
+            /** @example true */
+            success: boolean;
+        };
+        PermissionResponseDto: {
+            id: number;
+            key: string;
+            description?: string;
         };
         CreateReservationDto: {
             /**
@@ -1539,10 +1682,10 @@ export interface components {
             /** @example 0 */
             position: number;
             /**
+             * @description Visibility: public, authenticated, admin, or role:<RoleName>
              * @example public
-             * @enum {string}
              */
-            visibility?: "public" | "authenticated" | "admin";
+            visibility?: string;
             /** @example false */
             isCta?: boolean;
             /** @example false */
@@ -1569,10 +1712,10 @@ export interface components {
             /** @example 0 */
             position?: number;
             /**
+             * @description Visibility: public, authenticated, admin, or role:<RoleName>
              * @example public
-             * @enum {string}
              */
-            visibility?: "public" | "authenticated" | "admin";
+            visibility?: string;
             /** @example false */
             isCta?: boolean;
             /** @example false */
@@ -1721,6 +1864,11 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        UserRole: {
+            id: number;
+            userId: number;
+            roleId: number;
+        };
         UserRelations: {
             reservations: components["schemas"]["Reservation"][];
             adminUsers: components["schemas"]["AdminUser"][];
@@ -1731,6 +1879,7 @@ export interface components {
             bracketParticipants: components["schemas"]["BracketParticipant"][];
             timeTrialParticipants: components["schemas"]["TimeTrialParticipant"][];
             pointTrialParticipants: components["schemas"]["PointTrialParticipant"][];
+            userRoles: components["schemas"]["UserRole"][];
         };
         User: {
             id: number;
@@ -1746,6 +1895,41 @@ export interface components {
         };
         MicrosoftSSOUserRelations: {
             user: components["schemas"]["User"];
+        };
+        RolePermission: {
+            id: number;
+            roleId: number;
+            permissionId: number;
+        };
+        RoleRelations: {
+            permissions: components["schemas"]["RolePermission"][];
+            userRoles: components["schemas"]["UserRole"][];
+        };
+        PermissionRelations: {
+            rolePermissions: components["schemas"]["RolePermission"][];
+        };
+        Role: {
+            id: number;
+            name: string;
+            description?: string;
+            isSystem: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        Permission: {
+            id: number;
+            key: string;
+            description?: string;
+        };
+        RolePermissionRelations: {
+            role: components["schemas"]["Role"];
+            permission: components["schemas"]["Permission"];
+        };
+        UserRoleRelations: {
+            user: components["schemas"]["User"];
+            role: components["schemas"]["Role"];
         };
         SettingRelations: Record<string, never>;
         FormRelations: Record<string, never>;
@@ -2145,6 +2329,199 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    RbacController_listRoles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleResponseDto"][];
+                };
+            };
+        };
+    };
+    RbacController_createRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRoleDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleDetailResponseDto"];
+                };
+            };
+        };
+    };
+    RbacController_getRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleDetailResponseDto"];
+                };
+            };
+        };
+    };
+    RbacController_deleteRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuccessResponseDto"];
+                };
+            };
+        };
+    };
+    RbacController_updateRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRoleDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleDetailResponseDto"];
+                };
+            };
+        };
+    };
+    RbacController_listPermissions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PermissionResponseDto"][];
+                };
+            };
+        };
+    };
+    RbacController_assignRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: number;
+                roleId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuccessResponseDto"];
+                };
+            };
+        };
+    };
+    RbacController_removeRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: number;
+                roleId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuccessResponseDto"];
+                };
+            };
+        };
+    };
+    RbacController_getUserRoles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleDetailResponseDto"][];
+                };
             };
         };
     };

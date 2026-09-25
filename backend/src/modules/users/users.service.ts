@@ -34,6 +34,7 @@ export class UsersService {
         adminUsers: { select: { id: true } },
         googleSSOUsers: { select: { id: true } },
         microsoftSSOUsers: { select: { id: true } },
+        userRoles: { select: { role: { select: { name: true } } } },
         _count: {
           select: {
             reservations: true,
@@ -61,6 +62,7 @@ export class UsersService {
       microsoftLinked: user.microsoftSSOUsers.length > 0,
       reservationCount: user._count.reservations,
       noShowCount: noShowMap.get(user.id) ?? 0,
+      roles: user.userRoles.map((ur) => ur.role.name),
     }));
   }
 

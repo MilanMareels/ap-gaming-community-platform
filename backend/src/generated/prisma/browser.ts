@@ -38,6 +38,26 @@ export type GoogleSSOUser = Prisma.GoogleSSOUserModel
  */
 export type MicrosoftSSOUser = Prisma.MicrosoftSSOUserModel
 /**
+ * Model Role
+ * 
+ */
+export type Role = Prisma.RoleModel
+/**
+ * Model Permission
+ * 
+ */
+export type Permission = Prisma.PermissionModel
+/**
+ * Model RolePermission
+ * 
+ */
+export type RolePermission = Prisma.RolePermissionModel
+/**
+ * Model UserRole
+ * 
+ */
+export type UserRole = Prisma.UserRoleModel
+/**
  * Model Setting
  * 
  */

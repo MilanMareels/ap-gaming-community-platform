@@ -368,6 +368,7 @@ function ConnectorLine({
 interface DragSlot {
   participantId: number;
   participantName: string;
+  matchId: number;
   x: number;
   y: number;
   width: number;
@@ -549,27 +550,33 @@ export function BracketSVG({
       }
     }
 
-    // Determine winner from finals match
+    // Determine winner position (always shown) and name (if finals completed)
     const finalsMatch = (matchesByRound.get(totalRounds) || [])[0];
     const finalsPos = finalsMatch ? positions.get(finalsMatch.id) : null;
-    let winner: { name: string; x: number; y: number; centerY: number; fromX: number; fromY: number } | null = null;
+    let winner: { name: string | null; x: number; y: number; centerY: number; fromX: number; fromY: number } | null = null;
 
-    if (finalsMatch && finalsPos && finalsMatch.status === 'COMPLETED') {
-      const winnerSlot = finalsMatch.participants.find(
-        (p) => p.isWinner && p.participant,
-      );
-      if (winnerSlot?.participant) {
-        const winnerX = finalsPos.x + cfg.matchWidth + cfg.roundGap * 0.4;
-        const winnerCenterY = finalsPos.centerY;
-        winner = {
-          name: winnerSlot.participant.name,
-          x: winnerX,
-          y: winnerCenterY - 32,
-          centerY: winnerCenterY,
-          fromX: finalsPos.x + cfg.matchWidth,
-          fromY: finalsPos.centerY,
-        };
+    if (finalsMatch && finalsPos) {
+      const winnerX = finalsPos.x + cfg.matchWidth + cfg.roundGap * 0.4;
+      const winnerCenterY = finalsPos.centerY;
+      let winnerName: string | null = null;
+
+      if (finalsMatch.status === 'COMPLETED') {
+        const winnerSlot = finalsMatch.participants.find(
+          (p) => p.isWinner && p.participant,
+        );
+        if (winnerSlot?.participant) {
+          winnerName = winnerSlot.participant.name;
+        }
       }
+
+      winner = {
+        name: winnerName,
+        x: winnerX,
+        y: winnerCenterY - 32,
+        centerY: winnerCenterY,
+        fromX: finalsPos.x + cfg.matchWidth,
+        fromY: finalsPos.centerY,
+      };
     }
 
     // Calculate SVG dimensions
@@ -628,6 +635,7 @@ export function BracketSVG({
             dragSlots.push({
               participantId: mp.participantId,
               participantName: mp.participant.name,
+              matchId: match.id,
               x: pos.x,
               y: pos.y + cfg.wrapperPadding + slotIdx * cfg.playerHeight,
               width: cfg.matchWidth,
@@ -753,8 +761,9 @@ export function BracketSVG({
               <path
                 d={`M ${layout.winner.fromX} ${layout.winner.fromY} L ${layout.winner.x} ${layout.winner.fromY}`}
                 fill="none"
-                stroke="#dc2626"
+                stroke={layout.winner.name ? '#dc2626' : '#374151'}
                 strokeWidth={2}
+                strokeDasharray={layout.winner.name ? undefined : '6 4'}
               />
 
               {/* Winner card */}
@@ -765,7 +774,7 @@ export function BracketSVG({
                   y={0}
                   textAnchor="middle"
                   fontSize={mode === 'kiosk' ? 28 : 20}
-                  className="fill-yellow-400"
+                  className={layout.winner.name ? 'fill-yellow-400' : 'fill-gray-600'}
                 >
                   &#x1F3C6;
                 </text>
@@ -792,8 +801,9 @@ export function BracketSVG({
                   rx={cfg.cornerRadius + 1}
                   ry={cfg.cornerRadius + 1}
                   fill="none"
-                  stroke="#dc2626"
+                  stroke={layout.winner.name ? '#dc2626' : '#374151'}
                   strokeWidth={2}
+                  strokeDasharray={layout.winner.name ? undefined : '6 4'}
                 />
                 <rect
                   x={1}
@@ -802,7 +812,7 @@ export function BracketSVG({
                   height={mode === 'kiosk' ? 36 : 28}
                   rx={cfg.cornerRadius}
                   ry={cfg.cornerRadius}
-                  className="fill-red-600/15"
+                  className={layout.winner.name ? 'fill-red-600/15' : 'fill-gray-800/30'}
                 />
                 <text
                   x={cfg.matchWidth / 2}
@@ -811,9 +821,9 @@ export function BracketSVG({
                   dominantBaseline="middle"
                   fontSize={mode === 'kiosk' ? cfg.fontSize + 2 : cfg.fontSize + 1}
                   fontWeight="bold"
-                  className="fill-white"
+                  className={layout.winner.name ? 'fill-white' : 'fill-gray-600'}
                 >
-                  {layout.winner.name}
+                  {layout.winner.name ?? 'TBD'}
                 </text>
               </g>
             </>
@@ -835,6 +845,7 @@ export function BracketSVG({
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop(slot.participantId)}
                 onDragEnd={handleDragEnd}
+                onClick={() => onMatchClick?.(slot.matchId)}
                 className={`absolute cursor-grab active:cursor-grabbing transition-all rounded-sm ${
                   isDragSource
                     ? 'ring-2 ring-red-500 bg-red-500/20 z-10'

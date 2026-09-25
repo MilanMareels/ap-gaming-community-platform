@@ -9,14 +9,16 @@ import {
   UserListQueryDto,
   WhitelistEntryDto,
 } from '../../dtos/users/user.dto.js';
-import { AdminGuard } from '../../guards/admin.guard.js';
+import { PermissionGuard } from '../../guards/permission.guard.js';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import type { JwtPayload } from '../auth/types/jwt-payload.type.js';
 import { UsersService } from './users.service.js';
 
 @ApiTags('Users')
 @Controller('users')
-@UseGuards(JwtAuthGuard, AdminGuard)
+@UseGuards(JwtAuthGuard, PermissionGuard)
+@RequirePermissions('users.manage')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

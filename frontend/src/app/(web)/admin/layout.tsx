@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { LogOut, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -12,6 +12,8 @@ type AuthProfile = components['schemas']['AuthProfileResponseDto'];
 
 interface AdminContextType {
   user: AuthProfile;
+  hasPermission: (permission: string) => boolean;
+  hasAnyPermission: (...permissions: string[]) => boolean;
 }
 
 const AdminContext = createContext<AdminContextType | null>(null);
@@ -22,14 +24,15 @@ export const useAdmin = () => {
 };
 
 const TABS = [
-  { id: 'reservations', label: 'Reservaties', href: '/admin/reservations' },
-  { id: 'events', label: 'Events', href: '/admin/events' },
-  { id: 'noshows', label: 'No-Shows', href: '/admin/noshows' },
-  { id: 'roster', label: 'Teams', href: '/admin/roster' },
-  { id: 'timetable', label: 'Openingsuren', href: '/admin/timetable' },
-  { id: 'users', label: 'Gebruikers', href: '/admin/users' },
-  { id: 'navigation', label: 'Navigatie', href: '/admin/navigation' },
-  { id: 'settings', label: 'Instellingen', href: '/admin/settings' },
+  { id: 'reservations', label: 'Reservaties', href: '/admin/reservations', permissions: ['reservations.manage'] },
+  { id: 'events', label: 'Events', href: '/admin/events', permissions: ['events.manage'] },
+  { id: 'noshows', label: 'No-Shows', href: '/admin/noshows', permissions: ['reservations.noshows.manage', 'reservations.manage'] },
+  { id: 'roster', label: 'Teams', href: '/admin/roster', permissions: ['roster.manage'] },
+  { id: 'timetable', label: 'Openingsuren', href: '/admin/timetable', permissions: ['timetable.manage'] },
+  { id: 'users', label: 'Gebruikers', href: '/admin/users', permissions: ['users.manage'] },
+  { id: 'navigation', label: 'Navigatie', href: '/admin/navigation', permissions: ['navigation.manage'] },
+  { id: 'roles', label: 'Rollen', href: '/admin/roles', permissions: ['roles.manage'] },
+  { id: 'settings', label: 'Instellingen', href: '/admin/settings', permissions: ['settings.manage'] },
 ];
 
 export default function AdminLayout({
@@ -50,7 +53,12 @@ export default function AdminLayout({
   const checkAuth = async () => {
     try {
       const res = await apiClient.GET('/auth/profile', {});
-      if (res.error || !res.data || !res.data.isAdmin) {
+      if (res.error || !res.data) {
+        window.location.href = `/login?returnUrl=${encodeURIComponent(pathname)}`;
+        return;
+      }
+      // Allow access if user is admin OR has any permissions
+      if (!res.data.isAdmin && (!res.data.permissions || res.data.permissions.length === 0)) {
         window.location.href = `/login?returnUrl=${encodeURIComponent(pathname)}`;
         return;
       }
@@ -81,11 +89,21 @@ export default function AdminLayout({
 
   if (!user) return null;
 
+  const userPermissions = new Set(user.permissions ?? []);
+
+  const visibleTabs = TABS.filter(
+    (tab) => tab.permissions.some((p) => userPermissions.has(p)),
+  );
+
   const activeTab =
-    TABS.find((t) => pathname.startsWith(t.href))?.id ?? 'reservations';
+    visibleTabs.find((t) => pathname.startsWith(t.href))?.id ?? visibleTabs[0]?.id;
 
   return (
-    <AdminContext value={{ user }}>
+    <AdminContext value={{
+      user,
+      hasPermission: (p) => userPermissions.has(p),
+      hasAnyPermission: (...ps) => ps.some((p) => userPermissions.has(p)),
+    }}>
       <div className='min-h-screen bg-slate-950 text-white p-4 md:p-8 pt-24'>
         <div className='max-w-7xl mx-auto'>
           <div className='mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-center sm:justify-between'>
@@ -103,7 +121,7 @@ export default function AdminLayout({
 
           <div className='-mx-4 overflow-x-auto border-b border-slate-800 px-4 sm:mx-0 sm:px-0'>
             <div className='flex min-w-max gap-1'>
-              {TABS.map((tab) => (
+              {visibleTabs.map((tab) => (
                 <Link
                   key={tab.id}
                   href={tab.href}

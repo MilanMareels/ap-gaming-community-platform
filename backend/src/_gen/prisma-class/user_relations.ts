@@ -8,6 +8,7 @@ import { EventRegistration } from './event_registration.js';
 import { BracketParticipant } from './bracket_participant.js';
 import { TimeTrialParticipant } from './time_trial_participant.js';
 import { PointTrialParticipant } from './point_trial_participant.js';
+import { UserRole } from './user_role.js';
 
 export class UserRelations {
 
@@ -37,4 +38,7 @@ export class UserRelations {
 
   @ApiProperty({ isArray: true, type: () => PointTrialParticipant })
   pointTrialParticipants: PointTrialParticipant[];
+
+  @ApiProperty({ isArray: true, type: () => UserRole })
+  userRoles: UserRole[];
 }

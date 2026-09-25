@@ -30,7 +30,8 @@ import {
   SwapParticipantsDto,
 } from '../../dtos/brackets/bracket-match.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
-import { AdminGuard } from '../../guards/admin.guard.js';
+import { PermissionGuard } from '../../guards/permission.guard.js';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { Public } from '../auth/public.decorator.js';
 import { HttpExceptionDto } from '../../dtos/http-exception.dto.js';
 
@@ -55,7 +56,8 @@ export class BracketsController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('brackets.manage')
   @ApiOperation({ summary: 'Create a bracket for an event (Admin only)' })
   @ApiCreatedResponse({ description: 'Bracket created' })
   @ApiBadRequestResponse({
@@ -74,7 +76,8 @@ export class BracketsController {
   }
 
   @Patch()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('brackets.manage')
   @ApiOperation({ summary: 'Update bracket settings (Admin only)' })
   @ApiOkResponse({ description: 'Bracket updated' })
   @ApiBadRequestResponse({
@@ -89,7 +92,8 @@ export class BracketsController {
   }
 
   @Delete()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('brackets.manage')
   @ApiOperation({ summary: 'Delete bracket for an event (Admin only)' })
   @ApiOkResponse({ description: 'Bracket deleted' })
   @ApiNotFoundResponse({
@@ -103,7 +107,8 @@ export class BracketsController {
   // --- Participant management ---
 
   @Post('participants')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('brackets.manage')
   @ApiOperation({ summary: 'Add participant to bracket (Admin only)' })
   @ApiCreatedResponse({ description: 'Participant added' })
   @ApiBadRequestResponse({
@@ -118,7 +123,8 @@ export class BracketsController {
   }
 
   @Post('participants/import')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('brackets.manage')
   @ApiOperation({
     summary: 'Import participants from event registrations (Admin only)',
   })
@@ -132,7 +138,8 @@ export class BracketsController {
   }
 
   @Delete('participants/:participantId')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('brackets.manage')
   @ApiOperation({
     summary: 'Remove participant from bracket (Admin only)',
   })
@@ -154,7 +161,8 @@ export class BracketsController {
   // --- Bracket generation ---
 
   @Post('generate')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('brackets.manage')
   @ApiOperation({ summary: 'Generate bracket structure (Admin only)' })
   @ApiCreatedResponse({ description: 'Bracket generated' })
   @ApiBadRequestResponse({
@@ -168,7 +176,8 @@ export class BracketsController {
   // --- Participant swapping ---
 
   @Post('swap-participants')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('brackets.manage')
   @ApiOperation({
     summary:
       'Swap two participants in round 1 matches (Admin only, GENERATED status)',
@@ -192,7 +201,8 @@ export class BracketsController {
   // --- Match management ---
 
   @Patch('matches/:matchId/status')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('brackets.manage')
   @ApiOperation({ summary: 'Update match status (Admin only)' })
   @ApiOkResponse({ description: 'Match status updated' })
   @ApiBadRequestResponse({
@@ -208,7 +218,8 @@ export class BracketsController {
   }
 
   @Post('matches/:matchId/result')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('brackets.manage')
   @ApiOperation({ summary: 'Submit match result (Admin only)' })
   @ApiCreatedResponse({ description: 'Result submitted and bracket updated' })
   @ApiBadRequestResponse({

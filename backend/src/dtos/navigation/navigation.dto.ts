@@ -27,8 +27,8 @@ export class CreateNavLinkDto {
   @IsInt()
   position!: number;
 
-  @ApiPropertyOptional({ example: 'public', enum: ['public', 'authenticated', 'admin'] })
-  @IsIn(['public', 'authenticated', 'admin'])
+  @ApiPropertyOptional({ example: 'public', description: 'Visibility: public, authenticated, admin, or role:<RoleName>' })
+  @IsString()
   @IsOptional()
   visibility?: string;
 
@@ -69,8 +69,8 @@ export class UpdateNavLinkDto {
   @IsOptional()
   position?: number;
 
-  @ApiPropertyOptional({ example: 'public', enum: ['public', 'authenticated', 'admin'] })
-  @IsIn(['public', 'authenticated', 'admin'])
+  @ApiPropertyOptional({ example: 'public', description: 'Visibility: public, authenticated, admin, or role:<RoleName>' })
+  @IsString()
   @IsOptional()
   visibility?: string;
 
