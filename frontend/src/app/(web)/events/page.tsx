@@ -1,12 +1,33 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
-import { Clock, Gamepad2, CalendarDays, Terminal, Activity, Calendars, Loader } from 'lucide-react';
+import Link from 'next/link';
+import { Clock, Gamepad2, CalendarDays, Activity, Calendars, Loader, Users, Trophy, Timer, Star } from 'lucide-react';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { apiClient } from '@/api';
 import type { Event } from '@/api';
 
 const DIGIT_HEIGHT_PX = 44;
+
+const CATEGORY_LABELS: Record<string, string> = {
+  SINGLE_DAY: 'Evenement',
+  MULTI_DAY: 'Meerdaags',
+  TOURNAMENT_BRACKET: 'Toernooi',
+  TOURNAMENT_TIMED: 'Time Trial',
+  TOURNAMENT_POINTS: 'Punten',
+};
+
+const CATEGORY_ICONS: Record<string, typeof Trophy> = {
+  TOURNAMENT_BRACKET: Trophy,
+  TOURNAMENT_TIMED: Timer,
+  TOURNAMENT_POINTS: Star,
+};
+
+function isMultiDay(event: Event): boolean {
+  const start = new Date(event.startTime);
+  const end = new Date(event.endTime);
+  return start.toDateString() !== end.toDateString();
+}
 
 function formatDateParts(dateStr: string): [string, string, string] {
   const d = new Date(dateStr);
@@ -15,6 +36,14 @@ function formatDateParts(dateStr: string): [string, string, string] {
     d.toLocaleDateString('nl-NL', { month: 'short' }),
     d.toLocaleDateString('nl-NL', { year: 'numeric' }),
   ];
+}
+
+function formatDateRange(startStr: string, endStr: string): string {
+  const start = new Date(startStr);
+  const end = new Date(endStr);
+  const startDate = start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+  const endDate = end.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+  return `${startDate} - ${endDate}`;
 }
 
 function formatTime(iso: string): string {
@@ -93,13 +122,37 @@ function DigitGroup({ value, label, minLength = 2 }: { value: number; label: str
   );
 }
 
+function CategoryBadge({ category }: { category: string }) {
+  const label = CATEGORY_LABELS[category] || category;
+  const Icon = CATEGORY_ICONS[category];
+
+  return (
+    <span className="inline-flex items-center gap-1.5 bg-[#d42422]/15 text-[#ff6b69] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+      {Icon && <Icon size={12} />}
+      {label}
+    </span>
+  );
+}
+
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [nowMs, setNowMs] = useState(() => Date.now());
 
   useEffect(() => {
-    fetchEvents();
+    const load = async () => {
+      try {
+        const res = await apiClient.GET('/events');
+        if (res.data) {
+          setEvents(res.data as unknown as Event[]);
+        }
+      } catch (err) {
+        console.error('Failed to fetch events:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load().catch(console.error);
   }, []);
 
   useEffect(() => {
@@ -109,19 +162,6 @@ export default function EventsPage() {
 
     return () => window.clearInterval(timer);
   }, []);
-
-  const fetchEvents = async () => {
-    try {
-      const res = await apiClient.GET('/events');
-      if (res.data) {
-        setEvents(res.data as unknown as Event[]);
-      }
-    } catch (err) {
-      console.error('Failed to fetch events:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -163,73 +203,87 @@ export default function EventsPage() {
           </div>
         ) : (
           <div className="space-y-12">
-            {/* HER0 EVENT */}
+            {/* HERO EVENT */}
             {heroEvent && (
               <ScrollReveal direction="up">
-                <div
-                  className={`relative bg-[#0a0f25] border-2 rounded-[2rem] overflow-hidden group ${isLive(heroEvent.startTime, heroEvent.endTime) ? 'border-[#d42422] shadow-[0_0_50px_rgba(212,36,34,0.15)]' : 'border-white/10 hover:border-white/30'} transition-all duration-500`}
-                >
-                  {isLive(heroEvent.startTime, heroEvent.endTime) && (
-                    <div className="absolute top-6 right-6 flex items-center gap-2 bg-[#d42422] text-white px-4 py-1.5 rounded-full font-bold tracking-widest text-sm uppercase z-30 animate-pulse">
-                      <Activity size={16} /> LIVE NOW
-                    </div>
-                  )}
+                <Link href={`/events/${heroEvent.id}`} className="block">
+                  <div
+                    className={`relative bg-[#0a0f25] border-2 rounded-[2rem] overflow-hidden group ${isLive(heroEvent.startTime, heroEvent.endTime) ? 'border-[#d42422] shadow-[0_0_50px_rgba(212,36,34,0.15)]' : 'border-white/10 hover:border-white/30'} transition-all duration-500`}
+                  >
+                    {isLive(heroEvent.startTime, heroEvent.endTime) && (
+                      <div className="absolute top-6 right-6 flex items-center gap-2 bg-[#d42422] text-white px-4 py-1.5 rounded-full font-bold tracking-widest text-sm uppercase z-30 animate-pulse">
+                        <Activity size={16} /> LIVE NOW
+                      </div>
+                    )}
 
-                  <div className="absolute inset-0 bg-gradient-to-tr from-[#020618] via-[#0a0f25] to-transparent z-10 opacity-90"></div>
+                    <div className="absolute inset-0 bg-gradient-to-tr from-[#020618] via-[#0a0f25] to-transparent z-10 opacity-90"></div>
 
-                  <div className="relative z-20 p-8 md:p-16 flex flex-col md:flex-row items-center md:items-end justify-between gap-8 h-full">
-                    <div className="flex-1">
-                      <p className="text-[#d42422] uppercase tracking-[0.2em] font-bold text-sm mb-4">Featured Event</p>
-                      <h2 className="text-4xl md:text-7xl font-black italic tracking-tighter text-white uppercase drop-shadow-xl mb-6 leading-none">
-                        {heroEvent.title}
-                      </h2>
-
-                      {heroCountdown && (
-                        <div className="mb-8 w-fit max-w-full md:min-w-[34rem] rounded-3xl border border-[#d42422]/30 bg-[#d42422]/10 p-3.5 md:p-4 backdrop-blur-md">
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
-                            <p className="text-[#ff6b69] uppercase tracking-[0.18em] font-bold text-[10px] md:text-xs">Mission Countdown</p>
-                            <p className="text-white/90 uppercase tracking-[0.14em] font-bold text-[10px]">{heroCountdown.label}</p>
-                          </div>
-
-                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 md:gap-x-5 md:gap-y-2">
-                            <DigitGroup value={heroCountdown.days} label="Days" minLength={2} />
-                            <DigitGroup value={heroCountdown.hours} label="Hours" minLength={2} />
-                            <DigitGroup value={heroCountdown.minutes} label="Minutes" minLength={2} />
-                            <DigitGroup value={heroCountdown.seconds} label="Seconds" minLength={2} />
-                          </div>
+                    <div className="relative z-20 p-8 md:p-16 flex flex-col md:flex-row items-center md:items-end justify-between gap-8 h-full">
+                      <div className="flex-1">
+                        <div className="flex flex-wrap items-center gap-3 mb-4">
+                          <p className="text-[#d42422] uppercase tracking-[0.2em] font-bold text-sm">Featured Event</p>
+                          <CategoryBadge category={heroEvent.category} />
+                          {heroEvent.registrationEnabled && (
+                            <span className="inline-flex items-center gap-1.5 bg-green-500/15 text-green-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                              <Users size={12} /> Inschrijving open
+                            </span>
+                          )}
                         </div>
-                      )}
+                        <h2 className="text-4xl md:text-7xl font-black italic tracking-tighter text-white uppercase drop-shadow-xl mb-6 leading-none">
+                          {heroEvent.title}
+                        </h2>
 
-                      <div className="flex flex-wrap gap-4">
-                        <div className="bg-black/50 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/10 flex items-center gap-3">
-                          <CalendarDays className="text-[#d42422]" />
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Date</p>
-                            <p className="text-lg font-bold text-white">
-                              {new Date(heroEvent.startTime).toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' })}
-                            </p>
+                        {heroCountdown && (
+                          <div className="mb-8 w-fit max-w-full md:min-w-[34rem] rounded-3xl border border-[#d42422]/30 bg-[#d42422]/10 p-3.5 md:p-4 backdrop-blur-md">
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
+                              <p className="text-[#ff6b69] uppercase tracking-[0.18em] font-bold text-[10px] md:text-xs">Countdown</p>
+                              <p className="text-white/90 uppercase tracking-[0.14em] font-bold text-[10px]">{heroCountdown.label}</p>
+                            </div>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 md:gap-x-5 md:gap-y-2">
+                              <DigitGroup value={heroCountdown.days} label="Days" minLength={2} />
+                              <DigitGroup value={heroCountdown.hours} label="Hours" minLength={2} />
+                              <DigitGroup value={heroCountdown.minutes} label="Minutes" minLength={2} />
+                              <DigitGroup value={heroCountdown.seconds} label="Seconds" minLength={2} />
+                            </div>
                           </div>
-                        </div>
-                        <div className="bg-black/50 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/10 flex items-center gap-3">
-                          <Clock className="text-[#d42422]" />
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Time</p>
-                            <p className="text-lg font-bold text-white">
-                              {formatTime(heroEvent.startTime)} - {formatTime(heroEvent.endTime)}
-                            </p>
+                        )}
+
+                        <div className="flex flex-wrap gap-4">
+                          <div className="bg-black/50 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/10 flex items-center gap-3">
+                            <CalendarDays className="text-[#d42422]" />
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Date</p>
+                              <p className="text-lg font-bold text-white">
+                                {isMultiDay(heroEvent)
+                                  ? formatDateRange(heroEvent.startTime, heroEvent.endTime)
+                                  : new Date(heroEvent.startTime).toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' })}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                        <div className="bg-[#d42422]/10 backdrop-blur-md px-6 py-4 rounded-2xl border border-[#d42422]/30 flex items-center gap-3">
-                          <Gamepad2 className="text-[#d42422]" />
-                          <div>
-                            <p className="text-xs text-[#d42422]/80 uppercase font-bold tracking-wider">Type</p>
-                            <p className="text-lg font-bold text-[#d42422]">{heroEvent.type}</p>
+                          <div className="bg-black/50 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/10 flex items-center gap-3">
+                            <Clock className="text-[#d42422]" />
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Time</p>
+                              <p className="text-lg font-bold text-white">
+                                {formatTime(heroEvent.startTime)} - {formatTime(heroEvent.endTime)}
+                              </p>
+                            </div>
                           </div>
+                          {heroEvent.type && (
+                            <div className="bg-[#d42422]/10 backdrop-blur-md px-6 py-4 rounded-2xl border border-[#d42422]/30 flex items-center gap-3">
+                              <Gamepad2 className="text-[#d42422]" />
+                              <div>
+                                <p className="text-xs text-[#d42422]/80 uppercase font-bold tracking-wider">Type</p>
+                                <p className="text-lg font-bold text-[#d42422]">{heroEvent.type}</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               </ScrollReveal>
             )}
 
@@ -238,28 +292,49 @@ export default function EventsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {otherEvents.map((event, idx) => {
                   const [day, month] = formatDateParts(event.startTime);
+                  const multiDay = isMultiDay(event);
                   return (
                     <ScrollReveal key={event.id} direction="up" delay={idx * 100}>
-                      <div className="bg-[#0a0f25] border border-white/10 p-8 rounded-[2rem] hover:border-[#d42422]/50 hover:-translate-y-1 transition-all group flex items-start gap-6 relative overflow-hidden h-full">
-                        <div className="flex flex-col items-center justify-center bg-black/40 rounded-2xl w-24 h-24 border border-white/5 shadow-inner">
-                          <span className="text-3xl font-black italic tracking-tighter text-white">{day}</span>
-                          <span className="text-xs uppercase tracking-widest text-[#d42422] font-bold">{month}</span>
-                        </div>
+                      <Link href={`/events/${event.id}`} className="block h-full">
+                        <div className="bg-[#0a0f25] border border-white/10 p-8 rounded-[2rem] hover:border-[#d42422]/50 hover:-translate-y-1 transition-all group flex items-start gap-6 relative overflow-hidden h-full">
+                          {multiDay ? (
+                            <div className="flex flex-col items-center justify-center bg-black/40 rounded-2xl w-24 h-24 border border-white/5 shadow-inner px-2">
+                              <span className="text-xs uppercase tracking-widest text-[#d42422] font-bold text-center leading-tight">
+                                {formatDateRange(event.startTime, event.endTime)}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center bg-black/40 rounded-2xl w-24 h-24 border border-white/5 shadow-inner">
+                              <span className="text-3xl font-black italic tracking-tighter text-white">{day}</span>
+                              <span className="text-xs uppercase tracking-widest text-[#d42422] font-bold">{month}</span>
+                            </div>
+                          )}
 
-                        <div className="flex-1">
-                          <h3 className="text-2xl font-black italic tracking-tight text-white uppercase mb-2 group-hover:text-[#d42422] transition-colors">
-                            {event.title}
-                          </h3>
-                          <div className="flex flex-col gap-2 mt-4">
-                            <p className="text-sm text-gray-400 flex items-center gap-2 font-medium">
-                              <Clock size={14} className="text-[#d42422]" /> {formatTime(event.startTime)} - {formatTime(event.endTime)}
-                            </p>
-                            <p className="text-sm text-gray-400 flex items-center gap-2 font-medium">
-                              <Gamepad2 size={14} className="text-[#d42422]" /> {event.type}
-                            </p>
+                          <div className="flex-1">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <CategoryBadge category={event.category} />
+                              {event.registrationEnabled && (
+                                <span className="inline-flex items-center gap-1 bg-green-500/15 text-green-400 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                                  <Users size={10} /> Inschrijving
+                                </span>
+                              )}
+                            </div>
+                            <h3 className="text-2xl font-black italic tracking-tight text-white uppercase mb-2 group-hover:text-[#d42422] transition-colors">
+                              {event.title}
+                            </h3>
+                            <div className="flex flex-col gap-2 mt-4">
+                              <p className="text-sm text-gray-400 flex items-center gap-2 font-medium">
+                                <Clock size={14} className="text-[#d42422]" /> {formatTime(event.startTime)} - {formatTime(event.endTime)}
+                              </p>
+                              {event.type && (
+                                <p className="text-sm text-gray-400 flex items-center gap-2 font-medium">
+                                  <Gamepad2 size={14} className="text-[#d42422]" /> {event.type}
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     </ScrollReveal>
                   );
                 })}

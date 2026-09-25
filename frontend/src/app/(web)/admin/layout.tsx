@@ -28,6 +28,7 @@ const TABS = [
   { id: 'roster', label: 'Teams', href: '/admin/roster' },
   { id: 'timetable', label: 'Openingsuren', href: '/admin/timetable' },
   { id: 'users', label: 'Gebruikers', href: '/admin/users' },
+  { id: 'navigation', label: 'Navigatie', href: '/admin/navigation' },
   { id: 'settings', label: 'Instellingen', href: '/admin/settings' },
 ];
 

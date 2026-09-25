@@ -37,27 +37,36 @@ export type EventSumAggregateOutputType = {
 export type EventMinAggregateOutputType = {
   id: number | null
   title: string | null
+  description: string | null
+  category: $Enums.EventCategory | null
   startTime: Date | null
   endTime: Date | null
   type: string | null
+  registrationEnabled: boolean | null
   createdAt: Date | null
 }
 
 export type EventMaxAggregateOutputType = {
   id: number | null
   title: string | null
+  description: string | null
+  category: $Enums.EventCategory | null
   startTime: Date | null
   endTime: Date | null
   type: string | null
+  registrationEnabled: boolean | null
   createdAt: Date | null
 }
 
 export type EventCountAggregateOutputType = {
   id: number
   title: number
+  description: number
+  category: number
   startTime: number
   endTime: number
   type: number
+  registrationEnabled: number
   createdAt: number
   _all: number
 }
@@ -74,27 +83,36 @@ export type EventSumAggregateInputType = {
 export type EventMinAggregateInputType = {
   id?: true
   title?: true
+  description?: true
+  category?: true
   startTime?: true
   endTime?: true
   type?: true
+  registrationEnabled?: true
   createdAt?: true
 }
 
 export type EventMaxAggregateInputType = {
   id?: true
   title?: true
+  description?: true
+  category?: true
   startTime?: true
   endTime?: true
   type?: true
+  registrationEnabled?: true
   createdAt?: true
 }
 
 export type EventCountAggregateInputType = {
   id?: true
   title?: true
+  description?: true
+  category?: true
   startTime?: true
   endTime?: true
   type?: true
+  registrationEnabled?: true
   createdAt?: true
   _all?: true
 }
@@ -188,9 +206,12 @@ export type EventGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type EventGroupByOutputType = {
   id: number
   title: string
+  description: string | null
+  category: $Enums.EventCategory
   startTime: Date
   endTime: Date
-  type: string
+  type: string | null
+  registrationEnabled: boolean
   createdAt: Date
   _count: EventCountAggregateOutputType | null
   _avg: EventAvgAggregateOutputType | null
@@ -220,19 +241,33 @@ export type EventWhereInput = {
   NOT?: Prisma.EventWhereInput | Prisma.EventWhereInput[]
   id?: Prisma.IntFilter<"Event"> | number
   title?: Prisma.StringFilter<"Event"> | string
+  description?: Prisma.StringNullableFilter<"Event"> | string | null
+  category?: Prisma.EnumEventCategoryFilter<"Event"> | $Enums.EventCategory
   startTime?: Prisma.DateTimeFilter<"Event"> | Date | string
   endTime?: Prisma.DateTimeFilter<"Event"> | Date | string
-  type?: Prisma.StringFilter<"Event"> | string
+  type?: Prisma.StringNullableFilter<"Event"> | string | null
+  registrationEnabled?: Prisma.BoolFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
+  registrations?: Prisma.EventRegistrationListRelationFilter
+  bracket?: Prisma.XOR<Prisma.BracketNullableScalarRelationFilter, Prisma.BracketWhereInput> | null
+  timeTrial?: Prisma.XOR<Prisma.TimeTrialNullableScalarRelationFilter, Prisma.TimeTrialWhereInput> | null
+  pointTrial?: Prisma.XOR<Prisma.PointTrialNullableScalarRelationFilter, Prisma.PointTrialWhereInput> | null
 }
 
 export type EventOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
+  category?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
-  type?: Prisma.SortOrder
+  type?: Prisma.SortOrderInput | Prisma.SortOrder
+  registrationEnabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  registrations?: Prisma.EventRegistrationOrderByRelationAggregateInput
+  bracket?: Prisma.BracketOrderByWithRelationInput
+  timeTrial?: Prisma.TimeTrialOrderByWithRelationInput
+  pointTrial?: Prisma.PointTrialOrderByWithRelationInput
 }
 
 export type EventWhereUniqueInput = Prisma.AtLeast<{
@@ -241,18 +276,28 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.EventWhereInput[]
   NOT?: Prisma.EventWhereInput | Prisma.EventWhereInput[]
   title?: Prisma.StringFilter<"Event"> | string
+  description?: Prisma.StringNullableFilter<"Event"> | string | null
+  category?: Prisma.EnumEventCategoryFilter<"Event"> | $Enums.EventCategory
   startTime?: Prisma.DateTimeFilter<"Event"> | Date | string
   endTime?: Prisma.DateTimeFilter<"Event"> | Date | string
-  type?: Prisma.StringFilter<"Event"> | string
+  type?: Prisma.StringNullableFilter<"Event"> | string | null
+  registrationEnabled?: Prisma.BoolFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
+  registrations?: Prisma.EventRegistrationListRelationFilter
+  bracket?: Prisma.XOR<Prisma.BracketNullableScalarRelationFilter, Prisma.BracketWhereInput> | null
+  timeTrial?: Prisma.XOR<Prisma.TimeTrialNullableScalarRelationFilter, Prisma.TimeTrialWhereInput> | null
+  pointTrial?: Prisma.XOR<Prisma.PointTrialNullableScalarRelationFilter, Prisma.PointTrialWhereInput> | null
 }, "id">
 
 export type EventOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
+  category?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
-  type?: Prisma.SortOrder
+  type?: Prisma.SortOrderInput | Prisma.SortOrder
+  registrationEnabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.EventCountOrderByAggregateInput
   _avg?: Prisma.EventAvgOrderByAggregateInput
@@ -267,78 +312,121 @@ export type EventScalarWhereWithAggregatesInput = {
   NOT?: Prisma.EventScalarWhereWithAggregatesInput | Prisma.EventScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Event"> | number
   title?: Prisma.StringWithAggregatesFilter<"Event"> | string
+  description?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
+  category?: Prisma.EnumEventCategoryWithAggregatesFilter<"Event"> | $Enums.EventCategory
   startTime?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
   endTime?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
-  type?: Prisma.StringWithAggregatesFilter<"Event"> | string
+  type?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
+  registrationEnabled?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
 }
 
 export type EventCreateInput = {
   title: string
+  description?: string | null
+  category?: $Enums.EventCategory
   startTime: Date | string
   endTime: Date | string
-  type: string
+  type?: string | null
+  registrationEnabled?: boolean
   createdAt?: Date | string
+  registrations?: Prisma.EventRegistrationCreateNestedManyWithoutEventInput
+  bracket?: Prisma.BracketCreateNestedOneWithoutEventInput
+  timeTrial?: Prisma.TimeTrialCreateNestedOneWithoutEventInput
+  pointTrial?: Prisma.PointTrialCreateNestedOneWithoutEventInput
 }
 
 export type EventUncheckedCreateInput = {
   id?: number
   title: string
+  description?: string | null
+  category?: $Enums.EventCategory
   startTime: Date | string
   endTime: Date | string
-  type: string
+  type?: string | null
+  registrationEnabled?: boolean
   createdAt?: Date | string
+  registrations?: Prisma.EventRegistrationUncheckedCreateNestedManyWithoutEventInput
+  bracket?: Prisma.BracketUncheckedCreateNestedOneWithoutEventInput
+  timeTrial?: Prisma.TimeTrialUncheckedCreateNestedOneWithoutEventInput
+  pointTrial?: Prisma.PointTrialUncheckedCreateNestedOneWithoutEventInput
 }
 
 export type EventUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.EventRegistrationUpdateManyWithoutEventNestedInput
+  bracket?: Prisma.BracketUpdateOneWithoutEventNestedInput
+  timeTrial?: Prisma.TimeTrialUpdateOneWithoutEventNestedInput
+  pointTrial?: Prisma.PointTrialUpdateOneWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutEventNestedInput
+  bracket?: Prisma.BracketUncheckedUpdateOneWithoutEventNestedInput
+  timeTrial?: Prisma.TimeTrialUncheckedUpdateOneWithoutEventNestedInput
+  pointTrial?: Prisma.PointTrialUncheckedUpdateOneWithoutEventNestedInput
 }
 
 export type EventCreateManyInput = {
   id?: number
   title: string
+  description?: string | null
+  category?: $Enums.EventCategory
   startTime: Date | string
   endTime: Date | string
-  type: string
+  type?: string | null
+  registrationEnabled?: boolean
   createdAt?: Date | string
 }
 
 export type EventUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type EventUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type EventCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  description?: Prisma.SortOrder
+  category?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  registrationEnabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -349,18 +437,24 @@ export type EventAvgOrderByAggregateInput = {
 export type EventMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  description?: Prisma.SortOrder
+  category?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  registrationEnabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type EventMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  description?: Prisma.SortOrder
+  category?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  registrationEnabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -368,55 +462,479 @@ export type EventSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
+export type EventScalarRelationFilter = {
+  is?: Prisma.EventWhereInput
+  isNot?: Prisma.EventWhereInput
+}
+
+export type EnumEventCategoryFieldUpdateOperationsInput = {
+  set?: $Enums.EventCategory
+}
+
+export type EventCreateNestedOneWithoutBracketInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutBracketInput, Prisma.EventUncheckedCreateWithoutBracketInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutBracketInput
+  connect?: Prisma.EventWhereUniqueInput
+}
+
+export type EventUpdateOneRequiredWithoutBracketNestedInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutBracketInput, Prisma.EventUncheckedCreateWithoutBracketInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutBracketInput
+  upsert?: Prisma.EventUpsertWithoutBracketInput
+  connect?: Prisma.EventWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EventUpdateToOneWithWhereWithoutBracketInput, Prisma.EventUpdateWithoutBracketInput>, Prisma.EventUncheckedUpdateWithoutBracketInput>
+}
+
+export type EventCreateNestedOneWithoutRegistrationsInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutRegistrationsInput, Prisma.EventUncheckedCreateWithoutRegistrationsInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutRegistrationsInput
+  connect?: Prisma.EventWhereUniqueInput
+}
+
+export type EventUpdateOneRequiredWithoutRegistrationsNestedInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutRegistrationsInput, Prisma.EventUncheckedCreateWithoutRegistrationsInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutRegistrationsInput
+  upsert?: Prisma.EventUpsertWithoutRegistrationsInput
+  connect?: Prisma.EventWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EventUpdateToOneWithWhereWithoutRegistrationsInput, Prisma.EventUpdateWithoutRegistrationsInput>, Prisma.EventUncheckedUpdateWithoutRegistrationsInput>
+}
+
+export type EventCreateNestedOneWithoutTimeTrialInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutTimeTrialInput, Prisma.EventUncheckedCreateWithoutTimeTrialInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutTimeTrialInput
+  connect?: Prisma.EventWhereUniqueInput
+}
+
+export type EventUpdateOneRequiredWithoutTimeTrialNestedInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutTimeTrialInput, Prisma.EventUncheckedCreateWithoutTimeTrialInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutTimeTrialInput
+  upsert?: Prisma.EventUpsertWithoutTimeTrialInput
+  connect?: Prisma.EventWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EventUpdateToOneWithWhereWithoutTimeTrialInput, Prisma.EventUpdateWithoutTimeTrialInput>, Prisma.EventUncheckedUpdateWithoutTimeTrialInput>
+}
+
+export type EventCreateNestedOneWithoutPointTrialInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutPointTrialInput, Prisma.EventUncheckedCreateWithoutPointTrialInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutPointTrialInput
+  connect?: Prisma.EventWhereUniqueInput
+}
+
+export type EventUpdateOneRequiredWithoutPointTrialNestedInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutPointTrialInput, Prisma.EventUncheckedCreateWithoutPointTrialInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutPointTrialInput
+  upsert?: Prisma.EventUpsertWithoutPointTrialInput
+  connect?: Prisma.EventWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EventUpdateToOneWithWhereWithoutPointTrialInput, Prisma.EventUpdateWithoutPointTrialInput>, Prisma.EventUncheckedUpdateWithoutPointTrialInput>
+}
+
+export type EventCreateWithoutBracketInput = {
+  title: string
+  description?: string | null
+  category?: $Enums.EventCategory
+  startTime: Date | string
+  endTime: Date | string
+  type?: string | null
+  registrationEnabled?: boolean
+  createdAt?: Date | string
+  registrations?: Prisma.EventRegistrationCreateNestedManyWithoutEventInput
+  timeTrial?: Prisma.TimeTrialCreateNestedOneWithoutEventInput
+  pointTrial?: Prisma.PointTrialCreateNestedOneWithoutEventInput
+}
+
+export type EventUncheckedCreateWithoutBracketInput = {
+  id?: number
+  title: string
+  description?: string | null
+  category?: $Enums.EventCategory
+  startTime: Date | string
+  endTime: Date | string
+  type?: string | null
+  registrationEnabled?: boolean
+  createdAt?: Date | string
+  registrations?: Prisma.EventRegistrationUncheckedCreateNestedManyWithoutEventInput
+  timeTrial?: Prisma.TimeTrialUncheckedCreateNestedOneWithoutEventInput
+  pointTrial?: Prisma.PointTrialUncheckedCreateNestedOneWithoutEventInput
+}
+
+export type EventCreateOrConnectWithoutBracketInput = {
+  where: Prisma.EventWhereUniqueInput
+  create: Prisma.XOR<Prisma.EventCreateWithoutBracketInput, Prisma.EventUncheckedCreateWithoutBracketInput>
+}
+
+export type EventUpsertWithoutBracketInput = {
+  update: Prisma.XOR<Prisma.EventUpdateWithoutBracketInput, Prisma.EventUncheckedUpdateWithoutBracketInput>
+  create: Prisma.XOR<Prisma.EventCreateWithoutBracketInput, Prisma.EventUncheckedCreateWithoutBracketInput>
+  where?: Prisma.EventWhereInput
+}
+
+export type EventUpdateToOneWithWhereWithoutBracketInput = {
+  where?: Prisma.EventWhereInput
+  data: Prisma.XOR<Prisma.EventUpdateWithoutBracketInput, Prisma.EventUncheckedUpdateWithoutBracketInput>
+}
+
+export type EventUpdateWithoutBracketInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.EventRegistrationUpdateManyWithoutEventNestedInput
+  timeTrial?: Prisma.TimeTrialUpdateOneWithoutEventNestedInput
+  pointTrial?: Prisma.PointTrialUpdateOneWithoutEventNestedInput
+}
+
+export type EventUncheckedUpdateWithoutBracketInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutEventNestedInput
+  timeTrial?: Prisma.TimeTrialUncheckedUpdateOneWithoutEventNestedInput
+  pointTrial?: Prisma.PointTrialUncheckedUpdateOneWithoutEventNestedInput
+}
+
+export type EventCreateWithoutRegistrationsInput = {
+  title: string
+  description?: string | null
+  category?: $Enums.EventCategory
+  startTime: Date | string
+  endTime: Date | string
+  type?: string | null
+  registrationEnabled?: boolean
+  createdAt?: Date | string
+  bracket?: Prisma.BracketCreateNestedOneWithoutEventInput
+  timeTrial?: Prisma.TimeTrialCreateNestedOneWithoutEventInput
+  pointTrial?: Prisma.PointTrialCreateNestedOneWithoutEventInput
+}
+
+export type EventUncheckedCreateWithoutRegistrationsInput = {
+  id?: number
+  title: string
+  description?: string | null
+  category?: $Enums.EventCategory
+  startTime: Date | string
+  endTime: Date | string
+  type?: string | null
+  registrationEnabled?: boolean
+  createdAt?: Date | string
+  bracket?: Prisma.BracketUncheckedCreateNestedOneWithoutEventInput
+  timeTrial?: Prisma.TimeTrialUncheckedCreateNestedOneWithoutEventInput
+  pointTrial?: Prisma.PointTrialUncheckedCreateNestedOneWithoutEventInput
+}
+
+export type EventCreateOrConnectWithoutRegistrationsInput = {
+  where: Prisma.EventWhereUniqueInput
+  create: Prisma.XOR<Prisma.EventCreateWithoutRegistrationsInput, Prisma.EventUncheckedCreateWithoutRegistrationsInput>
+}
+
+export type EventUpsertWithoutRegistrationsInput = {
+  update: Prisma.XOR<Prisma.EventUpdateWithoutRegistrationsInput, Prisma.EventUncheckedUpdateWithoutRegistrationsInput>
+  create: Prisma.XOR<Prisma.EventCreateWithoutRegistrationsInput, Prisma.EventUncheckedCreateWithoutRegistrationsInput>
+  where?: Prisma.EventWhereInput
+}
+
+export type EventUpdateToOneWithWhereWithoutRegistrationsInput = {
+  where?: Prisma.EventWhereInput
+  data: Prisma.XOR<Prisma.EventUpdateWithoutRegistrationsInput, Prisma.EventUncheckedUpdateWithoutRegistrationsInput>
+}
+
+export type EventUpdateWithoutRegistrationsInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bracket?: Prisma.BracketUpdateOneWithoutEventNestedInput
+  timeTrial?: Prisma.TimeTrialUpdateOneWithoutEventNestedInput
+  pointTrial?: Prisma.PointTrialUpdateOneWithoutEventNestedInput
+}
+
+export type EventUncheckedUpdateWithoutRegistrationsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bracket?: Prisma.BracketUncheckedUpdateOneWithoutEventNestedInput
+  timeTrial?: Prisma.TimeTrialUncheckedUpdateOneWithoutEventNestedInput
+  pointTrial?: Prisma.PointTrialUncheckedUpdateOneWithoutEventNestedInput
+}
+
+export type EventCreateWithoutTimeTrialInput = {
+  title: string
+  description?: string | null
+  category?: $Enums.EventCategory
+  startTime: Date | string
+  endTime: Date | string
+  type?: string | null
+  registrationEnabled?: boolean
+  createdAt?: Date | string
+  registrations?: Prisma.EventRegistrationCreateNestedManyWithoutEventInput
+  bracket?: Prisma.BracketCreateNestedOneWithoutEventInput
+  pointTrial?: Prisma.PointTrialCreateNestedOneWithoutEventInput
+}
+
+export type EventUncheckedCreateWithoutTimeTrialInput = {
+  id?: number
+  title: string
+  description?: string | null
+  category?: $Enums.EventCategory
+  startTime: Date | string
+  endTime: Date | string
+  type?: string | null
+  registrationEnabled?: boolean
+  createdAt?: Date | string
+  registrations?: Prisma.EventRegistrationUncheckedCreateNestedManyWithoutEventInput
+  bracket?: Prisma.BracketUncheckedCreateNestedOneWithoutEventInput
+  pointTrial?: Prisma.PointTrialUncheckedCreateNestedOneWithoutEventInput
+}
+
+export type EventCreateOrConnectWithoutTimeTrialInput = {
+  where: Prisma.EventWhereUniqueInput
+  create: Prisma.XOR<Prisma.EventCreateWithoutTimeTrialInput, Prisma.EventUncheckedCreateWithoutTimeTrialInput>
+}
+
+export type EventUpsertWithoutTimeTrialInput = {
+  update: Prisma.XOR<Prisma.EventUpdateWithoutTimeTrialInput, Prisma.EventUncheckedUpdateWithoutTimeTrialInput>
+  create: Prisma.XOR<Prisma.EventCreateWithoutTimeTrialInput, Prisma.EventUncheckedCreateWithoutTimeTrialInput>
+  where?: Prisma.EventWhereInput
+}
+
+export type EventUpdateToOneWithWhereWithoutTimeTrialInput = {
+  where?: Prisma.EventWhereInput
+  data: Prisma.XOR<Prisma.EventUpdateWithoutTimeTrialInput, Prisma.EventUncheckedUpdateWithoutTimeTrialInput>
+}
+
+export type EventUpdateWithoutTimeTrialInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.EventRegistrationUpdateManyWithoutEventNestedInput
+  bracket?: Prisma.BracketUpdateOneWithoutEventNestedInput
+  pointTrial?: Prisma.PointTrialUpdateOneWithoutEventNestedInput
+}
+
+export type EventUncheckedUpdateWithoutTimeTrialInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutEventNestedInput
+  bracket?: Prisma.BracketUncheckedUpdateOneWithoutEventNestedInput
+  pointTrial?: Prisma.PointTrialUncheckedUpdateOneWithoutEventNestedInput
+}
+
+export type EventCreateWithoutPointTrialInput = {
+  title: string
+  description?: string | null
+  category?: $Enums.EventCategory
+  startTime: Date | string
+  endTime: Date | string
+  type?: string | null
+  registrationEnabled?: boolean
+  createdAt?: Date | string
+  registrations?: Prisma.EventRegistrationCreateNestedManyWithoutEventInput
+  bracket?: Prisma.BracketCreateNestedOneWithoutEventInput
+  timeTrial?: Prisma.TimeTrialCreateNestedOneWithoutEventInput
+}
+
+export type EventUncheckedCreateWithoutPointTrialInput = {
+  id?: number
+  title: string
+  description?: string | null
+  category?: $Enums.EventCategory
+  startTime: Date | string
+  endTime: Date | string
+  type?: string | null
+  registrationEnabled?: boolean
+  createdAt?: Date | string
+  registrations?: Prisma.EventRegistrationUncheckedCreateNestedManyWithoutEventInput
+  bracket?: Prisma.BracketUncheckedCreateNestedOneWithoutEventInput
+  timeTrial?: Prisma.TimeTrialUncheckedCreateNestedOneWithoutEventInput
+}
+
+export type EventCreateOrConnectWithoutPointTrialInput = {
+  where: Prisma.EventWhereUniqueInput
+  create: Prisma.XOR<Prisma.EventCreateWithoutPointTrialInput, Prisma.EventUncheckedCreateWithoutPointTrialInput>
+}
+
+export type EventUpsertWithoutPointTrialInput = {
+  update: Prisma.XOR<Prisma.EventUpdateWithoutPointTrialInput, Prisma.EventUncheckedUpdateWithoutPointTrialInput>
+  create: Prisma.XOR<Prisma.EventCreateWithoutPointTrialInput, Prisma.EventUncheckedCreateWithoutPointTrialInput>
+  where?: Prisma.EventWhereInput
+}
+
+export type EventUpdateToOneWithWhereWithoutPointTrialInput = {
+  where?: Prisma.EventWhereInput
+  data: Prisma.XOR<Prisma.EventUpdateWithoutPointTrialInput, Prisma.EventUncheckedUpdateWithoutPointTrialInput>
+}
+
+export type EventUpdateWithoutPointTrialInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.EventRegistrationUpdateManyWithoutEventNestedInput
+  bracket?: Prisma.BracketUpdateOneWithoutEventNestedInput
+  timeTrial?: Prisma.TimeTrialUpdateOneWithoutEventNestedInput
+}
+
+export type EventUncheckedUpdateWithoutPointTrialInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutEventNestedInput
+  bracket?: Prisma.BracketUncheckedUpdateOneWithoutEventNestedInput
+  timeTrial?: Prisma.TimeTrialUncheckedUpdateOneWithoutEventNestedInput
+}
+
+
+/**
+ * Count Type EventCountOutputType
+ */
+
+export type EventCountOutputType = {
+  registrations: number
+}
+
+export type EventCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  registrations?: boolean | EventCountOutputTypeCountRegistrationsArgs
+}
+
+/**
+ * EventCountOutputType without action
+ */
+export type EventCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EventCountOutputType
+   */
+  select?: Prisma.EventCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * EventCountOutputType without action
+ */
+export type EventCountOutputTypeCountRegistrationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EventRegistrationWhereInput
+}
 
 
 export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
+  description?: boolean
+  category?: boolean
   startTime?: boolean
   endTime?: boolean
   type?: boolean
+  registrationEnabled?: boolean
   createdAt?: boolean
+  registrations?: boolean | Prisma.Event$registrationsArgs<ExtArgs>
+  bracket?: boolean | Prisma.Event$bracketArgs<ExtArgs>
+  timeTrial?: boolean | Prisma.Event$timeTrialArgs<ExtArgs>
+  pointTrial?: boolean | Prisma.Event$pointTrialArgs<ExtArgs>
+  _count?: boolean | Prisma.EventCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["event"]>
 
 export type EventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
+  description?: boolean
+  category?: boolean
   startTime?: boolean
   endTime?: boolean
   type?: boolean
+  registrationEnabled?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["event"]>
 
 export type EventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
+  description?: boolean
+  category?: boolean
   startTime?: boolean
   endTime?: boolean
   type?: boolean
+  registrationEnabled?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["event"]>
 
 export type EventSelectScalar = {
   id?: boolean
   title?: boolean
+  description?: boolean
+  category?: boolean
   startTime?: boolean
   endTime?: boolean
   type?: boolean
+  registrationEnabled?: boolean
   createdAt?: boolean
 }
 
-export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "startTime" | "endTime" | "type" | "createdAt", ExtArgs["result"]["event"]>
+export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "category" | "startTime" | "endTime" | "type" | "registrationEnabled" | "createdAt", ExtArgs["result"]["event"]>
+export type EventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  registrations?: boolean | Prisma.Event$registrationsArgs<ExtArgs>
+  bracket?: boolean | Prisma.Event$bracketArgs<ExtArgs>
+  timeTrial?: boolean | Prisma.Event$timeTrialArgs<ExtArgs>
+  pointTrial?: boolean | Prisma.Event$pointTrialArgs<ExtArgs>
+  _count?: boolean | Prisma.EventCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type EventIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type EventIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Event"
-  objects: {}
+  objects: {
+    registrations: Prisma.$EventRegistrationPayload<ExtArgs>[]
+    bracket: Prisma.$BracketPayload<ExtArgs> | null
+    timeTrial: Prisma.$TimeTrialPayload<ExtArgs> | null
+    pointTrial: Prisma.$PointTrialPayload<ExtArgs> | null
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     title: string
+    description: string | null
+    category: $Enums.EventCategory
     startTime: Date
     endTime: Date
-    type: string
+    type: string | null
+    registrationEnabled: boolean
     createdAt: Date
   }, ExtArgs["result"]["event"]>
   composites: {}
@@ -812,6 +1330,10 @@ readonly fields: EventFieldRefs;
  */
 export interface Prisma__EventClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  registrations<T extends Prisma.Event$registrationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$registrationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EventRegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  bracket<T extends Prisma.Event$bracketArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$bracketArgs<ExtArgs>>): Prisma.Prisma__BracketClient<runtime.Types.Result.GetResult<Prisma.$BracketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  timeTrial<T extends Prisma.Event$timeTrialArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$timeTrialArgs<ExtArgs>>): Prisma.Prisma__TimeTrialClient<runtime.Types.Result.GetResult<Prisma.$TimeTrialPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  pointTrial<T extends Prisma.Event$pointTrialArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$pointTrialArgs<ExtArgs>>): Prisma.Prisma__PointTrialClient<runtime.Types.Result.GetResult<Prisma.$PointTrialPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -843,9 +1365,12 @@ export interface Prisma__EventClient<T, Null = never, ExtArgs extends runtime.Ty
 export interface EventFieldRefs {
   readonly id: Prisma.FieldRef<"Event", 'Int'>
   readonly title: Prisma.FieldRef<"Event", 'String'>
+  readonly description: Prisma.FieldRef<"Event", 'String'>
+  readonly category: Prisma.FieldRef<"Event", 'EventCategory'>
   readonly startTime: Prisma.FieldRef<"Event", 'DateTime'>
   readonly endTime: Prisma.FieldRef<"Event", 'DateTime'>
   readonly type: Prisma.FieldRef<"Event", 'String'>
+  readonly registrationEnabled: Prisma.FieldRef<"Event", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Event", 'DateTime'>
 }
     
@@ -863,6 +1388,10 @@ export type EventFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Omit specific fields from the Event
    */
   omit?: Prisma.EventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EventInclude<ExtArgs> | null
   /**
    * Filter, which Event to fetch.
    */
@@ -882,6 +1411,10 @@ export type EventFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.EventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EventInclude<ExtArgs> | null
+  /**
    * Filter, which Event to fetch.
    */
   where: Prisma.EventWhereUniqueInput
@@ -899,6 +1432,10 @@ export type EventFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the Event
    */
   omit?: Prisma.EventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EventInclude<ExtArgs> | null
   /**
    * Filter, which Event to fetch.
    */
@@ -948,6 +1485,10 @@ export type EventFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   omit?: Prisma.EventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EventInclude<ExtArgs> | null
+  /**
    * Filter, which Event to fetch.
    */
   where?: Prisma.EventWhereInput
@@ -996,6 +1537,10 @@ export type EventFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.EventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EventInclude<ExtArgs> | null
+  /**
    * Filter, which Events to fetch.
    */
   where?: Prisma.EventWhereInput
@@ -1038,6 +1583,10 @@ export type EventCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Omit specific fields from the Event
    */
   omit?: Prisma.EventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EventInclude<ExtArgs> | null
   /**
    * The data needed to create a Event.
    */
@@ -1086,6 +1635,10 @@ export type EventUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Omit specific fields from the Event
    */
   omit?: Prisma.EventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EventInclude<ExtArgs> | null
   /**
    * The data needed to update a Event.
    */
@@ -1153,6 +1706,10 @@ export type EventUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    */
   omit?: Prisma.EventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EventInclude<ExtArgs> | null
+  /**
    * The filter to search for the Event to update in case it exists.
    */
   where: Prisma.EventWhereUniqueInput
@@ -1179,6 +1736,10 @@ export type EventDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    */
   omit?: Prisma.EventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EventInclude<ExtArgs> | null
+  /**
    * Filter which Event to delete.
    */
   where: Prisma.EventWhereUniqueInput
@@ -1199,6 +1760,87 @@ export type EventDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
+ * Event.registrations
+ */
+export type Event$registrationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EventRegistration
+   */
+  select?: Prisma.EventRegistrationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EventRegistration
+   */
+  omit?: Prisma.EventRegistrationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EventRegistrationInclude<ExtArgs> | null
+  where?: Prisma.EventRegistrationWhereInput
+  orderBy?: Prisma.EventRegistrationOrderByWithRelationInput | Prisma.EventRegistrationOrderByWithRelationInput[]
+  cursor?: Prisma.EventRegistrationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EventRegistrationScalarFieldEnum | Prisma.EventRegistrationScalarFieldEnum[]
+}
+
+/**
+ * Event.bracket
+ */
+export type Event$bracketArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Bracket
+   */
+  select?: Prisma.BracketSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Bracket
+   */
+  omit?: Prisma.BracketOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BracketInclude<ExtArgs> | null
+  where?: Prisma.BracketWhereInput
+}
+
+/**
+ * Event.timeTrial
+ */
+export type Event$timeTrialArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TimeTrial
+   */
+  select?: Prisma.TimeTrialSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TimeTrial
+   */
+  omit?: Prisma.TimeTrialOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TimeTrialInclude<ExtArgs> | null
+  where?: Prisma.TimeTrialWhereInput
+}
+
+/**
+ * Event.pointTrial
+ */
+export type Event$pointTrialArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PointTrial
+   */
+  select?: Prisma.PointTrialSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PointTrial
+   */
+  omit?: Prisma.PointTrialOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PointTrialInclude<ExtArgs> | null
+  where?: Prisma.PointTrialWhereInput
+}
+
+/**
  * Event without action
  */
 export type EventDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1210,4 +1852,8 @@ export type EventDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Omit specific fields from the Event
    */
   omit?: Prisma.EventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EventInclude<ExtArgs> | null
 }

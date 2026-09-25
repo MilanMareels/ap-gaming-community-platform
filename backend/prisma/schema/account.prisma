@@ -5,11 +5,15 @@ model User {
   email   String  @unique
   sNumber String
 
-  reservations      Reservation[]
-  adminUsers        AdminUser[]
-  googleSSOUsers    GoogleSSOUser[]
-  microsoftSSOUsers MicrosoftSSOUser[]
-  rosterEntries     RosterEntry[]
+  reservations       Reservation[]
+  adminUsers         AdminUser[]
+  googleSSOUsers     GoogleSSOUser[]
+  microsoftSSOUsers  MicrosoftSSOUser[]
+  rosterEntries       RosterEntry[]
+  eventRegistrations  EventRegistration[]
+  bracketParticipants BracketParticipant[]
+  timeTrialParticipants  TimeTrialParticipant[]
+  pointTrialParticipants PointTrialParticipant[]
 }
 
 model AdminUser {

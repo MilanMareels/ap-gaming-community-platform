@@ -582,7 +582,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Get a single event by ID (public) */
+        get: operations["EventsController_findById"];
         put?: never;
         post?: never;
         /** Delete an event (Admin only) */
@@ -591,6 +592,58 @@ export interface paths {
         head?: never;
         /** Update an event (Admin only) */
         patch: operations["EventsController_update"];
+        trace?: never;
+    };
+    "/events/{id}/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register current user for an event */
+        post: operations["EventsController_register"];
+        /** Unregister current user from an event */
+        delete: operations["EventsController_unregister"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{id}/registration-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Check if current user is registered for an event */
+        get: operations["EventsController_registrationStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{id}/registrations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all registrations for an event (Admin only) */
+        get: operations["EventsController_getRegistrations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/users": {
@@ -713,6 +766,320 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/navigation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get navigation tree (public) */
+        get: operations["NavigationController_getNavTree"];
+        put?: never;
+        /** Create a nav link (Admin only) */
+        post: operations["NavigationController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/navigation/admin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all nav links flat (Admin only) */
+        get: operations["NavigationController_getAllFlat"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/navigation/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Reorder nav links (Admin only) */
+        patch: operations["NavigationController_reorder"];
+        trace?: never;
+    };
+    "/navigation/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a nav link (Admin only) */
+        delete: operations["NavigationController_delete"];
+        options?: never;
+        head?: never;
+        /** Update a nav link (Admin only) */
+        patch: operations["NavigationController_update"];
+        trace?: never;
+    };
+    "/events/{eventId}/bracket": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get bracket for an event (public) */
+        get: operations["BracketsController_findByEvent"];
+        put?: never;
+        /** Create a bracket for an event (Admin only) */
+        post: operations["BracketsController_create"];
+        /** Delete bracket for an event (Admin only) */
+        delete: operations["BracketsController_delete"];
+        options?: never;
+        head?: never;
+        /** Update bracket settings (Admin only) */
+        patch: operations["BracketsController_update"];
+        trace?: never;
+    };
+    "/events/{eventId}/bracket/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add participant to bracket (Admin only) */
+        post: operations["BracketsController_addParticipant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/bracket/participants/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import participants from event registrations (Admin only) */
+        post: operations["BracketsController_importParticipants"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/bracket/participants/{participantId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove participant from bracket (Admin only) */
+        delete: operations["BracketsController_removeParticipant"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/bracket/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Generate bracket structure (Admin only) */
+        post: operations["BracketsController_generate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/bracket/swap-participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Swap two participants in round 1 matches (Admin only, GENERATED status) */
+        post: operations["BracketsController_swapParticipants"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/bracket/matches/{matchId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update match status (Admin only) */
+        patch: operations["BracketsController_updateMatchStatus"];
+        trace?: never;
+    };
+    "/events/{eventId}/bracket/matches/{matchId}/result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit match result (Admin only) */
+        post: operations["BracketsController_submitResult"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/time-trial": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get time trial for an event (public) */
+        get: operations["TimeTrialsController_findByEvent"];
+        put?: never;
+        /** Create a time trial for an event (Admin only) */
+        post: operations["TimeTrialsController_create"];
+        /** Delete time trial for an event (Admin only) */
+        delete: operations["TimeTrialsController_delete"];
+        options?: never;
+        head?: never;
+        /** Update time trial status (Admin only) */
+        patch: operations["TimeTrialsController_updateStatus"];
+        trace?: never;
+    };
+    "/events/{eventId}/time-trial/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add entry to time trial (Admin only) */
+        post: operations["TimeTrialsController_addEntry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/time-trial/entries/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import entries from event registrations (Admin only) */
+        post: operations["TimeTrialsController_importEntries"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/time-trial/entries/{entryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove entry from time trial (Admin only) */
+        delete: operations["TimeTrialsController_removeEntry"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/time-trial/entries/{entryId}/time": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Set or update entry time (Admin only) */
+        patch: operations["TimeTrialsController_updateTime"];
+        trace?: never;
+    };
+    "/events/{eventId}/time-trial/entries/batch-time": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Bulk update entry times (Admin only) */
+        patch: operations["TimeTrialsController_batchUpdateTime"];
         trace?: never;
     };
 }
@@ -977,22 +1344,40 @@ export interface components {
         CreateEventDto: {
             /** @example League of Legends Tournament */
             title: string;
+            /** @example A fun tournament for all skill levels. */
+            description?: string;
+            /**
+             * @example SINGLE_DAY
+             * @enum {string}
+             */
+            category: "SINGLE_DAY" | "MULTI_DAY" | "TOURNAMENT_BRACKET" | "TOURNAMENT_TIMED";
             /** @example 2026-03-15T18:00:00.000Z */
             startTime: string;
             /** @example 2026-03-15T22:00:00.000Z */
             endTime: string;
             /** @example Tournament */
-            type: string;
+            type?: string;
+            /** @example false */
+            registrationEnabled?: boolean;
         };
         UpdateEventDto: {
             /** @example Updated Tournament */
             title?: string;
+            /** @example Updated description. */
+            description?: string;
+            /**
+             * @example MULTI_DAY
+             * @enum {string}
+             */
+            category?: "SINGLE_DAY" | "MULTI_DAY" | "TOURNAMENT_BRACKET" | "TOURNAMENT_TIMED";
             /** @example 2026-03-16T18:00:00.000Z */
             startTime?: string;
             /** @example 2026-03-16T22:00:00.000Z */
             endTime?: string;
             /** @example Casual */
             type?: string;
+            /** @example true */
+            registrationEnabled?: boolean;
         };
         UserListItemDto: {
             id: number;
@@ -1053,6 +1438,159 @@ export interface components {
             sNumber?: string;
             email?: string;
         };
+        NavLink: {
+            id: number;
+            label: string;
+            href?: string;
+            icon?: string;
+            parentId?: number;
+            position: number;
+            visibility: string;
+            isCta: boolean;
+            openInNewTab: boolean;
+            isProtected: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CreateNavLinkDto: {
+            /** @example Events */
+            label: string;
+            /** @example /events */
+            href?: string;
+            /** @example Calendar */
+            icon?: string;
+            /** @example 1 */
+            parentId?: number;
+            /** @example 0 */
+            position: number;
+            /**
+             * @example public
+             * @enum {string}
+             */
+            visibility?: "public" | "authenticated" | "admin";
+            /** @example false */
+            isCta?: boolean;
+            /** @example false */
+            openInNewTab?: boolean;
+        };
+        ReorderItemDto: {
+            /** @example 1 */
+            id: number;
+            /** @example 0 */
+            position: number;
+        };
+        ReorderNavLinksDto: {
+            items: components["schemas"]["ReorderItemDto"][];
+        };
+        UpdateNavLinkDto: {
+            /** @example Events */
+            label?: string;
+            /** @example /events */
+            href?: string;
+            /** @example Calendar */
+            icon?: string;
+            /** @example 1 */
+            parentId?: number;
+            /** @example 0 */
+            position?: number;
+            /**
+             * @example public
+             * @enum {string}
+             */
+            visibility?: "public" | "authenticated" | "admin";
+            /** @example false */
+            isCta?: boolean;
+            /** @example false */
+            openInNewTab?: boolean;
+        };
+        CreateBracketDto: {
+            /** @example 2 */
+            playersPerMatch: number;
+            /** @example 1 */
+            advancingPerMatch: number;
+            /**
+             * @example SINGLE_ELIMINATION
+             * @enum {string}
+             */
+            format?: "SINGLE_ELIMINATION";
+            /** @example false */
+            thirdPlaceMatch?: boolean;
+        };
+        UpdateBracketDto: {
+            /** @example 2 */
+            playersPerMatch?: number;
+            /** @example 1 */
+            advancingPerMatch?: number;
+            /** @example false */
+            thirdPlaceMatch?: boolean;
+        };
+        AddParticipantDto: {
+            /** @example John Doe */
+            name: string;
+            /** @example john@example.com */
+            email?: string;
+            /** @example 1 */
+            userId?: number;
+            /** @example 1 */
+            seed?: number;
+        };
+        SwapParticipantsDto: {
+            /**
+             * @description First participant to swap
+             * @example 1
+             */
+            participantAId: number;
+            /**
+             * @description Second participant to swap
+             * @example 2
+             */
+            participantBId: number;
+        };
+        MatchResultEntryDto: {
+            /** @example 1 */
+            participantId: number;
+            /** @example 3 */
+            score: number;
+        };
+        UpdateMatchResultDto: {
+            results: components["schemas"]["MatchResultEntryDto"][];
+        };
+        UpdateTimeTrialStatusDto: {
+            /**
+             * @example ACTIVE
+             * @enum {string}
+             */
+            status: "DRAFT" | "ACTIVE" | "COMPLETED";
+        };
+        AddTimeTrialEntryDto: {
+            /** @example John Doe */
+            name: string;
+            /** @example john@example.com */
+            email?: string;
+            /** @example 1 */
+            userId?: number;
+        };
+        UpdateEntryTimeDto: {
+            /**
+             * @description Time in milliseconds
+             * @example 83456
+             */
+            timeMs: number;
+        };
+        BatchTimeEntry: {
+            /** @example 1 */
+            entryId: number;
+            /**
+             * @description Time in milliseconds, or null to clear
+             * @example 83456
+             */
+            timeMs?: number;
+        };
+        BatchUpdateTimeDto: {
+            entries: components["schemas"]["BatchTimeEntry"][];
+        };
         GoogleSSOUser: {
             id: number;
             ssoId: string;
@@ -1063,12 +1601,42 @@ export interface components {
             ssoId: string;
             userId: number;
         };
+        EventRegistration: {
+            id: number;
+            eventId: number;
+            userId: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        BracketParticipant: {
+            id: number;
+            bracketId: number;
+            name: string;
+            email?: string;
+            userId?: number;
+            seed?: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        TimeTrialEntry: {
+            id: number;
+            timeTrialId: number;
+            name: string;
+            email?: string;
+            userId?: number;
+            timeMs?: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
         UserRelations: {
             reservations: components["schemas"]["Reservation"][];
             adminUsers: components["schemas"]["AdminUser"][];
             googleSSOUsers: components["schemas"]["GoogleSSOUser"][];
             microsoftSSOUsers: components["schemas"]["MicrosoftSSOUser"][];
             rosterEntries: components["schemas"]["RosterEntry"][];
+            eventRegistrations: components["schemas"]["EventRegistration"][];
+            bracketParticipants: components["schemas"]["BracketParticipant"][];
+            timeTrialEntries: components["schemas"]["TimeTrialEntry"][];
         };
         User: {
             id: number;
@@ -1087,6 +1655,10 @@ export interface components {
         };
         SettingRelations: Record<string, never>;
         FormRelations: Record<string, never>;
+        NavLinkRelations: {
+            parent?: components["schemas"]["NavLink"];
+            children: components["schemas"]["NavLink"][];
+        };
         RosterGameRelations: {
             rosterEntries: components["schemas"]["RosterEntry"][];
         };
@@ -1098,22 +1670,114 @@ export interface components {
             user: components["schemas"]["User"];
         };
         TimeTableEntryRelations: Record<string, never>;
-        EventRelations: Record<string, never>;
-        Form: {
+        /** @enum {string} */
+        BracketFormat: "SINGLE_ELIMINATION";
+        /** @enum {string} */
+        BracketStatus: "DRAFT" | "GENERATED" | "IN_PROGRESS" | "COMPLETED";
+        Bracket: {
             id: number;
-            title: string;
-            url: string;
+            eventId: number;
+            format: components["schemas"]["BracketFormat"];
+            playersPerMatch: number;
+            advancingPerMatch: number;
+            thirdPlaceMatch: boolean;
+            status: components["schemas"]["BracketStatus"];
+            totalRounds: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
+        /** @enum {string} */
+        TimeTrialStatus: "DRAFT" | "ACTIVE" | "COMPLETED";
+        TimeTrial: {
+            id: number;
+            eventId: number;
+            status: components["schemas"]["TimeTrialStatus"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        EventRelations: {
+            registrations: components["schemas"]["EventRegistration"][];
+            bracket?: components["schemas"]["Bracket"];
+            timeTrial?: components["schemas"]["TimeTrial"];
+        };
+        /** @enum {string} */
+        EventCategory: "SINGLE_DAY" | "MULTI_DAY" | "TOURNAMENT_BRACKET" | "TOURNAMENT_TIMED";
         Event: {
             id: number;
             title: string;
+            description?: string;
+            category: components["schemas"]["EventCategory"];
             /** Format: date-time */
             startTime: string;
             /** Format: date-time */
             endTime: string;
-            type: string;
+            type?: string;
+            registrationEnabled: boolean;
             /** Format: date-time */
             createdAt: string;
+        };
+        /** @enum {string} */
+        MatchStatus: "PENDING" | "BYE" | "IN_PROGRESS" | "COMPLETED";
+        BracketMatch: {
+            id: number;
+            bracketId: number;
+            round: number;
+            position: number;
+            status: components["schemas"]["MatchStatus"];
+            nextMatchId?: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        BracketRelations: {
+            event: components["schemas"]["Event"];
+            participants: components["schemas"]["BracketParticipant"][];
+            matches: components["schemas"]["BracketMatch"][];
+        };
+        BracketMatchParticipant: {
+            id: number;
+            matchId: number;
+            participantId?: number;
+            score?: number;
+            isWinner: boolean;
+            isBye: boolean;
+        };
+        BracketParticipantRelations: {
+            bracket: components["schemas"]["Bracket"];
+            user?: components["schemas"]["User"];
+            matchParticipants: components["schemas"]["BracketMatchParticipant"][];
+        };
+        BracketMatchRelations: {
+            bracket: components["schemas"]["Bracket"];
+            nextMatch?: components["schemas"]["BracketMatch"];
+            sourceMatches: components["schemas"]["BracketMatch"][];
+            participants: components["schemas"]["BracketMatchParticipant"][];
+        };
+        BracketMatchParticipantRelations: {
+            match: components["schemas"]["BracketMatch"];
+            participant?: components["schemas"]["BracketParticipant"];
+        };
+        EventRegistrationRelations: {
+            event: components["schemas"]["Event"];
+            user: components["schemas"]["User"];
+        };
+        TimeTrialRelations: {
+            event: components["schemas"]["Event"];
+            entries: components["schemas"]["TimeTrialEntry"][];
+        };
+        TimeTrialEntryRelations: {
+            timeTrial: components["schemas"]["TimeTrial"];
+            user?: components["schemas"]["User"];
+        };
+        Form: {
+            id: number;
+            title: string;
+            url: string;
         };
     };
     responses: never;
@@ -2108,6 +2772,36 @@ export interface operations {
             };
         };
     };
+    EventsController_findById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateEventDto"];
+                };
+            };
+            /** @description Event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
     EventsController_delete: {
         parameters: {
             query?: never;
@@ -2148,6 +2842,122 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CreateEventDto"];
+                };
+            };
+        };
+    };
+    EventsController_register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Registration created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Registration not enabled or already registered */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+            /** @description Event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    EventsController_unregister: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Registration removed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Registration not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    EventsController_registrationStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Registration status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EventsController_getRegistrations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of registrations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
                 };
             };
         };
@@ -2355,6 +3165,753 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    NavigationController_getNavTree: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NavLink"][];
+                };
+            };
+        };
+    };
+    NavigationController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateNavLinkDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NavLink"];
+                };
+            };
+        };
+    };
+    NavigationController_getAllFlat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NavLink"][];
+                };
+            };
+        };
+    };
+    NavigationController_reorder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderNavLinksDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NavigationController_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NavigationController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateNavLinkDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NavLink"];
+                };
+            };
+        };
+    };
+    BracketsController_findByEvent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Bracket with participants and matches */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BracketsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBracketDto"];
+            };
+        };
+        responses: {
+            /** @description Bracket created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Event already has a bracket or invalid category */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+            /** @description Event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    BracketsController_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Bracket deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bracket not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    BracketsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBracketDto"];
+            };
+        };
+        responses: {
+            /** @description Bracket updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Can only update in DRAFT status */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    BracketsController_addParticipant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddParticipantDto"];
+            };
+        };
+        responses: {
+            /** @description Participant added */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Can only add in DRAFT status */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    BracketsController_importParticipants: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Participants imported */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Can only import in DRAFT status */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    BracketsController_removeParticipant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+                participantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Participant removed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Participant not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    BracketsController_generate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Bracket generated */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Already generated or insufficient participants */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    BracketsController_swapParticipants: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SwapParticipantsDto"];
+            };
+        };
+        responses: {
+            /** @description Participants swapped */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bracket not in GENERATED status or scores already entered */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    BracketsController_updateMatchStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+                matchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Match status updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Cannot change status */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    BracketsController_submitResult: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+                matchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMatchResultDto"];
+            };
+        };
+        responses: {
+            /** @description Result submitted and bracket updated */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid participants or match already completed */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    TimeTrialsController_findByEvent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Time trial with entries */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TimeTrialsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Time trial created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Event already has a time trial or invalid category */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+            /** @description Event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    TimeTrialsController_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Time trial deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Time trial not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    TimeTrialsController_updateStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTimeTrialStatusDto"];
+            };
+        };
+        responses: {
+            /** @description Time trial status updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid status transition */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    TimeTrialsController_addEntry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddTimeTrialEntryDto"];
+            };
+        };
+        responses: {
+            /** @description Entry added */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Can only add in DRAFT status */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    TimeTrialsController_importEntries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Entries imported */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Can only import in DRAFT status */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    TimeTrialsController_removeEntry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+                entryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Entry removed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Entry not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    TimeTrialsController_updateTime: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+                entryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateEntryTimeDto"];
+            };
+        };
+        responses: {
+            /** @description Time updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Time trial must be ACTIVE or COMPLETED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    TimeTrialsController_batchUpdateTime: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BatchUpdateTimeDto"];
+            };
+        };
+        responses: {
+            /** @description Times updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Time trial must be ACTIVE or COMPLETED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
             };
         };
     };
