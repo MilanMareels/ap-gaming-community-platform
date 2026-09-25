@@ -822,9 +822,9 @@ export function BracketSVG({
                 />
                 <text
                   x={cfg.matchWidth / 2}
-                  y={mode === 'kiosk' ? 54 : 43}
+                  y={mode === 'kiosk' ? 49 : 39}
                   textAnchor="middle"
-                  dominantBaseline="middle"
+                  dominantBaseline="central"
                   fontSize={mode === 'kiosk' ? cfg.fontSize + 2 : cfg.fontSize + 1}
                   fontWeight="bold"
                   className={layout.winner.name ? 'fill-white' : 'fill-gray-600'}
