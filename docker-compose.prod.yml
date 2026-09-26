@@ -6,13 +6,22 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-apgaming}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: ${POSTGRES_DB:-apgaming}
+    ports:
+      - 127.0.0.1:5432:5432
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-apgaming}"]
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-apgaming}']
       interval: 10s
       timeout: 5s
       retries: 5
+
+  backend-init:
+    image: ghcr.io/milanmareels/ap-gaming-hub/backend:latest
+    user: root
+    entrypoint: ["/bin/sh", "-c", "mkdir -p /backend/uploads/rosters && chown -R node:node /backend/uploads"]
+    volumes:
+      - backend-uploads:/backend/uploads/
 
   backend:
     image: ghcr.io/milanmareels/ap-gaming-hub/backend:latest
@@ -20,7 +29,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      backend-init:
+        condition: service_completed_successfully
+    volumes:
+      - backend-uploads:/backend/uploads/
     environment:
+      PORT: 3000
       DATABASE_URL: postgresql://${POSTGRES_USER:-apgaming}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-apgaming}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Set JWT_SECRET_KEY in .env}
       SESSION_SECRET_KEY: ${SESSION_SECRET_KEY:?Set SESSION_SECRET_KEY in .env}
@@ -28,14 +42,18 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:?Set GOOGLE_CLIENT_SECRET in .env}
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-https://example.com/api/auth/google/callback}
       FRONTEND_URL: ${FRONTEND_URL:-https://example.com}
+
+      MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID}
+      MICROSOFT_CLIENT_SECRET: ${MICROSOFT_CLIENT_SECRET}
+      MICROSOFT_TENANT_ID: ${MICROSOFT_TENANT_ID}
+      MICROSOFT_REDIRECT_URI: https://apgaming.be/api/auth/microsoft/callback
+
       NODE_ENV: production
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USER: ${SMTP_USER}
       SMTP_PASS: ${SMTP_PASS}
-      SMTP_FROM: ${SMTP_FROM}
-    volumes:
-      - ./uploads:/usr/src/app/uploads
+      SMTP_FROM: '"AP Gaming Community" <noreply@apgaming.be>'
 
   frontend:
     image: ghcr.io/milanmareels/ap-gaming-hub/frontend:latest
@@ -53,7 +71,8 @@ services:
       - frontend
       - backend
     ports:
-      - "${PORT:-80}:80"
+      - '${PORT:-80}:80'
 
 volumes:
   postgres-data:
+  backend-uploads:

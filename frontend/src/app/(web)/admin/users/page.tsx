@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ShieldCheck, ShieldOff, Trash2, Unlink, Pencil, Plus, X, Loader2, Users, Search } from 'lucide-react';
+import { ShieldCheck, ShieldOff, Trash2, Unlink, Pencil, X, Loader2, Users, Search, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { getApiErrorMessage } from '@/util/api-error';
@@ -17,6 +17,7 @@ type UserListItem = {
   microsoftLinked: boolean;
   reservationCount: number;
   noShowCount: number;
+  roles: string[];
 };
 
 type SsoLink = { id: number; ssoId: string };
@@ -41,7 +42,14 @@ type UserDetail = {
   }[];
 };
 
-type WhitelistEntry = { email: string; userId: number; userEmail: string | null };
+type RoleListItem = {
+  id: number;
+  name: string;
+  description: string | null;
+  isSystem: boolean;
+  permissions: string[];
+  userCount: number;
+};
 
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, {
@@ -66,7 +74,6 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [whitelist, setWhitelist] = useState<WhitelistEntry[]>([]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -85,23 +92,10 @@ export default function AdminUsersPage() {
     }
   }, [search, adminOnly, noShowsOnly]);
 
-  const refreshWhitelist = useCallback(async () => {
-    try {
-      const list = await api<WhitelistEntry[]>('/users/whitelist');
-      setWhitelist(list);
-    } catch (err) {
-      console.error('Failed to load whitelist:', err);
-    }
-  }, []);
-
   useEffect(() => {
     const handle = setTimeout(refresh, 200);
     return () => clearTimeout(handle);
   }, [refresh]);
-
-  useEffect(() => {
-    refreshWhitelist();
-  }, [refreshWhitelist]);
 
   return (
     <div className='space-y-6'>
@@ -170,7 +164,14 @@ export default function AdminUsersPage() {
                         {!u.microsoftLinked && !u.googleLinked && <span className='text-xs text-gray-600'>—</span>}
                       </div>
                     </td>
-                    <td className='p-4'>{u.isAdmin && <Badge variant='danger'>Admin</Badge>}</td>
+                    <td className='p-4'>
+                      <div className='flex flex-wrap gap-1'>
+                        {u.roles.map((role) => (
+                          <Badge key={role} variant={role === 'Admin' ? 'danger' : 'info'}>{role}</Badge>
+                        ))}
+                        {u.roles.length === 0 && <span className='text-xs text-gray-600'>—</span>}
+                      </div>
+                    </td>
                     <td className='p-4 text-gray-300'>
                       {u.reservationCount}
                       {u.noShowCount > 0 && <span className='text-red-400 text-xs ml-2'>({u.noShowCount} no-show)</span>}
@@ -194,114 +195,13 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      <WhitelistSection users={users} whitelist={whitelist} refresh={refreshWhitelist} />
-
       {selectedId !== null && (
         <UserDetailDrawer
           userId={selectedId}
           currentUserId={currentUser.id}
           onClose={() => setSelectedId(null)}
-          onMutated={() => {
-            refresh();
-            refreshWhitelist();
-          }}
+          onMutated={refresh}
         />
-      )}
-    </div>
-  );
-}
-
-function WhitelistSection({
-  users,
-  whitelist,
-  refresh,
-}: {
-  users: UserListItem[];
-  whitelist: WhitelistEntry[];
-  refresh: () => void;
-}) {
-  const [email, setEmail] = useState('');
-  const [userId, setUserId] = useState<number | ''>('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || userId === '') return;
-    setBusy(true);
-    setError('');
-    try {
-      await api('/users/whitelist', { method: 'POST', body: JSON.stringify({ email, userId: Number(userId) }) });
-      setEmail('');
-      setUserId('');
-      refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const remove = async (email: string) => {
-    if (!confirm(`Verwijder whitelist-entry voor ${email}?`)) return;
-    try {
-      await api(`/users/whitelist/${encodeURIComponent(email)}`, { method: 'DELETE' });
-      refresh();
-    } catch (err) {
-      console.error('Failed to delete whitelist entry:', err);
-    }
-  };
-
-  return (
-    <div className='bg-slate-900 rounded-xl border border-slate-800 overflow-hidden'>
-      <div className='p-6 border-b border-slate-800'>
-        <h3 className='font-bold text-xl'>SSO Whitelist</h3>
-        <p className='text-gray-400 text-sm mt-1'>
-          Pre-autoriseer een externe SSO-email (Google/Microsoft) om automatisch gekoppeld te worden aan een bestaande gebruiker bij eerste login.
-        </p>
-        <form onSubmit={submit} className='mt-4 flex flex-wrap gap-3'>
-          <input
-            type='email'
-            placeholder='SSO-email (bv. iemand@gmail.com)'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className='bg-slate-950 border border-slate-700 rounded p-2 text-white text-sm flex-1 min-w-[220px]'
-          />
-          <select
-            value={userId}
-            onChange={(e) => setUserId(e.target.value === '' ? '' : Number(e.target.value))}
-            required
-            className='bg-slate-950 border border-slate-700 rounded p-2 text-white text-sm min-w-[200px]'
-          >
-            <option value=''>Kies gebruiker…</option>
-            {users.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.name || u.email} ({u.email})
-              </option>
-            ))}
-          </select>
-          <Button type='submit' size='md' variant='primary' disabled={busy}>
-            <Plus size={14} /> Toevoegen
-          </Button>
-        </form>
-        {error && <div className='mt-3 text-sm text-red-400'>{error}</div>}
-      </div>
-
-      {whitelist.length > 0 && (
-        <ul className='divide-y divide-slate-800'>
-          {whitelist.map((entry) => (
-            <li key={entry.email} className='flex items-center justify-between gap-4 p-4 text-sm'>
-              <div>
-                <div className='text-white font-medium'>{entry.email}</div>
-                <div className='text-xs text-gray-500'>→ koppelt aan gebruiker #{entry.userId} {entry.userEmail && `(${entry.userEmail})`}</div>
-              </div>
-              <button onClick={() => remove(entry.email)} className='text-gray-500 hover:text-red-400'>
-                <X size={16} />
-              </button>
-            </li>
-          ))}
-        </ul>
       )}
     </div>
   );
@@ -324,22 +224,34 @@ function UserDetailDrawer({
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', sNumber: '' });
   const [busy, setBusy] = useState(false);
+  const [allRoles, setAllRoles] = useState<RoleListItem[]>([]);
+  const [userRoleIds, setUserRoleIds] = useState<Set<number>>(new Set());
+  const [togglingRole, setTogglingRole] = useState<number | null>(null);
 
   const isSelf = detail?.id === currentUserId;
+
+  const { hasPermission } = useAdmin();
+  const canManageRoles = hasPermission('users.roles.manage');
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const data = await api<UserDetail>(`/users/${userId}`);
+      const [data, roles, assignedRoles] = await Promise.all([
+        api<UserDetail>(`/users/${userId}`),
+        canManageRoles ? api<RoleListItem[]>('/rbac/roles').catch(() => [] as RoleListItem[]) : Promise.resolve([] as RoleListItem[]),
+        canManageRoles ? api<{ id: number; name: string }[]>(`/rbac/users/${userId}/roles`).catch(() => [] as { id: number; name: string }[]) : Promise.resolve([] as { id: number; name: string }[]),
+      ]);
       setDetail(data);
       setForm({ name: data.name || '', email: data.email, sNumber: data.sNumber });
+      setAllRoles(roles);
+      setUserRoleIds(new Set(assignedRoles.map((r) => r.id)));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load');
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, canManageRoles]);
 
   useEffect(() => {
     load();
@@ -369,6 +281,28 @@ function UserDetailDrawer({
       await api(`/users/${userId}`, { method: 'PATCH', body: JSON.stringify(form) });
       setEditing(false);
     });
+
+  const toggleRole = async (roleId: number) => {
+    setTogglingRole(roleId);
+    setError('');
+    try {
+      const hasRole = userRoleIds.has(roleId);
+      await api(`/rbac/users/${userId}/roles/${roleId}`, {
+        method: hasRole ? 'DELETE' : 'POST',
+      });
+      setUserRoleIds((prev) => {
+        const next = new Set(prev);
+        if (hasRole) next.delete(roleId);
+        else next.add(roleId);
+        return next;
+      });
+      onMutated();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update role');
+    } finally {
+      setTogglingRole(null);
+    }
+  };
 
   return (
     <div className='fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm' onClick={onClose}>
@@ -468,6 +402,41 @@ function UserDetailDrawer({
                 </Button>
               )}
             </section>
+
+            {canManageRoles && allRoles.length > 0 && (
+              <section>
+                <div className='text-xs uppercase text-gray-500 mb-2'>Rollen</div>
+                <div className='space-y-2'>
+                  {allRoles.map((role) => (
+                    <label
+                      key={role.id}
+                      className='flex items-center justify-between bg-slate-900 border border-slate-800 rounded p-3 cursor-pointer hover:border-slate-700 transition-colors'
+                    >
+                      <div className='flex items-center gap-2.5'>
+                        <input
+                          type='checkbox'
+                          checked={userRoleIds.has(role.id)}
+                          onChange={() => toggleRole(role.id)}
+                          disabled={togglingRole !== null}
+                          className='rounded accent-red-600'
+                        />
+                        <div>
+                          <div className='flex items-center gap-2'>
+                            <Shield size={14} className={role.isSystem ? 'text-red-500' : 'text-blue-400'} />
+                            <span className='text-sm font-medium text-white'>{role.name}</span>
+                            {role.isSystem && <Badge variant='warning'>Systeem</Badge>}
+                          </div>
+                          {role.description && (
+                            <div className='text-xs text-gray-500 mt-0.5'>{role.description}</div>
+                          )}
+                        </div>
+                      </div>
+                      {togglingRole === role.id && <Loader2 size={14} className='animate-spin text-gray-400' />}
+                    </label>
+                  ))}
+                </div>
+              </section>
+            )}
 
             <section>
               <div className='text-xs uppercase text-gray-500 mb-2'>SSO koppelingen</div>

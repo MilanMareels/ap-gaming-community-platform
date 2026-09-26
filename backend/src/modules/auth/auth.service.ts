@@ -151,19 +151,37 @@ export class AuthService {
 
     const user = await this.prisma.user.findUnique({
       where: { id: claims.sub },
-      include: { adminUsers: true },
+      include: {
+        adminUsers: true,
+        userRoles: {
+          include: {
+            role: {
+              include: {
+                permissions: {
+                  include: { permission: true },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
 
+    const roles = user.userRoles.map((ur) => ur.role.name);
+    const permissions = [...new Set(user.userRoles.flatMap((ur) => ur.role.permissions.map((rp) => rp.permission.key)))];
+
     return {
       id: user.id,
       name: user.name,
       email: user.email,
       sNumber: user.sNumber,
-      isAdmin: user.adminUsers.length > 0,
+      isAdmin: user.adminUsers.length > 0 || roles.includes('Admin'),
+      roles,
+      permissions,
     };
   }
 
@@ -358,6 +376,7 @@ export class AuthService {
     const adminCount = await this.prisma.adminUser.count();
     if (adminCount === 0) {
       await this.prisma.adminUser.create({ data: { userId: newUser.id } });
+      await this.assignAdminRole(newUser.id);
     }
 
     return newUser;
@@ -496,16 +515,46 @@ export class AuthService {
       data: { email: args.email, name: args.name, sNumber: args.sNumberFallback },
     });
     await this.prisma.adminUser.create({ data: { userId: user.id } });
+    await this.assignAdminRole(user.id);
     return user;
+  }
+
+  private async assignAdminRole(userId: number) {
+    const adminRole = await this.prisma.role.findUnique({ where: { name: 'Admin' } });
+    if (adminRole) {
+      await this.prisma.userRole.upsert({
+        where: { userId_roleId: { userId, roleId: adminRole.id } },
+        update: {},
+        create: { userId, roleId: adminRole.id },
+      });
+    }
   }
 
   private async generateToken(userId: number, email: string) {
     const adminUser = await this.prisma.adminUser.findFirst({ where: { userId } });
 
+    const userRoles = await this.prisma.userRole.findMany({
+      where: { userId },
+      include: {
+        role: {
+          include: {
+            permissions: {
+              include: { permission: true },
+            },
+          },
+        },
+      },
+    });
+
+    const roles = userRoles.map((ur) => ur.role.name);
+    const permissions = [...new Set(userRoles.flatMap((ur) => ur.role.permissions.map((rp) => rp.permission.key)))];
+
     const payload: JwtPayload = {
       sub: userId,
       email,
-      isAdmin: Boolean(adminUser),
+      isAdmin: Boolean(adminUser) || roles.includes('Admin'),
+      roles,
+      permissions,
     };
 
     return this.jwtService.signAsync(payload as Record<string, unknown>, { expiresIn: '1d' });

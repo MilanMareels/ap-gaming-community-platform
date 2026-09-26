@@ -12,7 +12,8 @@ import {
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
-import { AdminGuard } from '../../guards/admin.guard.js';
+import { PermissionGuard } from '../../guards/permission.guard.js';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { Public } from '../auth/public.decorator.js';
 import type { JwtPayload } from '../auth/types/jwt-payload.type.js';
 import { PrismaModel } from '../../_gen/prisma-class/index.js';
@@ -45,7 +46,8 @@ export class ReservationsController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('reservations.manage')
   @ApiOperation({ summary: 'Get all reservations (Admin only)' })
   @ApiOkResponse({ type: [PrismaModel.Reservation] })
   findAll(@Query() query: ReservationQueryDto) {
@@ -63,7 +65,8 @@ export class ReservationsController {
   }
 
   @Get('verify/:cuid')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('reservations.manage')
   @ApiOperation({
     summary: 'Verify reservation by QR code CUID (Admin only)',
   })
@@ -74,7 +77,8 @@ export class ReservationsController {
   }
 
   @Post('admin')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('reservations.manage')
   @ApiOperation({
     summary: 'Create a reservation as admin (no date restrictions)',
   })
@@ -85,7 +89,8 @@ export class ReservationsController {
   }
 
   @Get('no-shows')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('reservations.noshows.manage', 'reservations.manage')
   @ApiOperation({ summary: 'Get all no-shows (Admin only)' })
   @ApiOkResponse({ type: [PrismaModel.Reservation] })
   getNoShows() {
@@ -93,7 +98,8 @@ export class ReservationsController {
   }
 
   @Patch(':userId/no-show')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('reservations.noshows.manage', 'reservations.manage')
   @ApiOperation({ summary: 'Unblock user from reservations (Admin only)' })
   @ApiOkResponse({ type: PrismaModel.Reservation })
   @ApiNotFoundResponse({ description: 'No no-shows found for this user', type: HttpExceptionDto })
@@ -102,7 +108,8 @@ export class ReservationsController {
   }
 
   @Patch(':id/status')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('reservations.manage')
   @ApiOperation({ summary: 'Update reservation status (Admin only)' })
   @ApiOkResponse({ type: PrismaModel.Reservation })
   @ApiNotFoundResponse({ description: 'Reservation not found', type: HttpExceptionDto })
@@ -111,7 +118,8 @@ export class ReservationsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('reservations.manage')
   @ApiOperation({ summary: 'Update a reservation (Admin only)' })
   @ApiOkResponse({ type: PrismaModel.Reservation })
   @ApiNotFoundResponse({ description: 'Reservation not found', type: HttpExceptionDto })
@@ -120,7 +128,8 @@ export class ReservationsController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('reservations.manage')
   @ApiOperation({ summary: 'Delete a reservation (Admin only)' })
   remove(@Param('id') id: string) {
     return this.reservationsService.remove(+id);

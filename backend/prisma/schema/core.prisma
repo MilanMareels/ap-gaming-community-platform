@@ -11,6 +11,26 @@ model Form {
   url   String
 }
 
+model NavLink {
+  id         Int     @id @default(autoincrement())
+  label      String
+  href       String?
+  icon       String?
+
+  parentId Int?
+  parent   NavLink?  @relation("NavLinkChildren", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  children NavLink[] @relation("NavLinkChildren")
+
+  position     Int
+  visibility   String  @default("public")
+  isCta        Boolean @default(false)
+  openInNewTab Boolean @default(false)
+  isProtected  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model RosterGame {
   id            Int           @id @default(autoincrement())
   name          String
@@ -29,6 +49,6 @@ model RosterEntry {
   handle String
   rank   String
   role   String?
-  
+
   imageUrl String?
 }

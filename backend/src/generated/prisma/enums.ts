@@ -25,3 +25,57 @@ export const ReservationStatus = {
 } as const
 
 export type ReservationStatus = (typeof ReservationStatus)[keyof typeof ReservationStatus]
+
+
+export const EventCategory = {
+  SINGLE_DAY: 'SINGLE_DAY',
+  MULTI_DAY: 'MULTI_DAY',
+  TOURNAMENT_BRACKET: 'TOURNAMENT_BRACKET',
+  TOURNAMENT_TIMED: 'TOURNAMENT_TIMED',
+  TOURNAMENT_POINTS: 'TOURNAMENT_POINTS'
+} as const
+
+export type EventCategory = (typeof EventCategory)[keyof typeof EventCategory]
+
+
+export const BracketFormat = {
+  SINGLE_ELIMINATION: 'SINGLE_ELIMINATION'
+} as const
+
+export type BracketFormat = (typeof BracketFormat)[keyof typeof BracketFormat]
+
+
+export const BracketStatus = {
+  DRAFT: 'DRAFT',
+  GENERATED: 'GENERATED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED'
+} as const
+
+export type BracketStatus = (typeof BracketStatus)[keyof typeof BracketStatus]
+
+
+export const MatchStatus = {
+  PENDING: 'PENDING',
+  BYE: 'BYE',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED'
+} as const
+
+export type MatchStatus = (typeof MatchStatus)[keyof typeof MatchStatus]
+
+
+export const TimeTrialStatus = {
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED'
+} as const
+
+export type TimeTrialStatus = (typeof TimeTrialStatus)[keyof typeof TimeTrialStatus]
+
+
+export const PointTrialStatus = {
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED'
+} as const
+
+export type PointTrialStatus = (typeof PointTrialStatus)[keyof typeof PointTrialStatus]

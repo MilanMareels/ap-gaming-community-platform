@@ -45,6 +45,9 @@ export class UserListItemDto {
 
   @ApiProperty()
   noShowCount!: number;
+
+  @ApiProperty({ type: [String] })
+  roles!: string[];
 }
 
 export class UserSsoLinkDto {
