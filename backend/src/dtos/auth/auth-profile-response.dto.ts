@@ -17,4 +17,10 @@ export class AuthProfileResponseDto {
     description: 'Whether the authenticated user is an admin user',
   })
   isAdmin!: boolean;
+
+  @ApiProperty({ type: [String], description: 'Role names assigned to the user' })
+  roles!: string[];
+
+  @ApiProperty({ type: [String], description: 'Permission keys the user has' })
+  permissions!: string[];
 }

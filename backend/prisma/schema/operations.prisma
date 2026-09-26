@@ -38,13 +38,227 @@ enum ReservationStatus {
   NO_SHOW
 }
 
+enum EventCategory {
+  SINGLE_DAY
+  MULTI_DAY
+  TOURNAMENT_BRACKET
+  TOURNAMENT_TIMED
+  TOURNAMENT_POINTS
+}
+
 model Event {
   id Int @id @default(autoincrement())
 
-  title     String
-  startTime DateTime
-  endTime   DateTime
-  type      String
+  title       String
+  description String?
+  category    EventCategory @default(SINGLE_DAY)
+  startTime   DateTime
+  endTime     DateTime
+  type        String?
+
+  registrationEnabled Boolean @default(false)
+
+  registrations EventRegistration[]
+  bracket       Bracket?
+  timeTrial     TimeTrial?
+  pointTrial    PointTrial?
+  createdAt     DateTime            @default(now())
+}
+
+enum BracketFormat {
+  SINGLE_ELIMINATION
+}
+
+enum BracketStatus {
+  DRAFT
+  GENERATED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum MatchStatus {
+  PENDING
+  BYE
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Bracket {
+  id      Int   @id @default(autoincrement())
+  eventId Int   @unique
+  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  format            BracketFormat @default(SINGLE_ELIMINATION)
+  playersPerMatch   Int           @default(2)
+  advancingPerMatch Int           @default(1)
+  thirdPlaceMatch   Boolean       @default(false)
+  status            BracketStatus @default(DRAFT)
+  totalRounds       Int           @default(0)
+
+  participants BracketParticipant[]
+  matches      BracketMatch[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BracketParticipant {
+  id        Int     @id @default(autoincrement())
+  bracketId Int
+  bracket   Bracket @relation(fields: [bracketId], references: [id], onDelete: Cascade)
+
+  name   String
+  email  String?
+  userId Int?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  seed Int?
+
+  matchParticipants BracketMatchParticipant[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([bracketId, email])
+}
+
+model BracketMatch {
+  id        Int     @id @default(autoincrement())
+  bracketId Int
+  bracket   Bracket @relation(fields: [bracketId], references: [id], onDelete: Cascade)
+
+  round    Int
+  position Int
+  status   MatchStatus @default(PENDING)
+
+  nextMatchId   Int?
+  nextMatch     BracketMatch?  @relation("MatchAdvancement", fields: [nextMatchId], references: [id], onDelete: SetNull)
+  sourceMatches BracketMatch[] @relation("MatchAdvancement")
+
+  participants BracketMatchParticipant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([bracketId, round, position])
+}
+
+model BracketMatchParticipant {
+  id      Int          @id @default(autoincrement())
+  matchId Int
+  match   BracketMatch @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  participantId Int?
+  participant   BracketParticipant? @relation(fields: [participantId], references: [id], onDelete: SetNull)
+
+  score    Int?
+  isWinner Boolean @default(false)
+  isBye    Boolean @default(false)
+
+  @@unique([matchId, participantId])
+}
+
+model EventRegistration {
+  id Int @id @default(autoincrement())
+
+  eventId Int
+  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+}
+
+enum TimeTrialStatus {
+  ACTIVE
+  COMPLETED
+}
+
+model TimeTrial {
+  id      Int   @id @default(autoincrement())
+  eventId Int   @unique
+  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  status       TimeTrialStatus      @default(ACTIVE)
+  participants TimeTrialParticipant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TimeTrialParticipant {
+  id          Int       @id @default(autoincrement())
+  timeTrialId Int
+  timeTrial   TimeTrial @relation(fields: [timeTrialId], references: [id], onDelete: Cascade)
+
+  name   String
+  email  String?
+  userId Int?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  bestTimeMs Int?
+
+  runs TimeTrialRun[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([timeTrialId, userId])
+}
+
+model TimeTrialRun {
+  id            Int                  @id @default(autoincrement())
+  participantId Int
+  participant   TimeTrialParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  timeMs Int
+
+  createdAt DateTime @default(now())
+}
+
+enum PointTrialStatus {
+  ACTIVE
+  COMPLETED
+}
+
+model PointTrial {
+  id      Int   @id @default(autoincrement())
+  eventId Int   @unique
+  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  status       PointTrialStatus      @default(ACTIVE)
+  participants PointTrialParticipant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PointTrialParticipant {
+  id           Int        @id @default(autoincrement())
+  pointTrialId Int
+  pointTrial   PointTrial @relation(fields: [pointTrialId], references: [id], onDelete: Cascade)
+
+  name   String
+  email  String?
+  userId Int?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  bestPoints Int?
+
+  entries PointTrialEntry[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([pointTrialId, userId])
+}
+
+model PointTrialEntry {
+  id            Int                   @id @default(autoincrement())
+  participantId Int
+  participant   PointTrialParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  points Int
 
   createdAt DateTime @default(now())
 }

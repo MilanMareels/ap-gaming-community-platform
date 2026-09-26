@@ -38,6 +38,26 @@ export type GoogleSSOUser = Prisma.GoogleSSOUserModel
  */
 export type MicrosoftSSOUser = Prisma.MicrosoftSSOUserModel
 /**
+ * Model Role
+ * 
+ */
+export type Role = Prisma.RoleModel
+/**
+ * Model Permission
+ * 
+ */
+export type Permission = Prisma.PermissionModel
+/**
+ * Model RolePermission
+ * 
+ */
+export type RolePermission = Prisma.RolePermissionModel
+/**
+ * Model UserRole
+ * 
+ */
+export type UserRole = Prisma.UserRoleModel
+/**
  * Model Setting
  * 
  */
@@ -47,6 +67,11 @@ export type Setting = Prisma.SettingModel
  * 
  */
 export type Form = Prisma.FormModel
+/**
+ * Model NavLink
+ * 
+ */
+export type NavLink = Prisma.NavLinkModel
 /**
  * Model RosterGame
  * 
@@ -72,3 +97,58 @@ export type TimeTableEntry = Prisma.TimeTableEntryModel
  * 
  */
 export type Event = Prisma.EventModel
+/**
+ * Model Bracket
+ * 
+ */
+export type Bracket = Prisma.BracketModel
+/**
+ * Model BracketParticipant
+ * 
+ */
+export type BracketParticipant = Prisma.BracketParticipantModel
+/**
+ * Model BracketMatch
+ * 
+ */
+export type BracketMatch = Prisma.BracketMatchModel
+/**
+ * Model BracketMatchParticipant
+ * 
+ */
+export type BracketMatchParticipant = Prisma.BracketMatchParticipantModel
+/**
+ * Model EventRegistration
+ * 
+ */
+export type EventRegistration = Prisma.EventRegistrationModel
+/**
+ * Model TimeTrial
+ * 
+ */
+export type TimeTrial = Prisma.TimeTrialModel
+/**
+ * Model TimeTrialParticipant
+ * 
+ */
+export type TimeTrialParticipant = Prisma.TimeTrialParticipantModel
+/**
+ * Model TimeTrialRun
+ * 
+ */
+export type TimeTrialRun = Prisma.TimeTrialRunModel
+/**
+ * Model PointTrial
+ * 
+ */
+export type PointTrial = Prisma.PointTrialModel
+/**
+ * Model PointTrialParticipant
+ * 
+ */
+export type PointTrialParticipant = Prisma.PointTrialParticipantModel
+/**
+ * Model PointTrialEntry
+ * 
+ */
+export type PointTrialEntry = Prisma.PointTrialEntryModel

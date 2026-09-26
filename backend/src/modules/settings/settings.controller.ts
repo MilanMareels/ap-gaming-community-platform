@@ -3,14 +3,16 @@ import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { SettingsService } from './settings.service.js';
 import { CreateAdminDto, UpdateSettingDto } from '../../dtos/admin/admin.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
-import { AdminGuard } from '../../guards/admin.guard.js';
+import { PermissionGuard } from '../../guards/permission.guard.js';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { PrismaModel } from '../../_gen/prisma-class/index.js';
 import { Public } from '../auth/public.decorator.js';
 import { UpdateFormDto } from '../../dtos/form/from.dto.js';
 
 @ApiTags('Settings')
 @Controller('settings')
-@UseGuards(JwtAuthGuard, AdminGuard)
+@UseGuards(JwtAuthGuard, PermissionGuard)
+@RequirePermissions('settings.manage')
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 

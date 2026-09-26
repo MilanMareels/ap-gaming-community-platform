@@ -38,13 +38,26 @@ export type RosterGameWithEntries = RosterGame & {
   rosterEntries: (RosterEntry & { user: User })[];
 };
 
-/** Event type — matches the backend Event model.
- *  Will be available as ApiSchemas['Event'] once definitions.ts is regenerated. */
-export type Event = {
-  id: number;
-  title: string;
-  startTime: string;
-  endTime: string;
-  type: string;
-  createdAt: string;
-};
+export type Event = ApiSchemas['Event'];
+export type EventCategory = ApiSchemas['EventCategory'];
+export type EventRegistration = ApiSchemas['EventRegistration'];
+export type CreateEventDto = ApiSchemas['CreateEventDto'];
+export type UpdateEventDto = ApiSchemas['UpdateEventDto'];
+
+export type Bracket = ApiSchemas['Bracket'];
+export type BracketFormat = ApiSchemas['BracketFormat'];
+export type BracketStatus = ApiSchemas['BracketStatus'];
+export type BracketMatch = ApiSchemas['BracketMatch'];
+export type BracketMatchParticipant = ApiSchemas['BracketMatchParticipant'];
+export type BracketParticipant = ApiSchemas['BracketParticipant'];
+export type MatchStatus = ApiSchemas['MatchStatus'];
+export type CreateBracketDto = ApiSchemas['CreateBracketDto'];
+export type UpdateBracketDto = ApiSchemas['UpdateBracketDto'];
+export type AddParticipantDto = ApiSchemas['AddParticipantDto'];
+export type UpdateMatchResultDto = ApiSchemas['UpdateMatchResultDto'];
+
+export type NavLink = ApiSchemas['NavLink'];
+export type NavLinkWithChildren = NavLink & { children: NavLink[] };
+export type CreateNavLinkDto = ApiSchemas['CreateNavLinkDto'];
+export type UpdateNavLinkDto = ApiSchemas['UpdateNavLinkDto'];
+export type ReorderNavLinksDto = ApiSchemas['ReorderNavLinksDto'];

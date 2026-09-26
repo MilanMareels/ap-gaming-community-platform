@@ -122,7 +122,7 @@ export function HubSection() {
             {/* Image Grid */}
             <div className="flex-1 grid grid-cols-2 gap-4 w-full">
               <button
-                onClick={() => open(3)}
+                onClick={() => open(1)}
                 className="aspect-[4/5] rounded-3xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 group hover:border-[#d42422]/50 transition-all hover:-translate-y-2 relative overflow-hidden cursor-pointer"
               >
                 <Image
@@ -141,7 +141,7 @@ export function HubSection() {
 
               <div className="flex flex-col gap-4">
                 <button
-                  onClick={() => open(4)}
+                  onClick={() => open(3)}
                   className="aspect-square rounded-3xl bg-gradient-to-bl from-white/10 to-transparent border border-white/10 group hover:border-[#d42422]/50 transition-all hover:translate-x-2 relative overflow-hidden cursor-pointer"
                 >
                   <Image

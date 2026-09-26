@@ -55,13 +55,29 @@ export const ModelName = {
   AdminUser: 'AdminUser',
   GoogleSSOUser: 'GoogleSSOUser',
   MicrosoftSSOUser: 'MicrosoftSSOUser',
+  Role: 'Role',
+  Permission: 'Permission',
+  RolePermission: 'RolePermission',
+  UserRole: 'UserRole',
   Setting: 'Setting',
   Form: 'Form',
+  NavLink: 'NavLink',
   RosterGame: 'RosterGame',
   RosterEntry: 'RosterEntry',
   Reservation: 'Reservation',
   TimeTableEntry: 'TimeTableEntry',
-  Event: 'Event'
+  Event: 'Event',
+  Bracket: 'Bracket',
+  BracketParticipant: 'BracketParticipant',
+  BracketMatch: 'BracketMatch',
+  BracketMatchParticipant: 'BracketMatchParticipant',
+  EventRegistration: 'EventRegistration',
+  TimeTrial: 'TimeTrial',
+  TimeTrialParticipant: 'TimeTrialParticipant',
+  TimeTrialRun: 'TimeTrialRun',
+  PointTrial: 'PointTrial',
+  PointTrialParticipant: 'PointTrialParticipant',
+  PointTrialEntry: 'PointTrialEntry'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -116,6 +132,45 @@ export const MicrosoftSSOUserScalarFieldEnum = {
 export type MicrosoftSSOUserScalarFieldEnum = (typeof MicrosoftSSOUserScalarFieldEnum)[keyof typeof MicrosoftSSOUserScalarFieldEnum]
 
 
+export const RoleScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  isSystem: 'isSystem',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
+
+
+export const PermissionScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  description: 'description'
+} as const
+
+export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof typeof PermissionScalarFieldEnum]
+
+
+export const RolePermissionScalarFieldEnum = {
+  id: 'id',
+  roleId: 'roleId',
+  permissionId: 'permissionId'
+} as const
+
+export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
+
+
+export const UserRoleScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roleId: 'roleId'
+} as const
+
+export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
+
+
 export const SettingScalarFieldEnum = {
   id: 'id',
   key: 'key',
@@ -132,6 +187,24 @@ export const FormScalarFieldEnum = {
 } as const
 
 export type FormScalarFieldEnum = (typeof FormScalarFieldEnum)[keyof typeof FormScalarFieldEnum]
+
+
+export const NavLinkScalarFieldEnum = {
+  id: 'id',
+  label: 'label',
+  href: 'href',
+  icon: 'icon',
+  parentId: 'parentId',
+  position: 'position',
+  visibility: 'visibility',
+  isCta: 'isCta',
+  openInNewTab: 'openInNewTab',
+  isProtected: 'isProtected',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NavLinkScalarFieldEnum = (typeof NavLinkScalarFieldEnum)[keyof typeof NavLinkScalarFieldEnum]
 
 
 export const RosterGameScalarFieldEnum = {
@@ -185,13 +258,149 @@ export type TimeTableEntryScalarFieldEnum = (typeof TimeTableEntryScalarFieldEnu
 export const EventScalarFieldEnum = {
   id: 'id',
   title: 'title',
+  description: 'description',
+  category: 'category',
   startTime: 'startTime',
   endTime: 'endTime',
   type: 'type',
+  registrationEnabled: 'registrationEnabled',
   createdAt: 'createdAt'
 } as const
 
 export type EventScalarFieldEnum = (typeof EventScalarFieldEnum)[keyof typeof EventScalarFieldEnum]
+
+
+export const BracketScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  format: 'format',
+  playersPerMatch: 'playersPerMatch',
+  advancingPerMatch: 'advancingPerMatch',
+  thirdPlaceMatch: 'thirdPlaceMatch',
+  status: 'status',
+  totalRounds: 'totalRounds',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BracketScalarFieldEnum = (typeof BracketScalarFieldEnum)[keyof typeof BracketScalarFieldEnum]
+
+
+export const BracketParticipantScalarFieldEnum = {
+  id: 'id',
+  bracketId: 'bracketId',
+  name: 'name',
+  email: 'email',
+  userId: 'userId',
+  seed: 'seed',
+  createdAt: 'createdAt'
+} as const
+
+export type BracketParticipantScalarFieldEnum = (typeof BracketParticipantScalarFieldEnum)[keyof typeof BracketParticipantScalarFieldEnum]
+
+
+export const BracketMatchScalarFieldEnum = {
+  id: 'id',
+  bracketId: 'bracketId',
+  round: 'round',
+  position: 'position',
+  status: 'status',
+  nextMatchId: 'nextMatchId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BracketMatchScalarFieldEnum = (typeof BracketMatchScalarFieldEnum)[keyof typeof BracketMatchScalarFieldEnum]
+
+
+export const BracketMatchParticipantScalarFieldEnum = {
+  id: 'id',
+  matchId: 'matchId',
+  participantId: 'participantId',
+  score: 'score',
+  isWinner: 'isWinner',
+  isBye: 'isBye'
+} as const
+
+export type BracketMatchParticipantScalarFieldEnum = (typeof BracketMatchParticipantScalarFieldEnum)[keyof typeof BracketMatchParticipantScalarFieldEnum]
+
+
+export const EventRegistrationScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type EventRegistrationScalarFieldEnum = (typeof EventRegistrationScalarFieldEnum)[keyof typeof EventRegistrationScalarFieldEnum]
+
+
+export const TimeTrialScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TimeTrialScalarFieldEnum = (typeof TimeTrialScalarFieldEnum)[keyof typeof TimeTrialScalarFieldEnum]
+
+
+export const TimeTrialParticipantScalarFieldEnum = {
+  id: 'id',
+  timeTrialId: 'timeTrialId',
+  name: 'name',
+  email: 'email',
+  userId: 'userId',
+  bestTimeMs: 'bestTimeMs',
+  createdAt: 'createdAt'
+} as const
+
+export type TimeTrialParticipantScalarFieldEnum = (typeof TimeTrialParticipantScalarFieldEnum)[keyof typeof TimeTrialParticipantScalarFieldEnum]
+
+
+export const TimeTrialRunScalarFieldEnum = {
+  id: 'id',
+  participantId: 'participantId',
+  timeMs: 'timeMs',
+  createdAt: 'createdAt'
+} as const
+
+export type TimeTrialRunScalarFieldEnum = (typeof TimeTrialRunScalarFieldEnum)[keyof typeof TimeTrialRunScalarFieldEnum]
+
+
+export const PointTrialScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PointTrialScalarFieldEnum = (typeof PointTrialScalarFieldEnum)[keyof typeof PointTrialScalarFieldEnum]
+
+
+export const PointTrialParticipantScalarFieldEnum = {
+  id: 'id',
+  pointTrialId: 'pointTrialId',
+  name: 'name',
+  email: 'email',
+  userId: 'userId',
+  bestPoints: 'bestPoints',
+  createdAt: 'createdAt'
+} as const
+
+export type PointTrialParticipantScalarFieldEnum = (typeof PointTrialParticipantScalarFieldEnum)[keyof typeof PointTrialParticipantScalarFieldEnum]
+
+
+export const PointTrialEntryScalarFieldEnum = {
+  id: 'id',
+  participantId: 'participantId',
+  points: 'points',
+  createdAt: 'createdAt'
+} as const
+
+export type PointTrialEntryScalarFieldEnum = (typeof PointTrialEntryScalarFieldEnum)[keyof typeof PointTrialEntryScalarFieldEnum]
 
 
 export const SortOrder = {

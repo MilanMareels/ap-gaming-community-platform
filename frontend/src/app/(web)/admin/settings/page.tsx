@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { AlertCircle, CheckCircle2, FileText, Link as LinkIcon, Lock, Plus, Trash2, Unlink } from 'lucide-react';
+import { AlertCircle, CheckCircle2, FileText, Link as LinkIcon, Unlink } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { apiClient } from '@/api';
-import type { Setting, AdminUserWithUser } from '@/api';
+import type { Setting } from '@/api';
 import { getApiErrorMessage } from '@/util/api-error';
 
 export interface Form {
@@ -25,10 +25,6 @@ export default function AdminSettingsPage() {
   const linkErrorFlash = searchParams.get('linkError');
 
   const [settings, setSettings] = useState<Setting[]>([]);
-  const [adminUsers, setAdminUsers] = useState<AdminUserWithUser[]>([]);
-  const [newAdminEmail, setNewAdminEmail] = useState('');
-  const [newAdminSNumber, setNewAdminSNumber] = useState('');
-  const [newAdminGmail, setNewAdminGmail] = useState('');
 
   const [formTitle, setFormTitle] = useState('');
   const [formUrl, setFormUrl] = useState('');
@@ -64,14 +60,12 @@ export default function AdminSettingsPage() {
 
   async function fetchData() {
     try {
-      const [settingsRes, adminsRes, formRes] = await Promise.all([
+      const [settingsRes, formRes] = await Promise.all([
         apiClient.GET('/settings', {}),
-        apiClient.GET('/settings/admins', {}),
         apiClient.GET('/settings/form', {}),
       ]);
 
       if (settingsRes.data) setSettings(settingsRes.data as Setting[]);
-      if (adminsRes.data) setAdminUsers(adminsRes.data as AdminUserWithUser[]);
       if (formRes.data) {
         const formData = formRes.data as unknown as Form;
         setFormTitle(formData.title || '');
@@ -103,37 +97,6 @@ export default function AdminSettingsPage() {
       });
     } catch (err) {
       console.error('Failed to save form:', err);
-    }
-  };
-
-  const handleAddAdmin = async () => {
-    if (!newAdminEmail.trim() || !newAdminSNumber.trim() || !newAdminGmail.trim()) return;
-    try {
-      await apiClient.POST('/settings/admins', {
-        body: {
-          email: newAdminEmail,
-          sNumber: newAdminSNumber,
-          gmailEmail: newAdminGmail,
-        },
-      });
-      setNewAdminEmail('');
-      setNewAdminSNumber('');
-      setNewAdminGmail('');
-      await fetchData();
-    } catch (err: unknown) {
-      alert((err as Error)?.message || 'Failed to add admin');
-    }
-  };
-
-  const handleRemoveAdmin = async (id: number) => {
-    if (!confirm('Are you sure you want to remove this admin?')) return;
-    try {
-      await apiClient.DELETE('/settings/admins/{id}', {
-        params: { path: { id: id.toString() } },
-      });
-      await fetchData();
-    } catch (err) {
-      console.error('Failed to remove admin:', err);
     }
   };
 
@@ -241,56 +204,6 @@ export default function AdminSettingsPage() {
         </div>
       </div>
 
-      {/* Admin Whitelist (legacy) — also available under /admin/users */}
-      <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
-        <h2 className="text-xl font-bold mb-1 flex items-center gap-2">
-          <Lock size={20} /> Admin Whitelist
-        </h2>
-        <p className="text-gray-400 text-sm mb-4">
-          Voor uitgebreid gebruikersbeheer (inclusief promoties, SSO-koppelingen en verwijderingen): zie de tab <span className="text-white font-medium">Gebruikers</span>.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
-          <input
-            type="email"
-            placeholder="Student e-mail (bijv. student@student.ap.be)"
-            className="bg-slate-950 border border-slate-700 rounded p-2 text-white"
-            value={newAdminEmail}
-            onChange={(e) => setNewAdminEmail(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="S-nummer (bijv. s123456)"
-            className="bg-slate-950 border border-slate-700 rounded p-2 text-white"
-            value={newAdminSNumber}
-            onChange={(e) => setNewAdminSNumber(e.target.value)}
-          />
-          <input
-            type="email"
-            placeholder="Gmail (bijv. naam@gmail.com)"
-            className="bg-slate-950 border border-slate-700 rounded p-2 text-white"
-            value={newAdminGmail}
-            onChange={(e) => setNewAdminGmail(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <Button onClick={handleAddAdmin}>
-            <Plus size={16} /> Add Admin
-          </Button>
-        </div>
-        <div className="space-y-2">
-          {adminUsers.map((admin) => (
-            <div key={admin.id} className="flex justify-between items-center bg-slate-950 p-3 rounded">
-              <div className="flex flex-col">
-                <span className="font-medium">{admin.user.email}</span>
-                <span className="text-xs text-gray-500">{admin.user.sNumber}</span>
-              </div>
-              <Button size="sm" variant="danger" onClick={() => handleRemoveAdmin(admin.id)}>
-                <Trash2 size={16} />
-              </Button>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
