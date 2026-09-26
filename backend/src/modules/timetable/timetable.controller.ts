@@ -3,7 +3,8 @@ import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse } from '@nestj
 import { TimetableService } from './timetable.service.js';
 import { CreateTimeTableEntryDto, UpdateTimeTableEntryDto } from '../../dtos/timetable/timetable.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
-import { AdminGuard } from '../../guards/admin.guard.js';
+import { PermissionGuard } from '../../guards/permission.guard.js';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { Public } from '../auth/public.decorator.js';
 import { PrismaModel } from '../../_gen/prisma-class/index.js';
 
@@ -21,7 +22,8 @@ export class TimetableController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('timetable.manage')
   @ApiOperation({ summary: 'Create a timetable entry (Admin only)' })
   @ApiCreatedResponse({ type: PrismaModel.TimeTableEntry })
   create(@Body() dto: CreateTimeTableEntryDto) {
@@ -29,7 +31,8 @@ export class TimetableController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('timetable.manage')
   @ApiOperation({ summary: 'Update a timetable entry (Admin only)' })
   @ApiOkResponse({ type: PrismaModel.TimeTableEntry })
   update(@Param('id') id: string, @Body() dto: UpdateTimeTableEntryDto) {
@@ -37,7 +40,8 @@ export class TimetableController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('timetable.manage')
   @ApiOperation({ summary: 'Delete a timetable entry (Admin only)' })
   remove(@Param('id') id: string) {
     return this.timetableService.remove(+id);

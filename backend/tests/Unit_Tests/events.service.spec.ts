@@ -38,6 +38,7 @@ describe('EventsService', () => {
       expect(result).toEqual(mockEvents);
       expect(prisma.event.findMany).toHaveBeenCalledWith({
         orderBy: { startTime: 'asc' },
+        include: { _count: { select: { registrations: true } } },
       });
     });
   });
@@ -81,9 +82,12 @@ describe('EventsService', () => {
       expect(prisma.event.create).toHaveBeenCalledWith({
         data: {
           title: 'New Event',
+          description: undefined,
+          category: undefined,
           startTime: new Date('2026-03-01T10:00:00Z'),
           endTime: new Date('2026-03-01T12:00:00Z'),
           type: 'Tournament',
+          registrationEnabled: false,
         },
       });
     });
