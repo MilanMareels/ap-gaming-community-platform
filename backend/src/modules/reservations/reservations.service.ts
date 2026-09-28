@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { MailService } from '../mail/mail.service.js';
+import { InventoryAdjustmentsService } from '../inventory-adjustments/inventory-adjustments.service.js';
 import {
   AdminCreateReservationDto,
   CreateReservationDto,
@@ -15,6 +16,7 @@ export class ReservationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailService: MailService,
+    private readonly inventoryAdjustmentsService: InventoryAdjustmentsService,
   ) {}
 
   private formatDateTimeDutch(date: Date): string {
@@ -144,6 +146,9 @@ export class ReservationsService {
       throw new BadRequestException(`Configuration error: capacity for '${dto.inventory}' is not a valid number.`);
     }
 
+    const adjustment = await this.inventoryAdjustmentsService.getEffectiveAdjustment(dto.inventory, startTime, endTime);
+    const effectiveCapacity = Math.max(0, maxCapacity + adjustment);
+
     const conflictingReservationsCount = await this.prisma.reservation.count({
       where: {
         inventory: dto.inventory,
@@ -153,7 +158,7 @@ export class ReservationsService {
       },
     });
 
-    if (conflictingReservationsCount >= maxCapacity) {
+    if (conflictingReservationsCount >= effectiveCapacity) {
       throw new BadRequestException(`All ${dto.inventory}s are already reserved for this time slot`);
     }
 
@@ -257,28 +262,35 @@ export class ReservationsService {
       });
     }
 
-    // Check for conflicts
-    const conflictingReservation = await this.prisma.reservation.findFirst({
-      where: {
-        inventory: dto.inventory,
-        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
-        OR: [
-          {
-            AND: [{ startTime: { lte: new Date(dto.startTime) } }, { endTime: { gt: new Date(dto.startTime) } }],
-          },
-          {
-            AND: [{ startTime: { lt: new Date(dto.endTime) } }, { endTime: { gte: new Date(dto.endTime) } }],
-          },
-        ],
-      },
-    });
-
-    if (conflictingReservation) {
-      throw new BadRequestException('This time slot is already reserved');
-    }
-
     const startTime = new Date(dto.startTime);
     const endTime = new Date(dto.endTime);
+
+    // Check capacity with inventory adjustments
+    const hardwareKey = dto.inventory.toLowerCase();
+    const settingRecord = await this.prisma.setting.findFirst({
+      where: { key: hardwareKey },
+    });
+
+    if (settingRecord) {
+      const maxCapacity = parseInt(settingRecord.value, 10);
+      if (!isNaN(maxCapacity)) {
+        const adjustment = await this.inventoryAdjustmentsService.getEffectiveAdjustment(dto.inventory, startTime, endTime);
+        const effectiveCapacity = Math.max(0, maxCapacity + adjustment);
+
+        const conflictingCount = await this.prisma.reservation.count({
+          where: {
+            inventory: dto.inventory,
+            status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+            startTime: { lt: endTime },
+            endTime: { gt: startTime },
+          },
+        });
+
+        if (conflictingCount >= effectiveCapacity) {
+          throw new BadRequestException('This time slot is already reserved');
+        }
+      }
+    }
 
     const reservation = await this.prisma.reservation.create({
       data: {

@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Unauthor
 import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { ReservationsService } from './reservations.service.js';
+import { InventoryAdjustmentsService } from '../inventory-adjustments/inventory-adjustments.service.js';
 import {
   CreateReservationDto,
   AdminCreateReservationDto,
@@ -11,6 +12,7 @@ import {
   UpdateReservationDto,
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
+import { InventoryAdjustmentSlotDto } from '../../dtos/inventory-adjustments/inventory-adjustment.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
@@ -22,7 +24,10 @@ import { HttpExceptionDto } from '../../dtos/http-exception.dto.js';
 @ApiTags('Reservations')
 @Controller('reservations')
 export class ReservationsController {
-  constructor(private readonly reservationsService: ReservationsService) {}
+  constructor(
+    private readonly reservationsService: ReservationsService,
+    private readonly inventoryAdjustmentsService: InventoryAdjustmentsService,
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -62,6 +67,16 @@ export class ReservationsController {
   @ApiOkResponse({ type: [ReservationSlotDto] })
   getSlots(@Query('date') date: string) {
     return this.reservationsService.getSlots(date);
+  }
+
+  @Public()
+  @Get('adjustments')
+  @ApiOperation({
+    summary: 'Get active inventory adjustments for a date (public, for availability calculation)',
+  })
+  @ApiOkResponse({ type: [InventoryAdjustmentSlotDto] })
+  getAdjustments(@Query('date') date: string) {
+    return this.inventoryAdjustmentsService.getAdjustmentsForDate(date);
   }
 
   @Get('verify/:cuid')

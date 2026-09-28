@@ -315,6 +315,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reservations/adjustments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get active inventory adjustments for a date (public, for availability calculation) */
+        get: operations["ReservationsController_getAdjustments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reservations/verify/{cuid}": {
         parameters: {
             query?: never;
@@ -416,6 +433,43 @@ export interface paths {
         head?: never;
         /** Update a reservation (Admin only) */
         patch: operations["ReservationsController_update"];
+        trace?: never;
+    };
+    "/inventory-adjustments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List inventory adjustments (Admin only) */
+        get: operations["InventoryAdjustmentsController_findAll"];
+        put?: never;
+        /** Create an inventory adjustment (Admin only) */
+        post: operations["InventoryAdjustmentsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/inventory-adjustments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single inventory adjustment (Admin only) */
+        get: operations["InventoryAdjustmentsController_findOne"];
+        put?: never;
+        post?: never;
+        /** Delete an inventory adjustment (Admin only) */
+        delete: operations["InventoryAdjustmentsController_remove"];
+        options?: never;
+        head?: never;
+        /** Update an inventory adjustment (Admin only) */
+        patch: operations["InventoryAdjustmentsController_update"];
         trace?: never;
     };
     "/roster/games": {
@@ -1388,6 +1442,22 @@ export interface components {
              */
             endTime: string;
         };
+        InventoryAdjustmentSlotDto: {
+            /** @example switch */
+            inventory: string;
+            /** @example -1 */
+            quantity: number;
+            /**
+             * Format: date-time
+             * @example 2026-09-28T14:00:00.000Z
+             */
+            startTime: string;
+            /**
+             * Format: date-time
+             * @example 2026-09-28T18:00:00.000Z
+             */
+            endTime: string;
+        };
         ReservationVerificationDto: {
             /** @example cm9x8k2df0000a1b2c3d4e5f6 */
             cuid: string;
@@ -1452,6 +1522,53 @@ export interface components {
             startTime?: string;
             /** @example 2026-02-28T12:00:00.000Z */
             endTime?: string;
+        };
+        CreateInventoryAdjustmentDto: {
+            /**
+             * @example switch
+             * @enum {string}
+             */
+            inventory: "pc" | "ps5" | "switch";
+            /**
+             * @description Positive = add capacity, negative = remove
+             * @example -1
+             */
+            quantity: number;
+            /** @example 2026-09-28T14:00:00.000Z */
+            startTime: string;
+            /** @example 2026-09-28T18:00:00.000Z */
+            endTime: string;
+            /** @example Switch in use for tournament */
+            reason?: string;
+        };
+        InventoryAdjustment: {
+            id: number;
+            inventory: string;
+            quantity: number;
+            /** Format: date-time */
+            startTime: string;
+            /** Format: date-time */
+            endTime: string;
+            reason?: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        UpdateInventoryAdjustmentDto: {
+            /**
+             * @example switch
+             * @enum {string}
+             */
+            inventory?: "pc" | "ps5" | "switch";
+            /** @example -1 */
+            quantity?: number;
+            /** @example 2026-09-28T14:00:00.000Z */
+            startTime?: string;
+            /** @example 2026-09-28T18:00:00.000Z */
+            endTime?: string;
+            /** @example Switch in use for tournament */
+            reason?: string;
         };
         RosterGame: {
             id: number;
@@ -1605,6 +1722,7 @@ export interface components {
             microsoftLinked: boolean;
             reservationCount: number;
             noShowCount: number;
+            roles: string[];
         };
         WhitelistEntryDto: {
             email: string;
@@ -2094,6 +2212,7 @@ export interface components {
         PointTrialEntryRelations: {
             participant: components["schemas"]["PointTrialParticipant"];
         };
+        InventoryAdjustmentRelations: Record<string, never>;
         Form: {
             id: number;
             title: string;
@@ -2639,6 +2758,27 @@ export interface operations {
             };
         };
     };
+    ReservationsController_getAdjustments: {
+        parameters: {
+            query: {
+                date: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventoryAdjustmentSlotDto"][];
+                };
+            };
+        };
+    };
     ReservationsController_verifyByCuid: {
         parameters: {
             query?: never;
@@ -2827,6 +2967,156 @@ export interface operations {
                 };
             };
             /** @description Reservation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    InventoryAdjustmentsController_findAll: {
+        parameters: {
+            query?: {
+                /** @description Filter by date (YYYY-MM-DD) */
+                date?: string;
+                inventory?: "pc" | "ps5" | "switch";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventoryAdjustment"][];
+                };
+            };
+        };
+    };
+    InventoryAdjustmentsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateInventoryAdjustmentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventoryAdjustment"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    InventoryAdjustmentsController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventoryAdjustment"];
+                };
+            };
+            /** @description Inventory adjustment not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    InventoryAdjustmentsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Inventory adjustment not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    InventoryAdjustmentsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateInventoryAdjustmentDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventoryAdjustment"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+            /** @description Inventory adjustment not found */
             404: {
                 headers: {
                     [name: string]: unknown;
