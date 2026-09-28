@@ -61,3 +61,8 @@ export type NavLinkWithChildren = NavLink & { children: NavLink[] };
 export type CreateNavLinkDto = ApiSchemas['CreateNavLinkDto'];
 export type UpdateNavLinkDto = ApiSchemas['UpdateNavLinkDto'];
 export type ReorderNavLinksDto = ApiSchemas['ReorderNavLinksDto'];
+
+export type InventoryAdjustment = ApiSchemas['InventoryAdjustment'];
+export type InventoryAdjustmentSlot = ApiSchemas['InventoryAdjustmentSlotDto'];
+export type CreateInventoryAdjustmentDto = ApiSchemas['CreateInventoryAdjustmentDto'];
+export type UpdateInventoryAdjustmentDto = ApiSchemas['UpdateInventoryAdjustmentDto'];

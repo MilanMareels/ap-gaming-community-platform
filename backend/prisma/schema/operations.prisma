@@ -262,3 +262,14 @@ model PointTrialEntry {
 
   createdAt DateTime @default(now())
 }
+
+model InventoryAdjustment {
+  id        Int      @id @default(autoincrement())
+  inventory String
+  quantity  Int
+  startTime DateTime
+  endTime   DateTime
+  reason    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
