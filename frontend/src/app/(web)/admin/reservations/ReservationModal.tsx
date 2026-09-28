@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input, Select } from '@/components/ui/Input';
 import { apiClient } from '@/api';
-import type { ReservationWithUser } from '@/api';
+import type { ReservationWithUser, ReservationStatus } from '@/api';
 
 interface ReservationModalProps {
   open: boolean;
@@ -27,6 +27,13 @@ const CONTROLLER_OPTIONS = [
   { value: '2', label: '2' },
   { value: '3', label: '3' },
   { value: '4', label: '4' },
+];
+
+const STATUS_OPTIONS = [
+  { value: 'RESERVED', label: 'Geboekt' },
+  { value: 'PRESENT', label: 'Aanwezig' },
+  { value: 'NO_SHOW', label: 'Afwezig' },
+  { value: 'CANCELLED', label: 'Geannuleerd' },
 ];
 
 /** Parse an ISO date-time to a date string (YYYY-MM-DD) */
@@ -62,6 +69,7 @@ export default function ReservationModal({
   const [sNumber, setSNumber] = useState('');
   const [inventory, setInventory] = useState('pc');
   const [controllers, setControllers] = useState('0');
+  const [status, setStatus] = useState<ReservationStatus>('RESERVED');
   const [date, setDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
@@ -75,6 +83,7 @@ export default function ReservationModal({
       setSNumber(reservation.user?.sNumber || '');
       setInventory(reservation.inventory);
       setControllers(String(reservation.controllers));
+      setStatus(reservation.status);
       setDate(toDateInput(reservation.startTime));
       setStartTime(toTimeInput(reservation.startTime));
       setEndTime(toTimeInput(reservation.endTime));
@@ -84,6 +93,7 @@ export default function ReservationModal({
       setSNumber('');
       setInventory('pc');
       setControllers('0');
+      setStatus('RESERVED');
       setDate('');
       setStartTime('');
       setEndTime('');
@@ -114,7 +124,7 @@ export default function ReservationModal({
 
     try {
       if (isEdit && reservation) {
-        // Update existing reservation
+        // Update existing reservation details
         await apiClient.PATCH('/reservations/{id}', {
           params: { path: { id: reservation.id.toString() } },
           body: {
@@ -126,6 +136,13 @@ export default function ReservationModal({
             endTime: endISO,
           },
         });
+        // Update status if it changed
+        if (status !== reservation.status) {
+          await apiClient.PATCH('/reservations/{id}/status', {
+            params: { path: { id: reservation.id.toString() } },
+            body: { status },
+          });
+        }
       } else {
         // Create new admin reservation
         await apiClient.POST('/reservations/admin', {
@@ -211,6 +228,15 @@ export default function ReservationModal({
               onChange={(e) => setControllers(e.target.value)}
             />
           </div>
+
+          {isEdit && (
+            <Select
+              label='Status'
+              options={STATUS_OPTIONS}
+              value={status}
+              onChange={(e) => setStatus(e.target.value as ReservationStatus)}
+            />
+          )}
 
           <Input
             label='Datum *'

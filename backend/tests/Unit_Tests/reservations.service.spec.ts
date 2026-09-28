@@ -6,6 +6,7 @@ import { PrismaService } from '../../src/modules/prisma/prisma.service.js';
 import { CreateReservationDto, ReservationStatus } from '../../src/dtos/reservations/reservation.dto.js';
 import { errorMessages } from '../../src/errors/errorMessages.js';
 import { MailService } from '../../src/modules/mail/mail.service.js';
+import { InventoryAdjustmentsService } from '../../src/modules/inventory-adjustments/inventory-adjustments.service.js';
 
 const getIsoDate = (offset = 0) => {
   const d = new Date();
@@ -70,8 +71,17 @@ describe('ReservationsService', () => {
       generateQRCode: jest.fn().mockResolvedValue(Buffer.from('fake-qr-code')),
     };
 
+    const mockInventoryAdjustmentsService = {
+      getEffectiveAdjustment: jest.fn().mockResolvedValue(0),
+    };
+
     const module = await Test.createTestingModule({
-      providers: [ReservationsService, { provide: PrismaService, useValue: mockPrisma }, { provide: MailService, useValue: mockMailService }],
+      providers: [
+        ReservationsService,
+        { provide: PrismaService, useValue: mockPrisma },
+        { provide: MailService, useValue: mockMailService },
+        { provide: InventoryAdjustmentsService, useValue: mockInventoryAdjustmentsService },
+      ],
     }).compile();
 
     service = module.get(ReservationsService);

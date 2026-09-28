@@ -176,3 +176,8 @@ export type PointTrialParticipant = Prisma.PointTrialParticipantModel
  * 
  */
 export type PointTrialEntry = Prisma.PointTrialEntryModel
+/**
+ * Model InventoryAdjustment
+ * 
+ */
+export type InventoryAdjustment = Prisma.InventoryAdjustmentModel

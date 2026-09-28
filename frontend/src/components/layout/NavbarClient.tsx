@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Gamepad2, Lock, Menu, X, ArrowRight, ChevronDown } from 'lucide-react';
+import { Gamepad2, Lock, LogIn, Menu, X, ArrowRight, ChevronDown } from 'lucide-react';
 import { DynamicIcon, iconNames } from 'lucide-react/dynamic';
 import type { NavLinkWithChildren } from '@/api';
 
@@ -163,21 +163,28 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
         </div>
 
         {/* Desktop CTA */}
-        {ctaItems.length > 0 && (
-          <div className="hidden md:flex flex-shrink-0 items-center pl-6 gap-3">
-            {ctaItems.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href || '#'}
-                target={item.openInNewTab ? '_blank' : undefined}
-                rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
-                className="bg-[#d42422] text-[#ffffff] px-6 py-2.5 rounded-full text-lg font-medium hover:bg-red-700 transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2 shadow-[0_0_15px_rgba(212,36,34,0.4)]"
-              >
-                {item.label} <ArrowRight className="w-5 h-5" strokeWidth={1.5} />
-              </Link>
-            ))}
-          </div>
-        )}
+        <div className="hidden md:flex flex-shrink-0 items-center pl-6 gap-3">
+          {userRole === 'public' && (
+            <Link
+              href="/login"
+              className="border border-white/20 text-gray-300 hover:text-white hover:border-white/40 px-5 py-2 rounded-full text-base font-medium transition-all inline-flex items-center gap-1.5"
+            >
+              <LogIn size={16} strokeWidth={1.5} />
+              Login
+            </Link>
+          )}
+          {ctaItems.map((item) => (
+            <Link
+              key={item.id}
+              href={item.href || '#'}
+              target={item.openInNewTab ? '_blank' : undefined}
+              rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
+              className="bg-[#d42422] text-[#ffffff] px-6 py-2.5 rounded-full text-lg font-medium hover:bg-red-700 transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2 shadow-[0_0_15px_rgba(212,36,34,0.4)]"
+            >
+              {item.label} <ArrowRight className="w-5 h-5" strokeWidth={1.5} />
+            </Link>
+          ))}
+        </div>
 
         {/* Mobile controls */}
         <div className="md:hidden flex items-center gap-4">
@@ -246,6 +253,16 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
                   {item.label}
                 </Link>
               ),
+            )}
+            {userRole === 'public' && (
+              <Link
+                href="/login"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 px-3 py-2 rounded-md text-lg font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all"
+              >
+                <LogIn size={18} strokeWidth={1.5} />
+                Login
+              </Link>
             )}
             {ctaItems.map((item) => (
               <Link

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { CheckCircle, Clock, ChevronRight, ChevronLeft, LogOut, Loader2 } from 'lucide-react';
 import { apiClient } from '@/api';
-import type { TimeTableEntry, ReservationSlot, Setting, components } from '@/api';
+import type { TimeTableEntry, ReservationSlot, Setting, InventoryAdjustmentSlot, components } from '@/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -56,6 +56,7 @@ export default function ReservationsPage() {
 
   const [timetable, setTimetable] = useState<TimeTableEntry[]>([]);
   const [existingReservations, setExistingReservations] = useState<ReservationSlot[]>([]);
+  const [adjustments, setAdjustments] = useState<InventoryAdjustmentSlot[]>([]);
   const [inventory, setInventory] = useState<Record<string, number>>({
     pc: 5,
     ps5: 1,
@@ -135,32 +136,48 @@ export default function ReservationsPage() {
   useEffect(() => {
     if (!formData.date) return;
 
-    const fetchReservations = async () => {
+    const fetchReservationsAndAdjustments = async () => {
       try {
-        const res = await apiClient.GET('/reservations/slots', { params: { query: { date: formData.date } } });
-        if (res.data) setExistingReservations(res.data as ReservationSlot[]);
+        const [slotsRes, adjRes] = await Promise.all([
+          apiClient.GET('/reservations/slots', { params: { query: { date: formData.date } } }),
+          apiClient.GET('/reservations/adjustments', { params: { query: { date: formData.date } } }),
+        ]);
+        if (slotsRes.data) setExistingReservations(slotsRes.data as ReservationSlot[]);
+        if (adjRes.data) setAdjustments(adjRes.data as InventoryAdjustmentSlot[]);
       } catch (err) {
         console.error('Failed to fetch reservations:', err);
       }
     };
 
-    fetchReservations();
+    fetchReservationsAndAdjustments();
   }, [formData.date]);
 
   const isTimeSlotValid = useCallback(
     (startTimeMins: number, durationMins: number, checkInventoryType?: string) => {
       const endMins = startTimeMins + durationMins;
       const checkType = (type: string) => {
-        const max = inventory[type] || 0;
+        const baseMax = inventory[type] || 0;
+
+        const adjustmentSum = adjustments
+          .filter(
+            (adj) =>
+              adj.inventory === type &&
+              timeToMins(adj.startTime) < endMins &&
+              timeToMins(adj.endTime) > startTimeMins,
+          )
+          .reduce((sum, adj) => sum + adj.quantity, 0);
+
+        const effectiveMax = Math.max(0, baseMax + adjustmentSum);
+
         const count = existingReservations.filter(
           (r) => r.inventory === type && timeToMins(r.startTime) < endMins && timeToMins(r.endTime) > startTimeMins,
         ).length;
-        return count < max;
+        return count < effectiveMax;
       };
       if (checkInventoryType) return checkType(checkInventoryType);
       return checkType('pc') || checkType('ps5') || checkType('switch');
     },
-    [existingReservations, inventory],
+    [existingReservations, inventory, adjustments],
   );
 
   const calculateAvailableStartTimes = useCallback(

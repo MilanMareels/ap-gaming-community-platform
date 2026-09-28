@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Trash2, Check, UserX, Gamepad2, Plus, Pencil, Ban, QrCode } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Trash2, Gamepad2, Plus, Pencil, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Pagination } from '@/components/ui/Pagination';
@@ -26,12 +26,15 @@ function formatTime(iso: string): string {
 
 export default function AdminReservationsPage() {
   const [reservations, setReservations] = useState<ReservationWithUser[]>([]);
-  const [filterDate, setFilterDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [filterDate, setFilterDate] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingReservation, setEditingReservation] = useState<ReservationWithUser | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const dividerRef = useRef<HTMLTableRowElement | null>(null);
+  const mobileDividerRef = useRef<HTMLDivElement | null>(null);
+  const hasScrolled = useRef(false);
 
   async function fetchReservations() {
     try {
@@ -75,19 +78,6 @@ export default function AdminReservationsPage() {
     }
   };
 
-  const handleCancel = async (id: number) => {
-    if (!confirm('Weet je zeker dat je deze reservering wilt annuleren?')) return;
-    try {
-      await apiClient.PATCH('/reservations/{id}/status', {
-        params: { path: { id: id.toString() } },
-        body: { status: 'CANCELLED' },
-      });
-      await fetchReservations();
-    } catch (err) {
-      console.error('Failed to cancel reservation:', err);
-    }
-  };
-
   const openCreateModal = () => {
     setEditingReservation(null);
     setModalOpen(true);
@@ -98,28 +88,113 @@ export default function AdminReservationsPage() {
     setModalOpen(true);
   };
 
-  const filtered = reservations.filter((r) => {
-    if (filterDate && dateFromISO(r.startTime) !== filterDate) return false;
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      const matchesEmail = r.email.toLowerCase().includes(q);
-      const matchesName = r.user?.name?.toLowerCase().includes(q);
-      const matchesSNumber = r.user?.sNumber?.toLowerCase().includes(q);
-      if (!matchesEmail && !matchesName && !matchesSNumber) return false;
-    }
-
-    return true;
-  });
+  const filtered = reservations
+    .filter((r) => {
+      if (filterDate && dateFromISO(r.startTime) !== filterDate) return false;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        const matchesEmail = r.email.toLowerCase().includes(q);
+        const matchesName = r.user?.name?.toLowerCase().includes(q);
+        const matchesSNumber = r.user?.sNumber?.toLowerCase().includes(q);
+        if (!matchesEmail && !matchesName && !matchesSNumber) return false;
+      }
+      return true;
+    })
+    // Sort by startTime ascending so past reservations come first, future ones after
+    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  const renderStatusBadge = (status: ReservationStatus) => {
-    if (status === 'PRESENT') return <Badge variant="success">Aanwezig</Badge>;
-    if (status === 'NO_SHOW') return <Badge variant="danger">Afwezig</Badge>;
-    if (status === 'CANCELLED') return <Badge variant="warning">Geannuleerd</Badge>;
-    return <Badge variant="warning">Geboekt</Badge>;
+  // Re-evaluate "now" every minute so the divider moves automatically
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(interval);
+  }, []);
+  const dividerIndexInFiltered = filtered.findIndex((r) => new Date(r.endTime) > now);
+  // The page that contains the divider
+  const dividerPage = dividerIndexInFiltered >= 0 ? Math.floor(dividerIndexInFiltered / ITEMS_PER_PAGE) + 1 : -1;
+  // The index within the current page's items where the divider sits (before this index)
+  const dividerIndexInPage =
+    dividerPage === currentPage && dividerIndexInFiltered >= 0
+      ? dividerIndexInFiltered - (currentPage - 1) * ITEMS_PER_PAGE
+      : -1;
+
+  // On first load, jump to the page containing the divider
+  const scrollToDivider = useCallback(() => {
+    const el = dividerRef.current || mobileDividerRef.current;
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasScrolled.current && dividerPage > 0 && reservations.length > 0) {
+      hasScrolled.current = true;
+      setCurrentPage(dividerPage);
+    }
+  }, [dividerPage, reservations.length]);
+
+  useEffect(() => {
+    // After the page renders with the divider, scroll to it
+    if (hasScrolled.current) {
+      // Small delay to let DOM render
+      const timer = setTimeout(scrollToDivider, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [currentPage, scrollToDivider]);
+
+  const statusOptions: { value: ReservationStatus; label: string; color: string }[] = [
+    { value: 'RESERVED', label: 'Geboekt', color: 'text-yellow-400' },
+    { value: 'PRESENT', label: 'Aanwezig', color: 'text-green-400' },
+    { value: 'NO_SHOW', label: 'Afwezig', color: 'text-red-400' },
+    { value: 'CANCELLED', label: 'Geannuleerd', color: 'text-orange-400' },
+  ];
+
+  const handleStatusChange = async (r: ReservationWithUser, newStatus: ReservationStatus) => {
+    if (newStatus === 'CANCELLED' && !confirm('Weet je zeker dat je deze reservering wilt annuleren?')) return;
+    await handleUpdateStatus(r.id, newStatus);
   };
+
+  const renderStatusSelect = (r: ReservationWithUser) => {
+    const current = statusOptions.find((o) => o.value === r.status);
+    return (
+      <select
+        className={`bg-slate-950 border border-slate-700 rounded-lg text-xs font-semibold p-1.5 outline-none focus:border-red-500 cursor-pointer ${current?.color ?? ''}`}
+        value={r.status}
+        onChange={(e) => handleStatusChange(r, e.target.value as ReservationStatus)}
+      >
+        {statusOptions.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    );
+  };
+
+  /** Red divider row for the desktop table */
+  const renderTableDivider = () => (
+    <tr ref={dividerRef}>
+      <td colSpan={6} className="p-0">
+        <div className="flex items-center gap-3 px-4 py-2">
+          <div className="flex-1 h-px bg-red-500" />
+          <span className="text-xs font-bold uppercase text-red-500 whitespace-nowrap">Nu</span>
+          <div className="flex-1 h-px bg-red-500" />
+        </div>
+      </td>
+    </tr>
+  );
+
+  /** Red divider for mobile cards */
+  const renderMobileDivider = () => (
+    <div ref={mobileDividerRef} className="flex items-center gap-3 px-2 py-1">
+      <div className="flex-1 h-px bg-red-500" />
+      <span className="text-xs font-bold uppercase text-red-500 whitespace-nowrap">Nu</span>
+      <div className="flex-1 h-px bg-red-500" />
+    </div>
+  );
 
   return (
     <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
@@ -170,63 +245,55 @@ export default function AdminReservationsPage() {
       </div>
 
       <div className="space-y-3 p-3 md:hidden">
-        {paginated.map((r) => (
-          <div key={r.id} className="rounded-xl border border-slate-800 bg-slate-950 p-3">
-            <div className="mb-2 flex items-start justify-between gap-2">
-              <div>
-                <p className="font-bold text-white">{r.user?.name || 'Unknown'}</p>
-                <p className="text-xs text-gray-400">{r.email}</p>
-                {r.user?.sNumber && <p className="text-xs text-gray-500">{r.user.sNumber}</p>}
+        {paginated.map((r, idx) => (
+          <div key={r.id}>
+            {dividerIndexInPage === idx && renderMobileDivider()}
+            <div className="rounded-xl border border-slate-800 bg-slate-950 p-3">
+              <div className="mb-2 flex items-start justify-between gap-2">
+                <div>
+                  <p className="font-bold text-white">{r.user?.name || 'Unknown'}</p>
+                  <p className="text-xs text-gray-400">{r.email}</p>
+                  {r.user?.sNumber && <p className="text-xs text-gray-500">{r.user.sNumber}</p>}
+                </div>
+                {renderStatusSelect(r)}
               </div>
-              {renderStatusBadge(r.status)}
-            </div>
 
-            <div className="mb-3 grid grid-cols-2 gap-2 text-xs text-gray-300">
-              <div className="rounded-lg border border-slate-800 bg-slate-900 p-2">
-                <p className="text-gray-500">Datum</p>
-                <p className="font-semibold text-white">{dateFromISO(r.startTime)}</p>
-              </div>
-              <div className="rounded-lg border border-slate-800 bg-slate-900 p-2">
-                <p className="text-gray-500">Tijd</p>
-                <p className="font-semibold text-white">
-                  {formatTime(r.startTime)} - {formatTime(r.endTime)}
-                </p>
-              </div>
-              <div className="col-span-2 rounded-lg border border-slate-800 bg-slate-900 p-2">
-                <div className="flex items-center gap-2">
-                  <Badge variant={r.inventory === 'pc' || r.inventory === 'switch' ? 'danger' : 'info'}>{r.inventory.toUpperCase()}</Badge>
-                  {r.controllers > 0 && (
-                    <span className="text-xs text-gray-400">
-                      <Gamepad2 className="inline" size={12} /> {r.controllers}
-                    </span>
-                  )}
+              <div className="mb-3 grid grid-cols-2 gap-2 text-xs text-gray-300">
+                <div className="rounded-lg border border-slate-800 bg-slate-900 p-2">
+                  <p className="text-gray-500">Datum</p>
+                  <p className="font-semibold text-white">{dateFromISO(r.startTime)}</p>
+                </div>
+                <div className="rounded-lg border border-slate-800 bg-slate-900 p-2">
+                  <p className="text-gray-500">Tijd</p>
+                  <p className="font-semibold text-white">
+                    {formatTime(r.startTime)} - {formatTime(r.endTime)}
+                  </p>
+                </div>
+                <div className="col-span-2 rounded-lg border border-slate-800 bg-slate-900 p-2">
+                  <div className="flex items-center gap-2">
+                    <Badge variant={r.inventory === 'pc' || r.inventory === 'switch' ? 'danger' : 'info'}>{r.inventory.toUpperCase()}</Badge>
+                    {r.controllers > 0 && (
+                      <span className="text-xs text-gray-400">
+                        <Gamepad2 className="inline" size={12} /> {r.controllers}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex flex-wrap gap-2">
-              {r.status === 'RESERVED' && (
-                <>
-                  <Button size="sm" variant="success" onClick={() => handleUpdateStatus(r.id, 'PRESENT')} title="Markeer als aanwezig">
-                    <Check size={16} /> Aanwezig
-                  </Button>
-                  <Button size="sm" variant="danger" onClick={() => handleUpdateStatus(r.id, 'NO_SHOW')} title="Markeer als no-show">
-                    <UserX size={16} /> No-show
-                  </Button>
-                  <Button size="sm" variant="secondary" onClick={() => handleCancel(r.id)} title="Annuleer reservering">
-                    <Ban size={16} /> Annuleer
-                  </Button>
-                </>
-              )}
-              <Button size="sm" variant="secondary" onClick={() => openEditModal(r)} title="Bewerk reservering">
-                <Pencil size={16} /> Bewerk
-              </Button>
-              <Button size="sm" variant="danger" onClick={() => handleDelete(r.id)} title="Verwijder reservering">
-                <Trash2 size={16} /> Verwijder
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="secondary" onClick={() => openEditModal(r)} title="Bewerk reservering">
+                  <Pencil size={16} /> Bewerk
+                </Button>
+                <Button size="sm" variant="danger" onClick={() => handleDelete(r.id)} title="Verwijder reservering">
+                  <Trash2 size={16} /> Verwijder
+                </Button>
+              </div>
             </div>
           </div>
         ))}
+        {/* Show divider at the end if all items on this page are past */}
+        {dividerIndexInPage === paginated.length && renderMobileDivider()}
 
         {paginated.length === 0 && (
           <div className="rounded-xl border border-slate-800 bg-slate-950 p-6 text-center text-gray-500">Geen reserveringen gevonden.</div>
@@ -246,53 +313,45 @@ export default function AdminReservationsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800">
-            {paginated.map((r) => (
-              <tr key={r.id}>
-                <td className="p-4 font-bold">
-                  {r.user?.name || 'Unknown'}
-                  <div className="text-xs text-gray-500 font-normal">
-                    {r.email}
-                    {r.user?.sNumber && <span className="ml-2 text-gray-600">({r.user.sNumber})</span>}
-                  </div>
-                </td>
-                <td className="p-4">{dateFromISO(r.startTime)}</td>
-                <td className="p-4">
-                  {formatTime(r.startTime)} - {formatTime(r.endTime)}
-                </td>
-                <td className="p-4">
-                  <Badge variant={r.inventory === 'pc' || r.inventory === 'switch' ? 'danger' : 'info'}>{r.inventory.toUpperCase()}</Badge>
-                  {r.controllers > 0 && (
-                    <span className="ml-2 text-xs text-gray-400">
-                      <Gamepad2 className="inline" size={12} /> {r.controllers}
-                    </span>
-                  )}
-                </td>
-                <td className="p-4">{renderStatusBadge(r.status)}</td>
-                <td className="p-4">
-                  <div className="flex gap-2 justify-end">
-                    {r.status === 'RESERVED' && (
-                      <>
-                        <Button size="sm" variant="success" onClick={() => handleUpdateStatus(r.id, 'PRESENT')} title="Markeer als aanwezig">
-                          <Check size={16} />
-                        </Button>
-                        <Button size="sm" variant="danger" onClick={() => handleUpdateStatus(r.id, 'NO_SHOW')} title="Markeer als no-show">
-                          <UserX size={16} />
-                        </Button>
-                        <Button size="sm" variant="secondary" onClick={() => handleCancel(r.id)} title="Annuleer reservering">
-                          <Ban size={16} />
-                        </Button>
-                      </>
+            {paginated.map((r, idx) => (
+              <React.Fragment key={r.id}>
+                {dividerIndexInPage === idx && renderTableDivider()}
+                <tr>
+                  <td className="p-4 font-bold">
+                    {r.user?.name || 'Unknown'}
+                    <div className="text-xs text-gray-500 font-normal">
+                      {r.email}
+                      {r.user?.sNumber && <span className="ml-2 text-gray-600">({r.user.sNumber})</span>}
+                    </div>
+                  </td>
+                  <td className="p-4">{dateFromISO(r.startTime)}</td>
+                  <td className="p-4">
+                    {formatTime(r.startTime)} - {formatTime(r.endTime)}
+                  </td>
+                  <td className="p-4">
+                    <Badge variant={r.inventory === 'pc' || r.inventory === 'switch' ? 'danger' : 'info'}>{r.inventory.toUpperCase()}</Badge>
+                    {r.controllers > 0 && (
+                      <span className="ml-2 text-xs text-gray-400">
+                        <Gamepad2 className="inline" size={12} /> {r.controllers}
+                      </span>
                     )}
-                    <Button size="sm" variant="secondary" onClick={() => openEditModal(r)} title="Bewerk reservering">
-                      <Pencil size={16} />
-                    </Button>
-                    <Button size="sm" variant="danger" onClick={() => handleDelete(r.id)} title="Verwijder reservering">
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
-                </td>
-              </tr>
+                  </td>
+                  <td className="p-4">{renderStatusSelect(r)}</td>
+                  <td className="p-4">
+                    <div className="flex gap-2 justify-end">
+                      <Button size="sm" variant="secondary" onClick={() => openEditModal(r)} title="Bewerk reservering">
+                        <Pencil size={16} />
+                      </Button>
+                      <Button size="sm" variant="danger" onClick={() => handleDelete(r.id)} title="Verwijder reservering">
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              </React.Fragment>
             ))}
+            {/* Show divider at the end if all items on this page are past */}
+            {dividerIndexInPage === paginated.length && renderTableDivider()}
             {paginated.length === 0 && (
               <tr>
                 <td colSpan={6} className="p-8 text-center text-gray-500">
