@@ -410,7 +410,8 @@ export const ModelName = {
   TimeTrialRun: 'TimeTrialRun',
   PointTrial: 'PointTrial',
   PointTrialParticipant: 'PointTrialParticipant',
-  PointTrialEntry: 'PointTrialEntry'
+  PointTrialEntry: 'PointTrialEntry',
+  InventoryAdjustment: 'InventoryAdjustment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -426,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "adminUser" | "googleSSOUser" | "microsoftSSOUser" | "role" | "permission" | "rolePermission" | "userRole" | "setting" | "form" | "navLink" | "rosterGame" | "rosterEntry" | "reservation" | "timeTableEntry" | "event" | "bracket" | "bracketParticipant" | "bracketMatch" | "bracketMatchParticipant" | "eventRegistration" | "timeTrial" | "timeTrialParticipant" | "timeTrialRun" | "pointTrial" | "pointTrialParticipant" | "pointTrialEntry"
+    modelProps: "user" | "adminUser" | "googleSSOUser" | "microsoftSSOUser" | "role" | "permission" | "rolePermission" | "userRole" | "setting" | "form" | "navLink" | "rosterGame" | "rosterEntry" | "reservation" | "timeTableEntry" | "event" | "bracket" | "bracketParticipant" | "bracketMatch" | "bracketMatchParticipant" | "eventRegistration" | "timeTrial" | "timeTrialParticipant" | "timeTrialRun" | "pointTrial" | "pointTrialParticipant" | "pointTrialEntry" | "inventoryAdjustment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2428,6 +2429,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    InventoryAdjustment: {
+      payload: Prisma.$InventoryAdjustmentPayload<ExtArgs>
+      fields: Prisma.InventoryAdjustmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InventoryAdjustmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryAdjustmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InventoryAdjustmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryAdjustmentPayload>
+        }
+        findFirst: {
+          args: Prisma.InventoryAdjustmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryAdjustmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InventoryAdjustmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryAdjustmentPayload>
+        }
+        findMany: {
+          args: Prisma.InventoryAdjustmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryAdjustmentPayload>[]
+        }
+        create: {
+          args: Prisma.InventoryAdjustmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryAdjustmentPayload>
+        }
+        createMany: {
+          args: Prisma.InventoryAdjustmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InventoryAdjustmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryAdjustmentPayload>[]
+        }
+        delete: {
+          args: Prisma.InventoryAdjustmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryAdjustmentPayload>
+        }
+        update: {
+          args: Prisma.InventoryAdjustmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryAdjustmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.InventoryAdjustmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InventoryAdjustmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InventoryAdjustmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryAdjustmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.InventoryAdjustmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryAdjustmentPayload>
+        }
+        aggregate: {
+          args: Prisma.InventoryAdjustmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInventoryAdjustment>
+        }
+        groupBy: {
+          args: Prisma.InventoryAdjustmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InventoryAdjustmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InventoryAdjustmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InventoryAdjustmentCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2774,6 +2849,20 @@ export const PointTrialEntryScalarFieldEnum = {
 export type PointTrialEntryScalarFieldEnum = (typeof PointTrialEntryScalarFieldEnum)[keyof typeof PointTrialEntryScalarFieldEnum]
 
 
+export const InventoryAdjustmentScalarFieldEnum = {
+  id: 'id',
+  inventory: 'inventory',
+  quantity: 'quantity',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  reason: 'reason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InventoryAdjustmentScalarFieldEnum = (typeof InventoryAdjustmentScalarFieldEnum)[keyof typeof InventoryAdjustmentScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -3100,6 +3189,7 @@ export type GlobalOmitConfig = {
   pointTrial?: Prisma.PointTrialOmit
   pointTrialParticipant?: Prisma.PointTrialParticipantOmit
   pointTrialEntry?: Prisma.PointTrialEntryOmit
+  inventoryAdjustment?: Prisma.InventoryAdjustmentOmit
 }
 
 /* Types for Logging */

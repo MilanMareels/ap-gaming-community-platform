@@ -25,6 +25,7 @@ import { TimeTrialRunRelations as _TimeTrialRunRelations } from './time_trial_ru
 import { PointTrialRelations as _PointTrialRelations } from './point_trial_relations.js';
 import { PointTrialParticipantRelations as _PointTrialParticipantRelations } from './point_trial_participant_relations.js';
 import { PointTrialEntryRelations as _PointTrialEntryRelations } from './point_trial_entry_relations.js';
+import { InventoryAdjustmentRelations as _InventoryAdjustmentRelations } from './inventory_adjustment_relations.js';
 import { User as _User } from './user.js';
 import { AdminUser as _AdminUser } from './admin_user.js';
 import { GoogleSSOUser as _GoogleSSOUser } from './google_s_s_o_user.js';
@@ -52,6 +53,7 @@ import { TimeTrialRun as _TimeTrialRun } from './time_trial_run.js';
 import { PointTrial as _PointTrial } from './point_trial.js';
 import { PointTrialParticipant as _PointTrialParticipant } from './point_trial_participant.js';
 import { PointTrialEntry as _PointTrialEntry } from './point_trial_entry.js';
+import { InventoryAdjustment as _InventoryAdjustment } from './inventory_adjustment.js';
 
 export namespace PrismaModel {
   export class UserRelations extends _UserRelations {}
@@ -81,6 +83,7 @@ export namespace PrismaModel {
   export class PointTrialRelations extends _PointTrialRelations {}
   export class PointTrialParticipantRelations extends _PointTrialParticipantRelations {}
   export class PointTrialEntryRelations extends _PointTrialEntryRelations {}
+  export class InventoryAdjustmentRelations extends _InventoryAdjustmentRelations {}
   export class User extends _User {}
   export class AdminUser extends _AdminUser {}
   export class GoogleSSOUser extends _GoogleSSOUser {}
@@ -108,6 +111,7 @@ export namespace PrismaModel {
   export class PointTrial extends _PointTrial {}
   export class PointTrialParticipant extends _PointTrialParticipant {}
   export class PointTrialEntry extends _PointTrialEntry {}
+  export class InventoryAdjustment extends _InventoryAdjustment {}
 
   export const extraModels = [
     UserRelations,
@@ -137,6 +141,7 @@ export namespace PrismaModel {
     PointTrialRelations,
     PointTrialParticipantRelations,
     PointTrialEntryRelations,
+    InventoryAdjustmentRelations,
     User,
     AdminUser,
     GoogleSSOUser,
@@ -164,5 +169,6 @@ export namespace PrismaModel {
     PointTrial,
     PointTrialParticipant,
     PointTrialEntry,
+    InventoryAdjustment,
   ];
 }

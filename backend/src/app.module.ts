@@ -12,6 +12,7 @@ import { BracketsModule } from './modules/brackets/brackets.module.js';
 import { TimeTrialsModule } from './modules/time-trials/time-trials.module.js';
 import { PointTrialsModule } from './modules/point-trials/point-trials.module.js';
 import { RbacModule } from './modules/rbac/rbac.module.js';
+import { InventoryAdjustmentsModule } from './modules/inventory-adjustments/inventory-adjustments.module.js';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { RbacModule } from './modules/rbac/rbac.module.js';
     BracketsModule,
     TimeTrialsModule,
     PointTrialsModule,
+    InventoryAdjustmentsModule,
   ],
   controllers: [],
   providers: [],

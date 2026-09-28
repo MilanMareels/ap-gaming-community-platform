@@ -77,7 +77,8 @@ export const ModelName = {
   TimeTrialRun: 'TimeTrialRun',
   PointTrial: 'PointTrial',
   PointTrialParticipant: 'PointTrialParticipant',
-  PointTrialEntry: 'PointTrialEntry'
+  PointTrialEntry: 'PointTrialEntry',
+  InventoryAdjustment: 'InventoryAdjustment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -401,6 +402,20 @@ export const PointTrialEntryScalarFieldEnum = {
 } as const
 
 export type PointTrialEntryScalarFieldEnum = (typeof PointTrialEntryScalarFieldEnum)[keyof typeof PointTrialEntryScalarFieldEnum]
+
+
+export const InventoryAdjustmentScalarFieldEnum = {
+  id: 'id',
+  inventory: 'inventory',
+  quantity: 'quantity',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  reason: 'reason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InventoryAdjustmentScalarFieldEnum = (typeof InventoryAdjustmentScalarFieldEnum)[keyof typeof InventoryAdjustmentScalarFieldEnum]
 
 
 export const SortOrder = {
