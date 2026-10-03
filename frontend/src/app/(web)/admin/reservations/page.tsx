@@ -12,22 +12,16 @@ import ReservationQrScannerModal from '@/components/reservations/ReservationQrSc
 
 const ITEMS_PER_PAGE = 10;
 
-/** Extract local date (YYYY-MM-DD) from an ISO datetime string */
+/** Extract date (YYYY-MM-DD) from an ISO datetime string */
 function dateFromISO(iso: string): string {
-  const d = new Date(iso);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+  return iso.slice(0, 10);
 }
 
-/** Format an ISO datetime string to HH:mm in local time */
+/** Format an ISO datetime string to HH:mm */
 function formatTime(iso: string): string {
   if (/^\d{2}:\d{2}$/.test(iso)) return iso;
   const d = new Date(iso);
-  const h = String(d.getHours()).padStart(2, '0');
-  const m = String(d.getMinutes()).padStart(2, '0');
-  return `${h}:${m}`;
+  return d.toISOString().slice(11, 16);
 }
 
 /** Get today's local date as YYYY-MM-DD */
@@ -37,6 +31,16 @@ function todayLocal(): string {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
+}
+
+/**
+ * Build a Date whose UTC value equals the current local wall-clock time.
+ * Reservation timestamps are stored as fake UTC (local time with a Z suffix),
+ * so comparisons must use the same convention.
+ */
+function nowAsFakeUTC(): Date {
+  const d = new Date();
+  return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()));
 }
 
 export default function AdminReservationsPage() {
@@ -122,9 +126,10 @@ export default function AdminReservationsPage() {
   const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   // Re-evaluate "now" every minute so the divider moves automatically
-  const [now, setNow] = useState(() => new Date());
+  // Uses fake-UTC to match the convention used by stored reservation timestamps
+  const [now, setNow] = useState(nowAsFakeUTC);
   useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 60_000);
+    const interval = setInterval(() => setNow(nowAsFakeUTC()), 60_000);
     return () => clearInterval(interval);
   }, []);
   // Only show the "now" divider when the current time falls within the range of today's reservations
