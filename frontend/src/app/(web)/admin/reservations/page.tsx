@@ -12,21 +12,36 @@ import ReservationQrScannerModal from '@/components/reservations/ReservationQrSc
 
 const ITEMS_PER_PAGE = 10;
 
-/** Extract date (YYYY-MM-DD) from an ISO datetime string */
+/** Extract local date (YYYY-MM-DD) from an ISO datetime string */
 function dateFromISO(iso: string): string {
-  return iso.slice(0, 10);
+  const d = new Date(iso);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
-/** Format an ISO datetime string to HH:mm */
+/** Format an ISO datetime string to HH:mm in local time */
 function formatTime(iso: string): string {
   if (/^\d{2}:\d{2}$/.test(iso)) return iso;
   const d = new Date(iso);
-  return d.toISOString().slice(11, 16);
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  return `${h}:${m}`;
+}
+
+/** Get today's local date as YYYY-MM-DD */
+function todayLocal(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
 export default function AdminReservationsPage() {
   const [reservations, setReservations] = useState<ReservationWithUser[]>([]);
-  const [filterDate, setFilterDate] = useState('');
+  const [filterDate, setFilterDate] = useState(todayLocal);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
@@ -112,7 +127,13 @@ export default function AdminReservationsPage() {
     const interval = setInterval(() => setNow(new Date()), 60_000);
     return () => clearInterval(interval);
   }, []);
-  const dividerIndexInFiltered = filtered.findIndex((r) => new Date(r.endTime) > now);
+  // Only show the "now" divider when the current time falls within the range of today's reservations
+  const nowIsRelevant =
+    filtered.length > 0 &&
+    now >= new Date(filtered[0].startTime) &&
+    now <= new Date(filtered[filtered.length - 1].endTime);
+
+  const dividerIndexInFiltered = nowIsRelevant ? filtered.findIndex((r) => new Date(r.endTime) > now) : -1;
   // The page that contains the divider
   const dividerPage = dividerIndexInFiltered >= 0 ? Math.floor(dividerIndexInFiltered / ITEMS_PER_PAGE) + 1 : -1;
   // The index within the current page's items where the divider sits (before this index)
