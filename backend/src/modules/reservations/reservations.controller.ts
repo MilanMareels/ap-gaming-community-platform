@@ -12,6 +12,7 @@ import {
   UpdateReservationDto,
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
+import { ReservationStatisticsDto, StatisticsQueryDto, UserStatisticsDto } from '../../dtos/reservations/reservation-statistics.dto.js';
 import { InventoryAdjustmentSlotDto } from '../../dtos/inventory-adjustments/inventory-adjustment.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
@@ -77,6 +78,25 @@ export class ReservationsController {
   @ApiOkResponse({ type: [InventoryAdjustmentSlotDto] })
   getAdjustments(@Query('date') date: string) {
     return this.inventoryAdjustmentsService.getAdjustmentsForDate(date);
+  }
+
+  @Get('statistics')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('statistics.view')
+  @ApiOperation({ summary: 'Get reservation statistics and insights (Admin only)' })
+  @ApiOkResponse({ type: ReservationStatisticsDto })
+  getStatistics(@Query() query: StatisticsQueryDto) {
+    return this.reservationsService.getStatistics(query.from, query.to);
+  }
+
+  @Get('statistics/user/:userId')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('statistics.view')
+  @ApiOperation({ summary: 'Get statistics for a specific user (Admin only)' })
+  @ApiOkResponse({ type: UserStatisticsDto })
+  @ApiNotFoundResponse({ description: 'User not found', type: HttpExceptionDto })
+  getUserStatistics(@Param('userId') userId: string) {
+    return this.reservationsService.getUserStatistics(+userId);
   }
 
   @Get('verify/:cuid')
