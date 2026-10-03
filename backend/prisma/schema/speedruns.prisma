@@ -1,0 +1,147 @@
+enum SpeedrunCategoryType {
+  FULL_GAME
+  PER_LEVEL
+}
+
+enum SpeedrunVariableScope {
+  GLOBAL
+  FULL_GAME
+  PER_LEVEL
+}
+
+enum SpeedrunRunStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model SpeedrunGame {
+  id            Int      @id @default(autoincrement())
+  name          String
+  slug          String   @unique
+  description   String?
+  coverImageUrl String?
+  hasInGameTimer Boolean @default(false)
+
+  categories SpeedrunCategory[]
+  levels     SpeedrunLevel[]
+  variables  SpeedrunVariable[]
+  runs       SpeedrunRun[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SpeedrunLevel {
+  id     Int          @id @default(autoincrement())
+  gameId Int
+  game   SpeedrunGame @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  name     String
+  position Int
+
+  runs SpeedrunRun[]
+
+  @@unique([gameId, position])
+}
+
+model SpeedrunCategory {
+  id     Int          @id @default(autoincrement())
+  gameId Int
+  game   SpeedrunGame @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  name        String
+  rules       String?
+  type        SpeedrunCategoryType
+  playerType  String @default("exactly")
+  playerCount Int    @default(1)
+  position    Int
+
+  variables SpeedrunVariable[]
+  runs      SpeedrunRun[]
+}
+
+model SpeedrunVariable {
+  id         Int                @id @default(autoincrement())
+  gameId     Int
+  game       SpeedrunGame       @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  categoryId Int?
+  category   SpeedrunCategory?  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  name          String
+  isSubcategory Boolean             @default(false)
+  isMandatory   Boolean             @default(false)
+  scope         SpeedrunVariableScope @default(GLOBAL)
+  position      Int
+
+  values    SpeedrunVariableValue[]
+  runValues SpeedrunRunVariableValue[]
+}
+
+model SpeedrunVariableValue {
+  id         Int              @id @default(autoincrement())
+  variableId Int
+  variable   SpeedrunVariable @relation(fields: [variableId], references: [id], onDelete: Cascade)
+
+  label     String
+  isDefault Boolean @default(false)
+  position  Int
+
+  runValues SpeedrunRunVariableValue[]
+}
+
+model SpeedrunRun {
+  id         Int              @id @default(autoincrement())
+  gameId     Int
+  game       SpeedrunGame     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  categoryId Int
+  category   SpeedrunCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  levelId    Int?
+  level      SpeedrunLevel?   @relation(fields: [levelId], references: [id], onDelete: SetNull)
+
+  submitterId Int
+  submitter   User @relation("SpeedrunRunSubmitter", fields: [submitterId], references: [id], onDelete: Cascade)
+
+  timeMs       Int
+  inGameTimeMs Int?
+
+  status          SpeedrunRunStatus @default(PENDING)
+  verifierId      Int?
+  verifier        User?    @relation("SpeedrunRunVerifier", fields: [verifierId], references: [id], onDelete: SetNull)
+  verifiedAt      DateTime?
+  rejectionReason String?
+
+  videoUrl    String
+  description String?
+  runDate     DateTime
+
+  players        SpeedrunRunPlayer[]
+  variableValues SpeedrunRunVariableValue[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SpeedrunRunPlayer {
+  id    Int         @id @default(autoincrement())
+  runId Int
+  run   SpeedrunRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  userId    Int?
+  user      User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestName String?
+
+  position Int
+}
+
+model SpeedrunRunVariableValue {
+  id         Int                   @id @default(autoincrement())
+  runId      Int
+  run        SpeedrunRun           @relation(fields: [runId], references: [id], onDelete: Cascade)
+  variableId Int
+  variable   SpeedrunVariable      @relation(fields: [variableId], references: [id], onDelete: Cascade)
+  valueId    Int
+  value      SpeedrunVariableValue @relation(fields: [valueId], references: [id], onDelete: Cascade)
+
+  @@unique([runId, variableId])
+}

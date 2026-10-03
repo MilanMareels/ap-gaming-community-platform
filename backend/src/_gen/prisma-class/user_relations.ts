@@ -9,6 +9,8 @@ import { BracketParticipant } from './bracket_participant.js';
 import { TimeTrialParticipant } from './time_trial_participant.js';
 import { PointTrialParticipant } from './point_trial_participant.js';
 import { UserRole } from './user_role.js';
+import { SpeedrunRun } from './speedrun_run.js';
+import { SpeedrunRunPlayer } from './speedrun_run_player.js';
 
 export class UserRelations {
 
@@ -41,4 +43,13 @@ export class UserRelations {
 
   @ApiProperty({ isArray: true, type: () => UserRole })
   userRoles: UserRole[];
+
+  @ApiProperty({ isArray: true, type: () => SpeedrunRun })
+  speedrunRunsSubmitted: SpeedrunRun[];
+
+  @ApiProperty({ isArray: true, type: () => SpeedrunRun })
+  speedrunRunsVerified: SpeedrunRun[];
+
+  @ApiProperty({ isArray: true, type: () => SpeedrunRunPlayer })
+  speedrunRunPlayers: SpeedrunRunPlayer[];
 }

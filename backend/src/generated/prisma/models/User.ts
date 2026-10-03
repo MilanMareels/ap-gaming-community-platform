@@ -218,6 +218,9 @@ export type UserWhereInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantListRelationFilter
   pointTrialParticipants?: Prisma.PointTrialParticipantListRelationFilter
   userRoles?: Prisma.UserRoleListRelationFilter
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunListRelationFilter
+  speedrunRunsVerified?: Prisma.SpeedrunRunListRelationFilter
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -235,6 +238,9 @@ export type UserOrderByWithRelationInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantOrderByRelationAggregateInput
   pointTrialParticipants?: Prisma.PointTrialParticipantOrderByRelationAggregateInput
   userRoles?: Prisma.UserRoleOrderByRelationAggregateInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunOrderByRelationAggregateInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunOrderByRelationAggregateInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -255,6 +261,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   timeTrialParticipants?: Prisma.TimeTrialParticipantListRelationFilter
   pointTrialParticipants?: Prisma.PointTrialParticipantListRelationFilter
   userRoles?: Prisma.UserRoleListRelationFilter
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunListRelationFilter
+  speedrunRunsVerified?: Prisma.SpeedrunRunListRelationFilter
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -293,6 +302,9 @@ export type UserCreateInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -310,6 +322,9 @@ export type UserUncheckedCreateInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -326,6 +341,9 @@ export type UserUpdateInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -343,6 +361,9 @@ export type UserUncheckedUpdateInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -566,6 +587,52 @@ export type UserUpdateOneWithoutPointTrialParticipantsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPointTrialParticipantsInput, Prisma.UserUpdateWithoutPointTrialParticipantsInput>, Prisma.UserUncheckedUpdateWithoutPointTrialParticipantsInput>
 }
 
+export type UserCreateNestedOneWithoutSpeedrunRunsSubmittedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSpeedrunRunsSubmittedInput, Prisma.UserUncheckedCreateWithoutSpeedrunRunsSubmittedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSpeedrunRunsSubmittedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutSpeedrunRunsVerifiedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSpeedrunRunsVerifiedInput, Prisma.UserUncheckedCreateWithoutSpeedrunRunsVerifiedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSpeedrunRunsVerifiedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSpeedrunRunsSubmittedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSpeedrunRunsSubmittedInput, Prisma.UserUncheckedCreateWithoutSpeedrunRunsSubmittedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSpeedrunRunsSubmittedInput
+  upsert?: Prisma.UserUpsertWithoutSpeedrunRunsSubmittedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSpeedrunRunsSubmittedInput, Prisma.UserUpdateWithoutSpeedrunRunsSubmittedInput>, Prisma.UserUncheckedUpdateWithoutSpeedrunRunsSubmittedInput>
+}
+
+export type UserUpdateOneWithoutSpeedrunRunsVerifiedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSpeedrunRunsVerifiedInput, Prisma.UserUncheckedCreateWithoutSpeedrunRunsVerifiedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSpeedrunRunsVerifiedInput
+  upsert?: Prisma.UserUpsertWithoutSpeedrunRunsVerifiedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSpeedrunRunsVerifiedInput, Prisma.UserUpdateWithoutSpeedrunRunsVerifiedInput>, Prisma.UserUncheckedUpdateWithoutSpeedrunRunsVerifiedInput>
+}
+
+export type UserCreateNestedOneWithoutSpeedrunRunPlayersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSpeedrunRunPlayersInput, Prisma.UserUncheckedCreateWithoutSpeedrunRunPlayersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSpeedrunRunPlayersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutSpeedrunRunPlayersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSpeedrunRunPlayersInput, Prisma.UserUncheckedCreateWithoutSpeedrunRunPlayersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSpeedrunRunPlayersInput
+  upsert?: Prisma.UserUpsertWithoutSpeedrunRunPlayersInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSpeedrunRunPlayersInput, Prisma.UserUpdateWithoutSpeedrunRunPlayersInput>, Prisma.UserUncheckedUpdateWithoutSpeedrunRunPlayersInput>
+}
+
 export type UserCreateWithoutAdminUsersInput = {
   name?: string | null
   email: string
@@ -579,6 +646,9 @@ export type UserCreateWithoutAdminUsersInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAdminUsersInput = {
@@ -595,6 +665,9 @@ export type UserUncheckedCreateWithoutAdminUsersInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAdminUsersInput = {
@@ -626,6 +699,9 @@ export type UserUpdateWithoutAdminUsersInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdminUsersInput = {
@@ -642,6 +718,9 @@ export type UserUncheckedUpdateWithoutAdminUsersInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutGoogleSSOUsersInput = {
@@ -657,6 +736,9 @@ export type UserCreateWithoutGoogleSSOUsersInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutGoogleSSOUsersInput = {
@@ -673,6 +755,9 @@ export type UserUncheckedCreateWithoutGoogleSSOUsersInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutGoogleSSOUsersInput = {
@@ -704,6 +789,9 @@ export type UserUpdateWithoutGoogleSSOUsersInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGoogleSSOUsersInput = {
@@ -720,6 +808,9 @@ export type UserUncheckedUpdateWithoutGoogleSSOUsersInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMicrosoftSSOUsersInput = {
@@ -735,6 +826,9 @@ export type UserCreateWithoutMicrosoftSSOUsersInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMicrosoftSSOUsersInput = {
@@ -751,6 +845,9 @@ export type UserUncheckedCreateWithoutMicrosoftSSOUsersInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMicrosoftSSOUsersInput = {
@@ -782,6 +879,9 @@ export type UserUpdateWithoutMicrosoftSSOUsersInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMicrosoftSSOUsersInput = {
@@ -798,6 +898,9 @@ export type UserUncheckedUpdateWithoutMicrosoftSSOUsersInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUserRolesInput = {
@@ -813,6 +916,9 @@ export type UserCreateWithoutUserRolesInput = {
   bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUserRolesInput = {
@@ -829,6 +935,9 @@ export type UserUncheckedCreateWithoutUserRolesInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUserRolesInput = {
@@ -860,6 +969,9 @@ export type UserUpdateWithoutUserRolesInput = {
   bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserRolesInput = {
@@ -876,6 +988,9 @@ export type UserUncheckedUpdateWithoutUserRolesInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRosterEntriesInput = {
@@ -891,6 +1006,9 @@ export type UserCreateWithoutRosterEntriesInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRosterEntriesInput = {
@@ -907,6 +1025,9 @@ export type UserUncheckedCreateWithoutRosterEntriesInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRosterEntriesInput = {
@@ -938,6 +1059,9 @@ export type UserUpdateWithoutRosterEntriesInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRosterEntriesInput = {
@@ -954,6 +1078,9 @@ export type UserUncheckedUpdateWithoutRosterEntriesInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReservationsInput = {
@@ -969,6 +1096,9 @@ export type UserCreateWithoutReservationsInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReservationsInput = {
@@ -985,6 +1115,9 @@ export type UserUncheckedCreateWithoutReservationsInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReservationsInput = {
@@ -1016,6 +1149,9 @@ export type UserUpdateWithoutReservationsInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReservationsInput = {
@@ -1032,6 +1168,9 @@ export type UserUncheckedUpdateWithoutReservationsInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBracketParticipantsInput = {
@@ -1047,6 +1186,9 @@ export type UserCreateWithoutBracketParticipantsInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBracketParticipantsInput = {
@@ -1063,6 +1205,9 @@ export type UserUncheckedCreateWithoutBracketParticipantsInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBracketParticipantsInput = {
@@ -1094,6 +1239,9 @@ export type UserUpdateWithoutBracketParticipantsInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBracketParticipantsInput = {
@@ -1110,6 +1258,9 @@ export type UserUncheckedUpdateWithoutBracketParticipantsInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEventRegistrationsInput = {
@@ -1125,6 +1276,9 @@ export type UserCreateWithoutEventRegistrationsInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEventRegistrationsInput = {
@@ -1141,6 +1295,9 @@ export type UserUncheckedCreateWithoutEventRegistrationsInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEventRegistrationsInput = {
@@ -1172,6 +1329,9 @@ export type UserUpdateWithoutEventRegistrationsInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEventRegistrationsInput = {
@@ -1188,6 +1348,9 @@ export type UserUncheckedUpdateWithoutEventRegistrationsInput = {
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTimeTrialParticipantsInput = {
@@ -1203,6 +1366,9 @@ export type UserCreateWithoutTimeTrialParticipantsInput = {
   bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTimeTrialParticipantsInput = {
@@ -1219,6 +1385,9 @@ export type UserUncheckedCreateWithoutTimeTrialParticipantsInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTimeTrialParticipantsInput = {
@@ -1250,6 +1419,9 @@ export type UserUpdateWithoutTimeTrialParticipantsInput = {
   bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTimeTrialParticipantsInput = {
@@ -1266,6 +1438,9 @@ export type UserUncheckedUpdateWithoutTimeTrialParticipantsInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
   pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPointTrialParticipantsInput = {
@@ -1281,6 +1456,9 @@ export type UserCreateWithoutPointTrialParticipantsInput = {
   bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPointTrialParticipantsInput = {
@@ -1297,6 +1475,9 @@ export type UserUncheckedCreateWithoutPointTrialParticipantsInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPointTrialParticipantsInput = {
@@ -1328,6 +1509,9 @@ export type UserUpdateWithoutPointTrialParticipantsInput = {
   bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPointTrialParticipantsInput = {
@@ -1344,6 +1528,279 @@ export type UserUncheckedUpdateWithoutPointTrialParticipantsInput = {
   bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSpeedrunRunsSubmittedInput = {
+  name?: string | null
+  email: string
+  sNumber: string
+  reservations?: Prisma.ReservationCreateNestedManyWithoutUserInput
+  adminUsers?: Prisma.AdminUserCreateNestedManyWithoutUserInput
+  googleSSOUsers?: Prisma.GoogleSSOUserCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserCreateNestedManyWithoutUserInput
+  rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutUserInput
+  eventRegistrations?: Prisma.EventRegistrationCreateNestedManyWithoutUserInput
+  bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSpeedrunRunsSubmittedInput = {
+  id?: number
+  name?: string | null
+  email: string
+  sNumber: string
+  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutUserInput
+  adminUsers?: Prisma.AdminUserUncheckedCreateNestedManyWithoutUserInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUncheckedCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedCreateNestedManyWithoutUserInput
+  rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutUserInput
+  eventRegistrations?: Prisma.EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+  bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutVerifierInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSpeedrunRunsSubmittedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSpeedrunRunsSubmittedInput, Prisma.UserUncheckedCreateWithoutSpeedrunRunsSubmittedInput>
+}
+
+export type UserCreateWithoutSpeedrunRunsVerifiedInput = {
+  name?: string | null
+  email: string
+  sNumber: string
+  reservations?: Prisma.ReservationCreateNestedManyWithoutUserInput
+  adminUsers?: Prisma.AdminUserCreateNestedManyWithoutUserInput
+  googleSSOUsers?: Prisma.GoogleSSOUserCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserCreateNestedManyWithoutUserInput
+  rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutUserInput
+  eventRegistrations?: Prisma.EventRegistrationCreateNestedManyWithoutUserInput
+  bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunCreateNestedManyWithoutSubmitterInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSpeedrunRunsVerifiedInput = {
+  id?: number
+  name?: string | null
+  email: string
+  sNumber: string
+  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutUserInput
+  adminUsers?: Prisma.AdminUserUncheckedCreateNestedManyWithoutUserInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUncheckedCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedCreateNestedManyWithoutUserInput
+  rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutUserInput
+  eventRegistrations?: Prisma.EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+  bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutSubmitterInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSpeedrunRunsVerifiedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSpeedrunRunsVerifiedInput, Prisma.UserUncheckedCreateWithoutSpeedrunRunsVerifiedInput>
+}
+
+export type UserUpsertWithoutSpeedrunRunsSubmittedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSpeedrunRunsSubmittedInput, Prisma.UserUncheckedUpdateWithoutSpeedrunRunsSubmittedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSpeedrunRunsSubmittedInput, Prisma.UserUncheckedCreateWithoutSpeedrunRunsSubmittedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSpeedrunRunsSubmittedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSpeedrunRunsSubmittedInput, Prisma.UserUncheckedUpdateWithoutSpeedrunRunsSubmittedInput>
+}
+
+export type UserUpdateWithoutSpeedrunRunsSubmittedInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  sNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  reservations?: Prisma.ReservationUpdateManyWithoutUserNestedInput
+  adminUsers?: Prisma.AdminUserUpdateManyWithoutUserNestedInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUpdateManyWithoutUserNestedInput
+  rosterEntries?: Prisma.RosterEntryUpdateManyWithoutUserNestedInput
+  eventRegistrations?: Prisma.EventRegistrationUpdateManyWithoutUserNestedInput
+  bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSpeedrunRunsSubmittedInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  sNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutUserNestedInput
+  adminUsers?: Prisma.AdminUserUncheckedUpdateManyWithoutUserNestedInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutUserNestedInput
+  eventRegistrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+  bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutVerifierNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutSpeedrunRunsVerifiedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSpeedrunRunsVerifiedInput, Prisma.UserUncheckedUpdateWithoutSpeedrunRunsVerifiedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSpeedrunRunsVerifiedInput, Prisma.UserUncheckedCreateWithoutSpeedrunRunsVerifiedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSpeedrunRunsVerifiedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSpeedrunRunsVerifiedInput, Prisma.UserUncheckedUpdateWithoutSpeedrunRunsVerifiedInput>
+}
+
+export type UserUpdateWithoutSpeedrunRunsVerifiedInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  sNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  reservations?: Prisma.ReservationUpdateManyWithoutUserNestedInput
+  adminUsers?: Prisma.AdminUserUpdateManyWithoutUserNestedInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUpdateManyWithoutUserNestedInput
+  rosterEntries?: Prisma.RosterEntryUpdateManyWithoutUserNestedInput
+  eventRegistrations?: Prisma.EventRegistrationUpdateManyWithoutUserNestedInput
+  bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUpdateManyWithoutSubmitterNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSpeedrunRunsVerifiedInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  sNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutUserNestedInput
+  adminUsers?: Prisma.AdminUserUncheckedUpdateManyWithoutUserNestedInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutUserNestedInput
+  eventRegistrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+  bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutSubmitterNestedInput
+  speedrunRunPlayers?: Prisma.SpeedrunRunPlayerUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSpeedrunRunPlayersInput = {
+  name?: string | null
+  email: string
+  sNumber: string
+  reservations?: Prisma.ReservationCreateNestedManyWithoutUserInput
+  adminUsers?: Prisma.AdminUserCreateNestedManyWithoutUserInput
+  googleSSOUsers?: Prisma.GoogleSSOUserCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserCreateNestedManyWithoutUserInput
+  rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutUserInput
+  eventRegistrations?: Prisma.EventRegistrationCreateNestedManyWithoutUserInput
+  bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunCreateNestedManyWithoutVerifierInput
+}
+
+export type UserUncheckedCreateWithoutSpeedrunRunPlayersInput = {
+  id?: number
+  name?: string | null
+  email: string
+  sNumber: string
+  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutUserInput
+  adminUsers?: Prisma.AdminUserUncheckedCreateNestedManyWithoutUserInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUncheckedCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedCreateNestedManyWithoutUserInput
+  rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutUserInput
+  eventRegistrations?: Prisma.EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+  bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutSubmitterInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedCreateNestedManyWithoutVerifierInput
+}
+
+export type UserCreateOrConnectWithoutSpeedrunRunPlayersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSpeedrunRunPlayersInput, Prisma.UserUncheckedCreateWithoutSpeedrunRunPlayersInput>
+}
+
+export type UserUpsertWithoutSpeedrunRunPlayersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSpeedrunRunPlayersInput, Prisma.UserUncheckedUpdateWithoutSpeedrunRunPlayersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSpeedrunRunPlayersInput, Prisma.UserUncheckedCreateWithoutSpeedrunRunPlayersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSpeedrunRunPlayersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSpeedrunRunPlayersInput, Prisma.UserUncheckedUpdateWithoutSpeedrunRunPlayersInput>
+}
+
+export type UserUpdateWithoutSpeedrunRunPlayersInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  sNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  reservations?: Prisma.ReservationUpdateManyWithoutUserNestedInput
+  adminUsers?: Prisma.AdminUserUpdateManyWithoutUserNestedInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUpdateManyWithoutUserNestedInput
+  rosterEntries?: Prisma.RosterEntryUpdateManyWithoutUserNestedInput
+  eventRegistrations?: Prisma.EventRegistrationUpdateManyWithoutUserNestedInput
+  bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUpdateManyWithoutVerifierNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSpeedrunRunPlayersInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  sNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutUserNestedInput
+  adminUsers?: Prisma.AdminUserUncheckedUpdateManyWithoutUserNestedInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutUserNestedInput
+  eventRegistrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+  bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  speedrunRunsSubmitted?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutSubmitterNestedInput
+  speedrunRunsVerified?: Prisma.SpeedrunRunUncheckedUpdateManyWithoutVerifierNestedInput
 }
 
 
@@ -1362,6 +1819,9 @@ export type UserCountOutputType = {
   timeTrialParticipants: number
   pointTrialParticipants: number
   userRoles: number
+  speedrunRunsSubmitted: number
+  speedrunRunsVerified: number
+  speedrunRunPlayers: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1375,6 +1835,9 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   timeTrialParticipants?: boolean | UserCountOutputTypeCountTimeTrialParticipantsArgs
   pointTrialParticipants?: boolean | UserCountOutputTypeCountPointTrialParticipantsArgs
   userRoles?: boolean | UserCountOutputTypeCountUserRolesArgs
+  speedrunRunsSubmitted?: boolean | UserCountOutputTypeCountSpeedrunRunsSubmittedArgs
+  speedrunRunsVerified?: boolean | UserCountOutputTypeCountSpeedrunRunsVerifiedArgs
+  speedrunRunPlayers?: boolean | UserCountOutputTypeCountSpeedrunRunPlayersArgs
 }
 
 /**
@@ -1457,6 +1920,27 @@ export type UserCountOutputTypeCountUserRolesArgs<ExtArgs extends runtime.Types.
   where?: Prisma.UserRoleWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSpeedrunRunsSubmittedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SpeedrunRunWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSpeedrunRunsVerifiedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SpeedrunRunWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSpeedrunRunPlayersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SpeedrunRunPlayerWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1473,6 +1957,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   timeTrialParticipants?: boolean | Prisma.User$timeTrialParticipantsArgs<ExtArgs>
   pointTrialParticipants?: boolean | Prisma.User$pointTrialParticipantsArgs<ExtArgs>
   userRoles?: boolean | Prisma.User$userRolesArgs<ExtArgs>
+  speedrunRunsSubmitted?: boolean | Prisma.User$speedrunRunsSubmittedArgs<ExtArgs>
+  speedrunRunsVerified?: boolean | Prisma.User$speedrunRunsVerifiedArgs<ExtArgs>
+  speedrunRunPlayers?: boolean | Prisma.User$speedrunRunPlayersArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1509,6 +1996,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   timeTrialParticipants?: boolean | Prisma.User$timeTrialParticipantsArgs<ExtArgs>
   pointTrialParticipants?: boolean | Prisma.User$pointTrialParticipantsArgs<ExtArgs>
   userRoles?: boolean | Prisma.User$userRolesArgs<ExtArgs>
+  speedrunRunsSubmitted?: boolean | Prisma.User$speedrunRunsSubmittedArgs<ExtArgs>
+  speedrunRunsVerified?: boolean | Prisma.User$speedrunRunsVerifiedArgs<ExtArgs>
+  speedrunRunPlayers?: boolean | Prisma.User$speedrunRunPlayersArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1527,6 +2017,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     timeTrialParticipants: Prisma.$TimeTrialParticipantPayload<ExtArgs>[]
     pointTrialParticipants: Prisma.$PointTrialParticipantPayload<ExtArgs>[]
     userRoles: Prisma.$UserRolePayload<ExtArgs>[]
+    speedrunRunsSubmitted: Prisma.$SpeedrunRunPayload<ExtArgs>[]
+    speedrunRunsVerified: Prisma.$SpeedrunRunPayload<ExtArgs>[]
+    speedrunRunPlayers: Prisma.$SpeedrunRunPlayerPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1937,6 +2430,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   timeTrialParticipants<T extends Prisma.User$timeTrialParticipantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$timeTrialParticipantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TimeTrialParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pointTrialParticipants<T extends Prisma.User$pointTrialParticipantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pointTrialParticipantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PointTrialParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   userRoles<T extends Prisma.User$userRolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$userRolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  speedrunRunsSubmitted<T extends Prisma.User$speedrunRunsSubmittedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$speedrunRunsSubmittedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SpeedrunRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  speedrunRunsVerified<T extends Prisma.User$speedrunRunsVerifiedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$speedrunRunsVerifiedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SpeedrunRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  speedrunRunPlayers<T extends Prisma.User$speedrunRunPlayersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$speedrunRunPlayersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SpeedrunRunPlayerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2595,6 +3091,78 @@ export type User$userRolesArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.UserRoleScalarFieldEnum | Prisma.UserRoleScalarFieldEnum[]
+}
+
+/**
+ * User.speedrunRunsSubmitted
+ */
+export type User$speedrunRunsSubmittedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SpeedrunRun
+   */
+  select?: Prisma.SpeedrunRunSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SpeedrunRun
+   */
+  omit?: Prisma.SpeedrunRunOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SpeedrunRunInclude<ExtArgs> | null
+  where?: Prisma.SpeedrunRunWhereInput
+  orderBy?: Prisma.SpeedrunRunOrderByWithRelationInput | Prisma.SpeedrunRunOrderByWithRelationInput[]
+  cursor?: Prisma.SpeedrunRunWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SpeedrunRunScalarFieldEnum | Prisma.SpeedrunRunScalarFieldEnum[]
+}
+
+/**
+ * User.speedrunRunsVerified
+ */
+export type User$speedrunRunsVerifiedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SpeedrunRun
+   */
+  select?: Prisma.SpeedrunRunSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SpeedrunRun
+   */
+  omit?: Prisma.SpeedrunRunOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SpeedrunRunInclude<ExtArgs> | null
+  where?: Prisma.SpeedrunRunWhereInput
+  orderBy?: Prisma.SpeedrunRunOrderByWithRelationInput | Prisma.SpeedrunRunOrderByWithRelationInput[]
+  cursor?: Prisma.SpeedrunRunWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SpeedrunRunScalarFieldEnum | Prisma.SpeedrunRunScalarFieldEnum[]
+}
+
+/**
+ * User.speedrunRunPlayers
+ */
+export type User$speedrunRunPlayersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SpeedrunRunPlayer
+   */
+  select?: Prisma.SpeedrunRunPlayerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SpeedrunRunPlayer
+   */
+  omit?: Prisma.SpeedrunRunPlayerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SpeedrunRunPlayerInclude<ExtArgs> | null
+  where?: Prisma.SpeedrunRunPlayerWhereInput
+  orderBy?: Prisma.SpeedrunRunPlayerOrderByWithRelationInput | Prisma.SpeedrunRunPlayerOrderByWithRelationInput[]
+  cursor?: Prisma.SpeedrunRunPlayerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SpeedrunRunPlayerScalarFieldEnum | Prisma.SpeedrunRunPlayerScalarFieldEnum[]
 }
 
 /**

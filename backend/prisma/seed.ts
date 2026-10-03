@@ -27,6 +27,8 @@ const PERMISSIONS = [
   { key: 'roles.manage', description: 'Manage roles and permissions' },
   { key: 'inventory-adjustments.manage', description: 'Manage inventory adjustments' },
   { key: 'statistics.view', description: 'View reservation statistics and insights' },
+  { key: 'speedruns.manage', description: 'Manage speedrun games, categories, variables, and levels' },
+  { key: 'speedruns.review', description: 'Review, verify, and reject speedrun submissions' },
 ];
 
 async function seedPermissionsAndRoles() {

@@ -334,10 +334,7 @@ export interface paths {
     };
     "/reservations/statistics": {
         parameters: {
-            query?: {
-                from?: string;
-                to?: string;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -356,9 +353,7 @@ export interface paths {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                userId: string;
-            };
+            path?: never;
             cookie?: never;
         };
         /** Get statistics for a specific user (Admin only) */
@@ -1337,6 +1332,370 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/speedruns/games": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all speedrun games (public) */
+        get: operations["SpeedrunGamesController_findAll"];
+        put?: never;
+        /** Create a speedrun game (Admin) */
+        post: operations["SpeedrunGamesController_createGame"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/speedruns/games/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a speedrun game by slug (public) */
+        get: operations["SpeedrunGamesController_findBySlug"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/speedruns/games/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a speedrun game (Admin) */
+        delete: operations["SpeedrunGamesController_deleteGame"];
+        options?: never;
+        head?: never;
+        /** Update a speedrun game (Admin) */
+        patch: operations["SpeedrunGamesController_updateGame"];
+        trace?: never;
+    };
+    "/speedruns/games/{id}/cover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload cover image for a speedrun game (Admin) */
+        post: operations["SpeedrunGamesController_uploadCover"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/speedruns/games/{gameId}/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a category for a game (Admin) */
+        post: operations["SpeedrunGamesController_createCategory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/speedruns/games/{gameId}/categories/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Reorder categories (Admin) */
+        patch: operations["SpeedrunGamesController_reorderCategories"];
+        trace?: never;
+    };
+    "/speedruns/games/{gameId}/categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a category (Admin) */
+        delete: operations["SpeedrunGamesController_deleteCategory"];
+        options?: never;
+        head?: never;
+        /** Update a category (Admin) */
+        patch: operations["SpeedrunGamesController_updateCategory"];
+        trace?: never;
+    };
+    "/speedruns/games/{gameId}/levels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a level for a game (Admin) */
+        post: operations["SpeedrunGamesController_createLevel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/speedruns/games/{gameId}/levels/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Reorder levels (Admin) */
+        patch: operations["SpeedrunGamesController_reorderLevels"];
+        trace?: never;
+    };
+    "/speedruns/games/{gameId}/levels/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a level (Admin) */
+        delete: operations["SpeedrunGamesController_deleteLevel"];
+        options?: never;
+        head?: never;
+        /** Update a level (Admin) */
+        patch: operations["SpeedrunGamesController_updateLevel"];
+        trace?: never;
+    };
+    "/speedruns/games/{gameId}/variables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a variable for a game (Admin) */
+        post: operations["SpeedrunGamesController_createVariable"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/speedruns/games/{gameId}/variables/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a variable (Admin) */
+        delete: operations["SpeedrunGamesController_deleteVariable"];
+        options?: never;
+        head?: never;
+        /** Update a variable (Admin) */
+        patch: operations["SpeedrunGamesController_updateVariable"];
+        trace?: never;
+    };
+    "/speedruns/games/{slug}/leaderboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get leaderboard for a game category (public) */
+        get: operations["SpeedrunRunsController_getLeaderboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/speedruns/runs/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all pending runs (Admin) */
+        get: operations["SpeedrunRunsController_findPending"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/speedruns/runs/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get runs submitted by the current user */
+        get: operations["SpeedrunRunsController_findMyRuns"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/speedruns/games/{gameId}/runs/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get pending runs for a game (Admin) */
+        get: operations["SpeedrunRunsController_findPendingByGame"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/speedruns/runs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a run by ID (public) */
+        get: operations["SpeedrunRunsController_findById"];
+        put?: never;
+        post?: never;
+        /** Delete own pending run */
+        delete: operations["SpeedrunRunsController_deleteRun"];
+        options?: never;
+        head?: never;
+        /** Edit own pending run */
+        patch: operations["SpeedrunRunsController_updateRun"];
+        trace?: never;
+    };
+    "/speedruns/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit a speedrun */
+        post: operations["SpeedrunRunsController_submitRun"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/speedruns/runs/{id}/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Verify a pending run (Admin) */
+        patch: operations["SpeedrunRunsController_verifyRun"];
+        trace?: never;
+    };
+    "/speedruns/runs/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Reject a pending run (Admin) */
+        patch: operations["SpeedrunRunsController_rejectRun"];
+        trace?: never;
+    };
+    "/speedruns/runs/{id}/admin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete any run (Admin) */
+        delete: operations["SpeedrunRunsController_adminDeleteRun"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1535,6 +1894,14 @@ export interface components {
             /** @example 3 */
             switch: number;
         };
+        UtilizationDto: {
+            /** @example pc */
+            inventory: string;
+            /** @example 75.5 */
+            utilizationPercent: number;
+            /** @example 6 */
+            maxCapacity: number;
+        };
         StatusBreakdownDto: {
             /** @example PRESENT */
             status: string;
@@ -1552,14 +1919,6 @@ export interface components {
             noShowRate: number;
             /** @example 10 */
             cancelRate: number;
-        };
-        UtilizationDto: {
-            /** @example pc */
-            inventory: string;
-            /** @example 75.5 */
-            utilizationPercent: number;
-            /** @example 6 */
-            maxCapacity: number;
         };
         DurationBucketDto: {
             /** @example 1h */
@@ -1593,6 +1952,22 @@ export interface components {
             /** @example 3 */
             timesAtCapacity: number;
         };
+        TopUserDto: {
+            /** @example 1 */
+            userId: number;
+            /** @example John Doe */
+            name: string;
+            /** @example john@student.ap.be */
+            email: string;
+            /** @example s123456 */
+            sNumber: string;
+            /** @example 25 */
+            totalReservations: number;
+            /** @example 85 */
+            showRate: number;
+            /** @example 5 */
+            noShowRate: number;
+        };
         ReservationStatisticsDto: {
             dailyCounts: components["schemas"]["DailyCountDto"][];
             weekdayAverages: components["schemas"]["WeekdayCountDto"][];
@@ -1609,22 +1984,6 @@ export interface components {
             newVsReturning: components["schemas"]["NewVsReturningDto"][];
             capacityPressure: components["schemas"]["CapacityPressureDto"][];
             topUsers: components["schemas"]["TopUserDto"][];
-        };
-        TopUserDto: {
-            /** @example 1 */
-            userId: number;
-            /** @example John Doe */
-            name: string;
-            /** @example john@student.ap.be */
-            email: string;
-            /** @example s123456 */
-            sNumber: string;
-            /** @example 25 */
-            totalReservations: number;
-            /** @example 85.0 */
-            showRate: number;
-            /** @example 5.0 */
-            noShowRate: number;
         };
         UserInfoDto: {
             /** @example John Doe */
@@ -1650,11 +2009,11 @@ export interface components {
             user: components["schemas"]["UserInfoDto"];
             /** @example 25 */
             totalReservations: number;
-            /** @example 85.0 */
+            /** @example 85 */
             showRate: number;
-            /** @example 5.0 */
+            /** @example 5 */
             noShowRate: number;
-            /** @example 10.0 */
+            /** @example 10 */
             cancelRate: number;
             /** @example 60 */
             avgDurationMinutes: number;
@@ -2141,6 +2500,169 @@ export interface components {
              */
             points: number;
         };
+        CreateSpeedrunGameDto: {
+            /** @example Super Mario 64 */
+            name: string;
+            /** @example super-mario-64 */
+            slug: string;
+            /** @example Classic N64 platformer */
+            description?: string;
+            /** @example false */
+            hasInGameTimer?: boolean;
+        };
+        UpdateSpeedrunGameDto: {
+            /** @example Super Mario 64 */
+            name?: string;
+            /** @example super-mario-64 */
+            slug?: string;
+            /** @example Classic N64 platformer */
+            description?: string;
+            /** @example true */
+            hasInGameTimer?: boolean;
+        };
+        CreateSpeedrunCategoryDto: {
+            /** @example Any% */
+            name: string;
+            /** @example Complete the game as fast as possible */
+            rules?: string;
+            /**
+             * @example FULL_GAME
+             * @enum {string}
+             */
+            type: "FULL_GAME" | "PER_LEVEL";
+            /**
+             * @description "exactly" or "up_to"
+             * @example exactly
+             */
+            playerType?: string;
+            /** @example 1 */
+            playerCount?: number;
+        };
+        ReorderSpeedrunCategoriesDto: {
+            items: components["schemas"]["ReorderItemDto"][];
+        };
+        UpdateSpeedrunCategoryDto: {
+            /** @example Any% */
+            name?: string;
+            /** @example Complete the game as fast as possible */
+            rules?: string;
+            /** @enum {string} */
+            type?: "FULL_GAME" | "PER_LEVEL";
+            /** @example exactly */
+            playerType?: string;
+            /** @example 1 */
+            playerCount?: number;
+        };
+        CreateSpeedrunLevelDto: {
+            /** @example Bob-omb Battlefield */
+            name: string;
+        };
+        ReorderSpeedrunLevelsDto: {
+            items: components["schemas"]["ReorderItemDto"][];
+        };
+        UpdateSpeedrunLevelDto: {
+            /** @example Bob-omb Battlefield */
+            name?: string;
+        };
+        VariableValueDto: {
+            /** @example N64 */
+            label: string;
+            /** @example false */
+            isDefault?: boolean;
+        };
+        CreateSpeedrunVariableDto: {
+            /** @example Platform */
+            name: string;
+            /** @description Category ID if variable is category-specific, null for game-wide */
+            categoryId?: number;
+            /** @example false */
+            isSubcategory?: boolean;
+            /** @example true */
+            isMandatory?: boolean;
+            /**
+             * @example GLOBAL
+             * @enum {string}
+             */
+            scope?: "GLOBAL" | "FULL_GAME" | "PER_LEVEL";
+            values: components["schemas"]["VariableValueDto"][];
+        };
+        UpdateSpeedrunVariableDto: {
+            /** @example Platform */
+            name?: string;
+            categoryId?: number;
+            /** @example false */
+            isSubcategory?: boolean;
+            /** @example true */
+            isMandatory?: boolean;
+            /** @enum {string} */
+            scope?: "GLOBAL" | "FULL_GAME" | "PER_LEVEL";
+            values?: components["schemas"]["VariableValueDto"][];
+        };
+        RunPlayerDto: {
+            /** @description User ID for registered players */
+            userId?: number;
+            /**
+             * @description Name for unregistered players
+             * @example GuestRunner
+             */
+            guestName?: string;
+        };
+        RunVariableValueDto: {
+            /** @description Variable ID */
+            variableId: number;
+            /** @description Selected value ID */
+            valueId: number;
+        };
+        SubmitSpeedrunRunDto: {
+            /** @description Game ID */
+            gameId: number;
+            /** @description Category ID */
+            categoryId: number;
+            /** @description Level ID (for per-level categories) */
+            levelId?: number;
+            /**
+             * @description Speedrun time in milliseconds
+             * @example 123456
+             */
+            timeMs: number;
+            /**
+             * @description In-game time in milliseconds
+             * @example 120000
+             */
+            inGameTimeMs?: number;
+            /** @example https://youtube.com/watch?v=abc123 */
+            videoUrl: string;
+            /**
+             * @description Rich text description (HTML)
+             * @example <p>Great run!</p>
+             */
+            description?: string;
+            /**
+             * @description Date the run was performed
+             * @example 2026-10-03
+             */
+            runDate: string;
+            players: components["schemas"]["RunPlayerDto"][];
+            variableValues?: components["schemas"]["RunVariableValueDto"][];
+        };
+        UpdateSpeedrunRunDto: {
+            /** @example 123456 */
+            timeMs?: number;
+            /** @example 120000 */
+            inGameTimeMs?: number;
+            /** @example https://youtube.com/watch?v=abc123 */
+            videoUrl?: string;
+            /** @example <p>Great run!</p> */
+            description?: string;
+            /** @example 2026-10-03 */
+            runDate?: string;
+            players?: components["schemas"]["RunPlayerDto"][];
+            variableValues?: components["schemas"]["RunVariableValueDto"][];
+        };
+        RejectSpeedrunRunDto: {
+            /** @example Video does not show the full run */
+            reason: string;
+        };
         GoogleSSOUser: {
             id: number;
             ssoId: string;
@@ -2193,6 +2715,37 @@ export interface components {
             userId: number;
             roleId: number;
         };
+        /** @enum {string} */
+        SpeedrunRunStatus: "PENDING" | "VERIFIED" | "REJECTED";
+        SpeedrunRun: {
+            id: number;
+            gameId: number;
+            categoryId: number;
+            levelId?: number;
+            submitterId: number;
+            timeMs: number;
+            inGameTimeMs?: number;
+            status: components["schemas"]["SpeedrunRunStatus"];
+            verifierId?: number;
+            /** Format: date-time */
+            verifiedAt?: string;
+            rejectionReason?: string;
+            videoUrl: string;
+            description?: string;
+            /** Format: date-time */
+            runDate: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        SpeedrunRunPlayer: {
+            id: number;
+            runId: number;
+            userId?: number;
+            guestName?: string;
+            position: number;
+        };
         UserRelations: {
             reservations: components["schemas"]["Reservation"][];
             adminUsers: components["schemas"]["AdminUser"][];
@@ -2204,6 +2757,9 @@ export interface components {
             timeTrialParticipants: components["schemas"]["TimeTrialParticipant"][];
             pointTrialParticipants: components["schemas"]["PointTrialParticipant"][];
             userRoles: components["schemas"]["UserRole"][];
+            speedrunRunsSubmitted: components["schemas"]["SpeedrunRun"][];
+            speedrunRunsVerified: components["schemas"]["SpeedrunRun"][];
+            speedrunRunPlayers: components["schemas"]["SpeedrunRunPlayer"][];
         };
         User: {
             id: number;
@@ -2419,6 +2975,104 @@ export interface components {
             participant: components["schemas"]["PointTrialParticipant"];
         };
         InventoryAdjustmentRelations: Record<string, never>;
+        /** @enum {string} */
+        SpeedrunCategoryType: "FULL_GAME" | "PER_LEVEL";
+        SpeedrunCategory: {
+            id: number;
+            gameId: number;
+            name: string;
+            rules?: string;
+            type: components["schemas"]["SpeedrunCategoryType"];
+            playerType: string;
+            playerCount: number;
+            position: number;
+        };
+        SpeedrunLevel: {
+            id: number;
+            gameId: number;
+            name: string;
+            position: number;
+        };
+        /** @enum {string} */
+        SpeedrunVariableScope: "GLOBAL" | "FULL_GAME" | "PER_LEVEL";
+        SpeedrunVariable: {
+            id: number;
+            gameId: number;
+            categoryId?: number;
+            name: string;
+            isSubcategory: boolean;
+            isMandatory: boolean;
+            scope: components["schemas"]["SpeedrunVariableScope"];
+            position: number;
+        };
+        SpeedrunGameRelations: {
+            categories: components["schemas"]["SpeedrunCategory"][];
+            levels: components["schemas"]["SpeedrunLevel"][];
+            variables: components["schemas"]["SpeedrunVariable"][];
+            runs: components["schemas"]["SpeedrunRun"][];
+        };
+        SpeedrunGame: {
+            id: number;
+            name: string;
+            slug: string;
+            description?: string;
+            coverImageUrl?: string;
+            hasInGameTimer: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        SpeedrunLevelRelations: {
+            game: components["schemas"]["SpeedrunGame"];
+            runs: components["schemas"]["SpeedrunRun"][];
+        };
+        SpeedrunCategoryRelations: {
+            game: components["schemas"]["SpeedrunGame"];
+            variables: components["schemas"]["SpeedrunVariable"][];
+            runs: components["schemas"]["SpeedrunRun"][];
+        };
+        SpeedrunVariableValue: {
+            id: number;
+            variableId: number;
+            label: string;
+            isDefault: boolean;
+            position: number;
+        };
+        SpeedrunRunVariableValue: {
+            id: number;
+            runId: number;
+            variableId: number;
+            valueId: number;
+        };
+        SpeedrunVariableRelations: {
+            game: components["schemas"]["SpeedrunGame"];
+            category?: components["schemas"]["SpeedrunCategory"];
+            values: components["schemas"]["SpeedrunVariableValue"][];
+            runValues: components["schemas"]["SpeedrunRunVariableValue"][];
+        };
+        SpeedrunVariableValueRelations: {
+            variable: components["schemas"]["SpeedrunVariable"];
+            runValues: components["schemas"]["SpeedrunRunVariableValue"][];
+        };
+        SpeedrunRunRelations: {
+            game: components["schemas"]["SpeedrunGame"];
+            category: components["schemas"]["SpeedrunCategory"];
+            level?: components["schemas"]["SpeedrunLevel"];
+            submitter: components["schemas"]["User"];
+            verifier?: components["schemas"]["User"];
+            players: components["schemas"]["SpeedrunRunPlayer"][];
+            variableValues: components["schemas"]["SpeedrunRunVariableValue"][];
+        };
+        SpeedrunRunPlayerRelations: {
+            run: components["schemas"]["SpeedrunRun"];
+            user?: components["schemas"]["User"];
+        };
+        SpeedrunRunVariableValueRelations: {
+            run: components["schemas"]["SpeedrunRun"];
+            variable: components["schemas"]["SpeedrunVariable"];
+            value: components["schemas"]["SpeedrunVariableValue"];
+        };
         Form: {
             id: number;
             title: string;
@@ -2850,49 +3504,6 @@ export interface operations {
             };
         };
     };
-    ReservationsController_getUserStatistics: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserStatisticsDto"];
-                };
-            };
-        };
-    };
-    ReservationsController_getStatistics: {
-        parameters: {
-            query?: {
-                from?: string;
-                to?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReservationStatisticsDto"];
-                };
-            };
-        };
-    };
     ReservationsController_findAll: {
         parameters: {
             query?: {
@@ -3024,6 +3635,58 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InventoryAdjustmentSlotDto"][];
+                };
+            };
+        };
+    };
+    ReservationsController_getStatistics: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationStatisticsDto"];
+                };
+            };
+        };
+    };
+    ReservationsController_getUserStatistics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserStatisticsDto"];
+                };
+            };
+            /** @description User not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
                 };
             };
         };
@@ -5203,6 +5866,618 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HttpExceptionDto"];
                 };
+            };
+        };
+    };
+    SpeedrunGamesController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunGamesController_createGame: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSpeedrunGameDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    SpeedrunGamesController_findBySlug: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Game not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    SpeedrunGamesController_deleteGame: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    SpeedrunGamesController_updateGame: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSpeedrunGameDto"];
+            };
+        };
+        responses: {
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    SpeedrunGamesController_uploadCover: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunGamesController_createCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSpeedrunCategoryDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunGamesController_reorderCategories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderSpeedrunCategoriesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunGamesController_deleteCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunGamesController_updateCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSpeedrunCategoryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunGamesController_createLevel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSpeedrunLevelDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunGamesController_reorderLevels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderSpeedrunLevelsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunGamesController_deleteLevel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunGamesController_updateLevel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSpeedrunLevelDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunGamesController_createVariable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSpeedrunVariableDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunGamesController_deleteVariable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunGamesController_updateVariable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSpeedrunVariableDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunRunsController_getLeaderboard: {
+        parameters: {
+            query: {
+                categoryId: number;
+                levelId?: number;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    SpeedrunRunsController_findPending: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunRunsController_findMyRuns: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunRunsController_findPendingByGame: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunRunsController_findById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    SpeedrunRunsController_deleteRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunRunsController_updateRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSpeedrunRunDto"];
+            };
+        };
+        responses: {
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    SpeedrunRunsController_submitRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubmitSpeedrunRunDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    SpeedrunRunsController_verifyRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunRunsController_rejectRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejectSpeedrunRunDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpeedrunRunsController_adminDeleteRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

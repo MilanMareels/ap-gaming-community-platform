@@ -411,7 +411,15 @@ export const ModelName = {
   PointTrial: 'PointTrial',
   PointTrialParticipant: 'PointTrialParticipant',
   PointTrialEntry: 'PointTrialEntry',
-  InventoryAdjustment: 'InventoryAdjustment'
+  InventoryAdjustment: 'InventoryAdjustment',
+  SpeedrunGame: 'SpeedrunGame',
+  SpeedrunLevel: 'SpeedrunLevel',
+  SpeedrunCategory: 'SpeedrunCategory',
+  SpeedrunVariable: 'SpeedrunVariable',
+  SpeedrunVariableValue: 'SpeedrunVariableValue',
+  SpeedrunRun: 'SpeedrunRun',
+  SpeedrunRunPlayer: 'SpeedrunRunPlayer',
+  SpeedrunRunVariableValue: 'SpeedrunRunVariableValue'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -427,7 +435,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "adminUser" | "googleSSOUser" | "microsoftSSOUser" | "role" | "permission" | "rolePermission" | "userRole" | "setting" | "form" | "navLink" | "rosterGame" | "rosterEntry" | "reservation" | "timeTableEntry" | "event" | "bracket" | "bracketParticipant" | "bracketMatch" | "bracketMatchParticipant" | "eventRegistration" | "timeTrial" | "timeTrialParticipant" | "timeTrialRun" | "pointTrial" | "pointTrialParticipant" | "pointTrialEntry" | "inventoryAdjustment"
+    modelProps: "user" | "adminUser" | "googleSSOUser" | "microsoftSSOUser" | "role" | "permission" | "rolePermission" | "userRole" | "setting" | "form" | "navLink" | "rosterGame" | "rosterEntry" | "reservation" | "timeTableEntry" | "event" | "bracket" | "bracketParticipant" | "bracketMatch" | "bracketMatchParticipant" | "eventRegistration" | "timeTrial" | "timeTrialParticipant" | "timeTrialRun" | "pointTrial" | "pointTrialParticipant" | "pointTrialEntry" | "inventoryAdjustment" | "speedrunGame" | "speedrunLevel" | "speedrunCategory" | "speedrunVariable" | "speedrunVariableValue" | "speedrunRun" | "speedrunRunPlayer" | "speedrunRunVariableValue"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2503,6 +2511,598 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SpeedrunGame: {
+      payload: Prisma.$SpeedrunGamePayload<ExtArgs>
+      fields: Prisma.SpeedrunGameFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SpeedrunGameFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunGamePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SpeedrunGameFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunGamePayload>
+        }
+        findFirst: {
+          args: Prisma.SpeedrunGameFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunGamePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SpeedrunGameFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunGamePayload>
+        }
+        findMany: {
+          args: Prisma.SpeedrunGameFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunGamePayload>[]
+        }
+        create: {
+          args: Prisma.SpeedrunGameCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunGamePayload>
+        }
+        createMany: {
+          args: Prisma.SpeedrunGameCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SpeedrunGameCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunGamePayload>[]
+        }
+        delete: {
+          args: Prisma.SpeedrunGameDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunGamePayload>
+        }
+        update: {
+          args: Prisma.SpeedrunGameUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunGamePayload>
+        }
+        deleteMany: {
+          args: Prisma.SpeedrunGameDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SpeedrunGameUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SpeedrunGameUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunGamePayload>[]
+        }
+        upsert: {
+          args: Prisma.SpeedrunGameUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunGamePayload>
+        }
+        aggregate: {
+          args: Prisma.SpeedrunGameAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSpeedrunGame>
+        }
+        groupBy: {
+          args: Prisma.SpeedrunGameGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunGameGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SpeedrunGameCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunGameCountAggregateOutputType> | number
+        }
+      }
+    }
+    SpeedrunLevel: {
+      payload: Prisma.$SpeedrunLevelPayload<ExtArgs>
+      fields: Prisma.SpeedrunLevelFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SpeedrunLevelFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunLevelPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SpeedrunLevelFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunLevelPayload>
+        }
+        findFirst: {
+          args: Prisma.SpeedrunLevelFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunLevelPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SpeedrunLevelFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunLevelPayload>
+        }
+        findMany: {
+          args: Prisma.SpeedrunLevelFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunLevelPayload>[]
+        }
+        create: {
+          args: Prisma.SpeedrunLevelCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunLevelPayload>
+        }
+        createMany: {
+          args: Prisma.SpeedrunLevelCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SpeedrunLevelCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunLevelPayload>[]
+        }
+        delete: {
+          args: Prisma.SpeedrunLevelDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunLevelPayload>
+        }
+        update: {
+          args: Prisma.SpeedrunLevelUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunLevelPayload>
+        }
+        deleteMany: {
+          args: Prisma.SpeedrunLevelDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SpeedrunLevelUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SpeedrunLevelUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunLevelPayload>[]
+        }
+        upsert: {
+          args: Prisma.SpeedrunLevelUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunLevelPayload>
+        }
+        aggregate: {
+          args: Prisma.SpeedrunLevelAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSpeedrunLevel>
+        }
+        groupBy: {
+          args: Prisma.SpeedrunLevelGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunLevelGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SpeedrunLevelCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunLevelCountAggregateOutputType> | number
+        }
+      }
+    }
+    SpeedrunCategory: {
+      payload: Prisma.$SpeedrunCategoryPayload<ExtArgs>
+      fields: Prisma.SpeedrunCategoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SpeedrunCategoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunCategoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SpeedrunCategoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunCategoryPayload>
+        }
+        findFirst: {
+          args: Prisma.SpeedrunCategoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunCategoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SpeedrunCategoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunCategoryPayload>
+        }
+        findMany: {
+          args: Prisma.SpeedrunCategoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunCategoryPayload>[]
+        }
+        create: {
+          args: Prisma.SpeedrunCategoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunCategoryPayload>
+        }
+        createMany: {
+          args: Prisma.SpeedrunCategoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SpeedrunCategoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunCategoryPayload>[]
+        }
+        delete: {
+          args: Prisma.SpeedrunCategoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunCategoryPayload>
+        }
+        update: {
+          args: Prisma.SpeedrunCategoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunCategoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.SpeedrunCategoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SpeedrunCategoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SpeedrunCategoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunCategoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.SpeedrunCategoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunCategoryPayload>
+        }
+        aggregate: {
+          args: Prisma.SpeedrunCategoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSpeedrunCategory>
+        }
+        groupBy: {
+          args: Prisma.SpeedrunCategoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunCategoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SpeedrunCategoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunCategoryCountAggregateOutputType> | number
+        }
+      }
+    }
+    SpeedrunVariable: {
+      payload: Prisma.$SpeedrunVariablePayload<ExtArgs>
+      fields: Prisma.SpeedrunVariableFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SpeedrunVariableFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariablePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SpeedrunVariableFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariablePayload>
+        }
+        findFirst: {
+          args: Prisma.SpeedrunVariableFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariablePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SpeedrunVariableFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariablePayload>
+        }
+        findMany: {
+          args: Prisma.SpeedrunVariableFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariablePayload>[]
+        }
+        create: {
+          args: Prisma.SpeedrunVariableCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariablePayload>
+        }
+        createMany: {
+          args: Prisma.SpeedrunVariableCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SpeedrunVariableCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariablePayload>[]
+        }
+        delete: {
+          args: Prisma.SpeedrunVariableDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariablePayload>
+        }
+        update: {
+          args: Prisma.SpeedrunVariableUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariablePayload>
+        }
+        deleteMany: {
+          args: Prisma.SpeedrunVariableDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SpeedrunVariableUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SpeedrunVariableUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariablePayload>[]
+        }
+        upsert: {
+          args: Prisma.SpeedrunVariableUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariablePayload>
+        }
+        aggregate: {
+          args: Prisma.SpeedrunVariableAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSpeedrunVariable>
+        }
+        groupBy: {
+          args: Prisma.SpeedrunVariableGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunVariableGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SpeedrunVariableCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunVariableCountAggregateOutputType> | number
+        }
+      }
+    }
+    SpeedrunVariableValue: {
+      payload: Prisma.$SpeedrunVariableValuePayload<ExtArgs>
+      fields: Prisma.SpeedrunVariableValueFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SpeedrunVariableValueFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariableValuePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SpeedrunVariableValueFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariableValuePayload>
+        }
+        findFirst: {
+          args: Prisma.SpeedrunVariableValueFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariableValuePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SpeedrunVariableValueFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariableValuePayload>
+        }
+        findMany: {
+          args: Prisma.SpeedrunVariableValueFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariableValuePayload>[]
+        }
+        create: {
+          args: Prisma.SpeedrunVariableValueCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariableValuePayload>
+        }
+        createMany: {
+          args: Prisma.SpeedrunVariableValueCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SpeedrunVariableValueCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariableValuePayload>[]
+        }
+        delete: {
+          args: Prisma.SpeedrunVariableValueDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariableValuePayload>
+        }
+        update: {
+          args: Prisma.SpeedrunVariableValueUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariableValuePayload>
+        }
+        deleteMany: {
+          args: Prisma.SpeedrunVariableValueDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SpeedrunVariableValueUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SpeedrunVariableValueUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariableValuePayload>[]
+        }
+        upsert: {
+          args: Prisma.SpeedrunVariableValueUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunVariableValuePayload>
+        }
+        aggregate: {
+          args: Prisma.SpeedrunVariableValueAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSpeedrunVariableValue>
+        }
+        groupBy: {
+          args: Prisma.SpeedrunVariableValueGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunVariableValueGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SpeedrunVariableValueCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunVariableValueCountAggregateOutputType> | number
+        }
+      }
+    }
+    SpeedrunRun: {
+      payload: Prisma.$SpeedrunRunPayload<ExtArgs>
+      fields: Prisma.SpeedrunRunFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SpeedrunRunFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SpeedrunRunFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPayload>
+        }
+        findFirst: {
+          args: Prisma.SpeedrunRunFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SpeedrunRunFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPayload>
+        }
+        findMany: {
+          args: Prisma.SpeedrunRunFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPayload>[]
+        }
+        create: {
+          args: Prisma.SpeedrunRunCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPayload>
+        }
+        createMany: {
+          args: Prisma.SpeedrunRunCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SpeedrunRunCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPayload>[]
+        }
+        delete: {
+          args: Prisma.SpeedrunRunDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPayload>
+        }
+        update: {
+          args: Prisma.SpeedrunRunUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPayload>
+        }
+        deleteMany: {
+          args: Prisma.SpeedrunRunDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SpeedrunRunUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SpeedrunRunUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPayload>[]
+        }
+        upsert: {
+          args: Prisma.SpeedrunRunUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPayload>
+        }
+        aggregate: {
+          args: Prisma.SpeedrunRunAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSpeedrunRun>
+        }
+        groupBy: {
+          args: Prisma.SpeedrunRunGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunRunGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SpeedrunRunCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunRunCountAggregateOutputType> | number
+        }
+      }
+    }
+    SpeedrunRunPlayer: {
+      payload: Prisma.$SpeedrunRunPlayerPayload<ExtArgs>
+      fields: Prisma.SpeedrunRunPlayerFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SpeedrunRunPlayerFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPlayerPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SpeedrunRunPlayerFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPlayerPayload>
+        }
+        findFirst: {
+          args: Prisma.SpeedrunRunPlayerFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPlayerPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SpeedrunRunPlayerFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPlayerPayload>
+        }
+        findMany: {
+          args: Prisma.SpeedrunRunPlayerFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPlayerPayload>[]
+        }
+        create: {
+          args: Prisma.SpeedrunRunPlayerCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPlayerPayload>
+        }
+        createMany: {
+          args: Prisma.SpeedrunRunPlayerCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SpeedrunRunPlayerCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPlayerPayload>[]
+        }
+        delete: {
+          args: Prisma.SpeedrunRunPlayerDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPlayerPayload>
+        }
+        update: {
+          args: Prisma.SpeedrunRunPlayerUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPlayerPayload>
+        }
+        deleteMany: {
+          args: Prisma.SpeedrunRunPlayerDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SpeedrunRunPlayerUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SpeedrunRunPlayerUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPlayerPayload>[]
+        }
+        upsert: {
+          args: Prisma.SpeedrunRunPlayerUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunPlayerPayload>
+        }
+        aggregate: {
+          args: Prisma.SpeedrunRunPlayerAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSpeedrunRunPlayer>
+        }
+        groupBy: {
+          args: Prisma.SpeedrunRunPlayerGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunRunPlayerGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SpeedrunRunPlayerCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunRunPlayerCountAggregateOutputType> | number
+        }
+      }
+    }
+    SpeedrunRunVariableValue: {
+      payload: Prisma.$SpeedrunRunVariableValuePayload<ExtArgs>
+      fields: Prisma.SpeedrunRunVariableValueFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SpeedrunRunVariableValueFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunVariableValuePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SpeedrunRunVariableValueFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunVariableValuePayload>
+        }
+        findFirst: {
+          args: Prisma.SpeedrunRunVariableValueFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunVariableValuePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SpeedrunRunVariableValueFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunVariableValuePayload>
+        }
+        findMany: {
+          args: Prisma.SpeedrunRunVariableValueFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunVariableValuePayload>[]
+        }
+        create: {
+          args: Prisma.SpeedrunRunVariableValueCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunVariableValuePayload>
+        }
+        createMany: {
+          args: Prisma.SpeedrunRunVariableValueCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SpeedrunRunVariableValueCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunVariableValuePayload>[]
+        }
+        delete: {
+          args: Prisma.SpeedrunRunVariableValueDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunVariableValuePayload>
+        }
+        update: {
+          args: Prisma.SpeedrunRunVariableValueUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunVariableValuePayload>
+        }
+        deleteMany: {
+          args: Prisma.SpeedrunRunVariableValueDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SpeedrunRunVariableValueUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SpeedrunRunVariableValueUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunVariableValuePayload>[]
+        }
+        upsert: {
+          args: Prisma.SpeedrunRunVariableValueUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SpeedrunRunVariableValuePayload>
+        }
+        aggregate: {
+          args: Prisma.SpeedrunRunVariableValueAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSpeedrunRunVariableValue>
+        }
+        groupBy: {
+          args: Prisma.SpeedrunRunVariableValueGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunRunVariableValueGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SpeedrunRunVariableValueCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SpeedrunRunVariableValueCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2863,6 +3463,112 @@ export const InventoryAdjustmentScalarFieldEnum = {
 export type InventoryAdjustmentScalarFieldEnum = (typeof InventoryAdjustmentScalarFieldEnum)[keyof typeof InventoryAdjustmentScalarFieldEnum]
 
 
+export const SpeedrunGameScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  coverImageUrl: 'coverImageUrl',
+  hasInGameTimer: 'hasInGameTimer',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SpeedrunGameScalarFieldEnum = (typeof SpeedrunGameScalarFieldEnum)[keyof typeof SpeedrunGameScalarFieldEnum]
+
+
+export const SpeedrunLevelScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  name: 'name',
+  position: 'position'
+} as const
+
+export type SpeedrunLevelScalarFieldEnum = (typeof SpeedrunLevelScalarFieldEnum)[keyof typeof SpeedrunLevelScalarFieldEnum]
+
+
+export const SpeedrunCategoryScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  name: 'name',
+  rules: 'rules',
+  type: 'type',
+  playerType: 'playerType',
+  playerCount: 'playerCount',
+  position: 'position'
+} as const
+
+export type SpeedrunCategoryScalarFieldEnum = (typeof SpeedrunCategoryScalarFieldEnum)[keyof typeof SpeedrunCategoryScalarFieldEnum]
+
+
+export const SpeedrunVariableScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  categoryId: 'categoryId',
+  name: 'name',
+  isSubcategory: 'isSubcategory',
+  isMandatory: 'isMandatory',
+  scope: 'scope',
+  position: 'position'
+} as const
+
+export type SpeedrunVariableScalarFieldEnum = (typeof SpeedrunVariableScalarFieldEnum)[keyof typeof SpeedrunVariableScalarFieldEnum]
+
+
+export const SpeedrunVariableValueScalarFieldEnum = {
+  id: 'id',
+  variableId: 'variableId',
+  label: 'label',
+  isDefault: 'isDefault',
+  position: 'position'
+} as const
+
+export type SpeedrunVariableValueScalarFieldEnum = (typeof SpeedrunVariableValueScalarFieldEnum)[keyof typeof SpeedrunVariableValueScalarFieldEnum]
+
+
+export const SpeedrunRunScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  categoryId: 'categoryId',
+  levelId: 'levelId',
+  submitterId: 'submitterId',
+  timeMs: 'timeMs',
+  inGameTimeMs: 'inGameTimeMs',
+  status: 'status',
+  verifierId: 'verifierId',
+  verifiedAt: 'verifiedAt',
+  rejectionReason: 'rejectionReason',
+  videoUrl: 'videoUrl',
+  description: 'description',
+  runDate: 'runDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SpeedrunRunScalarFieldEnum = (typeof SpeedrunRunScalarFieldEnum)[keyof typeof SpeedrunRunScalarFieldEnum]
+
+
+export const SpeedrunRunPlayerScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  userId: 'userId',
+  guestName: 'guestName',
+  position: 'position'
+} as const
+
+export type SpeedrunRunPlayerScalarFieldEnum = (typeof SpeedrunRunPlayerScalarFieldEnum)[keyof typeof SpeedrunRunPlayerScalarFieldEnum]
+
+
+export const SpeedrunRunVariableValueScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  variableId: 'variableId',
+  valueId: 'valueId'
+} as const
+
+export type SpeedrunRunVariableValueScalarFieldEnum = (typeof SpeedrunRunVariableValueScalarFieldEnum)[keyof typeof SpeedrunRunVariableValueScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -3055,6 +3761,48 @@ export type ListEnumPointTrialStatusFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'SpeedrunCategoryType'
+ */
+export type EnumSpeedrunCategoryTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SpeedrunCategoryType'>
+    
+
+
+/**
+ * Reference to a field of type 'SpeedrunCategoryType[]'
+ */
+export type ListEnumSpeedrunCategoryTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SpeedrunCategoryType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SpeedrunVariableScope'
+ */
+export type EnumSpeedrunVariableScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SpeedrunVariableScope'>
+    
+
+
+/**
+ * Reference to a field of type 'SpeedrunVariableScope[]'
+ */
+export type ListEnumSpeedrunVariableScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SpeedrunVariableScope[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SpeedrunRunStatus'
+ */
+export type EnumSpeedrunRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SpeedrunRunStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SpeedrunRunStatus[]'
+ */
+export type ListEnumSpeedrunRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SpeedrunRunStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -3190,6 +3938,14 @@ export type GlobalOmitConfig = {
   pointTrialParticipant?: Prisma.PointTrialParticipantOmit
   pointTrialEntry?: Prisma.PointTrialEntryOmit
   inventoryAdjustment?: Prisma.InventoryAdjustmentOmit
+  speedrunGame?: Prisma.SpeedrunGameOmit
+  speedrunLevel?: Prisma.SpeedrunLevelOmit
+  speedrunCategory?: Prisma.SpeedrunCategoryOmit
+  speedrunVariable?: Prisma.SpeedrunVariableOmit
+  speedrunVariableValue?: Prisma.SpeedrunVariableValueOmit
+  speedrunRun?: Prisma.SpeedrunRunOmit
+  speedrunRunPlayer?: Prisma.SpeedrunRunPlayerOmit
+  speedrunRunVariableValue?: Prisma.SpeedrunRunVariableValueOmit
 }
 
 /* Types for Logging */

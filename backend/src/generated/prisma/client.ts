@@ -181,3 +181,43 @@ export type PointTrialEntry = Prisma.PointTrialEntryModel
  * 
  */
 export type InventoryAdjustment = Prisma.InventoryAdjustmentModel
+/**
+ * Model SpeedrunGame
+ * 
+ */
+export type SpeedrunGame = Prisma.SpeedrunGameModel
+/**
+ * Model SpeedrunLevel
+ * 
+ */
+export type SpeedrunLevel = Prisma.SpeedrunLevelModel
+/**
+ * Model SpeedrunCategory
+ * 
+ */
+export type SpeedrunCategory = Prisma.SpeedrunCategoryModel
+/**
+ * Model SpeedrunVariable
+ * 
+ */
+export type SpeedrunVariable = Prisma.SpeedrunVariableModel
+/**
+ * Model SpeedrunVariableValue
+ * 
+ */
+export type SpeedrunVariableValue = Prisma.SpeedrunVariableValueModel
+/**
+ * Model SpeedrunRun
+ * 
+ */
+export type SpeedrunRun = Prisma.SpeedrunRunModel
+/**
+ * Model SpeedrunRunPlayer
+ * 
+ */
+export type SpeedrunRunPlayer = Prisma.SpeedrunRunPlayerModel
+/**
+ * Model SpeedrunRunVariableValue
+ * 
+ */
+export type SpeedrunRunVariableValue = Prisma.SpeedrunRunVariableValueModel

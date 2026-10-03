@@ -79,3 +79,29 @@ export const PointTrialStatus = {
 } as const
 
 export type PointTrialStatus = (typeof PointTrialStatus)[keyof typeof PointTrialStatus]
+
+
+export const SpeedrunCategoryType = {
+  FULL_GAME: 'FULL_GAME',
+  PER_LEVEL: 'PER_LEVEL'
+} as const
+
+export type SpeedrunCategoryType = (typeof SpeedrunCategoryType)[keyof typeof SpeedrunCategoryType]
+
+
+export const SpeedrunVariableScope = {
+  GLOBAL: 'GLOBAL',
+  FULL_GAME: 'FULL_GAME',
+  PER_LEVEL: 'PER_LEVEL'
+} as const
+
+export type SpeedrunVariableScope = (typeof SpeedrunVariableScope)[keyof typeof SpeedrunVariableScope]
+
+
+export const SpeedrunRunStatus = {
+  PENDING: 'PENDING',
+  VERIFIED: 'VERIFIED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type SpeedrunRunStatus = (typeof SpeedrunRunStatus)[keyof typeof SpeedrunRunStatus]

@@ -32,6 +32,7 @@ const TABS = [
   { id: 'users', label: 'Gebruikers', href: '/admin/users', permissions: ['users.manage'] },
   { id: 'navigation', label: 'Navigatie', href: '/admin/navigation', permissions: ['navigation.manage'] },
   { id: 'roles', label: 'Rollen', href: '/admin/roles', permissions: ['roles.manage'] },
+  { id: 'speedruns', label: 'Speedruns', href: '/admin/speedruns', permissions: ['speedruns.manage', 'speedruns.review'] },
   { id: 'statistics', label: 'Statistieken', href: '/admin/statistics', permissions: ['statistics.view'] },
   { id: 'settings', label: 'Instellingen', href: '/admin/settings', permissions: ['settings.manage'] },
 ];

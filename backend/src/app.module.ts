@@ -13,6 +13,7 @@ import { TimeTrialsModule } from './modules/time-trials/time-trials.module.js';
 import { PointTrialsModule } from './modules/point-trials/point-trials.module.js';
 import { RbacModule } from './modules/rbac/rbac.module.js';
 import { InventoryAdjustmentsModule } from './modules/inventory-adjustments/inventory-adjustments.module.js';
+import { SpeedrunsModule } from './modules/speedruns/speedruns.module.js';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { InventoryAdjustmentsModule } from './modules/inventory-adjustments/inve
     TimeTrialsModule,
     PointTrialsModule,
     InventoryAdjustmentsModule,
+    SpeedrunsModule,
   ],
   controllers: [],
   providers: [],

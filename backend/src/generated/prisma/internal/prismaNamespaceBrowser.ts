@@ -78,7 +78,15 @@ export const ModelName = {
   PointTrial: 'PointTrial',
   PointTrialParticipant: 'PointTrialParticipant',
   PointTrialEntry: 'PointTrialEntry',
-  InventoryAdjustment: 'InventoryAdjustment'
+  InventoryAdjustment: 'InventoryAdjustment',
+  SpeedrunGame: 'SpeedrunGame',
+  SpeedrunLevel: 'SpeedrunLevel',
+  SpeedrunCategory: 'SpeedrunCategory',
+  SpeedrunVariable: 'SpeedrunVariable',
+  SpeedrunVariableValue: 'SpeedrunVariableValue',
+  SpeedrunRun: 'SpeedrunRun',
+  SpeedrunRunPlayer: 'SpeedrunRunPlayer',
+  SpeedrunRunVariableValue: 'SpeedrunRunVariableValue'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -416,6 +424,112 @@ export const InventoryAdjustmentScalarFieldEnum = {
 } as const
 
 export type InventoryAdjustmentScalarFieldEnum = (typeof InventoryAdjustmentScalarFieldEnum)[keyof typeof InventoryAdjustmentScalarFieldEnum]
+
+
+export const SpeedrunGameScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  coverImageUrl: 'coverImageUrl',
+  hasInGameTimer: 'hasInGameTimer',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SpeedrunGameScalarFieldEnum = (typeof SpeedrunGameScalarFieldEnum)[keyof typeof SpeedrunGameScalarFieldEnum]
+
+
+export const SpeedrunLevelScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  name: 'name',
+  position: 'position'
+} as const
+
+export type SpeedrunLevelScalarFieldEnum = (typeof SpeedrunLevelScalarFieldEnum)[keyof typeof SpeedrunLevelScalarFieldEnum]
+
+
+export const SpeedrunCategoryScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  name: 'name',
+  rules: 'rules',
+  type: 'type',
+  playerType: 'playerType',
+  playerCount: 'playerCount',
+  position: 'position'
+} as const
+
+export type SpeedrunCategoryScalarFieldEnum = (typeof SpeedrunCategoryScalarFieldEnum)[keyof typeof SpeedrunCategoryScalarFieldEnum]
+
+
+export const SpeedrunVariableScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  categoryId: 'categoryId',
+  name: 'name',
+  isSubcategory: 'isSubcategory',
+  isMandatory: 'isMandatory',
+  scope: 'scope',
+  position: 'position'
+} as const
+
+export type SpeedrunVariableScalarFieldEnum = (typeof SpeedrunVariableScalarFieldEnum)[keyof typeof SpeedrunVariableScalarFieldEnum]
+
+
+export const SpeedrunVariableValueScalarFieldEnum = {
+  id: 'id',
+  variableId: 'variableId',
+  label: 'label',
+  isDefault: 'isDefault',
+  position: 'position'
+} as const
+
+export type SpeedrunVariableValueScalarFieldEnum = (typeof SpeedrunVariableValueScalarFieldEnum)[keyof typeof SpeedrunVariableValueScalarFieldEnum]
+
+
+export const SpeedrunRunScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  categoryId: 'categoryId',
+  levelId: 'levelId',
+  submitterId: 'submitterId',
+  timeMs: 'timeMs',
+  inGameTimeMs: 'inGameTimeMs',
+  status: 'status',
+  verifierId: 'verifierId',
+  verifiedAt: 'verifiedAt',
+  rejectionReason: 'rejectionReason',
+  videoUrl: 'videoUrl',
+  description: 'description',
+  runDate: 'runDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SpeedrunRunScalarFieldEnum = (typeof SpeedrunRunScalarFieldEnum)[keyof typeof SpeedrunRunScalarFieldEnum]
+
+
+export const SpeedrunRunPlayerScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  userId: 'userId',
+  guestName: 'guestName',
+  position: 'position'
+} as const
+
+export type SpeedrunRunPlayerScalarFieldEnum = (typeof SpeedrunRunPlayerScalarFieldEnum)[keyof typeof SpeedrunRunPlayerScalarFieldEnum]
+
+
+export const SpeedrunRunVariableValueScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  variableId: 'variableId',
+  valueId: 'valueId'
+} as const
+
+export type SpeedrunRunVariableValueScalarFieldEnum = (typeof SpeedrunRunVariableValueScalarFieldEnum)[keyof typeof SpeedrunRunVariableValueScalarFieldEnum]
 
 
 export const SortOrder = {

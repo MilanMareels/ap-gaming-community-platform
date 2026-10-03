@@ -26,6 +26,14 @@ import { PointTrialRelations as _PointTrialRelations } from './point_trial_relat
 import { PointTrialParticipantRelations as _PointTrialParticipantRelations } from './point_trial_participant_relations.js';
 import { PointTrialEntryRelations as _PointTrialEntryRelations } from './point_trial_entry_relations.js';
 import { InventoryAdjustmentRelations as _InventoryAdjustmentRelations } from './inventory_adjustment_relations.js';
+import { SpeedrunGameRelations as _SpeedrunGameRelations } from './speedrun_game_relations.js';
+import { SpeedrunLevelRelations as _SpeedrunLevelRelations } from './speedrun_level_relations.js';
+import { SpeedrunCategoryRelations as _SpeedrunCategoryRelations } from './speedrun_category_relations.js';
+import { SpeedrunVariableRelations as _SpeedrunVariableRelations } from './speedrun_variable_relations.js';
+import { SpeedrunVariableValueRelations as _SpeedrunVariableValueRelations } from './speedrun_variable_value_relations.js';
+import { SpeedrunRunRelations as _SpeedrunRunRelations } from './speedrun_run_relations.js';
+import { SpeedrunRunPlayerRelations as _SpeedrunRunPlayerRelations } from './speedrun_run_player_relations.js';
+import { SpeedrunRunVariableValueRelations as _SpeedrunRunVariableValueRelations } from './speedrun_run_variable_value_relations.js';
 import { User as _User } from './user.js';
 import { AdminUser as _AdminUser } from './admin_user.js';
 import { GoogleSSOUser as _GoogleSSOUser } from './google_s_s_o_user.js';
@@ -54,6 +62,14 @@ import { PointTrial as _PointTrial } from './point_trial.js';
 import { PointTrialParticipant as _PointTrialParticipant } from './point_trial_participant.js';
 import { PointTrialEntry as _PointTrialEntry } from './point_trial_entry.js';
 import { InventoryAdjustment as _InventoryAdjustment } from './inventory_adjustment.js';
+import { SpeedrunGame as _SpeedrunGame } from './speedrun_game.js';
+import { SpeedrunLevel as _SpeedrunLevel } from './speedrun_level.js';
+import { SpeedrunCategory as _SpeedrunCategory } from './speedrun_category.js';
+import { SpeedrunVariable as _SpeedrunVariable } from './speedrun_variable.js';
+import { SpeedrunVariableValue as _SpeedrunVariableValue } from './speedrun_variable_value.js';
+import { SpeedrunRun as _SpeedrunRun } from './speedrun_run.js';
+import { SpeedrunRunPlayer as _SpeedrunRunPlayer } from './speedrun_run_player.js';
+import { SpeedrunRunVariableValue as _SpeedrunRunVariableValue } from './speedrun_run_variable_value.js';
 
 export namespace PrismaModel {
   export class UserRelations extends _UserRelations {}
@@ -84,6 +100,14 @@ export namespace PrismaModel {
   export class PointTrialParticipantRelations extends _PointTrialParticipantRelations {}
   export class PointTrialEntryRelations extends _PointTrialEntryRelations {}
   export class InventoryAdjustmentRelations extends _InventoryAdjustmentRelations {}
+  export class SpeedrunGameRelations extends _SpeedrunGameRelations {}
+  export class SpeedrunLevelRelations extends _SpeedrunLevelRelations {}
+  export class SpeedrunCategoryRelations extends _SpeedrunCategoryRelations {}
+  export class SpeedrunVariableRelations extends _SpeedrunVariableRelations {}
+  export class SpeedrunVariableValueRelations extends _SpeedrunVariableValueRelations {}
+  export class SpeedrunRunRelations extends _SpeedrunRunRelations {}
+  export class SpeedrunRunPlayerRelations extends _SpeedrunRunPlayerRelations {}
+  export class SpeedrunRunVariableValueRelations extends _SpeedrunRunVariableValueRelations {}
   export class User extends _User {}
   export class AdminUser extends _AdminUser {}
   export class GoogleSSOUser extends _GoogleSSOUser {}
@@ -112,6 +136,14 @@ export namespace PrismaModel {
   export class PointTrialParticipant extends _PointTrialParticipant {}
   export class PointTrialEntry extends _PointTrialEntry {}
   export class InventoryAdjustment extends _InventoryAdjustment {}
+  export class SpeedrunGame extends _SpeedrunGame {}
+  export class SpeedrunLevel extends _SpeedrunLevel {}
+  export class SpeedrunCategory extends _SpeedrunCategory {}
+  export class SpeedrunVariable extends _SpeedrunVariable {}
+  export class SpeedrunVariableValue extends _SpeedrunVariableValue {}
+  export class SpeedrunRun extends _SpeedrunRun {}
+  export class SpeedrunRunPlayer extends _SpeedrunRunPlayer {}
+  export class SpeedrunRunVariableValue extends _SpeedrunRunVariableValue {}
 
   export const extraModels = [
     UserRelations,
@@ -142,6 +174,14 @@ export namespace PrismaModel {
     PointTrialParticipantRelations,
     PointTrialEntryRelations,
     InventoryAdjustmentRelations,
+    SpeedrunGameRelations,
+    SpeedrunLevelRelations,
+    SpeedrunCategoryRelations,
+    SpeedrunVariableRelations,
+    SpeedrunVariableValueRelations,
+    SpeedrunRunRelations,
+    SpeedrunRunPlayerRelations,
+    SpeedrunRunVariableValueRelations,
     User,
     AdminUser,
     GoogleSSOUser,
@@ -170,5 +210,13 @@ export namespace PrismaModel {
     PointTrialParticipant,
     PointTrialEntry,
     InventoryAdjustment,
+    SpeedrunGame,
+    SpeedrunLevel,
+    SpeedrunCategory,
+    SpeedrunVariable,
+    SpeedrunVariableValue,
+    SpeedrunRun,
+    SpeedrunRunPlayer,
+    SpeedrunRunVariableValue,
   ];
 }
