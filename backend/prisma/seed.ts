@@ -26,6 +26,7 @@ const PERMISSIONS = [
   { key: 'point-trials.manage', description: 'Manage point trials' },
   { key: 'roles.manage', description: 'Manage roles and permissions' },
   { key: 'inventory-adjustments.manage', description: 'Manage inventory adjustments' },
+  { key: 'statistics.view', description: 'View reservation statistics and insights' },
 ];
 
 async function seedPermissionsAndRoles() {

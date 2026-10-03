@@ -63,6 +63,8 @@ export type UpdateNavLinkDto = ApiSchemas['UpdateNavLinkDto'];
 export type ReorderNavLinksDto = ApiSchemas['ReorderNavLinksDto'];
 
 export type InventoryAdjustment = ApiSchemas['InventoryAdjustment'];
+export type ReservationStatistics = ApiSchemas['ReservationStatisticsDto'];
+export type UserStatistics = ApiSchemas['UserStatisticsDto'];
 export type InventoryAdjustmentSlot = ApiSchemas['InventoryAdjustmentSlotDto'];
 export type CreateInventoryAdjustmentDto = ApiSchemas['CreateInventoryAdjustmentDto'];
 export type UpdateInventoryAdjustmentDto = ApiSchemas['UpdateInventoryAdjustmentDto'];

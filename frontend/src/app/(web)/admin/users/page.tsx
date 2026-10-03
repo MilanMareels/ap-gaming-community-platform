@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ShieldCheck, ShieldOff, Trash2, Unlink, Pencil, X, Loader2, Users, Search, Shield } from 'lucide-react';
+import { ShieldCheck, ShieldOff, Trash2, Unlink, Pencil, X, Loader2, Users, Search, Shield, BarChart3 } from 'lucide-react';
+import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { getApiErrorMessage } from '@/util/api-error';
@@ -177,9 +178,16 @@ export default function AdminUsersPage() {
                       {u.noShowCount > 0 && <span className='text-red-400 text-xs ml-2'>({u.noShowCount} no-show)</span>}
                     </td>
                     <td className='p-4 text-right'>
-                      <Button size='md' variant='secondary' onClick={() => setSelectedId(u.id)}>
-                        Beheer
-                      </Button>
+                      <div className='flex gap-2 justify-end'>
+                        <Link href={`/admin/statistics/user/${u.id}`}>
+                          <Button size='md' variant='secondary' title='Statistieken'>
+                            <BarChart3 size={14} />
+                          </Button>
+                        </Link>
+                        <Button size='md' variant='secondary' onClick={() => setSelectedId(u.id)}>
+                          Beheer
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}
