@@ -332,6 +332,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reservations/statistics": {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get reservation statistics and insights (Admin only) */
+        get: operations["ReservationsController_getStatistics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reservations/statistics/user/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        /** Get statistics for a specific user (Admin only) */
+        get: operations["ReservationsController_getUserStatistics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reservations/verify/{cuid}": {
         parameters: {
             query?: never;
@@ -1457,6 +1496,173 @@ export interface components {
              * @example 2026-09-28T18:00:00.000Z
              */
             endTime: string;
+        };
+        DailyCountDto: {
+            /** @example 2026-10-01 */
+            date: string;
+            /** @example 12 */
+            count: number;
+        };
+        WeekdayCountDto: {
+            /** @example 1 */
+            day: number;
+            /** @example Maandag */
+            label: string;
+            /** @example 18.5 */
+            avg: number;
+        };
+        HourSlotDto: {
+            /** @example 14 */
+            hour: number;
+            /** @example Maandag */
+            day: string;
+            /** @example 8 */
+            count: number;
+        };
+        HardwareCountDto: {
+            /** @example pc */
+            inventory: string;
+            /** @example 42 */
+            count: number;
+        };
+        HardwareOverTimeDto: {
+            /** @example 2026-W40 */
+            week: string;
+            /** @example 10 */
+            pc: number;
+            /** @example 5 */
+            ps5: number;
+            /** @example 3 */
+            switch: number;
+        };
+        StatusBreakdownDto: {
+            /** @example PRESENT */
+            status: string;
+            /** @example 85 */
+            count: number;
+            /** @example 42.5 */
+            percentage: number;
+        };
+        StatusOverTimeDto: {
+            /** @example 2026-W40 */
+            week: string;
+            /** @example 80 */
+            showRate: number;
+            /** @example 10 */
+            noShowRate: number;
+            /** @example 10 */
+            cancelRate: number;
+        };
+        UtilizationDto: {
+            /** @example pc */
+            inventory: string;
+            /** @example 75.5 */
+            utilizationPercent: number;
+            /** @example 6 */
+            maxCapacity: number;
+        };
+        DurationBucketDto: {
+            /** @example 1h */
+            label: string;
+            /** @example 30 */
+            count: number;
+        };
+        RepeatUserDto: {
+            /** @example 120 */
+            totalUsers: number;
+            /** @example 45 */
+            repeatUsers: number;
+            /** @example 37.5 */
+            repeatPercent: number;
+        };
+        NewVsReturningDto: {
+            /** @example 2026-W40 */
+            week: string;
+            /** @example 5 */
+            newUsers: number;
+            /** @example 12 */
+            returningUsers: number;
+        };
+        CapacityPressureDto: {
+            /** @example 14:00 */
+            slot: string;
+            /** @example 6 */
+            maxCapacity: number;
+            /** @example 4.2 */
+            avgBookings: number;
+            /** @example 3 */
+            timesAtCapacity: number;
+        };
+        ReservationStatisticsDto: {
+            dailyCounts: components["schemas"]["DailyCountDto"][];
+            weekdayAverages: components["schemas"]["WeekdayCountDto"][];
+            peakHoursHeatmap: components["schemas"]["HourSlotDto"][];
+            hardwareBreakdown: components["schemas"]["HardwareCountDto"][];
+            hardwareOverTime: components["schemas"]["HardwareOverTimeDto"][];
+            /** @example 1.8 */
+            avgControllersPerReservation: number;
+            utilization: components["schemas"]["UtilizationDto"][];
+            statusBreakdown: components["schemas"]["StatusBreakdownDto"][];
+            statusOverTime: components["schemas"]["StatusOverTimeDto"][];
+            durationDistribution: components["schemas"]["DurationBucketDto"][];
+            repeatUsers: components["schemas"]["RepeatUserDto"];
+            newVsReturning: components["schemas"]["NewVsReturningDto"][];
+            capacityPressure: components["schemas"]["CapacityPressureDto"][];
+            topUsers: components["schemas"]["TopUserDto"][];
+        };
+        TopUserDto: {
+            /** @example 1 */
+            userId: number;
+            /** @example John Doe */
+            name: string;
+            /** @example john@student.ap.be */
+            email: string;
+            /** @example s123456 */
+            sNumber: string;
+            /** @example 25 */
+            totalReservations: number;
+            /** @example 85.0 */
+            showRate: number;
+            /** @example 5.0 */
+            noShowRate: number;
+        };
+        UserInfoDto: {
+            /** @example John Doe */
+            name: string;
+            /** @example john@student.ap.be */
+            email: string;
+            /** @example s123456 */
+            sNumber: string;
+        };
+        MonthlyCountDto: {
+            /** @example 2026-10 */
+            month: string;
+            /** @example 8 */
+            count: number;
+        };
+        HourCountDto: {
+            /** @example 14 */
+            hour: number;
+            /** @example 5 */
+            count: number;
+        };
+        UserStatisticsDto: {
+            user: components["schemas"]["UserInfoDto"];
+            /** @example 25 */
+            totalReservations: number;
+            /** @example 85.0 */
+            showRate: number;
+            /** @example 5.0 */
+            noShowRate: number;
+            /** @example 10.0 */
+            cancelRate: number;
+            /** @example 60 */
+            avgDurationMinutes: number;
+            /** @example 1.5 */
+            avgControllers: number;
+            hardwareBreakdown: components["schemas"]["HardwareCountDto"][];
+            reservationsOverTime: components["schemas"]["MonthlyCountDto"][];
+            preferredSlots: components["schemas"]["HourCountDto"][];
         };
         ReservationVerificationDto: {
             /** @example cm9x8k2df0000a1b2c3d4e5f6 */
@@ -2640,6 +2846,49 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RoleDetailResponseDto"][];
+                };
+            };
+        };
+    };
+    ReservationsController_getUserStatistics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserStatisticsDto"];
+                };
+            };
+        };
+    };
+    ReservationsController_getStatistics: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationStatisticsDto"];
                 };
             };
         };
