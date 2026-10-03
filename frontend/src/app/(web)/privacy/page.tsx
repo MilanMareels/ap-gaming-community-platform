@@ -19,7 +19,7 @@ export default function PrivacyPage() {
                 <Eye className='text-red-500' /> Welke gegevens verzamelen we?
               </h2>
               <p>
-                Wanneer je een reservatie maakt op de AP Gaming Hub, verzamelen
+                Wanneer je de AP Gaming Hub gebruikt, verzamelen
                 we de volgende gegevens:
               </p>
               <ul className='list-disc pl-6 mt-4 space-y-2 text-gray-400'>
@@ -37,8 +37,14 @@ export default function PrivacyPage() {
                 </li>
                 <li>
                   <strong className='text-white'>Reservatie details:</strong> De
-                  datum, tijd en het type hardware (PC of Console) dat je
-                  reserveert.
+                  datum, tijd en het type hardware (PC, PS5 of Nintendo Switch) dat je
+                  reserveert, inclusief het aantal controllers.
+                </li>
+                <li>
+                  <strong className='text-white'>Inloggegevens via SSO:</strong> Wanneer
+                  je inlogt via Google of Microsoft, ontvangen wij een uniek
+                  identificatienummer van de betreffende provider om je account
+                  te koppelen. We ontvangen geen wachtwoorden.
                 </li>
               </ul>
             </section>
@@ -64,6 +70,12 @@ export default function PrivacyPage() {
                 <li>
                   Om misbruik van de apparatuur te kunnen koppelen aan een
                   gebruiker.
+                </li>
+                <li>
+                  Om geanonimiseerde en geaggregeerde statistieken te
+                  genereren over het gebruik van de Gaming Hub (zoals
+                  bezettingsgraad en piekuren), zodat we onze dienstverlening
+                  kunnen verbeteren.
                 </li>
               </ul>
             </section>
@@ -104,10 +116,10 @@ export default function PrivacyPage() {
                     beheerder/ontwikkelaar:
                   </p>
                   <a
-                    href='mailto:milan.mareels@student.ap.be'
+                    href='mailto:stijn.voeten01@student.ap.be'
                     className='text-red-500 font-bold hover:underline mt-2 inline-block'
                   >
-                    milan.mareels@student.ap.be
+                    stijn.voeten01@student.ap.be
                   </a>
                 </div>
               </div>

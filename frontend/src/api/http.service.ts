@@ -2,7 +2,7 @@ import createClient from 'openapi-fetch';
 import type { paths } from './definitions';
 
 const authExceptions: (keyof paths)[] = ['/reservations'];
-const publicPages: string[] = ['/login', '/reservations'];
+const publicPages: string[] = ['/login', '/reservations', '/events'];
 
 const middlewareFetch = async (input: Request) => {
   const result = await fetch(input);
@@ -16,7 +16,7 @@ const middlewareFetch = async (input: Request) => {
     }
 
     const pathname = window.location.pathname;
-    if (publicPages.some((page) => pathname === page)) return result;
+    if (publicPages.some((page) => pathname === page || pathname.startsWith(page + '/'))) return result;
     window.location.href =
       '/login?authfailed=1&returnUrl=' + encodeURIComponent(pathname);
   }
