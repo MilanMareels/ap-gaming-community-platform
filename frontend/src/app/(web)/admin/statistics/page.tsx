@@ -62,7 +62,7 @@ function StatCard({ title, value, subtitle }: { title: string; value: string | n
 
 function ChartCard({ title, children, className = '' }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-xl border border-slate-800 bg-slate-900 p-5 ${className}`}>
+    <div className={`min-w-0 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 p-5 ${className}`}>
       <h3 className="mb-4 text-sm font-bold uppercase tracking-wide text-gray-500">{title}</h3>
       {children}
     </div>
@@ -261,12 +261,41 @@ export default function AdminStatisticsPage() {
         <ChartCard title="Statusverdeling">
           <ResponsiveContainer width="100%" height={280}>
             <PieChart>
-              <Pie data={pieData} cx="50%" cy="50%" innerRadius={55} outerRadius={90} dataKey="value" paddingAngle={3} label={({ name, percent }: { name?: string; percent?: number }) => `${name ?? ''} ${((percent ?? 0) * 100).toFixed(0)}%`}>
+              <Pie
+                data={pieData}
+                cx="50%"
+                cy="42%"
+                innerRadius={50}
+                outerRadius="65%"
+                dataKey="value"
+                paddingAngle={3}
+                label={(props) => {
+                  const cx = Number(props.cx);
+                  const cy = Number(props.cy);
+                  const innerRadius = Number(props.innerRadius);
+                  const outerRadius = Number(props.outerRadius);
+                  const midAngle = Number(props.midAngle);
+                  const radius = innerRadius + (outerRadius - innerRadius) * 0.55;
+                  const x = cx + radius * Math.cos((-midAngle * Math.PI) / 180);
+                  const y = cy + radius * Math.sin((-midAngle * Math.PI) / 180);
+                  return (
+                    <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fill="#fff" fontSize={11} fontWeight={700}>
+                      {`${(Number(props.percent) * 100).toFixed(0)}%`}
+                    </text>
+                  );
+                }}
+                labelLine={false}
+              >
                 {pieData.map((entry, i) => (
                   <Cell key={i} fill={entry.fill} />
                 ))}
               </Pie>
               <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: 8, color: '#fff' }} />
+              <Legend
+                verticalAlign="bottom"
+                align="center"
+                wrapperStyle={{ width: '100%', fontSize: 11, lineHeight: '20px' }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -378,9 +407,9 @@ export default function AdminStatisticsPage() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <div className="rounded-xl border border-slate-800 bg-slate-900 p-5">
+        <div className="flex h-full flex-col rounded-xl border border-slate-800 bg-slate-900 p-5">
           <h3 className="mb-4 text-sm font-bold uppercase tracking-wide text-gray-500">Controller vraag</h3>
-          <div className="flex items-center justify-center py-8">
+          <div className="flex flex-1 items-center justify-center">
             <div className="text-center">
               <p className="text-5xl font-black text-white">{stats.avgControllersPerReservation}</p>
               <p className="mt-2 text-sm text-gray-400">gemiddeld aantal controllers per reservering</p>
