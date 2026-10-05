@@ -68,6 +68,7 @@ export default function AdminSettingsPage() {
 
   const [formTitle, setFormTitle] = useState('');
   const [formUrl, setFormUrl] = useState('');
+  const [twitchChannel, setTwitchChannel] = useState('');
 
   const [adjustments, setAdjustments] = useState<InventoryAdjustment[]>([]);
   const [adjustmentForm, setAdjustmentForm] = useState<AdjustmentFormState>(emptyAdjustmentForm);
@@ -112,6 +113,10 @@ export default function AdminSettingsPage() {
       ]);
 
       if (settingsRes.data) setSettings(settingsRes.data as Setting[]);
+      if (settingsRes.data) {
+        const twitchSetting = (settingsRes.data as Setting[]).find((setting) => setting.key === 'twitchChannel');
+        setTwitchChannel(twitchSetting?.value || '');
+      }
       if (formRes.data) {
         const formData = formRes.data as unknown as Form;
         setFormTitle(formData.title || '');
@@ -322,6 +327,23 @@ export default function AdminSettingsPage() {
               onBlur={handleSaveForm}
             />
           </div>
+        </div>
+      </div>
+
+      {/* Twitch Settings */}
+      <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+        <h2 className="text-xl font-bold mb-1">Twitch stream</h2>
+        <p className="text-gray-400 text-sm mb-4">Configureer het Twitch-kanaal voor de publieke stream- en signagepagina.</p>
+        <div className="max-w-xl">
+          <label className="text-xs font-bold text-gray-500 uppercase">Twitch-kanaal</label>
+          <input
+            type="text"
+            placeholder="Bijv. apgamingbe of twitch.tv/apgamingbe"
+            className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white mt-1"
+            value={twitchChannel}
+            onChange={(e) => setTwitchChannel(e.target.value)}
+            onBlur={() => handleUpdateSetting('twitchChannel', twitchChannel.trim())}
+          />
         </div>
       </div>
 

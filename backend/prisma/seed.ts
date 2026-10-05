@@ -27,6 +27,8 @@ const PERMISSIONS = [
   { key: 'roles.manage', description: 'Manage roles and permissions' },
   { key: 'inventory-adjustments.manage', description: 'Manage inventory adjustments' },
   { key: 'statistics.view', description: 'View reservation statistics and insights' },
+  { key: 'forms.manage', description: 'Manage forms, submissions, and comments' },
+  { key: 'jobs.manage', description: 'Manage job postings (vacatures)' },
 ];
 
 async function seedPermissionsAndRoles() {

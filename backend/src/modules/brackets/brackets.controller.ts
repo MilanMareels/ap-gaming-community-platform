@@ -1,34 +1,12 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Param,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiCreatedResponse,
-  ApiBadRequestResponse,
-  ApiNotFoundResponse,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { BracketsService } from './brackets.service.js';
 import { BracketParticipantsService } from './bracket-participants.service.js';
 import { BracketMatchesService } from './bracket-matches.service.js';
 import { BracketGeneratorService } from './bracket-generator.service.js';
-import {
-  CreateBracketDto,
-  UpdateBracketDto,
-} from '../../dtos/brackets/bracket.dto.js';
+import { CreateBracketDto, UpdateBracketDto } from '../../dtos/brackets/bracket.dto.js';
 import { AddParticipantDto } from '../../dtos/brackets/bracket-participant.dto.js';
-import {
-  UpdateMatchResultDto,
-  SwapParticipantsDto,
-} from '../../dtos/brackets/bracket-match.dto.js';
+import { UpdateMatchResultDto, SwapParticipantsDto } from '../../dtos/brackets/bracket-match.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
@@ -68,10 +46,7 @@ export class BracketsController {
     description: 'Event not found',
     type: HttpExceptionDto,
   })
-  create(
-    @Param('eventId') eventId: string,
-    @Body() dto: CreateBracketDto,
-  ) {
+  create(@Param('eventId') eventId: string, @Body() dto: CreateBracketDto) {
     return this.bracketsService.create(+eventId, dto);
   }
 
@@ -84,10 +59,7 @@ export class BracketsController {
     description: 'Can only update in DRAFT status',
     type: HttpExceptionDto,
   })
-  update(
-    @Param('eventId') eventId: string,
-    @Body() dto: UpdateBracketDto,
-  ) {
+  update(@Param('eventId') eventId: string, @Body() dto: UpdateBracketDto) {
     return this.bracketsService.update(+eventId, dto);
   }
 
@@ -115,10 +87,7 @@ export class BracketsController {
     description: 'Can only add in DRAFT status',
     type: HttpExceptionDto,
   })
-  addParticipant(
-    @Param('eventId') eventId: string,
-    @Body() dto: AddParticipantDto,
-  ) {
+  addParticipant(@Param('eventId') eventId: string, @Body() dto: AddParticipantDto) {
     return this.participantsService.addParticipant(+eventId, dto);
   }
 
@@ -148,14 +117,8 @@ export class BracketsController {
     description: 'Participant not found',
     type: HttpExceptionDto,
   })
-  removeParticipant(
-    @Param('eventId') eventId: string,
-    @Param('participantId') participantId: string,
-  ) {
-    return this.participantsService.removeParticipant(
-      +eventId,
-      +participantId,
-    );
+  removeParticipant(@Param('eventId') eventId: string, @Param('participantId') participantId: string) {
+    return this.participantsService.removeParticipant(+eventId, +participantId);
   }
 
   // --- Bracket generation ---
@@ -179,23 +142,15 @@ export class BracketsController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @RequirePermissions('brackets.manage')
   @ApiOperation({
-    summary:
-      'Swap two participants in round 1 matches (Admin only, GENERATED status)',
+    summary: 'Swap two participants in round 1 matches (Admin only, GENERATED status)',
   })
   @ApiOkResponse({ description: 'Participants swapped' })
   @ApiBadRequestResponse({
     description: 'Bracket not in GENERATED status or scores already entered',
     type: HttpExceptionDto,
   })
-  swapParticipants(
-    @Param('eventId') eventId: string,
-    @Body() dto: SwapParticipantsDto,
-  ) {
-    return this.matchesService.swapParticipants(
-      +eventId,
-      dto.participantAId,
-      dto.participantBId,
-    );
+  swapParticipants(@Param('eventId') eventId: string, @Body() dto: SwapParticipantsDto) {
+    return this.matchesService.swapParticipants(+eventId, dto.participantAId, dto.participantBId);
   }
 
   // --- Match management ---
@@ -209,11 +164,7 @@ export class BracketsController {
     description: 'Cannot change status',
     type: HttpExceptionDto,
   })
-  updateMatchStatus(
-    @Param('eventId') eventId: string,
-    @Param('matchId') matchId: string,
-    @Body('status') status: 'IN_PROGRESS' | 'PENDING',
-  ) {
+  updateMatchStatus(@Param('eventId') eventId: string, @Param('matchId') matchId: string, @Body('status') status: 'IN_PROGRESS' | 'PENDING') {
     return this.matchesService.updateMatchStatus(+eventId, +matchId, status);
   }
 
@@ -226,11 +177,7 @@ export class BracketsController {
     description: 'Invalid participants or match already completed',
     type: HttpExceptionDto,
   })
-  submitResult(
-    @Param('eventId') eventId: string,
-    @Param('matchId') matchId: string,
-    @Body() dto: UpdateMatchResultDto,
-  ) {
+  submitResult(@Param('eventId') eventId: string, @Param('matchId') matchId: string, @Body() dto: UpdateMatchResultDto) {
     return this.matchesService.submitResult(+eventId, +matchId, dto);
   }
 }

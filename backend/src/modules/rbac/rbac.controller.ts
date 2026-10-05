@@ -4,7 +4,14 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { RbacAdminService } from './rbac-admin.service.js';
-import { CreateRoleDto, UpdateRoleDto, RoleResponseDto, RoleDetailResponseDto, PermissionResponseDto, SuccessResponseDto } from '../../dtos/rbac/rbac.dto.js';
+import {
+  CreateRoleDto,
+  UpdateRoleDto,
+  RoleResponseDto,
+  RoleDetailResponseDto,
+  PermissionResponseDto,
+  SuccessResponseDto,
+} from '../../dtos/rbac/rbac.dto.js';
 
 @ApiTags('rbac')
 @Controller('rbac')

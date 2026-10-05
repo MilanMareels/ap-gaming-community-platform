@@ -15,6 +15,9 @@ model User {
   timeTrialParticipants  TimeTrialParticipant[]
   pointTrialParticipants PointTrialParticipant[]
   userRoles           UserRole[]
+
+  dynamicFormSubmissions        DynamicFormSubmission[]
+  dynamicFormSubmissionComments DynamicFormSubmissionComment[]
 }
 
 model AdminUser {

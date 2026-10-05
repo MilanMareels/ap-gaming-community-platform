@@ -9,6 +9,18 @@
 * 🟢 You can import this file directly.
 */
 
+export const FormFieldType = {
+  SHORT_TEXT: 'SHORT_TEXT',
+  LONG_TEXT: 'LONG_TEXT',
+  SELECT: 'SELECT',
+  CHECKBOX: 'CHECKBOX',
+  FILE_UPLOAD: 'FILE_UPLOAD',
+  TEXT_BLOCK: 'TEXT_BLOCK'
+} as const
+
+export type FormFieldType = (typeof FormFieldType)[keyof typeof FormFieldType]
+
+
 export const TimeTableType = {
   OPEN: 'OPEN',
   CLOSED: 'CLOSED'

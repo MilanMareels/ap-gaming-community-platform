@@ -11,6 +11,12 @@ import { FormRelations as _FormRelations } from './form_relations.js';
 import { NavLinkRelations as _NavLinkRelations } from './nav_link_relations.js';
 import { RosterGameRelations as _RosterGameRelations } from './roster_game_relations.js';
 import { RosterEntryRelations as _RosterEntryRelations } from './roster_entry_relations.js';
+import { DynamicFormRelations as _DynamicFormRelations } from './dynamic_form_relations.js';
+import { DynamicFormFieldRelations as _DynamicFormFieldRelations } from './dynamic_form_field_relations.js';
+import { DynamicFormSubmissionRelations as _DynamicFormSubmissionRelations } from './dynamic_form_submission_relations.js';
+import { DynamicFormSubmissionAnswerRelations as _DynamicFormSubmissionAnswerRelations } from './dynamic_form_submission_answer_relations.js';
+import { DynamicFormSubmissionCommentRelations as _DynamicFormSubmissionCommentRelations } from './dynamic_form_submission_comment_relations.js';
+import { JobRelations as _JobRelations } from './job_relations.js';
 import { ReservationRelations as _ReservationRelations } from './reservation_relations.js';
 import { TimeTableEntryRelations as _TimeTableEntryRelations } from './time_table_entry_relations.js';
 import { EventRelations as _EventRelations } from './event_relations.js';
@@ -39,6 +45,12 @@ import { Form as _Form } from './form.js';
 import { NavLink as _NavLink } from './nav_link.js';
 import { RosterGame as _RosterGame } from './roster_game.js';
 import { RosterEntry as _RosterEntry } from './roster_entry.js';
+import { DynamicForm as _DynamicForm } from './dynamic_form.js';
+import { DynamicFormField as _DynamicFormField } from './dynamic_form_field.js';
+import { DynamicFormSubmission as _DynamicFormSubmission } from './dynamic_form_submission.js';
+import { DynamicFormSubmissionAnswer as _DynamicFormSubmissionAnswer } from './dynamic_form_submission_answer.js';
+import { DynamicFormSubmissionComment as _DynamicFormSubmissionComment } from './dynamic_form_submission_comment.js';
+import { Job as _Job } from './job.js';
 import { Reservation as _Reservation } from './reservation.js';
 import { TimeTableEntry as _TimeTableEntry } from './time_table_entry.js';
 import { Event as _Event } from './event.js';
@@ -69,6 +81,12 @@ export namespace PrismaModel {
   export class NavLinkRelations extends _NavLinkRelations {}
   export class RosterGameRelations extends _RosterGameRelations {}
   export class RosterEntryRelations extends _RosterEntryRelations {}
+  export class DynamicFormRelations extends _DynamicFormRelations {}
+  export class DynamicFormFieldRelations extends _DynamicFormFieldRelations {}
+  export class DynamicFormSubmissionRelations extends _DynamicFormSubmissionRelations {}
+  export class DynamicFormSubmissionAnswerRelations extends _DynamicFormSubmissionAnswerRelations {}
+  export class DynamicFormSubmissionCommentRelations extends _DynamicFormSubmissionCommentRelations {}
+  export class JobRelations extends _JobRelations {}
   export class ReservationRelations extends _ReservationRelations {}
   export class TimeTableEntryRelations extends _TimeTableEntryRelations {}
   export class EventRelations extends _EventRelations {}
@@ -97,6 +115,12 @@ export namespace PrismaModel {
   export class NavLink extends _NavLink {}
   export class RosterGame extends _RosterGame {}
   export class RosterEntry extends _RosterEntry {}
+  export class DynamicForm extends _DynamicForm {}
+  export class DynamicFormField extends _DynamicFormField {}
+  export class DynamicFormSubmission extends _DynamicFormSubmission {}
+  export class DynamicFormSubmissionAnswer extends _DynamicFormSubmissionAnswer {}
+  export class DynamicFormSubmissionComment extends _DynamicFormSubmissionComment {}
+  export class Job extends _Job {}
   export class Reservation extends _Reservation {}
   export class TimeTableEntry extends _TimeTableEntry {}
   export class Event extends _Event {}
@@ -127,6 +151,12 @@ export namespace PrismaModel {
     NavLinkRelations,
     RosterGameRelations,
     RosterEntryRelations,
+    DynamicFormRelations,
+    DynamicFormFieldRelations,
+    DynamicFormSubmissionRelations,
+    DynamicFormSubmissionAnswerRelations,
+    DynamicFormSubmissionCommentRelations,
+    JobRelations,
     ReservationRelations,
     TimeTableEntryRelations,
     EventRelations,
@@ -155,6 +185,12 @@ export namespace PrismaModel {
     NavLink,
     RosterGame,
     RosterEntry,
+    DynamicForm,
+    DynamicFormField,
+    DynamicFormSubmission,
+    DynamicFormSubmissionAnswer,
+    DynamicFormSubmissionComment,
+    Job,
     Reservation,
     TimeTableEntry,
     Event,

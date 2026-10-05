@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { UpdateTimeTrialStatusDto } from '../../dtos/time-trials/time-trial.dto.js';
 
@@ -32,9 +28,7 @@ export class TimeTrialsService {
     });
     if (!event) throw new NotFoundException('Event not found');
     if (event.category !== 'TOURNAMENT_TIMED') {
-      throw new BadRequestException(
-        'Time trials can only be created for timed tournament events',
-      );
+      throw new BadRequestException('Time trials can only be created for timed tournament events');
     }
     if (event.timeTrial) {
       throw new BadRequestException('Event already has a time trial');
@@ -57,9 +51,7 @@ export class TimeTrialsService {
     };
 
     if (!allowed[timeTrial.status]?.includes(dto.status)) {
-      throw new BadRequestException(
-        `Cannot transition from ${timeTrial.status} to ${dto.status}`,
-      );
+      throw new BadRequestException(`Cannot transition from ${timeTrial.status} to ${dto.status}`);
     }
 
     return this.prisma.timeTrial.update({

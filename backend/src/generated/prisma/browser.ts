@@ -83,6 +83,36 @@ export type RosterGame = Prisma.RosterGameModel
  */
 export type RosterEntry = Prisma.RosterEntryModel
 /**
+ * Model DynamicForm
+ * 
+ */
+export type DynamicForm = Prisma.DynamicFormModel
+/**
+ * Model DynamicFormField
+ * 
+ */
+export type DynamicFormField = Prisma.DynamicFormFieldModel
+/**
+ * Model DynamicFormSubmission
+ * 
+ */
+export type DynamicFormSubmission = Prisma.DynamicFormSubmissionModel
+/**
+ * Model DynamicFormSubmissionAnswer
+ * 
+ */
+export type DynamicFormSubmissionAnswer = Prisma.DynamicFormSubmissionAnswerModel
+/**
+ * Model DynamicFormSubmissionComment
+ * 
+ */
+export type DynamicFormSubmissionComment = Prisma.DynamicFormSubmissionCommentModel
+/**
+ * Model Job
+ * 
+ */
+export type Job = Prisma.JobModel
+/**
  * Model Reservation
  * 
  */
