@@ -10,11 +10,6 @@ import { RbacModule } from '../rbac/rbac.module.js';
 @Module({
   imports: [AuthModule, RbacModule],
   controllers: [BracketsController],
-  providers: [
-    BracketsService,
-    BracketParticipantsService,
-    BracketMatchesService,
-    BracketGeneratorService,
-  ],
+  providers: [BracketsService, BracketParticipantsService, BracketMatchesService, BracketGeneratorService],
 })
 export class BracketsModule {}

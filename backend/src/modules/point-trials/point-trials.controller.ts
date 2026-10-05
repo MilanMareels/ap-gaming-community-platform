@@ -1,28 +1,9 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Param,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiCreatedResponse,
-  ApiBadRequestResponse,
-  ApiNotFoundResponse,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { PointTrialsService } from './point-trials.service.js';
 import { PointTrialEntriesService } from './point-trial-entries.service.js';
 import { UpdatePointTrialStatusDto } from '../../dtos/point-trials/point-trial.dto.js';
-import {
-  AddPointTrialParticipantDto,
-  AddPointEntryDto,
-} from '../../dtos/point-trials/point-trial-entry.dto.js';
+import { AddPointTrialParticipantDto, AddPointEntryDto } from '../../dtos/point-trials/point-trial-entry.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
@@ -73,10 +54,7 @@ export class PointTrialsController {
     description: 'Invalid status transition',
     type: HttpExceptionDto,
   })
-  updateStatus(
-    @Param('eventId') eventId: string,
-    @Body() dto: UpdatePointTrialStatusDto,
-  ) {
+  updateStatus(@Param('eventId') eventId: string, @Body() dto: UpdatePointTrialStatusDto) {
     return this.pointTrialsService.updateStatus(+eventId, dto);
   }
 
@@ -100,10 +78,7 @@ export class PointTrialsController {
   @RequirePermissions('point-trials.manage')
   @ApiOperation({ summary: 'Add participant to point trial (Admin only)' })
   @ApiCreatedResponse({ description: 'Participant added' })
-  addParticipant(
-    @Param('eventId') eventId: string,
-    @Body() dto: AddPointTrialParticipantDto,
-  ) {
+  addParticipant(@Param('eventId') eventId: string, @Body() dto: AddPointTrialParticipantDto) {
     return this.entriesService.addParticipant(+eventId, dto);
   }
 
@@ -118,10 +93,7 @@ export class PointTrialsController {
     description: 'Participant not found',
     type: HttpExceptionDto,
   })
-  removeParticipant(
-    @Param('eventId') eventId: string,
-    @Param('participantId') participantId: string,
-  ) {
+  removeParticipant(@Param('eventId') eventId: string, @Param('participantId') participantId: string) {
     return this.entriesService.removeParticipant(+eventId, +participantId);
   }
 
@@ -131,10 +103,7 @@ export class PointTrialsController {
   @Get('participants/:participantId/entries')
   @ApiOperation({ summary: 'Get entry history for a participant (public)' })
   @ApiOkResponse({ description: 'List of entries sorted by points' })
-  getEntries(
-    @Param('eventId') eventId: string,
-    @Param('participantId') participantId: string,
-  ) {
+  getEntries(@Param('eventId') eventId: string, @Param('participantId') participantId: string) {
     return this.entriesService.getEntries(+eventId, +participantId);
   }
 
@@ -147,11 +116,7 @@ export class PointTrialsController {
     description: 'Participant not found',
     type: HttpExceptionDto,
   })
-  addEntry(
-    @Param('eventId') eventId: string,
-    @Param('participantId') participantId: string,
-    @Body() dto: AddPointEntryDto,
-  ) {
+  addEntry(@Param('eventId') eventId: string, @Param('participantId') participantId: string, @Body() dto: AddPointEntryDto) {
     return this.entriesService.addEntry(+eventId, +participantId, dto.points);
   }
 
@@ -164,10 +129,7 @@ export class PointTrialsController {
     description: 'Entry not found',
     type: HttpExceptionDto,
   })
-  deleteEntry(
-    @Param('eventId') eventId: string,
-    @Param('entryId') entryId: string,
-  ) {
+  deleteEntry(@Param('eventId') eventId: string, @Param('entryId') entryId: string) {
     return this.entriesService.deleteEntry(+eventId, +entryId);
   }
 }

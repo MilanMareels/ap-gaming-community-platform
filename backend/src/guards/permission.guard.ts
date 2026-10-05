@@ -26,10 +26,7 @@ export class PermissionGuard implements CanActivate {
       throw new UnauthorizedException('User not authenticated');
     }
 
-    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [context.getHandler(), context.getClass()]);
 
     // If no @RequirePermissions() decorator, just require authentication
     if (!requiredPermissions || requiredPermissions.length === 0) {
