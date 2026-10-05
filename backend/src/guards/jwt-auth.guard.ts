@@ -27,6 +27,17 @@ export class JwtAuthGuard implements CanActivate {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [context.getHandler(), context.getClass()]);
 
     if (isPublic) {
+      // Still try to extract user for public routes that optionally use auth
+      try {
+        const publicRequest = context.switchToHttp().getRequest<Request & { user?: unknown }>();
+        const extracted = this.extractToken(publicRequest);
+        if (extracted.token) {
+          const claims = await this.authService.verifyToken(extracted.token);
+          publicRequest.user = claims;
+        }
+      } catch {
+        // Ignore - user just won't be populated
+      }
       return true;
     }
 

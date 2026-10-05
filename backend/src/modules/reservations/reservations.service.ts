@@ -571,9 +571,7 @@ export class ReservationsService {
       const key = toDateStr(r.startTime);
       dailyMap.set(key, (dailyMap.get(key) ?? 0) + 1);
     }
-    const dailyCounts = [...dailyMap.entries()]
-      .map(([date, count]) => ({ date, count }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+    const dailyCounts = [...dailyMap.entries()].map(([date, count]) => ({ date, count })).sort((a, b) => a.date.localeCompare(b.date));
 
     // ─── Weekday averages ───
     const weekdayTotals = Array.from({ length: 7 }, () => ({ total: 0, days: new Set<string>() }));
@@ -617,14 +615,11 @@ export class ReservationsService {
       const entry = hwWeekMap.get(week)!;
       if (r.inventory in entry) entry[r.inventory as keyof typeof entry] += 1;
     }
-    const hardwareOverTime = [...hwWeekMap.entries()]
-      .map(([week, v]) => ({ week, ...v }))
-      .sort((a, b) => a.week.localeCompare(b.week));
+    const hardwareOverTime = [...hwWeekMap.entries()].map(([week, v]) => ({ week, ...v })).sort((a, b) => a.week.localeCompare(b.week));
 
     // ─── Average controllers ───
     const totalControllers = reservations.reduce((s, r) => s + r.controllers, 0);
-    const avgControllersPerReservation =
-      reservations.length > 0 ? Math.round((totalControllers / reservations.length) * 10) / 10 : 0;
+    const avgControllersPerReservation = reservations.length > 0 ? Math.round((totalControllers / reservations.length) * 10) / 10 : 0;
 
     // ─── Utilization per hardware type ───
     const settings = await this.prisma.setting.findMany({
@@ -634,9 +629,7 @@ export class ReservationsService {
 
     // For each hardware type, compute average bookings vs capacity across active time slots
     const utilization = [...capacityMap.entries()].map(([inventory, maxCap]) => {
-      const hwReservations = reservations.filter(
-        (r) => r.inventory === inventory && r.status !== ReservationStatus.CANCELLED,
-      );
+      const hwReservations = reservations.filter((r) => r.inventory === inventory && r.status !== ReservationStatus.CANCELLED);
       if (hwReservations.length === 0 || maxCap <= 0) {
         return { inventory, utilizationPercent: 0, maxCapacity: maxCap };
       }
@@ -879,9 +872,7 @@ export class ReservationsService {
       const key = r.startTime.toISOString().slice(0, 7); // YYYY-MM
       monthlyMap.set(key, (monthlyMap.get(key) ?? 0) + 1);
     }
-    const reservationsOverTime = [...monthlyMap.entries()]
-      .map(([month, count]) => ({ month, count }))
-      .sort((a, b) => a.month.localeCompare(b.month));
+    const reservationsOverTime = [...monthlyMap.entries()].map(([month, count]) => ({ month, count })).sort((a, b) => a.month.localeCompare(b.month));
 
     // Preferred time slots
     const slotMap = new Map<number, number>();
@@ -889,9 +880,7 @@ export class ReservationsService {
       const hour = r.startTime.getUTCHours();
       slotMap.set(hour, (slotMap.get(hour) ?? 0) + 1);
     }
-    const preferredSlots = [...slotMap.entries()]
-      .map(([hour, count]) => ({ hour, count }))
-      .sort((a, b) => a.hour - b.hour);
+    const preferredSlots = [...slotMap.entries()].map(([hour, count]) => ({ hour, count })).sort((a, b) => a.hour - b.hour);
 
     return {
       user: { name: user.name ?? 'Unknown', email: user.email, sNumber: user.sNumber },

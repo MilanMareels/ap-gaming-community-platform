@@ -1,28 +1,9 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Param,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiCreatedResponse,
-  ApiBadRequestResponse,
-  ApiNotFoundResponse,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { TimeTrialsService } from './time-trials.service.js';
 import { TimeTrialEntriesService } from './time-trial-entries.service.js';
 import { UpdateTimeTrialStatusDto } from '../../dtos/time-trials/time-trial.dto.js';
-import {
-  AddTimeTrialParticipantDto,
-  AddRunDto,
-} from '../../dtos/time-trials/time-trial-entry.dto.js';
+import { AddTimeTrialParticipantDto, AddRunDto } from '../../dtos/time-trials/time-trial-entry.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
@@ -73,10 +54,7 @@ export class TimeTrialsController {
     description: 'Invalid status transition',
     type: HttpExceptionDto,
   })
-  updateStatus(
-    @Param('eventId') eventId: string,
-    @Body() dto: UpdateTimeTrialStatusDto,
-  ) {
+  updateStatus(@Param('eventId') eventId: string, @Body() dto: UpdateTimeTrialStatusDto) {
     return this.timeTrialsService.updateStatus(+eventId, dto);
   }
 
@@ -100,10 +78,7 @@ export class TimeTrialsController {
   @RequirePermissions('time-trials.manage')
   @ApiOperation({ summary: 'Add participant to time trial (Admin only)' })
   @ApiCreatedResponse({ description: 'Participant added' })
-  addParticipant(
-    @Param('eventId') eventId: string,
-    @Body() dto: AddTimeTrialParticipantDto,
-  ) {
+  addParticipant(@Param('eventId') eventId: string, @Body() dto: AddTimeTrialParticipantDto) {
     return this.entriesService.addParticipant(+eventId, dto);
   }
 
@@ -118,10 +93,7 @@ export class TimeTrialsController {
     description: 'Participant not found',
     type: HttpExceptionDto,
   })
-  removeParticipant(
-    @Param('eventId') eventId: string,
-    @Param('participantId') participantId: string,
-  ) {
+  removeParticipant(@Param('eventId') eventId: string, @Param('participantId') participantId: string) {
     return this.entriesService.removeParticipant(+eventId, +participantId);
   }
 
@@ -131,10 +103,7 @@ export class TimeTrialsController {
   @Get('participants/:participantId/runs')
   @ApiOperation({ summary: 'Get run history for a participant (public)' })
   @ApiOkResponse({ description: 'List of runs sorted by time' })
-  getRuns(
-    @Param('eventId') eventId: string,
-    @Param('participantId') participantId: string,
-  ) {
+  getRuns(@Param('eventId') eventId: string, @Param('participantId') participantId: string) {
     return this.entriesService.getRuns(+eventId, +participantId);
   }
 
@@ -147,11 +116,7 @@ export class TimeTrialsController {
     description: 'Participant not found',
     type: HttpExceptionDto,
   })
-  addRun(
-    @Param('eventId') eventId: string,
-    @Param('participantId') participantId: string,
-    @Body() dto: AddRunDto,
-  ) {
+  addRun(@Param('eventId') eventId: string, @Param('participantId') participantId: string, @Body() dto: AddRunDto) {
     return this.entriesService.addRun(+eventId, +participantId, dto.timeMs);
   }
 
@@ -164,10 +129,7 @@ export class TimeTrialsController {
     description: 'Run not found',
     type: HttpExceptionDto,
   })
-  deleteRun(
-    @Param('eventId') eventId: string,
-    @Param('runId') runId: string,
-  ) {
+  deleteRun(@Param('eventId') eventId: string, @Param('runId') runId: string) {
     return this.entriesService.deleteRun(+eventId, +runId);
   }
 }

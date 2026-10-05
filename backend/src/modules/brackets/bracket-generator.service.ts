@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
@@ -20,31 +16,23 @@ export class BracketGeneratorService {
     });
     if (!bracket) throw new NotFoundException('Bracket not found');
     if (bracket.status !== 'DRAFT') {
-      throw new BadRequestException(
-        'Bracket has already been generated. Delete and recreate to regenerate.',
-      );
+      throw new BadRequestException('Bracket has already been generated. Delete and recreate to regenerate.');
     }
     if (bracket.participants.length < 2) {
-      throw new BadRequestException(
-        'At least 2 participants are required to generate a bracket',
-      );
+      throw new BadRequestException('At least 2 participants are required to generate a bracket');
     }
 
     const { playersPerMatch, advancingPerMatch, thirdPlaceMatch } = bracket;
     const participantCount = bracket.participants.length;
 
     // Calculate rounds needed
-    const totalRounds = Math.ceil(
-      Math.log(participantCount) / Math.log(playersPerMatch),
-    );
+    const totalRounds = Math.ceil(Math.log(participantCount) / Math.log(playersPerMatch));
     const idealSize = Math.pow(playersPerMatch, totalRounds);
     const byeCount = idealSize - participantCount;
     const firstRoundMatchCount = idealSize / playersPerMatch;
 
     // Seed participants: those with explicit seeds first (sorted), then the rest
-    const seeded = bracket.participants
-      .filter((p) => p.seed !== null)
-      .sort((a, b) => a.seed! - b.seed!);
+    const seeded = bracket.participants.filter((p) => p.seed !== null).sort((a, b) => a.seed! - b.seed!);
     const unseeded = bracket.participants.filter((p) => p.seed === null);
     const orderedParticipants = [...seeded, ...unseeded];
 
@@ -59,13 +47,10 @@ export class BracketGeneratorService {
 
     // Build match structure from finals backwards (so we can set nextMatchId)
     // Round 1 = first round, Round totalRounds = finals
-    const matchesByRound: Array<
-      Array<{ round: number; position: number; id?: number }>
-    > = [];
+    const matchesByRound: Array<Array<{ round: number; position: number; id?: number }>> = [];
 
     for (let round = 1; round <= totalRounds; round++) {
-      const matchCount =
-        Math.pow(playersPerMatch, totalRounds - round) / advancingPerMatch;
+      const matchCount = Math.pow(playersPerMatch, totalRounds - round) / advancingPerMatch;
       const roundMatches: Array<{
         round: number;
         position: number;
@@ -106,12 +91,7 @@ export class BracketGeneratorService {
 
     // Create 3rd place match if enabled (only makes sense with >= 4 participants and 2-player matches)
     let thirdPlaceMatchId: number | null = null;
-    if (
-      thirdPlaceMatch &&
-      totalRounds >= 2 &&
-      playersPerMatch === 2 &&
-      advancingPerMatch === 1
-    ) {
+    if (thirdPlaceMatch && totalRounds >= 2 && playersPerMatch === 2 && advancingPerMatch === 1) {
       const created = await this.prisma.bracketMatch.create({
         data: {
           bracketId: bracket.id,
@@ -162,14 +142,9 @@ export class BracketGeneratorService {
       });
 
       // Check if this match has BYEs - if only one real participant, auto-advance
-      const realParticipants = matchParticipants.filter(
-        (p) => !p.isBye && p.participantId !== null,
-      );
+      const realParticipants = matchParticipants.filter((p) => !p.isBye && p.participantId !== null);
 
-      if (
-        realParticipants.length <= advancingPerMatch &&
-        realParticipants.length > 0
-      ) {
+      if (realParticipants.length <= advancingPerMatch && realParticipants.length > 0) {
         // Auto-advance: mark match as BYE, set winners, place in next match
         await this.prisma.bracketMatch.update({
           where: { id: matchId },
@@ -242,10 +217,7 @@ export class BracketGeneratorService {
    * For 8 players in 2-player matches: [0, 7, 3, 4, 1, 6, 2, 5]
    * This ensures seed 1 plays seed 8, seed 2 plays seed 7, etc.
    */
-  private generateSeedOrder(
-    size: number,
-    playersPerMatch: number,
-  ): number[] {
+  private generateSeedOrder(size: number, playersPerMatch: number): number[] {
     if (playersPerMatch === 2) {
       return this.generateStandardSeedOrder(size);
     }

@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { AddParticipantDto } from '../../dtos/brackets/bracket-participant.dto.js';
 
@@ -16,9 +12,7 @@ export class BracketParticipantsService {
     });
     if (!bracket) throw new NotFoundException('Bracket not found');
     if (bracket.status !== 'DRAFT') {
-      throw new BadRequestException(
-        'Can only add participants while bracket is in DRAFT status',
-      );
+      throw new BadRequestException('Can only add participants while bracket is in DRAFT status');
     }
 
     // If email provided, try to find matching user
@@ -48,9 +42,7 @@ export class BracketParticipantsService {
     });
     if (!bracket) throw new NotFoundException('Bracket not found');
     if (bracket.status !== 'DRAFT') {
-      throw new BadRequestException(
-        'Can only remove participants while bracket is in DRAFT status',
-      );
+      throw new BadRequestException('Can only remove participants while bracket is in DRAFT status');
     }
 
     const participant = await this.prisma.bracketParticipant.findFirst({
@@ -69,9 +61,7 @@ export class BracketParticipantsService {
     });
     if (!bracket) throw new NotFoundException('Bracket not found');
     if (bracket.status !== 'DRAFT') {
-      throw new BadRequestException(
-        'Can only import participants while bracket is in DRAFT status',
-      );
+      throw new BadRequestException('Can only import participants while bracket is in DRAFT status');
     }
 
     const registrations = await this.prisma.eventRegistration.findMany({
@@ -85,17 +75,10 @@ export class BracketParticipantsService {
       where: { bracketId: bracket.id },
       select: { email: true, userId: true },
     });
-    const existingEmails = new Set(
-      existingParticipants.map((p) => p.email).filter(Boolean),
-    );
-    const existingUserIds = new Set(
-      existingParticipants.map((p) => p.userId).filter(Boolean),
-    );
+    const existingEmails = new Set(existingParticipants.map((p) => p.email).filter(Boolean));
+    const existingUserIds = new Set(existingParticipants.map((p) => p.userId).filter(Boolean));
 
-    const toCreate = registrations.filter(
-      (r) =>
-        !existingEmails.has(r.user.email) && !existingUserIds.has(r.user.id),
-    );
+    const toCreate = registrations.filter((r) => !existingEmails.has(r.user.email) && !existingUserIds.has(r.user.id));
 
     if (toCreate.length === 0) {
       return { imported: 0 };

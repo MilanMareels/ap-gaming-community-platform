@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { UpdatePointTrialStatusDto } from '../../dtos/point-trials/point-trial.dto.js';
 
@@ -32,9 +28,7 @@ export class PointTrialsService {
     });
     if (!event) throw new NotFoundException('Event not found');
     if (event.category !== 'TOURNAMENT_POINTS') {
-      throw new BadRequestException(
-        'Point trials can only be created for point-based tournament events',
-      );
+      throw new BadRequestException('Point trials can only be created for point-based tournament events');
     }
     if (event.pointTrial) {
       throw new BadRequestException('Event already has a point trial');
@@ -57,9 +51,7 @@ export class PointTrialsService {
     };
 
     if (!allowed[pointTrial.status]?.includes(dto.status)) {
-      throw new BadRequestException(
-        `Cannot transition from ${pointTrial.status} to ${dto.status}`,
-      );
+      throw new BadRequestException(`Cannot transition from ${pointTrial.status} to ${dto.status}`);
     }
 
     return this.prisma.pointTrial.update({

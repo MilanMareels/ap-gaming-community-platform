@@ -1,14 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
-import {
-  CreateWhitelistDto,
-  UpdateUserDto,
-  UserDetailDto,
-  UserListItemDto,
-  UserListQueryDto,
-  WhitelistEntryDto,
-} from '../../dtos/users/user.dto.js';
+import { CreateWhitelistDto, UpdateUserDto, UserDetailDto, UserListItemDto, UserListQueryDto, WhitelistEntryDto } from '../../dtos/users/user.dto.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';

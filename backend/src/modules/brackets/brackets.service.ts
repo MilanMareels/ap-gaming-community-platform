@@ -1,13 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import {
-  CreateBracketDto,
-  UpdateBracketDto,
-} from '../../dtos/brackets/bracket.dto.js';
+import { CreateBracketDto, UpdateBracketDto } from '../../dtos/brackets/bracket.dto.js';
 
 @Injectable()
 export class BracketsService {
@@ -44,9 +37,7 @@ export class BracketsService {
     });
     if (!event) throw new NotFoundException('Event not found');
     if (event.category !== 'TOURNAMENT_BRACKET') {
-      throw new BadRequestException(
-        'Brackets can only be created for tournament bracket events',
-      );
+      throw new BadRequestException('Brackets can only be created for tournament bracket events');
     }
     if (event.bracket) {
       throw new BadRequestException('Event already has a bracket');
@@ -69,18 +60,13 @@ export class BracketsService {
     });
     if (!bracket) throw new NotFoundException('Bracket not found');
     if (bracket.status !== 'DRAFT') {
-      throw new BadRequestException(
-        'Can only update bracket settings while in DRAFT status',
-      );
+      throw new BadRequestException('Can only update bracket settings while in DRAFT status');
     }
 
     const data: Record<string, unknown> = {};
-    if (dto.playersPerMatch !== undefined)
-      data.playersPerMatch = dto.playersPerMatch;
-    if (dto.advancingPerMatch !== undefined)
-      data.advancingPerMatch = dto.advancingPerMatch;
-    if (dto.thirdPlaceMatch !== undefined)
-      data.thirdPlaceMatch = dto.thirdPlaceMatch;
+    if (dto.playersPerMatch !== undefined) data.playersPerMatch = dto.playersPerMatch;
+    if (dto.advancingPerMatch !== undefined) data.advancingPerMatch = dto.advancingPerMatch;
+    if (dto.thirdPlaceMatch !== undefined) data.thirdPlaceMatch = dto.thirdPlaceMatch;
 
     return this.prisma.bracket.update({
       where: { eventId },

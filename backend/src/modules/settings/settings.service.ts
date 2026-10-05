@@ -12,7 +12,7 @@ export class SettingsService {
   }
 
   async getPublicSettings() {
-    const publicKeys = ['googleFormUrl'];
+    const publicKeys = ['googleFormUrl', 'twitchChannel'];
     return this.prisma.setting.findMany({
       where: { key: { in: publicKeys } },
     });

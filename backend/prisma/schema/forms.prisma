@@ -1,0 +1,109 @@
+enum FormFieldType {
+  SHORT_TEXT
+  LONG_TEXT
+  SELECT
+  CHECKBOX
+  FILE_UPLOAD
+  TEXT_BLOCK
+}
+
+model DynamicForm {
+  id   Int    @id @default(autoincrement())
+  cuid String @unique @default(cuid())
+
+  title             String
+  description       String?
+  requiresAuth      Boolean @default(false)
+  confirmationEmail Boolean @default(true)
+  discordWebhookUrl String?
+  isActive          Boolean @default(true)
+
+  fields      DynamicFormField[]
+  submissions DynamicFormSubmission[]
+  jobs        Job[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("dynamic_form")
+}
+
+model DynamicFormField {
+  id       Int           @id @default(autoincrement())
+  formId   Int
+  form     DynamicForm   @relation(fields: [formId], references: [id], onDelete: Cascade)
+  type     FormFieldType
+  label    String
+  required Boolean       @default(false)
+  position Int
+  config   Json?
+
+  answers DynamicFormSubmissionAnswer[]
+
+  @@map("dynamic_form_field")
+}
+
+model DynamicFormSubmission {
+  id   Int    @id @default(autoincrement())
+  cuid String @unique @default(cuid())
+
+  formId Int
+  form   DynamicForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  userId         Int?
+  user           User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  submitterEmail String?
+  submitterName  String?
+
+  answers  DynamicFormSubmissionAnswer[]
+  comments DynamicFormSubmissionComment[]
+
+  createdAt DateTime @default(now())
+
+  @@map("dynamic_form_submission")
+}
+
+model DynamicFormSubmissionAnswer {
+  id           Int                   @id @default(autoincrement())
+  submissionId Int
+  submission   DynamicFormSubmission  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  fieldId      Int
+  field        DynamicFormField      @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  value    String?
+  values   Json?
+  filePath String?
+  fileName String?
+
+  @@map("dynamic_form_submission_answer")
+}
+
+model DynamicFormSubmissionComment {
+  id           Int                   @id @default(autoincrement())
+  submissionId Int
+  submission   DynamicFormSubmission  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  userId       Int?
+  user         User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  authorName   String?
+  content      String
+  isAdmin      Boolean               @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@map("dynamic_form_submission_comment")
+}
+
+model Job {
+  id               Int          @id @default(autoincrement())
+  title            String
+  shortDescription String       @default("")
+  description      String
+  isActive         Boolean      @default(true)
+  formId      Int?
+  form        DynamicForm? @relation(fields: [formId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("job")
+}

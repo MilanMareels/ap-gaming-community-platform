@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { UpdateMatchResultDto } from '../../dtos/brackets/bracket-match.dto.js';
 
@@ -10,11 +6,7 @@ import { UpdateMatchResultDto } from '../../dtos/brackets/bracket-match.dto.js';
 export class BracketMatchesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async swapParticipants(
-    eventId: number,
-    participantAId: number,
-    participantBId: number,
-  ) {
+  async swapParticipants(eventId: number, participantAId: number, participantBId: number) {
     const bracket = await this.prisma.bracket.findUnique({
       where: { eventId },
       include: {
@@ -26,9 +18,7 @@ export class BracketMatchesService {
     });
     if (!bracket) throw new NotFoundException('Bracket not found');
     if (bracket.status !== 'GENERATED') {
-      throw new BadRequestException(
-        'Can only swap participants when bracket is in GENERATED status',
-      );
+      throw new BadRequestException('Can only swap participants when bracket is in GENERATED status');
     }
 
     // Find the two match-participant records in round 1
@@ -40,17 +30,13 @@ export class BracketMatchesService {
       for (const mp of match.participants) {
         if (mp.participantId === participantAId && !mp.isBye) {
           if (mp.score !== null) {
-            throw new BadRequestException(
-              'Cannot swap: scores have already been entered',
-            );
+            throw new BadRequestException('Cannot swap: scores have already been entered');
           }
           slotA = { id: mp.id, matchId: mp.matchId };
         }
         if (mp.participantId === participantBId && !mp.isBye) {
           if (mp.score !== null) {
-            throw new BadRequestException(
-              'Cannot swap: scores have already been entered',
-            );
+            throw new BadRequestException('Cannot swap: scores have already been entered');
           }
           slotB = { id: mp.id, matchId: mp.matchId };
         }
@@ -58,14 +44,10 @@ export class BracketMatchesService {
     }
 
     if (!slotA) {
-      throw new NotFoundException(
-        `Participant ${participantAId} not found in round 1`,
-      );
+      throw new NotFoundException(`Participant ${participantAId} not found in round 1`);
     }
     if (!slotB) {
-      throw new NotFoundException(
-        `Participant ${participantBId} not found in round 1`,
-      );
+      throw new NotFoundException(`Participant ${participantBId} not found in round 1`);
     }
 
     // Swap the participantId values
@@ -83,11 +65,7 @@ export class BracketMatchesService {
     return { swapped: true };
   }
 
-  async updateMatchStatus(
-    eventId: number,
-    matchId: number,
-    status: 'IN_PROGRESS' | 'PENDING',
-  ) {
+  async updateMatchStatus(eventId: number, matchId: number, status: 'IN_PROGRESS' | 'PENDING') {
     const bracket = await this.prisma.bracket.findUnique({
       where: { eventId },
     });
@@ -98,9 +76,7 @@ export class BracketMatchesService {
     });
     if (!match) throw new NotFoundException('Match not found');
     if (match.status === 'COMPLETED' || match.status === 'BYE') {
-      throw new BadRequestException(
-        'Cannot change status of a completed or BYE match',
-      );
+      throw new BadRequestException('Cannot change status of a completed or BYE match');
     }
 
     await this.prisma.bracketMatch.update({
@@ -117,11 +93,7 @@ export class BracketMatchesService {
     }
   }
 
-  async submitResult(
-    eventId: number,
-    matchId: number,
-    dto: UpdateMatchResultDto,
-  ) {
+  async submitResult(eventId: number, matchId: number, dto: UpdateMatchResultDto) {
     const bracket = await this.prisma.bracket.findUnique({
       where: { eventId },
     });
@@ -142,14 +114,10 @@ export class BracketMatchesService {
     }
 
     // Validate all non-BYE participants have scores
-    const matchParticipantIds = match.participants.map(
-      (p) => p.participantId,
-    );
+    const matchParticipantIds = match.participants.map((p) => p.participantId);
     for (const result of dto.results) {
       if (!matchParticipantIds.includes(result.participantId)) {
-        throw new BadRequestException(
-          `Participant ${result.participantId} is not in this match`,
-        );
+        throw new BadRequestException(`Participant ${result.participantId} is not in this match`);
       }
     }
 
@@ -166,12 +134,8 @@ export class BracketMatchesService {
 
     // Determine winners (top N by score, where N = advancingPerMatch)
     const sortedResults = [...dto.results].sort((a, b) => b.score - a.score);
-    const winnerIds = sortedResults
-      .slice(0, bracket.advancingPerMatch)
-      .map((r) => r.participantId);
-    const loserIds = sortedResults
-      .slice(bracket.advancingPerMatch)
-      .map((r) => r.participantId);
+    const winnerIds = sortedResults.slice(0, bracket.advancingPerMatch).map((r) => r.participantId);
+    const loserIds = sortedResults.slice(bracket.advancingPerMatch).map((r) => r.participantId);
 
     // Mark winners
     for (const winnerId of winnerIds) {
@@ -207,13 +171,12 @@ export class BracketMatchesService {
     if (match.nextMatchId) {
       for (const winnerId of winnerIds) {
         // Check if already placed (from a previous submission)
-        const existing =
-          await this.prisma.bracketMatchParticipant.findFirst({
-            where: {
-              matchId: match.nextMatchId,
-              participantId: winnerId,
-            },
-          });
+        const existing = await this.prisma.bracketMatchParticipant.findFirst({
+          where: {
+            matchId: match.nextMatchId,
+            participantId: winnerId,
+          },
+        });
         if (!existing) {
           await this.prisma.bracketMatchParticipant.create({
             data: {
@@ -227,12 +190,7 @@ export class BracketMatchesService {
     }
 
     // Handle 3rd place match: place losers of semi-finals
-    if (
-      bracket.thirdPlaceMatch &&
-      match.round === bracket.totalRounds - 1 &&
-      bracket.playersPerMatch === 2 &&
-      bracket.advancingPerMatch === 1
-    ) {
+    if (bracket.thirdPlaceMatch && match.round === bracket.totalRounds - 1 && bracket.playersPerMatch === 2 && bracket.advancingPerMatch === 1) {
       // Find the 3rd place match (round = totalRounds, position = 1)
       const thirdPlaceMatch = await this.prisma.bracketMatch.findFirst({
         where: {
@@ -244,13 +202,12 @@ export class BracketMatchesService {
 
       if (thirdPlaceMatch) {
         for (const loserId of loserIds) {
-          const existing =
-            await this.prisma.bracketMatchParticipant.findFirst({
-              where: {
-                matchId: thirdPlaceMatch.id,
-                participantId: loserId,
-              },
-            });
+          const existing = await this.prisma.bracketMatchParticipant.findFirst({
+            where: {
+              matchId: thirdPlaceMatch.id,
+              participantId: loserId,
+            },
+          });
           if (!existing) {
             await this.prisma.bracketMatchParticipant.create({
               data: {
