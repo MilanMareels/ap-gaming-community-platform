@@ -79,10 +79,12 @@ export default function PublicJobDetailPage() {
         </ScrollReveal>
 
         <ScrollReveal>
-          <div
-            className="prose prose-invert prose-sm max-w-none mb-8 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_p]:text-gray-300 [&_p]:leading-relaxed [&_a]:text-red-400 [&_a:hover]:text-red-300 [&_ul]:text-gray-300 [&_ol]:text-gray-300 [&_blockquote]:border-red-600 [&_blockquote]:text-gray-400"
-            dangerouslySetInnerHTML={{ __html: job.description }}
-          />
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 mb-8">
+            <div
+              className="prose prose-invert prose-sm max-w-none [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_p]:text-gray-300 [&_p]:leading-relaxed [&_a]:text-red-400 [&_a:hover]:text-red-300 [&_ul]:text-gray-300 [&_ol]:text-gray-300 [&_blockquote]:border-red-600 [&_blockquote]:text-gray-400"
+              dangerouslySetInnerHTML={{ __html: job.description }}
+            />
+          </div>
         </ScrollReveal>
 
         {job.form && (
