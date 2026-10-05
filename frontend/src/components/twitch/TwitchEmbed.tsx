@@ -25,32 +25,11 @@ function isValidChannel(channel: string): boolean {
   return /^[a-z0-9_]+$/.test(channel);
 }
 
-declare global {
-  interface Window {
-    Twitch?: {
-      Embed: new (
-        elementId: string,
-        options: {
-          channel: string;
-          width: string;
-          height: string;
-          parent: string[];
-          autoplay: boolean;
-          muted: boolean;
-          layout?: string;
-        },
-      ) => unknown;
-    };
-  }
-}
-
 export default function TwitchEmbed({ signage = false }: TwitchEmbedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const embedRef = useRef<HTMLDivElement>(null);
   const [channel, setChannel] = useState('');
   const [loading, setLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [embedReady, setEmbedReady] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -72,36 +51,6 @@ export default function TwitchEmbed({ signage = false }: TwitchEmbedProps) {
       active = false;
     };
   }, []);
-
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://embed.twitch.tv/embed/v1.js';
-    script.async = true;
-    script.onload = () => setEmbedReady(true);
-    document.head.appendChild(script);
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!embedReady || !channel || !isValidChannel(channel) || !embedRef.current) return;
-    if (!window.Twitch?.Embed) return;
-
-    embedRef.current.innerHTML = '';
-    const embedId = 'twitch-embed-target';
-    embedRef.current.id = embedId;
-
-    new window.Twitch.Embed(embedId, {
-      channel,
-      width: '100%',
-      height: '100%',
-      parent: [window.location.hostname],
-      autoplay: true,
-      muted: true,
-      layout: 'video',
-    });
-  }, [embedReady, channel]);
 
   useEffect(() => {
     const handleFullscreenChange = () => setIsFullscreen(document.fullscreenElement === containerRef.current);
@@ -132,19 +81,30 @@ export default function TwitchEmbed({ signage = false }: TwitchEmbedProps) {
     );
   }
 
+  const parent = typeof window === 'undefined' ? '' : window.location.hostname;
+  const playerUrl = `https://player.twitch.tv/?channel=${encodeURIComponent(channel)}&parent=${encodeURIComponent(parent)}${signage ? '&autoplay=true&muted=true' : ''}`;
+
   return (
     <div
       ref={containerRef}
-      className={signage ? 'relative h-screen w-screen bg-black' : 'relative aspect-video w-full bg-black'}
+      className={signage ? 'relative h-screen w-screen bg-black' : 'relative aspect-video w-full overflow-hidden rounded-xl bg-black'}
     >
-      <div ref={embedRef} className="h-full w-full" />
+      <iframe
+        src={playerUrl}
+        title={`Twitch stream ${channel}`}
+        width="854"
+        height="480"
+        style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowFullScreen
+      />
       {!signage && (
         <button
           type="button"
           onClick={toggleFullscreen}
           aria-label={isFullscreen ? 'Volledig scherm verlaten' : 'Volledig scherm openen'}
           title={isFullscreen ? 'Volledig scherm verlaten' : 'Volledig scherm openen'}
-          className="absolute right-3 top-3 z-10 rounded-lg bg-black/70 p-2 text-white transition-opacity hover:bg-black"
+          className="absolute right-3 top-3 z-10 rounded-lg bg-black/70 p-2 text-white opacity-70 transition-opacity hover:opacity-100"
         >
           {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
         </button>

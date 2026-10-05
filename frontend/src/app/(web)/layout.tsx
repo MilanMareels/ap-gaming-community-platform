@@ -9,9 +9,9 @@ export default function WebLayout({
   return (
     <>
       <div
-        className="fixed inset-0 z-[-1] pointer-events-none"
+        className="fixed inset-0 z-[-1] pointer-events-none opacity-50"
         style={{
-          backgroundImage: 'linear-gradient(rgba(2,6,24,0.5), rgba(2,6,24,0.5)), url("/Vectors-raam.svg")',
+          backgroundImage: 'url("/Vectors-raam.svg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
