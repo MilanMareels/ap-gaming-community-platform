@@ -334,10 +334,7 @@ export interface paths {
     };
     "/reservations/statistics": {
         parameters: {
-            query?: {
-                from?: string;
-                to?: string;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -356,9 +353,7 @@ export interface paths {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                userId: string;
-            };
+            path?: never;
             cookie?: never;
         };
         /** Get statistics for a specific user (Admin only) */
@@ -1337,6 +1332,335 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/forms/admin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all forms (Admin only) */
+        get: operations["FormsController_findAll"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/admin/simple": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active forms as simple list for selectors */
+        get: operations["FormsController_findAllSimple"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/admin/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get form with fields (Admin only) */
+        get: operations["FormsController_findById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a new form (Admin only) */
+        post: operations["FormsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a form (Admin only) */
+        delete: operations["FormsController_delete"];
+        options?: never;
+        head?: never;
+        /** Update a form (Admin only) */
+        patch: operations["FormsController_update"];
+        trace?: never;
+    };
+    "/forms/{id}/fields": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a field to a form (Admin only) */
+        post: operations["FormsController_createField"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{id}/fields/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Reorder form fields (Admin only) */
+        patch: operations["FormsController_reorderFields"];
+        trace?: never;
+    };
+    "/forms/{id}/fields/{fieldId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a form field (Admin only) */
+        delete: operations["FormsController_deleteField"];
+        options?: never;
+        head?: never;
+        /** Update a form field (Admin only) */
+        patch: operations["FormsController_updateField"];
+        trace?: never;
+    };
+    "/forms/public/{cuid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get form for public rendering */
+        get: operations["FormsController_findPublic"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/public/{cuid}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit a form response */
+        post: operations["FormSubmissionsController_submitForm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{id}/submissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List submissions for a form (Admin only) */
+        get: operations["FormSubmissionsController_getSubmissions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/submissions/{submissionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single submission with answers (Admin only) */
+        get: operations["FormSubmissionsController_getSubmissionById"];
+        put?: never;
+        post?: never;
+        /** Delete a submission (Admin only) */
+        delete: operations["FormSubmissionsController_deleteSubmission"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/submissions/{submissionId}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add admin comment to a submission */
+        post: operations["FormSubmissionsController_addAdminComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/submission/{cuid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get submission with comments (public viewer) */
+        get: operations["FormSubmissionsController_getPublicSubmission"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/submission/{cuid}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add comment to submission (public) */
+        post: operations["FormSubmissionsController_addPublicComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active jobs (public) */
+        get: operations["JobsController_findActive"];
+        put?: never;
+        /** Create a job (Admin only) */
+        post: operations["JobsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/admin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all jobs (Admin only) */
+        get: operations["JobsController_findAll"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/admin/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a job by ID (Admin only) */
+        get: operations["JobsController_findByIdAdmin"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single active job (public) */
+        get: operations["JobsController_findById"];
+        put?: never;
+        post?: never;
+        /** Delete a job (Admin only) */
+        delete: operations["JobsController_delete"];
+        options?: never;
+        head?: never;
+        /** Update a job (Admin only) */
+        patch: operations["JobsController_update"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1535,6 +1859,14 @@ export interface components {
             /** @example 3 */
             switch: number;
         };
+        UtilizationDto: {
+            /** @example pc */
+            inventory: string;
+            /** @example 75.5 */
+            utilizationPercent: number;
+            /** @example 6 */
+            maxCapacity: number;
+        };
         StatusBreakdownDto: {
             /** @example PRESENT */
             status: string;
@@ -1552,14 +1884,6 @@ export interface components {
             noShowRate: number;
             /** @example 10 */
             cancelRate: number;
-        };
-        UtilizationDto: {
-            /** @example pc */
-            inventory: string;
-            /** @example 75.5 */
-            utilizationPercent: number;
-            /** @example 6 */
-            maxCapacity: number;
         };
         DurationBucketDto: {
             /** @example 1h */
@@ -1593,6 +1917,22 @@ export interface components {
             /** @example 3 */
             timesAtCapacity: number;
         };
+        TopUserDto: {
+            /** @example 1 */
+            userId: number;
+            /** @example John Doe */
+            name: string;
+            /** @example john@student.ap.be */
+            email: string;
+            /** @example s123456 */
+            sNumber: string;
+            /** @example 25 */
+            totalReservations: number;
+            /** @example 85 */
+            showRate: number;
+            /** @example 5 */
+            noShowRate: number;
+        };
         ReservationStatisticsDto: {
             dailyCounts: components["schemas"]["DailyCountDto"][];
             weekdayAverages: components["schemas"]["WeekdayCountDto"][];
@@ -1609,22 +1949,6 @@ export interface components {
             newVsReturning: components["schemas"]["NewVsReturningDto"][];
             capacityPressure: components["schemas"]["CapacityPressureDto"][];
             topUsers: components["schemas"]["TopUserDto"][];
-        };
-        TopUserDto: {
-            /** @example 1 */
-            userId: number;
-            /** @example John Doe */
-            name: string;
-            /** @example john@student.ap.be */
-            email: string;
-            /** @example s123456 */
-            sNumber: string;
-            /** @example 25 */
-            totalReservations: number;
-            /** @example 85.0 */
-            showRate: number;
-            /** @example 5.0 */
-            noShowRate: number;
         };
         UserInfoDto: {
             /** @example John Doe */
@@ -1650,11 +1974,11 @@ export interface components {
             user: components["schemas"]["UserInfoDto"];
             /** @example 25 */
             totalReservations: number;
-            /** @example 85.0 */
+            /** @example 85 */
             showRate: number;
-            /** @example 5.0 */
+            /** @example 5 */
             noShowRate: number;
-            /** @example 10.0 */
+            /** @example 10 */
             cancelRate: number;
             /** @example 60 */
             avgDurationMinutes: number;
@@ -1850,8 +2174,18 @@ export interface components {
             value: string;
         };
         UpdateFormDto: {
+            /** @example Updated title */
             title?: string;
-            url?: string;
+            /** @example Updated description */
+            description?: string;
+            /** @example false */
+            requiresAuth?: boolean;
+            /** @example true */
+            confirmationEmail?: boolean;
+            /** @example https://discord.com/api/webhooks/... */
+            discordWebhookUrl?: string;
+            /** @example true */
+            isActive?: boolean;
         };
         UpdateSettingDto: {
             /** @example googleFormUrl */
@@ -2141,6 +2475,95 @@ export interface components {
              */
             points: number;
         };
+        CreateFormDto: {
+            /** @example Feedback formulier */
+            title: string;
+            /** @example Laat ons weten wat je ervan vindt. */
+            description?: string;
+            /** @example false */
+            requiresAuth?: boolean;
+            /** @example true */
+            confirmationEmail?: boolean;
+            /** @example https://discord.com/api/webhooks/... */
+            discordWebhookUrl?: string;
+        };
+        CreateFormFieldDto: {
+            /**
+             * @example SHORT_TEXT
+             * @enum {string}
+             */
+            type: "SHORT_TEXT" | "LONG_TEXT" | "SELECT" | "CHECKBOX" | "FILE_UPLOAD" | "TEXT_BLOCK";
+            /** @example Wat is je naam? */
+            label: string;
+            /** @example false */
+            required?: boolean;
+            /** @example 0 */
+            position: number;
+            /**
+             * @example {
+             *       "options": [
+             *         "Optie A",
+             *         "Optie B"
+             *       ]
+             *     }
+             */
+            config?: Record<string, never>;
+        };
+        ReorderFieldItemDto: {
+            /** @example 1 */
+            id: number;
+            /** @example 0 */
+            position: number;
+        };
+        ReorderFormFieldsDto: {
+            items: components["schemas"]["ReorderFieldItemDto"][];
+        };
+        UpdateFormFieldDto: {
+            /** @enum {string} */
+            type?: "SHORT_TEXT" | "LONG_TEXT" | "SELECT" | "CHECKBOX" | "FILE_UPLOAD" | "TEXT_BLOCK";
+            /** @example Updated label */
+            label?: string;
+            /** @example true */
+            required?: boolean;
+            /** @example 1 */
+            position?: number;
+            /**
+             * @example {
+             *       "options": [
+             *         "A",
+             *         "B",
+             *         "C"
+             *       ]
+             *     }
+             */
+            config?: Record<string, never>;
+        };
+        CreateCommentDto: {
+            /** @example Bedankt voor je inzending! */
+            content: string;
+            /** @example Jan Janssens */
+            authorName?: string;
+        };
+        CreateJobDto: {
+            /** @example Event Coordinator */
+            title: string;
+            /** @example <p>Wij zoeken een enthousiaste event coordinator...</p> */
+            description: string;
+            /** @example true */
+            isActive?: boolean;
+            /** @example 1 */
+            formId?: number;
+        };
+        UpdateJobDto: {
+            /** @example Updated Title */
+            title?: string;
+            /** @example <p>Updated description...</p> */
+            description?: string;
+            /** @example false */
+            isActive?: boolean;
+            /** @example 2 */
+            formId?: number;
+        };
         GoogleSSOUser: {
             id: number;
             ssoId: string;
@@ -2193,6 +2616,26 @@ export interface components {
             userId: number;
             roleId: number;
         };
+        DynamicFormSubmission: {
+            id: number;
+            cuid: string;
+            formId: number;
+            userId?: number;
+            submitterEmail?: string;
+            submitterName?: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        DynamicFormSubmissionComment: {
+            id: number;
+            submissionId: number;
+            userId?: number;
+            authorName?: string;
+            content: string;
+            isAdmin: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
         UserRelations: {
             reservations: components["schemas"]["Reservation"][];
             adminUsers: components["schemas"]["AdminUser"][];
@@ -2204,6 +2647,8 @@ export interface components {
             timeTrialParticipants: components["schemas"]["TimeTrialParticipant"][];
             pointTrialParticipants: components["schemas"]["PointTrialParticipant"][];
             userRoles: components["schemas"]["UserRole"][];
+            dynamicFormSubmissions: components["schemas"]["DynamicFormSubmission"][];
+            dynamicFormSubmissionComments: components["schemas"]["DynamicFormSubmissionComment"][];
         };
         User: {
             id: number;
@@ -2267,6 +2712,77 @@ export interface components {
         RosterEntryRelations: {
             user: components["schemas"]["User"];
             game: components["schemas"]["RosterGame"];
+        };
+        /** @enum {string} */
+        FormFieldType: "SHORT_TEXT" | "LONG_TEXT" | "SELECT" | "CHECKBOX" | "FILE_UPLOAD" | "TEXT_BLOCK";
+        DynamicFormField: {
+            id: number;
+            formId: number;
+            type: components["schemas"]["FormFieldType"];
+            label: string;
+            required: boolean;
+            position: number;
+            config?: Record<string, never>;
+        };
+        Job: {
+            id: number;
+            title: string;
+            description: string;
+            isActive: boolean;
+            formId?: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        DynamicFormRelations: {
+            fields: components["schemas"]["DynamicFormField"][];
+            submissions: components["schemas"]["DynamicFormSubmission"][];
+            jobs: components["schemas"]["Job"][];
+        };
+        DynamicForm: {
+            id: number;
+            cuid: string;
+            title: string;
+            description?: string;
+            requiresAuth: boolean;
+            confirmationEmail: boolean;
+            discordWebhookUrl?: string;
+            isActive: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        DynamicFormSubmissionAnswer: {
+            id: number;
+            submissionId: number;
+            fieldId: number;
+            value?: string;
+            values?: Record<string, never>;
+            filePath?: string;
+            fileName?: string;
+        };
+        DynamicFormFieldRelations: {
+            form: components["schemas"]["DynamicForm"];
+            answers: components["schemas"]["DynamicFormSubmissionAnswer"][];
+        };
+        DynamicFormSubmissionRelations: {
+            form: components["schemas"]["DynamicForm"];
+            user?: components["schemas"]["User"];
+            answers: components["schemas"]["DynamicFormSubmissionAnswer"][];
+            comments: components["schemas"]["DynamicFormSubmissionComment"][];
+        };
+        DynamicFormSubmissionAnswerRelations: {
+            submission: components["schemas"]["DynamicFormSubmission"];
+            field: components["schemas"]["DynamicFormField"];
+        };
+        DynamicFormSubmissionCommentRelations: {
+            submission: components["schemas"]["DynamicFormSubmission"];
+            user?: components["schemas"]["User"];
+        };
+        JobRelations: {
+            form?: components["schemas"]["DynamicForm"];
         };
         ReservationRelations: {
             user: components["schemas"]["User"];
@@ -2850,49 +3366,6 @@ export interface operations {
             };
         };
     };
-    ReservationsController_getUserStatistics: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserStatisticsDto"];
-                };
-            };
-        };
-    };
-    ReservationsController_getStatistics: {
-        parameters: {
-            query?: {
-                from?: string;
-                to?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReservationStatisticsDto"];
-                };
-            };
-        };
-    };
     ReservationsController_findAll: {
         parameters: {
             query?: {
@@ -3024,6 +3497,58 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InventoryAdjustmentSlotDto"][];
+                };
+            };
+        };
+    };
+    ReservationsController_getStatistics: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationStatisticsDto"];
+                };
+            };
+        };
+    };
+    ReservationsController_getUserStatistics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserStatisticsDto"];
+                };
+            };
+            /** @description User not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
                 };
             };
         };
@@ -5203,6 +5728,507 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HttpExceptionDto"];
                 };
+            };
+        };
+    };
+    FormsController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormsController_findAllSimple: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormsController_findById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFormDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormsController_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateFormDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormsController_createField: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFormFieldDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormsController_reorderFields: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderFormFieldsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormsController_deleteField: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                fieldId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormsController_updateField: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                fieldId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateFormFieldDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormsController_findPublic: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_submitForm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_getSubmissions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_getSubmissionById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                submissionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_deleteSubmission: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                submissionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_addAdminComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                submissionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCommentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_getPublicSubmission: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_addPublicComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCommentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    JobsController_findActive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    JobsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateJobDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    JobsController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    JobsController_findByIdAdmin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    JobsController_findById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    JobsController_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    JobsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateJobDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

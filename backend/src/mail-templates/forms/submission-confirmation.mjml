@@ -1,0 +1,63 @@
+<mjml>
+  <mj-head>
+    <mj-title>Inzending Bevestiging - AP Gaming Hub</mj-title>
+    <mj-attributes>
+      <mj-all font-family="Arial, sans-serif" />
+      <mj-text font-size="14px" color="#333333" line-height="1.6" />
+      <mj-button background-color="#DC2626" color="#ffffff" border-radius="4px" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f4">
+    <!-- Header -->
+    <mj-section background-color="#DC2626" padding="30px 0">
+      <mj-column>
+        <mj-text align="center" font-size="32px" font-weight="bold" color="#ffffff"> AP Gaming Hub </mj-text>
+        <mj-text align="center" font-size="18px" color="#ffffff"> Inzending Bevestiging </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Main Content -->
+    <mj-section background-color="#ffffff" padding="40px 30px">
+      <mj-column>
+        <mj-text font-size="16px" color="#1f2937"> Beste {{ submitterName }}, </mj-text>
+        <mj-text font-size="14px" color="#4b5563">
+          Bedankt voor het invullen van het formulier <strong>"{{ formTitle }}"</strong>.
+          Je inzending is succesvol ontvangen op {{ submissionDate }}.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Info -->
+    <mj-section background-color="#ffffff" padding="0 30px 20px 30px">
+      <mj-column>
+        <mj-text font-size="14px" color="#4b5563">
+          Je kunt je inzending en eventuele reacties bekijken via onderstaande knop.
+          Als er reacties worden geplaatst, word je hiervan per e-mail op de hoogte gebracht.
+        </mj-text>
+        <mj-button
+          href="{{ submissionUrl }}"
+          background-color="#DC2626"
+          color="#ffffff"
+          border-radius="6px"
+          font-weight="bold"
+          font-size="14px"
+          padding="15px 0"
+        >
+          Bekijk je inzending
+        </mj-button>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+    <mj-section background-color="#1f2937" padding="30px 30px">
+      <mj-column>
+        <mj-text align="center" font-size="13px" color="#9ca3af" line-height="1.6">
+          Bedankt voor je inzending bij AP Gaming Hub!<br />
+          Voor vragen, neem contact met ons op.
+        </mj-text>
+        <mj-divider border-color="#374151" padding="20px 0"></mj-divider>
+        <mj-text align="center" font-size="11px" color="#6b7280"> &copy; 2026 AP Gaming Hub. Alle rechten voorbehouden. </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

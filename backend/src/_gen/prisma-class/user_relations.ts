@@ -9,6 +9,8 @@ import { BracketParticipant } from './bracket_participant.js';
 import { TimeTrialParticipant } from './time_trial_participant.js';
 import { PointTrialParticipant } from './point_trial_participant.js';
 import { UserRole } from './user_role.js';
+import { DynamicFormSubmission } from './dynamic_form_submission.js';
+import { DynamicFormSubmissionComment } from './dynamic_form_submission_comment.js';
 
 export class UserRelations {
 
@@ -41,4 +43,10 @@ export class UserRelations {
 
   @ApiProperty({ isArray: true, type: () => UserRole })
   userRoles: UserRole[];
+
+  @ApiProperty({ isArray: true, type: () => DynamicFormSubmission })
+  dynamicFormSubmissions: DynamicFormSubmission[];
+
+  @ApiProperty({ isArray: true, type: () => DynamicFormSubmissionComment })
+  dynamicFormSubmissionComments: DynamicFormSubmissionComment[];
 }

@@ -2,7 +2,7 @@ import createClient from 'openapi-fetch';
 import type { paths } from './definitions';
 
 const authExceptions: (keyof paths)[] = ['/reservations'];
-const publicPages: string[] = ['/login', '/reservations', '/events'];
+const publicPages: string[] = ['/login', '/reservations', '/events', '/forms', '/jobs'];
 
 const middlewareFetch = async (input: Request) => {
   const result = await fetch(input);
