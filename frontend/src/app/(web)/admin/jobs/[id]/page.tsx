@@ -66,7 +66,7 @@ export default function AdminJobEditorPage() {
         shortDescription,
         description,
         isActive,
-        formId: formId ?? null,
+        formId: formId ?? undefined,
       },
     });
     setSaving(false);

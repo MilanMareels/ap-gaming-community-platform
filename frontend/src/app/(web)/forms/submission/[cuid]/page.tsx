@@ -57,15 +57,15 @@ export default function PublicSubmissionPage() {
   const [sending, setSending] = useState(false);
 
   const refresh = useCallback(async () => {
-    const res = await apiClient.GET('/forms/submission/{cuid}', { params: { path: { cuid } } });
+    const res = await apiClient.GET('/forms/submission/{cuid}', { params: { path: { cuid } } }) as { data?: Submission; error?: any; response?: Response };
     if (res.error) {
-      if ((res.error as any)?.statusCode === 401 || (res.response as any)?.status === 401) {
+      if (res.error?.statusCode === 401 || res.response?.status === 401) {
         setAccessDenied(true);
       } else {
         setError('Inzending niet gevonden.');
       }
     } else if (res.data) {
-      setSubmission(res.data as unknown as Submission);
+      setSubmission(res.data);
     } else {
       setError('Inzending niet gevonden.');
     }
