@@ -2547,6 +2547,8 @@ export interface components {
         CreateJobDto: {
             /** @example Event Coordinator */
             title: string;
+            /** @example Korte beschrijving voor de vacaturelijst */
+            shortDescription?: string;
             /** @example <p>Wij zoeken een enthousiaste event coordinator...</p> */
             description: string;
             /** @example true */
@@ -2557,6 +2559,8 @@ export interface components {
         UpdateJobDto: {
             /** @example Updated Title */
             title?: string;
+            /** @example Updated short description */
+            shortDescription?: string;
             /** @example <p>Updated description...</p> */
             description?: string;
             /** @example false */
@@ -2727,6 +2731,7 @@ export interface components {
         Job: {
             id: number;
             title: string;
+            shortDescription: string;
             description: string;
             isActive: boolean;
             formId?: number;
