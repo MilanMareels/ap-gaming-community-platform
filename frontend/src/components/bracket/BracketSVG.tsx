@@ -44,7 +44,7 @@ function getConfig(mode: 'admin' | 'public' | 'kiosk') {
     matchWidth: 228,
     seedWidth: 24,
     scoreWidth: 32,
-    nameWidth: 140,
+    nameWidth: 164,
     playerHeight: 22,
     matchPadding: 2,
     roundGap: 300,
