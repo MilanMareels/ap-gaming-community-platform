@@ -231,7 +231,7 @@ export default function AdminFormBuilderPage() {
         description: description || undefined,
         requiresAuth,
         confirmationEmail,
-        discordWebhookUrl: discordWebhookUrl || null,
+        discordWebhookUrl: discordWebhookUrl || undefined,
       },
     });
     setSaving(false);
