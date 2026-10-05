@@ -257,7 +257,7 @@ export default function AdminFormBuilderPage() {
         label,
         position,
         required: newFieldRequired,
-        config: config ?? ((newFieldType === 'SELECT' || newFieldType === 'CHECKBOX') ? { options: ['Optie 1'] } : undefined),
+        config: (config ?? ((newFieldType === 'SELECT' || newFieldType === 'CHECKBOX') ? { options: ['Optie 1'] } : undefined)) as any,
       },
     });
     resetNewField();
