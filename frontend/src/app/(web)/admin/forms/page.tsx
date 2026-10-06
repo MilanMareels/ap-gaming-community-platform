@@ -28,7 +28,7 @@ export default function AdminFormsPage() {
   const [copied, setCopied] = useState<number | null>(null);
 
   const refresh = useCallback(async () => {
-    const res = await apiClient.GET('/forms/admin', {});
+    const res = await (apiClient.GET as any)('/forms/admin', {});
     if (res.data) setForms(res.data as unknown as DynamicForm[]);
   }, []);
 
@@ -37,7 +37,7 @@ export default function AdminFormsPage() {
   const handleCreate = async () => {
     if (!newTitle.trim()) return;
     setCreating(true);
-    await apiClient.POST('/forms', { body: { title: newTitle.trim() } });
+    await (apiClient.POST as any)('/forms', { body: { title: newTitle.trim() } });
     setNewTitle('');
     setShowCreate(false);
     setCreating(false);
@@ -46,7 +46,7 @@ export default function AdminFormsPage() {
 
   const handleDelete = async (id: number) => {
     if (!confirm('Weet je zeker dat je dit formulier wilt verwijderen? Alle inzendingen worden ook verwijderd.')) return;
-    await apiClient.DELETE('/forms/{id}', { params: { path: { id: String(id) } } });
+    await (apiClient.DELETE as any)('/forms/{id}', { params: { path: { id: String(id) } } });
     refresh();
   };
 
