@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams } from 'next/navigation';
-import { Loader2, CheckCircle, Upload, X } from 'lucide-react';
+import { useParams, useSearchParams } from 'next/navigation';
+import { Loader2, CheckCircle, Upload, X, Eye } from 'lucide-react';
+import Link from 'next/link';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { apiClient } from '@/api';
@@ -30,7 +32,9 @@ interface DynamicForm {
 
 export default function PublicFormPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const cuid = params.cuid as string;
+  const isPreview = searchParams.get('preview') === 'true';
 
   const [form, setForm] = useState<DynamicForm | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,7 +63,7 @@ export default function PublicFormPage() {
       } catch {}
 
       // Fetch form
-      const res = await apiClient.GET('/forms/public/{cuid}', { params: { path: { cuid } } });
+      const res = await (apiClient.GET as any)('/forms/public/{cuid}', { params: { path: { cuid } } });
       if (res.error || !res.data) {
         setError('Formulier niet gevonden.');
         setLoading(false);
@@ -67,7 +71,7 @@ export default function PublicFormPage() {
       }
 
       const formData = res.data as unknown as DynamicForm;
-      if (!formData.isActive) {
+      if (!formData.isActive && !isPreview) {
         setError('Dit formulier is niet meer actief.');
         setLoading(false);
         return;
@@ -240,8 +244,23 @@ export default function PublicFormPage() {
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
       <div className="max-w-2xl mx-auto">
+        {isPreview && (
+          <div className="bg-yellow-900/30 border border-yellow-700/50 rounded-lg px-4 py-3 mb-6 flex items-center gap-3">
+            <Eye size={18} className="text-yellow-500 shrink-0" />
+            <span className="text-yellow-300 text-sm flex-1">
+              Dit is een voorbeeld. Dit formulier is nog niet zichtbaar voor bezoekers.
+            </span>
+            <Link href={`/admin/forms/${form.id}`}>
+              <Button size="sm" variant="ghost">Terug naar editor</Button>
+            </Link>
+          </div>
+        )}
+
         <ScrollReveal>
-          <h1 className="text-3xl font-bold mb-2">{form.title}</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-3xl font-bold">{form.title}</h1>
+            {isPreview && !form.isActive && <Badge variant="warning">Inactief</Badge>}
+          </div>
           {form.description && <p className="text-gray-400 mb-8">{form.description}</p>}
         </ScrollReveal>
 
