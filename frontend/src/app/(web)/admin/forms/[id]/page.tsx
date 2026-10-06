@@ -306,7 +306,7 @@ export default function AdminFormBuilderPage() {
           <ArrowLeft size={16} />
         </Button>
         <h2 className="text-xl font-bold flex-1">Formulier bewerken</h2>
-        <a href={`/forms/${form.cuid}`} target="_blank" rel="noopener noreferrer">
+        <a href={`/forms/${form.cuid}?preview=true`} target="_blank" rel="noopener noreferrer">
           <Button size="sm" variant="ghost"><ExternalLink size={14} /> Voorbeeld</Button>
         </a>
         <Link href={`/admin/forms/${form.id}/submissions`}>

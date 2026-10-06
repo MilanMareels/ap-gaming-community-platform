@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { RichTextEditor } from '@/components/ui/RichTextEditor';
 import { apiClient } from '@/api';
@@ -83,6 +83,9 @@ export default function AdminJobEditorPage() {
           <ArrowLeft size={16} />
         </Button>
         <h2 className="text-xl font-bold flex-1">Vacature bewerken</h2>
+        <a href={`/jobs/${jobId}?preview=true`} target="_blank" rel="noopener noreferrer">
+          <Button size="sm" variant="ghost"><ExternalLink size={14} /> Voorbeeld</Button>
+        </a>
         <Button size="sm" onClick={handleSave} disabled={saving}>
           <Save size={14} /> {saving ? 'Opslaan...' : saved ? 'Opgeslagen!' : 'Opslaan'}
         </Button>
