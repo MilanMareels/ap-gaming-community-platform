@@ -49,11 +49,9 @@ export default function PublicJobsPage() {
         <ScrollReveal>
           <div className="text-center mb-12">
             <h1 className="text-4xl font-black uppercase tracking-wider mb-3">
-              <span className="text-red-600">Vacatures</span>
+              <span className="text-red-600">Versterk Onze Teams</span>
             </h1>
-            <p className="text-gray-400 text-lg">
-              Wil je meehelpen bij AP Gaming Hub? Bekijk onze openstaande vacatures!
-            </p>
+            <p className="text-gray-400 text-lg">Sluit je aan bij onze staff of esports teams en maak deel uit van AP Gaming!</p>
           </div>
         </ScrollReveal>
 
@@ -73,14 +71,8 @@ export default function PublicJobsPage() {
                   <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-red-600/50 transition-colors group">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <h2 className="text-xl font-bold mb-2 group-hover:text-red-400 transition-colors">
-                          {job.title}
-                        </h2>
-                        {job.shortDescription && (
-                          <p className="text-gray-400 text-sm line-clamp-2">
-                            {job.shortDescription}
-                          </p>
-                        )}
+                        <h2 className="text-xl font-bold mb-2 group-hover:text-red-400 transition-colors">{job.title}</h2>
+                        {job.shortDescription && <p className="text-gray-400 text-sm line-clamp-2">{job.shortDescription}</p>}
                       </div>
                       <ArrowRight className="text-gray-600 group-hover:text-red-400 transition-colors mt-1 shrink-0" size={20} />
                     </div>
