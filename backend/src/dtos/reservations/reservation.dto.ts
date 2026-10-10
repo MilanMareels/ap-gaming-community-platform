@@ -155,3 +155,37 @@ export class ReservationVerificationDto {
   @ApiProperty({ enum: ReservationStatus })
   status!: ReservationStatus;
 }
+
+export class MyReservationDto {
+  @ApiProperty({ example: 'cm9x8k2df0000a1b2c3d4e5f6' })
+  cuid!: string;
+
+  @ApiProperty({ example: 'pc', enum: ['pc', 'ps5', 'switch'] })
+  inventory!: string;
+
+  @ApiProperty({ example: 2 })
+  controllers!: number;
+
+  @ApiProperty({ example: '2026-02-28T10:00:00.000Z' })
+  startTime!: Date;
+
+  @ApiProperty({ example: '2026-02-28T12:00:00.000Z' })
+  endTime!: Date;
+
+  @ApiProperty({ enum: ReservationStatus, enumName: 'ReservationStatus' })
+  status!: ReservationStatus;
+}
+
+export class MyReservationsResponseDto {
+  @ApiProperty({ type: [MyReservationDto], description: 'All reservations of the authenticated user, newest first' })
+  reservations!: MyReservationDto[];
+
+  @ApiProperty({ example: 1, description: 'Number of no-shows currently counting towards a block' })
+  noShowCount!: number;
+
+  @ApiProperty({ example: 3, description: 'Number of no-shows after which the user can no longer make reservations' })
+  noShowLimit!: number;
+
+  @ApiProperty({ description: 'Whether the user is blocked from making new reservations' })
+  isBlocked!: boolean;
+}

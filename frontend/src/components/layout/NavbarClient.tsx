@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Gamepad2, Lock, LogIn, Menu, X, ArrowRight, ChevronDown } from 'lucide-react';
+import { Gamepad2, Lock, LogIn, Menu, X, ArrowRight, ChevronDown, UserRound } from 'lucide-react';
 import { DynamicIcon, iconNames } from 'lucide-react/dynamic';
 import type { NavLinkWithChildren } from '@/api';
 
@@ -164,13 +164,21 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex flex-shrink-0 items-center pl-6 gap-3">
-          {userRole === 'public' && (
+          {userRole === 'public' ? (
             <Link
               href="/login"
               className="border border-white/20 text-gray-300 hover:text-white hover:border-white/40 px-5 py-2 rounded-full text-base font-medium transition-all inline-flex items-center gap-1.5"
             >
               <LogIn size={16} strokeWidth={1.5} />
               Login
+            </Link>
+          ) : (
+            <Link
+              href="/profile"
+              className={`border px-5 py-2 rounded-full text-base font-medium transition-all inline-flex items-center gap-1.5 ${pathname === '/profile' ? 'border-white/40 text-white' : 'border-white/20 text-gray-300 hover:text-white hover:border-white/40'}`}
+            >
+              <UserRound size={16} strokeWidth={1.5} />
+              Profiel
             </Link>
           )}
           {ctaItems.map((item) => (
@@ -254,7 +262,7 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
                 </Link>
               ),
             )}
-            {userRole === 'public' && (
+            {userRole === 'public' ? (
               <Link
                 href="/login"
                 onClick={() => setIsOpen(false)}
@@ -262,6 +270,15 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
               >
                 <LogIn size={18} strokeWidth={1.5} />
                 Login
+              </Link>
+            ) : (
+              <Link
+                href="/profile"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 px-3 py-2 rounded-md text-lg font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all"
+              >
+                <UserRound size={18} strokeWidth={1.5} />
+                Profiel
               </Link>
             )}
             {ctaItems.map((item) => (

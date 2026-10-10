@@ -5,11 +5,15 @@ import { InventoryAdjustmentsService } from '../inventory-adjustments/inventory-
 import {
   AdminCreateReservationDto,
   CreateReservationDto,
+  MyReservationsResponseDto,
   ReservationStatus,
   UpdateReservationDto,
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
 import { errorMessages } from '../../errors/errorMessages.js';
+
+/** Number of no-shows after which a user can no longer make reservations. */
+export const NO_SHOW_LIMIT = 3;
 
 @Injectable()
 export class ReservationsService {
@@ -107,6 +111,36 @@ export class ReservationsService {
     }
   }
 
+  private async sendNoShowEmail(email: string, name: string, noShowCount: number, inventory: string, startTime: Date, endTime: Date): Promise<void> {
+    // First no-show is a friendly reminder, anything below the limit is a warning, reaching the limit blocks the user
+    const isBlocked = noShowCount >= NO_SHOW_LIMIT;
+    const isFirst = !isBlocked && noShowCount === 1;
+    const subject = isBlocked
+      ? 'Je kan niet meer reserveren - AP Gaming Hub'
+      : isFirst
+        ? 'We hebben je gemist - AP Gaming Hub'
+        : 'Waarschuwing: herhaalde no-show - AP Gaming Hub';
+
+    try {
+      await this.mailService.sendMail(email, subject, 'reservation/no-show', {
+        name,
+        noShowCount,
+        noShowLimit: NO_SHOW_LIMIT,
+        remaining: Math.max(0, NO_SHOW_LIMIT - noShowCount),
+        isFirst,
+        isBlocked,
+        inventory: this.capitalizeInventory(inventory),
+        startTime: this.formatDateTimeDutch(startTime),
+        endTime: this.formatDateTimeDutch(endTime),
+        guideUrl: `${process.env.FRONTEND_URL}/reservations/how-to-cancel`,
+        profileUrl: `${process.env.FRONTEND_URL}/profile`,
+      });
+    } catch (error) {
+      // Log error but don't fail the status update
+      console.error('Failed to send no-show email:', error);
+    }
+  }
+
   async createForUser(userId: number, dto: CreateReservationDto) {
     const now = new Date();
     const maxDate = new Date();
@@ -169,7 +203,7 @@ export class ReservationsService {
       },
     });
 
-    if (noShowCount >= 3) {
+    if (noShowCount >= NO_SHOW_LIMIT) {
       throw new BadRequestException('You already have three no-shows. You can no longer make new reservations.');
     }
 
@@ -472,11 +506,30 @@ export class ReservationsService {
       throw new NotFoundException('Reservation not found');
     }
 
-    return this.prisma.reservation.update({
+    const updatedReservation = await this.prisma.reservation.update({
       where: { id },
       data: { status: dto.status },
       include: { user: true },
     });
+
+    // Only notify on the transition to NO_SHOW, so re-saving an existing no-show doesn't send another email
+    if (dto.status === ReservationStatus.NO_SHOW && reservation.status !== ReservationStatus.NO_SHOW) {
+      const noShowCount = await this.prisma.reservation.count({
+        where: { userId: updatedReservation.userId, status: ReservationStatus.NO_SHOW },
+      });
+
+      await this.sendNoShowEmail(
+        updatedReservation.email,
+        // Admin-created reservations can belong to users without a name or student number ('N/A')
+        updatedReservation.user.name ?? (updatedReservation.user.sNumber !== 'N/A' ? updatedReservation.user.sNumber : 'gamer'),
+        noShowCount,
+        updatedReservation.inventory,
+        updatedReservation.startTime,
+        updatedReservation.endTime,
+      );
+    }
+
+    return updatedReservation;
   }
 
   async remove(id: number) {
@@ -896,6 +949,43 @@ export class ReservationsService {
     };
   }
 
+  async getMine(userId: number): Promise<MyReservationsResponseDto> {
+    const reservations = await this.prisma.reservation.findMany({
+      where: { userId },
+      select: {
+        cuid: true,
+        inventory: true,
+        controllers: true,
+        startTime: true,
+        endTime: true,
+        status: true,
+      },
+      orderBy: { startTime: 'desc' },
+    });
+
+    const noShowCount = reservations.filter((r) => r.status === ReservationStatus.NO_SHOW).length;
+
+    return {
+      reservations: reservations.map((r) => ({ ...r, status: r.status as ReservationStatus })),
+      noShowCount,
+      noShowLimit: NO_SHOW_LIMIT,
+      isBlocked: noShowCount >= NO_SHOW_LIMIT,
+    };
+  }
+
+  async cancelMine(userId: number, cuid: string) {
+    const reservation = await this.prisma.reservation.findFirst({
+      where: { cuid },
+    });
+
+    // Don't reveal whether a reservation exists when it belongs to someone else
+    if (!reservation || reservation.userId !== userId) {
+      throw new NotFoundException('Reservation not found');
+    }
+
+    return this.cancelReservation(reservation);
+  }
+
   async cancelByCuid(cuid: string) {
     const reservation = await this.prisma.reservation.findFirst({
       where: { cuid },
@@ -905,6 +995,10 @@ export class ReservationsService {
       throw new NotFoundException('Reservation not found');
     }
 
+    return this.cancelReservation(reservation);
+  }
+
+  private async cancelReservation(reservation: { id: number; status: string; startTime: Date }) {
     if (reservation.status === ReservationStatus.CANCELLED) {
       throw new BadRequestException('Reservation is already cancelled');
     }
