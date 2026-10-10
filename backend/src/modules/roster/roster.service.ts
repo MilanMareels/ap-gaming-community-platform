@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { CreateRosterEntryDto } from '../../dtos/roster/roster.dto.js';
+import { CreateRosterEntryDto, UpdateRosterEntryDto } from '../../dtos/roster/roster.dto.js';
 
 @Injectable()
 export class RosterService {
@@ -70,6 +70,23 @@ export class RosterService {
         role: dto.role,
         imageUrl: imagePath,
       },
+      include: {
+        user: true,
+        game: true,
+      },
+    });
+  }
+
+  async updateEntry(id: number, dto: UpdateRosterEntryDto, imagePath: string | null | undefined) {
+    const data: Record<string, unknown> = {};
+    if (dto.handle !== undefined) data.handle = dto.handle;
+    if (dto.rank !== undefined) data.rank = dto.rank;
+    if (dto.role !== undefined) data.role = dto.role;
+    if (imagePath !== undefined) data.imageUrl = imagePath;
+
+    return this.prisma.rosterEntry.update({
+      where: { id },
+      data,
       include: {
         user: true,
         game: true,

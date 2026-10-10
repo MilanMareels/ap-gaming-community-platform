@@ -1,18 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AlertOctagon, Check, ShieldOff } from 'lucide-react';
+import { Ban, ShieldOff, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { apiClient } from '@/api';
 import type { ReservationWithUser } from '@/api';
-import { Button } from '@/components/ui/Button';
+import { PageHeader } from '@/components/admin/PageHeader';
+import { EmptyState } from '@/components/admin/EmptyState';
 
-/** Extract date (YYYY-MM-DD) from an ISO datetime string */
 function dateFromISO(iso: string): string {
   return iso.slice(0, 10);
 }
 
-/** Format an ISO datetime string to HH:mm */
 function formatTime(iso: string): string {
   if (/^\d{2}:\d{2}$/.test(iso)) return iso;
   const d = new Date(iso);
@@ -42,8 +41,7 @@ export default function AdminNoShowsPage() {
   }
 
   useEffect(() => {
-    fetchNoShows();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    void fetchNoShows();
   }, []);
 
   const handelUnblockUser = async (userId: string) => {
@@ -58,7 +56,6 @@ export default function AdminNoShowsPage() {
     }
   };
 
-  // Group no-shows by student (sNumber or email as key)
   const grouped: NoShowGroup[] = Object.values(
     noShows
       .filter((r) => {
@@ -88,63 +85,68 @@ export default function AdminNoShowsPage() {
   ).sort((a, b) => b.count - a.count);
 
   return (
-    <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
-      <div className="p-6 border-b border-slate-800">
-        <h3 className="font-bold text-xl flex items-center gap-2">
-          <AlertOctagon className="text-red-500" /> No-Show Logboek
-        </h3>
-        <p className="text-gray-400 text-sm mt-1">Lijst van studenten die niet zijn komen opdagen.</p>
-        <div className="mt-4">
-          <input
-            type="text"
-            placeholder="Zoek op Email of S-nummer"
-            className="bg-slate-950 border border-slate-700 rounded p-2 text-white text-sm w-full md:w-64"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+    <>
+      <PageHeader title="No-Shows" description="Lijst van studenten die niet zijn komen opdagen." />
+
+      <div className="bg-linear-to-br from-slate-900 via-slate-900 to-slate-900/90 rounded-xl border border-slate-800 overflow-hidden">
+        <div className="p-4 border-b border-slate-800/60 bg-slate-900/50">
+          <div className="relative max-w-md">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+            <input
+              type="text"
+              placeholder="Zoek op naam, email of s-nummer..."
+              className="w-full bg-slate-950 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-gray-500 focus:border-red-500 focus:ring-1 focus:ring-red-500/20 outline-none transition-colors"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="bg-slate-950 text-gray-500">
+                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider">Student</th>
+                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider">Aantal</th>
+                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider">Geschiedenis</th>
+                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-right">Actie</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/60">
+              {grouped.map((s) => (
+                <tr key={s.sNumber} className="hover:bg-slate-800/30 transition-colors">
+                  <td className="px-4 py-3.5">
+                    <div className="font-medium text-white">{s.name}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">
+                      {s.email}
+                      {s.sNumber !== '-' && <span className="text-gray-600 ml-1">({s.sNumber})</span>}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <Badge variant="danger">{s.count}x</Badge>
+                  </td>
+                  <td className="px-4 py-3.5 text-gray-400 text-xs max-w-xs truncate">{s.history.join(', ')}</td>
+                  <td className="px-4 py-3.5 text-right">
+                    <button
+                      onClick={() => handelUnblockUser(s.id)}
+                      className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors"
+                      title="Deblokkeren"
+                    >
+                      <ShieldOff size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {grouped.length === 0 && (
+                <tr>
+                  <td colSpan={4}>
+                    <EmptyState icon={Ban} title="Geen no-shows geregistreerd" description="Er zijn momenteel geen no-shows in het systeem." />
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-slate-950 text-gray-500 uppercase">
-            <tr>
-              <th className="p-4">Student</th>
-              <th className="p-4">Aantal No-Shows</th>
-              <th className="p-4">Geschiedenis</th>
-              <th className="p-4 text-right">Actie</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-800">
-            {grouped.map((s) => (
-              <tr key={s.sNumber}>
-                <td className="p-4 font-bold">
-                  {s.name}
-                  <div className="text-xs text-gray-500 font-normal">
-                    {s.email}
-                    {s.sNumber !== '-' && <span className="ml-2 text-gray-600">({s.sNumber})</span>}
-                  </div>
-                </td>
-                <td className="p-4">
-                  <Badge variant="danger">{s.count}x</Badge>
-                </td>
-                <td className="p-4 text-gray-400 text-xs">{s.history.join(', ')}</td>
-                <td className="p-4 text-right">
-                  <Button size="md" variant="secondary" title="Deblokkeren gebruiker" onClick={() => handelUnblockUser(s.id)}>
-                    <ShieldOff size="16" />
-                  </Button>
-                </td>
-              </tr>
-            ))}
-            {grouped.length === 0 && (
-              <tr>
-                <td colSpan={4} className="p-8 text-center text-gray-500">
-                  Geen no-shows geregistreerd.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    </>
   );
 }

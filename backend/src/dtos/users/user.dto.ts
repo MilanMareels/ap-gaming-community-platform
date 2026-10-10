@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBooleanString, IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsBooleanString, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class UserListQueryDto {
   @ApiProperty({ required: false, description: 'Search by name, email or sNumber' })
@@ -16,6 +17,21 @@ export class UserListQueryDto {
   @IsOptional()
   @IsBooleanString()
   noShowsOnly?: string;
+
+  @ApiProperty({ required: false, default: 1, minimum: 1, description: 'Page number, starting at 1' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @ApiProperty({ required: false, default: 25, minimum: 1, maximum: 100, description: 'Number of users per page' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  pageSize?: number;
 }
 
 export class UserListItemDto {
@@ -48,6 +64,23 @@ export class UserListItemDto {
 
   @ApiProperty({ type: [String] })
   roles!: string[];
+}
+
+export class UserListResponseDto {
+  @ApiProperty({ type: [UserListItemDto] })
+  items!: UserListItemDto[];
+
+  @ApiProperty({ description: 'Total number of users matching the filters' })
+  total!: number;
+
+  @ApiProperty()
+  page!: number;
+
+  @ApiProperty()
+  pageSize!: number;
+
+  @ApiProperty()
+  totalPages!: number;
 }
 
 export class UserSsoLinkDto {

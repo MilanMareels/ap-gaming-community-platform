@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Delete, Param, UseGuards, BadRequestException, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Delete, Param, UseGuards, BadRequestException, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiConsumes } from '@nestjs/swagger';
 import { RosterService } from './roster.service.js';
-import { CreateRosterEntryDto, CreateRosterGameDto } from '../../dtos/roster/roster.dto.js';
+import { CreateRosterEntryDto, CreateRosterGameDto, UpdateRosterEntryDto } from '../../dtos/roster/roster.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
@@ -76,6 +76,34 @@ export class RosterController {
   createEntry(@Body() dto: CreateRosterEntryDto, @UploadedFile() file?: any) {
     const imagePath = file ? `uploads/rosters/${file.filename}` : null;
     return this.rosterService.createEntry(dto, imagePath);
+  }
+
+  @Patch('entries/:id')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('roster.manage')
+  @ApiOperation({ summary: 'Update a roster entry with optional image (Admin only)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse({ type: PrismaModel.RosterEntry })
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads/rosters',
+        filename: (req, file, cb) => {
+          const ext = extname(file.originalname);
+          cb(null, `roster-${randomUUID()}${ext}`);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
+          return cb(null, false);
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  updateEntry(@Param('id') id: string, @Body() dto: UpdateRosterEntryDto, @UploadedFile() file?: any) {
+    const imagePath = file ? `uploads/rosters/${file.filename}` : undefined;
+    return this.rosterService.updateEntry(+id, dto, imagePath);
   }
 
   @Delete('entries/:id')

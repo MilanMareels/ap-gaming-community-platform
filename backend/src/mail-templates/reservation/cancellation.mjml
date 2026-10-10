@@ -56,7 +56,7 @@
       <mj-column>
         <mj-text align="center" font-size="13px" color="#9ca3af" line-height="1.6"> Voor vragen, neem contact met ons op. </mj-text>
         <mj-divider border-color="#374151" padding="20px 0"></mj-divider>
-        <mj-text align="center" font-size="11px" color="#6b7280"> © 2026 AP Gaming Hub. Alle rechten voorbehouden. </mj-text>
+        <mj-text align="center" font-size="11px" color="#6b7280"> © {{ currentYear }} AP Gaming Hub. Alle rechten voorbehouden. </mj-text>
       </mj-column>
     </mj-section>
   </mj-body>

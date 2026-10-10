@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, Shield, Users, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { PageHeader } from '@/components/admin/PageHeader';
+import { EmptyState } from '@/components/admin/EmptyState';
 import { apiClient } from '@/api';
 import { getApiErrorMessage } from '@/util/api-error';
 
@@ -22,7 +24,6 @@ interface Permission {
   description: string | null;
 }
 
-// Permission categories for the checkbox grid
 const PERMISSION_CATEGORIES: Record<string, string[]> = {
   Events: ['events.manage', 'events.registrations.view'],
   Reservaties: ['reservations.manage', 'reservations.noshows.manage'],
@@ -31,13 +32,15 @@ const PERMISSION_CATEGORIES: Record<string, string[]> = {
   Beheer: ['users.manage', 'users.roles.manage', 'roles.manage', 'settings.manage'],
 };
 
+const inputClass = 'w-full bg-slate-950 border border-slate-700 rounded-lg py-2.5 px-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/20 transition-colors';
+const labelClass = 'block text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-1.5';
+
 export default function AdminRolesPage() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [allPermissions, setAllPermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Form state
   const [formMode, setFormMode] = useState<'none' | 'create' | 'edit'>('none');
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [formName, setFormName] = useState('');
@@ -179,113 +182,129 @@ export default function AdminRolesPage() {
   };
 
   if (loading) {
-    return <div className="text-gray-400">Laden...</div>;
+    return (
+      <>
+        <PageHeader title="Rollen" description="Beheer rollen en permissies." />
+        <div className="text-gray-400 text-center py-12">Laden...</div>
+      </>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">Rollen</h2>
-        <Button onClick={openCreateForm}>
-          <Plus size={18} /> Nieuwe rol
-        </Button>
-      </div>
+    <>
+      <PageHeader
+        title="Rollen"
+        description="Beheer rollen en permissies."
+        actions={
+          <Button size="sm" variant="primary" onClick={openCreateForm}>
+            <Plus size={16} /> Nieuwe rol
+          </Button>
+        }
+      />
 
       {error && (
-        <div className="bg-red-900/30 border border-red-900 text-red-400 px-4 py-3 rounded">
+        <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
           {error}
         </div>
       )}
 
       {/* Form */}
       {formMode !== 'none' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">
+        <div className="mb-6 bg-linear-to-br from-slate-900 via-slate-900 to-slate-900/90 border border-slate-800 rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-800/60 flex items-center justify-between bg-slate-900/50">
+            <h3 className="text-sm font-bold text-white">
               {formMode === 'create' ? 'Nieuwe rol' : `Rol bewerken: ${editingRole?.name}`}
             </h3>
-            <button onClick={closeForm} className="text-gray-500 hover:text-white">
-              <X size={20} />
+            <button onClick={closeForm} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-slate-800 transition-colors">
+              <X size={18} />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Naam</label>
-              <input
-                type="text"
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white focus:outline-none focus:border-red-600"
-                placeholder="bijv. Event Manager"
-                disabled={editingRole?.isSystem && formMode === 'edit'}
-              />
+          <div className="px-6 py-5 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Naam</label>
+                <input
+                  type="text"
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  className={inputClass}
+                  placeholder="bijv. Event Manager"
+                  disabled={editingRole?.isSystem && formMode === 'edit'}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Beschrijving</label>
+                <input
+                  type="text"
+                  value={formDescription}
+                  onChange={(e) => setFormDescription(e.target.value)}
+                  className={inputClass}
+                  placeholder="bijv. Kan events en toernooien beheren"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Beschrijving</label>
-              <input
-                type="text"
-                value={formDescription}
-                onChange={(e) => setFormDescription(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white focus:outline-none focus:border-red-600"
-                placeholder="bijv. Kan events en toernooien beheren"
-              />
-            </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-3">Permissies</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Object.entries(PERMISSION_CATEGORIES).map(([category, keys]) => (
-                <div key={category} className="bg-slate-800/50 rounded-lg p-3 space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-300 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={keys.every((k) => formPermissions.has(k))}
-                      onChange={() => toggleCategory(keys)}
-                      className="rounded accent-red-600"
-                    />
-                    {category}
-                  </label>
-                  <div className="space-y-1 ml-5">
-                    {keys.map((key) => (
-                      <label key={key} className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formPermissions.has(key)}
-                          onChange={() => togglePermission(key)}
-                          className="rounded accent-red-600"
-                        />
-                        {getPermissionLabel(key)}
-                      </label>
-                    ))}
+            <div>
+              <label className={labelClass}>Permissies</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
+                {Object.entries(PERMISSION_CATEGORIES).map(([category, keys]) => (
+                  <div key={category} className="bg-slate-950/60 border border-slate-800/60 rounded-lg p-3 space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-300 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={keys.every((k) => formPermissions.has(k))}
+                        onChange={() => toggleCategory(keys)}
+                        className="rounded accent-red-600"
+                      />
+                      {category}
+                    </label>
+                    <div className="space-y-1 ml-5">
+                      {keys.map((key) => (
+                        <label key={key} className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formPermissions.has(key)}
+                            onChange={() => togglePermission(key)}
+                            className="rounded accent-red-600"
+                          />
+                          {getPermissionLabel(key)}
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="flex gap-2 pt-2">
-            <Button onClick={handleSave} disabled={saving}>
-              {saving ? 'Opslaan...' : formMode === 'create' ? 'Aanmaken' : 'Opslaan'}
-            </Button>
-            <Button variant="ghost" onClick={closeForm}>
-              Annuleren
-            </Button>
+            <div className="flex gap-2 pt-2">
+              <Button size="sm" variant="primary" onClick={handleSave} disabled={saving}>
+                {saving ? 'Opslaan...' : formMode === 'create' ? 'Aanmaken' : 'Opslaan'}
+              </Button>
+              <Button size="sm" variant="secondary" onClick={closeForm}>
+                Annuleren
+              </Button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Roles list */}
-      <div className="grid gap-4">
+      <div className="space-y-3">
         {roles.map((role) => (
           <div
             key={role.id}
-            className="bg-slate-900 border border-slate-800 rounded-lg p-4"
+            className="bg-linear-to-r from-slate-900 to-slate-900/80 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition-all group"
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <Shield size={20} className={role.isSystem ? 'text-red-500' : 'text-blue-400'} />
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                  role.isSystem
+                    ? 'bg-linear-to-br from-red-500/20 to-red-600/10 border border-red-500/20'
+                    : 'bg-linear-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/20'
+                }`}>
+                  <Shield size={18} className={role.isSystem ? 'text-red-400' : 'text-blue-400'} />
+                </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-white">{role.name}</span>
@@ -298,17 +317,25 @@ export default function AdminRolesPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1 text-sm text-gray-500">
+                <span className="flex items-center gap-1 text-xs text-gray-500">
                   <Users size={14} /> {role.userCount}
                 </span>
-                <Button variant="ghost" onClick={() => openEditForm(role)} className="p-2">
-                  <Pencil size={16} />
-                </Button>
-                {!role.isSystem && (
-                  <Button variant="ghost" onClick={() => handleDelete(role)} className="p-2 text-red-500 hover:text-red-400">
-                    <Trash2 size={16} />
-                  </Button>
-                )}
+                <div className="flex gap-1 opacity-50 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => openEditForm(role)}
+                    className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  {!role.isSystem && (
+                    <button
+                      onClick={() => handleDelete(role)}
+                      className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-900/20 transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -326,9 +353,11 @@ export default function AdminRolesPage() {
         ))}
 
         {roles.length === 0 && (
-          <div className="text-center text-gray-500 py-8">Geen rollen gevonden</div>
+          <div className="bg-linear-to-br from-slate-900 via-slate-900 to-slate-900/90 rounded-xl border border-slate-800">
+            <EmptyState icon={Shield} title="Geen rollen gevonden" description="Maak een nieuwe rol aan." />
+          </div>
         )}
       </div>
-    </div>
+    </>
   );
 }

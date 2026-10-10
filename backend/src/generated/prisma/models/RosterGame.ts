@@ -171,7 +171,7 @@ export type RosterGameGroupByOutputType = {
   _max: RosterGameMaxAggregateOutputType | null
 }
 
-type GetRosterGameGroupByPayload<T extends RosterGameGroupByArgs> = Prisma.PrismaPromise<
+export type GetRosterGameGroupByPayload<T extends RosterGameGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<RosterGameGroupByOutputType, T['by']> &
       {
@@ -1031,6 +1031,11 @@ export type RosterGameFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` RosterGames.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of RosterGames.
+   */
   distinct?: Prisma.RosterGameScalarFieldEnum | Prisma.RosterGameScalarFieldEnum[]
 }
 

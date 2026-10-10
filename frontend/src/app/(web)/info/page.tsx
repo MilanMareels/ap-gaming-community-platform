@@ -3,19 +3,27 @@
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { ShieldAlert, Terminal, Cpu, Users, Gamepad2, Zap, Lock, ChevronDown, ChevronUp, ClipboardList, Info } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { apiClient } from '@/api';
 import DiscordIcon from '@/components/ui/DiscordIcon';
 
-const FAQS = [
+const FAQS: { question: string; answer: string; link?: { href: string; label: string } }[] = [
   {
     question: 'Hoe reserveer ik een plaats?',
     answer:
-      "Ga via het menu naar de pagina 'Reservaties'. Vul je studentennummer en AP-e-mailadres in, kies of je een pc of PS5 wilt gebruiken en selecteer een beschikbaar tijdslot.",
+      "Ga via het menu naar de pagina 'Reservaties' en log in met je AP Microsoft-account. Kies of je een pc, PS5 of Switch wilt gebruiken en selecteer een beschikbaar tijdslot.",
+  },
+  {
+    question: 'Hoe annuleer ik mijn reservatie?',
+    answer:
+      "Log in en ga naar 'Profiel', of klik op 'Reservatie annuleren' in je bevestigingsmail. Je kan annuleren tot het begin van je reservatie.",
+    link: { href: '/reservations/how-to-cancel', label: 'Bekijk de stap-voor-stap uitleg' },
   },
   {
     question: 'Wat als ik niet kom opdagen bij mijn reservatie?',
     answer:
-      'Ben je verhinderd? Annuleer dan op tijd via Discord of e-mail. Bij een no-show zonder afmelding krijg je een waarschuwing. Bij herhaling kan je account tijdelijk geblokkeerd worden.',
+      'Kom je niet opdagen zonder te annuleren, dan krijg je een no-show. Bij je eerste no-show krijg je een herinnering, bij de tweede een waarschuwing en na drie no-shows kan je niet meer reserveren.',
+    link: { href: '/reservations/how-to-cancel', label: 'Meer over het no-show beleid' },
   },
   {
     question: "Welke PC's zijn er?",
@@ -304,6 +312,11 @@ export default function InfoPage() {
                     }`}
                   >
                     <p className="text-gray-400 text-lg leading-relaxed border-t border-white/10 pt-4">{faq.answer}</p>
+                    {faq.link && (
+                      <Link href={faq.link.href} className="inline-block mt-3 text-[#d42422] hover:text-red-400 font-semibold transition-colors">
+                        {faq.link.label} &rarr;
+                      </Link>
+                    )}
                   </div>
                 </div>
               ))}

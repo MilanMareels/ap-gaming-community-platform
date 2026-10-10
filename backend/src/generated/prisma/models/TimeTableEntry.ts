@@ -203,7 +203,7 @@ export type TimeTableEntryGroupByOutputType = {
   _max: TimeTableEntryMaxAggregateOutputType | null
 }
 
-type GetTimeTableEntryGroupByPayload<T extends TimeTableEntryGroupByArgs> = Prisma.PrismaPromise<
+export type GetTimeTableEntryGroupByPayload<T extends TimeTableEntryGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<TimeTableEntryGroupByOutputType, T['by']> &
       {
@@ -1033,6 +1033,11 @@ export type TimeTableEntryFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Skip the first `n` TimeTableEntries.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of TimeTableEntries.
+   */
   distinct?: Prisma.TimeTableEntryScalarFieldEnum | Prisma.TimeTableEntryScalarFieldEnum[]
 }
 
