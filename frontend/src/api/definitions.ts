@@ -281,6 +281,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reservations/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get reservations and no-show status of the authenticated user */
+        get: operations["ReservationsController_getMine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reservations/me/{cuid}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Cancel an own reservation of the authenticated user */
+        patch: operations["ReservationsController_cancelMine"];
+        trace?: never;
+    };
     "/reservations/cancel/{cuid}": {
         parameters: {
             query?: never;
@@ -1789,6 +1823,44 @@ export interface components {
             /** @example Bad Request */
             error: string;
         };
+        MyReservationDto: {
+            /** @example cm9x8k2df0000a1b2c3d4e5f6 */
+            cuid: string;
+            /**
+             * @example pc
+             * @enum {string}
+             */
+            inventory: "pc" | "ps5" | "switch";
+            /** @example 2 */
+            controllers: number;
+            /**
+             * Format: date-time
+             * @example 2026-02-28T10:00:00.000Z
+             */
+            startTime: string;
+            /**
+             * Format: date-time
+             * @example 2026-02-28T12:00:00.000Z
+             */
+            endTime: string;
+            status: components["schemas"]["ReservationStatus"];
+        };
+        MyReservationsResponseDto: {
+            /** @description All reservations of the authenticated user, newest first */
+            reservations: components["schemas"]["MyReservationDto"][];
+            /**
+             * @description Number of no-shows currently counting towards a block
+             * @example 1
+             */
+            noShowCount: number;
+            /**
+             * @description Number of no-shows after which the user can no longer make reservations
+             * @example 3
+             */
+            noShowLimit: number;
+            /** @description Whether the user is blocked from making new reservations */
+            isBlocked: boolean;
+        };
         ReservationSlotDto: {
             /** @example pc */
             inventory: string;
@@ -2263,6 +2335,14 @@ export interface components {
             reservationCount: number;
             noShowCount: number;
             roles: string[];
+        };
+        UserListResponseDto: {
+            items: components["schemas"]["UserListItemDto"][];
+            /** @description Total number of users matching the filters */
+            total: number;
+            page: number;
+            pageSize: number;
+            totalPages: number;
         };
         WhitelistEntryDto: {
             email: string;
@@ -3425,6 +3505,64 @@ export interface operations {
             };
         };
     };
+    ReservationsController_getMine: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyReservationsResponseDto"];
+                };
+            };
+        };
+    };
+    ReservationsController_cancelMine: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+            /** @description Reservation is already cancelled or has already started */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+            /** @description Reservation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
     ReservationsController_cancelByCuid: {
         parameters: {
             query?: never;
@@ -4553,6 +4691,10 @@ export interface operations {
                 adminOnly?: string;
                 /** @description Only return users with active no-shows when "true" */
                 noShowsOnly?: string;
+                /** @description Page number, starting at 1 */
+                page?: number;
+                /** @description Number of users per page */
+                pageSize?: number;
             };
             header?: never;
             path?: never;
@@ -4565,7 +4707,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserListItemDto"][];
+                    "application/json": components["schemas"]["UserListResponseDto"];
                 };
             };
         };

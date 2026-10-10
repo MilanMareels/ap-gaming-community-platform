@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Trash2, Gamepad2, Plus, Pencil, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -33,16 +33,6 @@ function todayLocal(): string {
   return `${y}-${m}-${day}`;
 }
 
-/**
- * Build a Date whose UTC value equals the current local wall-clock time.
- * Reservation timestamps are stored as fake UTC (local time with a Z suffix),
- * so comparisons must use the same convention.
- */
-function nowAsFakeUTC(): Date {
-  const d = new Date();
-  return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()));
-}
-
 export default function AdminReservationsPage() {
   const [reservations, setReservations] = useState<ReservationWithUser[]>([]);
   const [filterDate, setFilterDate] = useState(todayLocal);
@@ -51,9 +41,6 @@ export default function AdminReservationsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingReservation, setEditingReservation] = useState<ReservationWithUser | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
-  const dividerRef = useRef<HTMLTableRowElement | null>(null);
-  const mobileDividerRef = useRef<HTMLDivElement | null>(null);
-  const hasScrolled = useRef(false);
 
   async function fetchReservations() {
     try {
@@ -125,52 +112,6 @@ export default function AdminReservationsPage() {
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  // Re-evaluate "now" every minute so the divider moves automatically
-  // Uses fake-UTC to match the convention used by stored reservation timestamps
-  const [now, setNow] = useState(nowAsFakeUTC);
-  useEffect(() => {
-    const interval = setInterval(() => setNow(nowAsFakeUTC()), 60_000);
-    return () => clearInterval(interval);
-  }, []);
-  // Only show the "now" divider when the current time falls within the range of today's reservations
-  const nowIsRelevant =
-    filtered.length > 0 &&
-    now >= new Date(filtered[0].startTime) &&
-    now <= new Date(filtered[filtered.length - 1].endTime);
-
-  const dividerIndexInFiltered = nowIsRelevant ? filtered.findIndex((r) => new Date(r.endTime) > now) : -1;
-  // The page that contains the divider
-  const dividerPage = dividerIndexInFiltered >= 0 ? Math.floor(dividerIndexInFiltered / ITEMS_PER_PAGE) + 1 : -1;
-  // The index within the current page's items where the divider sits (before this index)
-  const dividerIndexInPage =
-    dividerPage === currentPage && dividerIndexInFiltered >= 0
-      ? dividerIndexInFiltered - (currentPage - 1) * ITEMS_PER_PAGE
-      : -1;
-
-  // On first load, jump to the page containing the divider
-  const scrollToDivider = useCallback(() => {
-    const el = dividerRef.current || mobileDividerRef.current;
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!hasScrolled.current && dividerPage > 0 && reservations.length > 0) {
-      hasScrolled.current = true;
-      setCurrentPage(dividerPage);
-    }
-  }, [dividerPage, reservations.length]);
-
-  useEffect(() => {
-    // After the page renders with the divider, scroll to it
-    if (hasScrolled.current) {
-      // Small delay to let DOM render
-      const timer = setTimeout(scrollToDivider, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [currentPage, scrollToDivider]);
-
   const statusOptions: { value: ReservationStatus; label: string; color: string }[] = [
     { value: 'RESERVED', label: 'Geboekt', color: 'text-yellow-400' },
     { value: 'PRESENT', label: 'Aanwezig', color: 'text-green-400' },
@@ -199,28 +140,6 @@ export default function AdminReservationsPage() {
       </select>
     );
   };
-
-  /** Red divider row for the desktop table */
-  const renderTableDivider = () => (
-    <tr ref={dividerRef}>
-      <td colSpan={6} className="p-0">
-        <div className="flex items-center gap-3 px-4 py-2">
-          <div className="flex-1 h-px bg-red-500" />
-          <span className="text-xs font-bold uppercase text-red-500 whitespace-nowrap">Nu</span>
-          <div className="flex-1 h-px bg-red-500" />
-        </div>
-      </td>
-    </tr>
-  );
-
-  /** Red divider for mobile cards */
-  const renderMobileDivider = () => (
-    <div ref={mobileDividerRef} className="flex items-center gap-3 px-2 py-1">
-      <div className="flex-1 h-px bg-red-500" />
-      <span className="text-xs font-bold uppercase text-red-500 whitespace-nowrap">Nu</span>
-      <div className="flex-1 h-px bg-red-500" />
-    </div>
-  );
 
   return (
     <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
@@ -271,9 +190,8 @@ export default function AdminReservationsPage() {
       </div>
 
       <div className="space-y-3 p-3 md:hidden">
-        {paginated.map((r, idx) => (
+        {paginated.map((r) => (
           <div key={r.id}>
-            {dividerIndexInPage === idx && renderMobileDivider()}
             <div className="rounded-xl border border-slate-800 bg-slate-950 p-3">
               <div className="mb-2 flex items-start justify-between gap-2">
                 <div>
@@ -318,9 +236,6 @@ export default function AdminReservationsPage() {
             </div>
           </div>
         ))}
-        {/* Show divider at the end if all items on this page are past */}
-        {dividerIndexInPage === paginated.length && renderMobileDivider()}
-
         {paginated.length === 0 && (
           <div className="rounded-xl border border-slate-800 bg-slate-950 p-6 text-center text-gray-500">Geen reserveringen gevonden.</div>
         )}
@@ -339,45 +254,40 @@ export default function AdminReservationsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800">
-            {paginated.map((r, idx) => (
-              <React.Fragment key={r.id}>
-                {dividerIndexInPage === idx && renderTableDivider()}
-                <tr>
-                  <td className="p-4 font-bold">
-                    {r.user?.name || 'Unknown'}
-                    <div className="text-xs text-gray-500 font-normal">
-                      {r.email}
-                      {r.user?.sNumber && <span className="ml-2 text-gray-600">({r.user.sNumber})</span>}
-                    </div>
-                  </td>
-                  <td className="p-4">{dateFromISO(r.startTime)}</td>
-                  <td className="p-4">
-                    {formatTime(r.startTime)} - {formatTime(r.endTime)}
-                  </td>
-                  <td className="p-4">
-                    <Badge variant={r.inventory === 'pc' || r.inventory === 'switch' ? 'danger' : 'info'}>{r.inventory.toUpperCase()}</Badge>
-                    {r.controllers > 0 && (
-                      <span className="ml-2 text-xs text-gray-400">
-                        <Gamepad2 className="inline" size={12} /> {r.controllers}
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-4">{renderStatusSelect(r)}</td>
-                  <td className="p-4">
-                    <div className="flex gap-2 justify-end">
-                      <Button size="sm" variant="secondary" onClick={() => openEditModal(r)} title="Bewerk reservering">
-                        <Pencil size={16} />
-                      </Button>
-                      <Button size="sm" variant="danger" onClick={() => handleDelete(r.id)} title="Verwijder reservering">
-                        <Trash2 size={16} />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              </React.Fragment>
+            {paginated.map((r) => (
+              <tr key={r.id}>
+                <td className="p-4 font-bold">
+                  {r.user?.name || 'Unknown'}
+                  <div className="text-xs text-gray-500 font-normal">
+                    {r.email}
+                    {r.user?.sNumber && <span className="ml-2 text-gray-600">({r.user.sNumber})</span>}
+                  </div>
+                </td>
+                <td className="p-4">{dateFromISO(r.startTime)}</td>
+                <td className="p-4">
+                  {formatTime(r.startTime)} - {formatTime(r.endTime)}
+                </td>
+                <td className="p-4">
+                  <Badge variant={r.inventory === 'pc' || r.inventory === 'switch' ? 'danger' : 'info'}>{r.inventory.toUpperCase()}</Badge>
+                  {r.controllers > 0 && (
+                    <span className="ml-2 text-xs text-gray-400">
+                      <Gamepad2 className="inline" size={12} /> {r.controllers}
+                    </span>
+                  )}
+                </td>
+                <td className="p-4">{renderStatusSelect(r)}</td>
+                <td className="p-4">
+                  <div className="flex gap-2 justify-end">
+                    <Button size="sm" variant="secondary" onClick={() => openEditModal(r)} title="Bewerk reservering">
+                      <Pencil size={16} />
+                    </Button>
+                    <Button size="sm" variant="danger" onClick={() => handleDelete(r.id)} title="Verwijder reservering">
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
             ))}
-            {/* Show divider at the end if all items on this page are past */}
-            {dividerIndexInPage === paginated.length && renderTableDivider()}
             {paginated.length === 0 && (
               <tr>
                 <td colSpan={6} className="p-8 text-center text-gray-500">

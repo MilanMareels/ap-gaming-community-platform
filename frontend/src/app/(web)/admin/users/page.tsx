@@ -5,6 +5,7 @@ import { ShieldCheck, ShieldOff, Trash2, Unlink, Pencil, X, Loader2, Users, Sear
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { Pagination } from '@/components/ui/Pagination';
 import { getApiErrorMessage } from '@/util/api-error';
 import { useAdmin } from '../layout';
 
@@ -20,6 +21,16 @@ type UserListItem = {
   noShowCount: number;
   roles: string[];
 };
+
+type UserListResponse = {
+  items: UserListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+const PAGE_SIZE = 25;
 
 type SsoLink = { id: number; ssoId: string };
 
@@ -72,6 +83,9 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState('');
   const [adminOnly, setAdminOnly] = useState(false);
   const [noShowsOnly, setNoShowsOnly] = useState(false);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -84,14 +98,20 @@ export default function AdminUsersPage() {
       if (search) params.set('search', search);
       if (adminOnly) params.set('adminOnly', 'true');
       if (noShowsOnly) params.set('noShowsOnly', 'true');
-      const list = await api<UserListItem[]>(`/users?${params.toString()}`);
-      setUsers(list);
+      params.set('page', String(page));
+      params.set('pageSize', String(PAGE_SIZE));
+      const result = await api<UserListResponse>(`/users?${params.toString()}`);
+      setUsers(result.items);
+      setTotal(result.total);
+      setTotalPages(result.totalPages);
+      // The server clamps out-of-range pages (e.g. after deleting the last user on the last page)
+      if (result.page !== page) setPage(result.page);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load users');
     } finally {
       setLoading(false);
     }
-  }, [search, adminOnly, noShowsOnly]);
+  }, [search, adminOnly, noShowsOnly, page]);
 
   useEffect(() => {
     const handle = setTimeout(refresh, 200);
@@ -115,17 +135,40 @@ export default function AdminUsersPage() {
                 placeholder='Zoek op naam, email of s-nummer'
                 className='bg-slate-950 border border-slate-700 rounded p-2 pl-8 text-white text-sm w-full'
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
               />
             </div>
             <label className='flex items-center gap-2 text-sm text-gray-300'>
-              <input type='checkbox' checked={adminOnly} onChange={(e) => setAdminOnly(e.target.checked)} />
+              <input
+                type='checkbox'
+                checked={adminOnly}
+                onChange={(e) => {
+                  setAdminOnly(e.target.checked);
+                  setPage(1);
+                }}
+              />
               Enkel admins
             </label>
             <label className='flex items-center gap-2 text-sm text-gray-300'>
-              <input type='checkbox' checked={noShowsOnly} onChange={(e) => setNoShowsOnly(e.target.checked)} />
+              <input
+                type='checkbox'
+                checked={noShowsOnly}
+                onChange={(e) => {
+                  setNoShowsOnly(e.target.checked);
+                  setPage(1);
+                }}
+              />
               Met no-shows
             </label>
+            {!loading && (
+              <span className='text-sm text-gray-500 ml-auto'>
+                {total} gebruiker{total === 1 ? '' : 's'}
+                {totalPages > 1 && ` · ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, total)}`}
+              </span>
+            )}
           </div>
         </div>
 
@@ -200,6 +243,10 @@ export default function AdminUsersPage() {
               )}
             </tbody>
           </table>
+        </div>
+
+        <div className='pb-4'>
+          <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
         </div>
       </div>
 

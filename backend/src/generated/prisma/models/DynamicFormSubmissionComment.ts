@@ -214,7 +214,7 @@ export type DynamicFormSubmissionCommentGroupByOutputType = {
   _max: DynamicFormSubmissionCommentMaxAggregateOutputType | null
 }
 
-type GetDynamicFormSubmissionCommentGroupByPayload<T extends DynamicFormSubmissionCommentGroupByArgs> = Prisma.PrismaPromise<
+export type GetDynamicFormSubmissionCommentGroupByPayload<T extends DynamicFormSubmissionCommentGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<DynamicFormSubmissionCommentGroupByOutputType, T['by']> &
       {
@@ -1373,6 +1373,11 @@ export type DynamicFormSubmissionCommentFindManyArgs<ExtArgs extends runtime.Typ
    * Skip the first `n` DynamicFormSubmissionComments.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of DynamicFormSubmissionComments.
+   */
   distinct?: Prisma.DynamicFormSubmissionCommentScalarFieldEnum | Prisma.DynamicFormSubmissionCommentScalarFieldEnum[]
 }
 

@@ -361,6 +361,17 @@ export class AuthService {
       return refreshed ?? whitelisted;
     }
 
+    const legacyUser = await this.findLegacyStudentUser(email, profile.userPrincipalName);
+    if (legacyUser) {
+      await this.prisma.microsoftSSOUser.create({
+        data: { ssoId: profile.id, userId: legacyUser.id },
+      });
+      // Migrates the legacy short email to the Microsoft email, and fills in name and sNumber
+      const refreshed = await this.applyMicrosoftProfile(legacyUser.id, profile);
+      this.logger.log(`Linked Microsoft account to legacy user ${legacyUser.id} (${legacyUser.email} -> ${email})`);
+      return refreshed ?? legacyUser;
+    }
+
     // Microsoft sign-in always allows user creation (this is the reservation entry point).
     const sNumber = this.extractSNumber(email, profile.userPrincipalName) || `msft_${profile.id.substring(0, 8)}`;
 
@@ -392,6 +403,31 @@ export class AuthService {
       return [profile.givenName, profile.surname].filter(Boolean).join(' ').trim() || null;
     }
     return profile.displayName?.trim() || null;
+  }
+
+  /**
+   * Users created outside of Microsoft sign-in (admin-created reservations, roster entries, older flows)
+   * can be stored under a short student email instead of the full Microsoft one. Look those up by
+   * s-number so signing in takes over that user instead of creating a duplicate. Users that are already
+   * linked to a Microsoft account belong to someone else's identity and are left alone.
+   */
+  private async findLegacyStudentUser(email: string, upn?: string) {
+    const sNumber = this.extractSNumber(email, upn);
+    if (!sNumber) return null;
+
+    for (const candidate of [`${sNumber}@ap.be`, `${sNumber}@student.ap.be`]) {
+      if (candidate === email) continue; // Already looked up as the full email
+
+      const user = await this.prisma.user.findFirst({
+        where: {
+          email: { equals: candidate, mode: 'insensitive' },
+          microsoftSSOUsers: { none: {} },
+        },
+      });
+      if (user) return user;
+    }
+
+    return null;
   }
 
   private extractSNumber(email: string, upn?: string): string | null {
