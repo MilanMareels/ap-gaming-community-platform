@@ -107,6 +107,21 @@ export default function AdminLayout({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Hide public navbar and footer inside admin
+  useEffect(() => {
+    const nav = document.getElementById('public-navbar');
+    const footer = document.getElementById('public-footer');
+    const main = nav?.parentElement?.querySelector('main');
+    if (nav) nav.style.display = 'none';
+    if (footer) footer.style.display = 'none';
+    if (main) main.style.paddingTop = '0';
+    return () => {
+      if (nav) nav.style.display = '';
+      if (footer) footer.style.display = '';
+      if (main) main.style.paddingTop = '';
+    };
+  }, []);
+
   // Close mobile sidebar on route change
   useEffect(() => {
     setMobileOpen(false);
@@ -211,15 +226,17 @@ export default function AdminLayout({
       >
         {/* Brand */}
         <div className='flex items-center gap-3 px-4 py-5 border-b border-slate-800'>
-          <div className='w-9 h-9 rounded-lg bg-red-600 flex items-center justify-center font-black text-sm shrink-0'>
-            AP
-          </div>
-          {!collapsed && (
-            <div className='overflow-hidden'>
-              <div className='text-sm font-bold whitespace-nowrap'>AP Gaming Hub</div>
-              <div className='text-[11px] text-gray-500 whitespace-nowrap'>Adminpaneel</div>
+          <Link href='/' className='flex items-center gap-3 group' title='Terug naar homepage'>
+            <div className='w-9 h-9 rounded-lg bg-red-600 group-hover:bg-red-500 transition-colors flex items-center justify-center font-black text-sm shrink-0'>
+              AP
             </div>
-          )}
+            {!collapsed && (
+              <div className='overflow-hidden'>
+                <div className='text-sm font-bold whitespace-nowrap group-hover:text-red-400 transition-colors'>AP Gaming Hub</div>
+                <div className='text-[11px] text-gray-500 whitespace-nowrap'>Adminpaneel</div>
+              </div>
+            )}
+          </Link>
           {/* Mobile close button */}
           <button onClick={() => setMobileOpen(false)} className='ml-auto p-1 rounded-lg hover:bg-slate-800 transition-colors lg:hidden'>
             <X size={18} />
