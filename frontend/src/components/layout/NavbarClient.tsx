@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Gamepad2, Lock, LogIn, Menu, X, ArrowRight, ChevronDown, UserRound } from 'lucide-react';
@@ -22,7 +22,9 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
   const [userRole, setUserRole] = useState<UserRole>('public');
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [hasAnyPermission, setHasAnyPermission] = useState(false);
+  const [navHeight, setNavHeight] = useState(0);
   const dropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const navRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
 
   // Close mobile menu on route change
@@ -31,6 +33,22 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
     setMobileExpanded(null);
     setOpenDropdown(null);
   }, [pathname]);
+
+  // Keep the page behind the open mobile menu from scrolling, so swipes scroll the menu instead
+  useEffect(() => {
+    if (!isOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isOpen]);
+
+  const toggleMobileMenu = () => {
+    // Measure the bar so the menu can fill exactly the remaining visible height
+    if (!isOpen && navRef.current) setNavHeight(navRef.current.offsetHeight);
+    setIsOpen(!isOpen);
+  };
 
   // Lightweight auth check for visibility filtering
   useEffect(() => {
@@ -90,7 +108,7 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
   };
 
   return (
-    <nav className="fixed w-full top-0 z-50 bg-[#020618]/80 backdrop-blur-md border-b border-white/10">
+    <nav ref={navRef} className="fixed w-full top-0 z-50 bg-[#020618]/80 backdrop-blur-md border-b border-white/10">
       <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
         {/* Logo */}
         <div className="flex items-center">
@@ -201,7 +219,7 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
               <Lock size={20} strokeWidth={1.5} />
             </Link>
           )}
-          <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 hover:text-white focus:outline-none p-2">
+          <button onClick={toggleMobileMenu} aria-expanded={isOpen} aria-label="Menu" className="text-gray-300 hover:text-white focus:outline-none p-2">
             {isOpen ? <X size={28} strokeWidth={1.5} /> : <Menu size={28} strokeWidth={1.5} />}
           </button>
         </div>
@@ -209,7 +227,12 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-[#020618] border-b border-white/10 absolute left-0 top-[72px] w-full max-h-[calc(100vh-4.5rem)] overflow-y-auto shadow-2xl">
+        <div
+          // dvh is the visible viewport, so the last items aren't hidden behind mobile browser toolbars like with vh.
+          // Browsers without dvh support fall back to vh.
+          style={{ '--nav-h': `${navHeight}px` } as CSSProperties}
+          className="md:hidden bg-[#020618] border-b border-white/10 absolute left-0 top-full w-full max-h-[calc(100vh-var(--nav-h))] supports-[height:100dvh]:max-h-[calc(100dvh-var(--nav-h))] overflow-y-auto overscroll-contain shadow-2xl"
+        >
           <div className="px-4 pt-2 pb-6 space-y-1">
             {regularItems.map((item) =>
               item.children && item.children.length > 0 ? (
