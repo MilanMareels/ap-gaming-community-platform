@@ -218,7 +218,7 @@ export type TimeTrialParticipantGroupByOutputType = {
   _max: TimeTrialParticipantMaxAggregateOutputType | null
 }
 
-type GetTimeTrialParticipantGroupByPayload<T extends TimeTrialParticipantGroupByArgs> = Prisma.PrismaPromise<
+export type GetTimeTrialParticipantGroupByPayload<T extends TimeTrialParticipantGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<TimeTrialParticipantGroupByOutputType, T['by']> &
       {
@@ -1508,6 +1508,11 @@ export type TimeTrialParticipantFindManyArgs<ExtArgs extends runtime.Types.Exten
    * Skip the first `n` TimeTrialParticipants.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of TimeTrialParticipants.
+   */
   distinct?: Prisma.TimeTrialParticipantScalarFieldEnum | Prisma.TimeTrialParticipantScalarFieldEnum[]
 }
 
