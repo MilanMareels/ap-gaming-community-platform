@@ -17,9 +17,11 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Plus, Trash2, Pencil, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
+import { GripVertical, Plus, Trash2, Pencil, ChevronDown, ChevronRight, ExternalLink, Navigation } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { PageHeader } from '@/components/admin/PageHeader';
+import { EmptyState } from '@/components/admin/EmptyState';
 import { apiClient } from '@/api';
 import type { NavLink } from '@/api';
 import { getApiErrorMessage } from '@/util/api-error';
@@ -39,6 +41,9 @@ const VISIBILITY_VARIANT: Record<string, 'default' | 'info' | 'warning'> = {
   admin: 'warning',
 };
 
+const inputClass = 'w-full bg-slate-950 border border-slate-700 rounded-lg py-2.5 px-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/20 transition-colors';
+const labelClass = 'block text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-1.5';
+
 function getVisibilityLabel(visibility: string, roleOptions: { value: string; label: string }[]) {
   const opt = [...BASE_VISIBILITY_OPTIONS, ...roleOptions].find((v) => v.value === visibility);
   return opt?.label ?? visibility;
@@ -57,7 +62,6 @@ export default function AdminNavigationPage() {
   const [expandedDropdowns, setExpandedDropdowns] = useState<Set<number>>(new Set());
   const [roleVisibilityOptions, setRoleVisibilityOptions] = useState<{ value: string; label: string }[]>([]);
 
-  // Form state for creating/editing
   const [formMode, setFormMode] = useState<'none' | 'createLink' | 'createDropdown' | 'createChild' | 'edit'>('none');
   const [formParentId, setFormParentId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
@@ -93,7 +97,7 @@ export default function AdminNavigationPage() {
         );
       }
     } catch {
-      // Non-critical, roles dropdown just won't show
+      // Non-critical
     }
   }, []);
 
@@ -119,7 +123,6 @@ export default function AdminNavigationPage() {
     const newIndex = items.findIndex((i) => i.id === over.id);
     if (oldIndex === -1 || newIndex === -1) return;
 
-    // Optimistic reorder
     const reordered = [...items];
     const [moved] = reordered.splice(oldIndex, 1);
     reordered.splice(newIndex, 0, moved);
@@ -140,7 +143,6 @@ export default function AdminNavigationPage() {
       });
       await revalidateNavigation();
     } catch {
-      // Revert on failure
       await fetchNavItems();
     }
   };
@@ -194,7 +196,6 @@ export default function AdminNavigationPage() {
         const isDropdown = formMode === 'createDropdown';
         const parentId = formMode === 'createChild' ? formParentId : null;
 
-        // Calculate next position
         const siblings = parentId == null
           ? navItems
           : navItems.find((n) => n.id === parentId)?.children ?? [];
@@ -246,51 +247,57 @@ export default function AdminNavigationPage() {
   };
 
   if (loading) {
-    return <div className="text-gray-400">Laden...</div>;
+    return (
+      <>
+        <PageHeader title="Navigatie" description="Beheer de navigatiebalk van de website." />
+        <div className="text-gray-400 text-center py-12">Laden...</div>
+      </>
+    );
   }
 
   const isFormOpen = formMode !== 'none';
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-bold">Navigatie</h2>
-          <p className="text-gray-400 text-sm">Beheer de navigatiebalk van de website.</p>
-        </div>
-        <div className="flex gap-2">
-          <Button onClick={() => startCreate('createLink')} disabled={isFormOpen}>
-            <Plus size={16} /> Link toevoegen
-          </Button>
-          <Button variant="secondary" onClick={() => startCreate('createDropdown')} disabled={isFormOpen}>
-            <Plus size={16} /> Dropdown toevoegen
-          </Button>
-        </div>
-      </div>
+    <>
+      <PageHeader
+        title="Navigatie"
+        description="Beheer de navigatiebalk van de website."
+        actions={
+          <div className="flex gap-2">
+            <Button size="sm" variant="primary" onClick={() => startCreate('createLink')} disabled={isFormOpen}>
+              <Plus size={16} /> Link toevoegen
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => startCreate('createDropdown')} disabled={isFormOpen}>
+              <Plus size={16} /> Dropdown
+            </Button>
+          </div>
+        }
+      />
 
       {error && (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{error}</div>
+        <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{error}</div>
       )}
 
       {/* Create form (top-level) */}
       {(formMode === 'createLink' || formMode === 'createDropdown') && formParentId == null && (
-        <NavLinkForm
-          formData={formData}
-          setFormData={setFormData}
-          onSubmit={handleSubmit}
-          onCancel={resetForm}
-          isDropdown={formMode === 'createDropdown'}
-          isChild={false}
-          submitLabel="Toevoegen"
-          roleVisibilityOptions={roleVisibilityOptions}
-        />
+        <div className="mb-6">
+          <NavLinkForm
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={handleSubmit}
+            onCancel={resetForm}
+            isDropdown={formMode === 'createDropdown'}
+            isChild={false}
+            submitLabel="Toevoegen"
+            roleVisibilityOptions={roleVisibilityOptions}
+          />
+        </div>
       )}
 
       {/* Nav items list */}
-      <div className="bg-slate-900 rounded-xl border border-slate-800">
+      <div className="bg-linear-to-br from-slate-900 via-slate-900 to-slate-900/90 rounded-xl border border-slate-800 overflow-hidden">
         {navItems.length === 0 && !isFormOpen && (
-          <div className="p-8 text-center text-gray-500">Geen navigatie-items. Voeg er een toe.</div>
+          <EmptyState icon={Navigation} title="Geen navigatie-items" description="Voeg een link of dropdown toe om te beginnen." />
         )}
 
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => handleDragEnd(e, null)}>
@@ -400,7 +407,7 @@ export default function AdminNavigationPage() {
           </SortableContext>
         </DndContext>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -449,7 +456,7 @@ function SortableNavItem({
 
   if (isEditing) {
     return (
-      <div ref={setNodeRef} style={style} className="p-3 border-b border-slate-800">
+      <div ref={setNodeRef} style={style} className="p-3 border-b border-slate-800/60">
         <NavLinkForm
           formData={formData}
           setFormData={setFormData}
@@ -468,7 +475,7 @@ function SortableNavItem({
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-3 px-4 py-3 border-b border-slate-800 last:border-b-0 hover:bg-slate-800/30 transition-colors group"
+      className="flex items-center gap-3 px-4 py-3 border-b border-slate-800/60 last:border-b-0 hover:bg-slate-800/30 transition-colors group"
     >
       {/* Drag handle */}
       <button {...attributes} {...listeners} className="cursor-grab text-gray-600 hover:text-gray-400 touch-none">
@@ -477,7 +484,7 @@ function SortableNavItem({
 
       {/* Expand toggle for dropdowns */}
       {isDropdownParent && onToggleExpand && (
-        <button onClick={onToggleExpand} className="text-gray-500 hover:text-gray-300">
+        <button onClick={onToggleExpand} className="text-gray-500 hover:text-gray-300 transition-colors">
           {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </button>
       )}
@@ -486,21 +493,13 @@ function SortableNavItem({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="font-medium text-white truncate">{item.label}</span>
-          {item.isCta && (
-            <Badge variant="danger">CTA</Badge>
-          )}
-          {isDropdownParent && hasChildren && (
-            <Badge variant="info">Dropdown</Badge>
-          )}
-          {isDropdownParent && !hasChildren && (
-            <Badge variant="warning">Dropdown (leeg)</Badge>
-          )}
-          {item.openInNewTab && (
-            <ExternalLink size={14} className="text-gray-500" />
-          )}
+          {item.isCta && <Badge variant="danger">CTA</Badge>}
+          {isDropdownParent && hasChildren && <Badge variant="info">Dropdown</Badge>}
+          {isDropdownParent && !hasChildren && <Badge variant="warning">Dropdown (leeg)</Badge>}
+          {item.openInNewTab && <ExternalLink size={14} className="text-gray-500" />}
         </div>
         {item.href && (
-          <span className="text-sm text-gray-500 truncate block">{item.href}</span>
+          <span className="text-xs text-gray-500 truncate block">{item.href}</span>
         )}
       </div>
 
@@ -511,12 +510,20 @@ function SortableNavItem({
 
       {/* Actions */}
       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button size="sm" variant="ghost" onClick={onEdit}>
+        <button
+          onClick={onEdit}
+          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors"
+        >
           <Pencil size={14} />
-        </Button>
-        <Button size="sm" variant="danger" onClick={onDelete} disabled={item.isProtected} title={item.isProtected ? 'Beveiligd item kan niet verwijderd worden' : undefined}>
+        </button>
+        <button
+          onClick={onDelete}
+          disabled={item.isProtected}
+          title={item.isProtected ? 'Beveiligd item kan niet verwijderd worden' : undefined}
+          className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-900/20 transition-colors disabled:opacity-30"
+        >
           <Trash2 size={14} />
-        </Button>
+        </button>
       </div>
     </div>
   );
@@ -538,14 +545,14 @@ interface NavLinkFormProps {
 function NavLinkForm({ formData, setFormData, onSubmit, onCancel, isDropdown, isChild, submitLabel, roleVisibilityOptions = [] }: NavLinkFormProps) {
   const visibilityOptions = [...BASE_VISIBILITY_OPTIONS, ...roleVisibilityOptions];
   return (
-    <div className="bg-slate-950 rounded-lg border border-slate-700 p-4 space-y-3">
+    <div className="bg-slate-950/60 rounded-lg border border-slate-800/60 p-4 space-y-3">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">Label</label>
+          <label className={labelClass}>Label</label>
           <input
             type="text"
             placeholder="Bijv. Events"
-            className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white mt-1"
+            className={inputClass}
             value={formData.label}
             onChange={(e) => setFormData((prev) => ({ ...prev, label: e.target.value }))}
             autoFocus
@@ -553,11 +560,11 @@ function NavLinkForm({ formData, setFormData, onSubmit, onCancel, isDropdown, is
         </div>
         {!isDropdown && (
           <div>
-            <label className="text-xs font-bold text-gray-500 uppercase">URL</label>
+            <label className={labelClass}>URL</label>
             <input
               type="text"
               placeholder="Bijv. /events"
-              className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white mt-1"
+              className={inputClass}
               value={formData.href}
               onChange={(e) => setFormData((prev) => ({ ...prev, href: e.target.value }))}
             />
@@ -567,19 +574,19 @@ function NavLinkForm({ formData, setFormData, onSubmit, onCancel, isDropdown, is
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">Icoon (optioneel)</label>
+          <label className={labelClass}>Icoon (optioneel)</label>
           <input
             type="text"
             placeholder="Bijv. Calendar"
-            className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white mt-1"
+            className={inputClass}
             value={formData.icon}
             onChange={(e) => setFormData((prev) => ({ ...prev, icon: e.target.value }))}
           />
         </div>
         <div>
-          <label className="text-xs font-bold text-gray-500 uppercase">Zichtbaarheid</label>
+          <label className={labelClass}>Zichtbaarheid</label>
           <select
-            className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white mt-1"
+            className={inputClass}
             value={formData.visibility}
             onChange={(e) => setFormData((prev) => ({ ...prev, visibility: e.target.value }))}
           >
@@ -615,10 +622,10 @@ function NavLinkForm({ formData, setFormData, onSubmit, onCancel, isDropdown, is
       </div>
 
       <div className="flex gap-2 pt-1">
-        <Button onClick={onSubmit} disabled={!formData.label.trim()}>
+        <Button size="sm" variant="primary" onClick={onSubmit} disabled={!formData.label.trim()}>
           {submitLabel}
         </Button>
-        <Button variant="ghost" onClick={onCancel}>
+        <Button size="sm" variant="secondary" onClick={onCancel}>
           Annuleren
         </Button>
       </div>

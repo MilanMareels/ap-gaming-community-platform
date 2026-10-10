@@ -109,9 +109,9 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
 
   return (
     <nav ref={navRef} className="fixed w-full top-0 z-50 bg-[#020618]/80 backdrop-blur-md border-b border-white/10">
-      <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+      <div className="flex items-center px-6 py-4 max-w-7xl mx-auto">
         {/* Logo */}
-        <div className="flex items-center">
+        <div className="flex items-center shrink-0">
           <Link
             href="/"
             className="text-2xl font-semibold tracking-tight text-[#ffffff] flex items-center gap-2 group"
@@ -122,8 +122,8 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
           </Link>
         </div>
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex gap-8 text-lg text-gray-300 font-medium items-center">
+        {/* Desktop nav — centered in available space */}
+        <div className="hidden md:flex flex-1 justify-center gap-6 text-base text-gray-300 font-medium items-center">
           {regularItems.map((item) =>
             item.children && item.children.length > 0 ? (
               <div
@@ -180,8 +180,8 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
           )}
         </div>
 
-        {/* Desktop CTA */}
-        <div className="hidden md:flex flex-shrink-0 items-center pl-6 gap-3">
+        {/* Desktop CTA — pinned right */}
+        <div className="hidden md:flex shrink-0 items-center gap-3">
           {userRole === 'public' ? (
             <Link
               href="/login"
@@ -205,7 +205,7 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
               href={item.href || '#'}
               target={item.openInNewTab ? '_blank' : undefined}
               rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
-              className="bg-[#d42422] text-[#ffffff] px-6 py-2.5 rounded-full text-lg font-medium hover:bg-red-700 transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2 shadow-[0_0_15px_rgba(212,36,34,0.4)]"
+              className="bg-[#d42422] text-[#ffffff] px-6 py-2.5 rounded-full text-base font-medium hover:bg-red-700 transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2 shadow-[0_0_15px_rgba(212,36,34,0.4)]"
             >
               {item.label} <ArrowRight className="w-5 h-5" strokeWidth={1.5} />
             </Link>
@@ -213,7 +213,7 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
         </div>
 
         {/* Mobile controls */}
-        <div className="md:hidden flex items-center gap-4">
+        <div className="md:hidden flex items-center gap-4 ml-auto">
           {hasAnyPermission && (
             <Link href="/admin" className="text-gray-500 hover:text-white p-2">
               <Lock size={20} strokeWidth={1.5} />

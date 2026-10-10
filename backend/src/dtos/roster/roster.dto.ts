@@ -38,3 +38,20 @@ export class CreateRosterEntryDto {
   @IsNotEmpty()
   gameId!: number;
 }
+
+export class UpdateRosterEntryDto {
+  @ApiPropertyOptional({ example: 'xXProGamerXx' })
+  @IsString()
+  @IsOptional()
+  handle?: string;
+
+  @ApiPropertyOptional({ example: 'Diamond' })
+  @IsString()
+  @IsOptional()
+  rank?: string;
+
+  @ApiPropertyOptional({ example: 'Support', nullable: true })
+  @IsString()
+  @IsOptional()
+  role?: string | null;
+}
