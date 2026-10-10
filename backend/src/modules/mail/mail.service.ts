@@ -27,16 +27,23 @@ export class MailService implements OnModuleInit {
     this.logger.log('SMTP connection established');
   }
 
-  async sendMail(to: string, subject: string, templateName: string, data: Record<string, any>) {
+  private async renderTemplate(templateName: string, data: Record<string, any>): Promise<string> {
     const templatePath = path.join(process.cwd(), 'src/mail-templates', `${templateName}.mjml`);
 
     const mjmlTemplate = await readFile(templatePath, 'utf-8');
-    const template = await this.liquid.parseAndRender(mjmlTemplate, data);
+    // currentYear is available in every template, e.g. for the copyright footer
+    const template = await this.liquid.parseAndRender(mjmlTemplate, { currentYear: new Date().getFullYear(), ...data });
     const { html, errors } = await mjml(template);
 
     if (errors && errors.length > 0) {
       throw new Error(`MJML template error: ${errors.map((e) => e.formattedMessage).join(', ')}`);
     }
+
+    return html;
+  }
+
+  async sendMail(to: string, subject: string, templateName: string, data: Record<string, any>) {
+    const html = await this.renderTemplate(templateName, data);
 
     await this.transporter.sendMail({
       from: process.env.SMTP_FROM || 'noreply@apgaming.be',
@@ -59,15 +66,7 @@ export class MailService implements OnModuleInit {
       cid?: string;
     }>,
   ) {
-    const templatePath = path.join(process.cwd(), 'src/mail-templates', `${templateName}.mjml`);
-
-    const mjmlTemplate = await readFile(templatePath, 'utf-8');
-    const template = await this.liquid.parseAndRender(mjmlTemplate, data);
-    const { html, errors } = await mjml(template);
-
-    if (errors && errors.length > 0) {
-      throw new Error(`MJML template error: ${errors.map((e) => e.formattedMessage).join(', ')}`);
-    }
+    const html = await this.renderTemplate(templateName, data);
 
     await this.transporter.sendMail({
       from: process.env.SMTP_FROM || 'noreply@apgaming.be',
