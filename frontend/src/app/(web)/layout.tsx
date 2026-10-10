@@ -17,10 +17,10 @@ export default function WebLayout({
           backgroundRepeat: 'no-repeat',
         }}
       />
-      <Navbar />
+      <div id="public-navbar"><Navbar /></div>
       <main className="min-h-screen pt-20">{children}</main>
       <GoogleAnalytics gaId="G-NKZ24M7811" />
-      <Footer />
+      <div id="public-footer"><Footer /></div>
     </>
   );
 }
