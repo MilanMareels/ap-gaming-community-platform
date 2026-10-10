@@ -249,7 +249,7 @@ export type NavLinkGroupByOutputType = {
   _max: NavLinkMaxAggregateOutputType | null
 }
 
-type GetNavLinkGroupByPayload<T extends NavLinkGroupByArgs> = Prisma.PrismaPromise<
+export type GetNavLinkGroupByPayload<T extends NavLinkGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<NavLinkGroupByOutputType, T['by']> &
       {
@@ -1567,6 +1567,11 @@ export type NavLinkFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Skip the first `n` NavLinks.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of NavLinks.
+   */
   distinct?: Prisma.NavLinkScalarFieldEnum | Prisma.NavLinkScalarFieldEnum[]
 }
 

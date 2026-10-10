@@ -32,7 +32,7 @@ export class MailService implements OnModuleInit {
 
     const mjmlTemplate = await readFile(templatePath, 'utf-8');
     const template = await this.liquid.parseAndRender(mjmlTemplate, data);
-    const { html, errors } = mjml(template);
+    const { html, errors } = await mjml(template);
 
     if (errors && errors.length > 0) {
       throw new Error(`MJML template error: ${errors.map((e) => e.formattedMessage).join(', ')}`);
@@ -63,7 +63,7 @@ export class MailService implements OnModuleInit {
 
     const mjmlTemplate = await readFile(templatePath, 'utf-8');
     const template = await this.liquid.parseAndRender(mjmlTemplate, data);
-    const { html, errors } = mjml(template);
+    const { html, errors } = await mjml(template);
 
     if (errors && errors.length > 0) {
       throw new Error(`MJML template error: ${errors.map((e) => e.formattedMessage).join(', ')}`);

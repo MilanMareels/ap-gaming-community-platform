@@ -217,7 +217,7 @@ export type InventoryAdjustmentGroupByOutputType = {
   _max: InventoryAdjustmentMaxAggregateOutputType | null
 }
 
-type GetInventoryAdjustmentGroupByPayload<T extends InventoryAdjustmentGroupByArgs> = Prisma.PrismaPromise<
+export type GetInventoryAdjustmentGroupByPayload<T extends InventoryAdjustmentGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<InventoryAdjustmentGroupByOutputType, T['by']> &
       {
@@ -1085,6 +1085,11 @@ export type InventoryAdjustmentFindManyArgs<ExtArgs extends runtime.Types.Extens
    * Skip the first `n` InventoryAdjustments.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of InventoryAdjustments.
+   */
   distinct?: Prisma.InventoryAdjustmentScalarFieldEnum | Prisma.InventoryAdjustmentScalarFieldEnum[]
 }
 

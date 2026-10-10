@@ -7,13 +7,13 @@
     "migrate": "tsx migrate.ts"
   },
   "dependencies": {
-    "dotenv": "^17.3.1",
-    "firebase": "^11.6.0",
-    "pg": "^8.16.0"
+    "dotenv": "^18.0.7",
+    "firebase": "^13.0.0",
+    "pg": "^8.23.1"
   },
   "devDependencies": {
-    "@types/pg": "^8.15.4",
-    "tsx": "^4.21.0",
-    "typescript": "^5.7.3"
+    "@types/pg": "^8.23.1",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3"
   }
 }
