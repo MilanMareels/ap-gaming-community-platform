@@ -210,7 +210,7 @@ export type DynamicFormSubmissionAnswerGroupByOutputType = {
   _max: DynamicFormSubmissionAnswerMaxAggregateOutputType | null
 }
 
-type GetDynamicFormSubmissionAnswerGroupByPayload<T extends DynamicFormSubmissionAnswerGroupByArgs> = Prisma.PrismaPromise<
+export type GetDynamicFormSubmissionAnswerGroupByPayload<T extends DynamicFormSubmissionAnswerGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<DynamicFormSubmissionAnswerGroupByOutputType, T['by']> &
       {
@@ -1367,6 +1367,11 @@ export type DynamicFormSubmissionAnswerFindManyArgs<ExtArgs extends runtime.Type
    * Skip the first `n` DynamicFormSubmissionAnswers.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of DynamicFormSubmissionAnswers.
+   */
   distinct?: Prisma.DynamicFormSubmissionAnswerScalarFieldEnum | Prisma.DynamicFormSubmissionAnswerScalarFieldEnum[]
 }
 

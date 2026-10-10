@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Gamepad2, Lock, LogIn, Menu, X, ArrowRight, ChevronDown } from 'lucide-react';
+import { Gamepad2, Lock, LogIn, Menu, X, ArrowRight, ChevronDown, UserRound } from 'lucide-react';
 import { DynamicIcon, iconNames } from 'lucide-react/dynamic';
 import type { NavLinkWithChildren } from '@/api';
 
@@ -22,7 +22,9 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
   const [userRole, setUserRole] = useState<UserRole>('public');
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [hasAnyPermission, setHasAnyPermission] = useState(false);
+  const [navHeight, setNavHeight] = useState(0);
   const dropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const navRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
 
   // Close mobile menu on route change
@@ -31,6 +33,22 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
     setMobileExpanded(null);
     setOpenDropdown(null);
   }, [pathname]);
+
+  // Keep the page behind the open mobile menu from scrolling, so swipes scroll the menu instead
+  useEffect(() => {
+    if (!isOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isOpen]);
+
+  const toggleMobileMenu = () => {
+    // Measure the bar so the menu can fill exactly the remaining visible height
+    if (!isOpen && navRef.current) setNavHeight(navRef.current.offsetHeight);
+    setIsOpen(!isOpen);
+  };
 
   // Lightweight auth check for visibility filtering
   useEffect(() => {
@@ -90,10 +108,10 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
   };
 
   return (
-    <nav className="fixed w-full top-0 z-50 bg-[#020618]/80 backdrop-blur-md border-b border-white/10">
-      <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+    <nav ref={navRef} className="fixed w-full top-0 z-50 bg-[#020618]/80 backdrop-blur-md border-b border-white/10">
+      <div className="flex items-center px-6 py-4 max-w-7xl mx-auto">
         {/* Logo */}
-        <div className="flex items-center">
+        <div className="flex items-center shrink-0">
           <Link
             href="/"
             className="text-2xl font-semibold tracking-tight text-[#ffffff] flex items-center gap-2 group"
@@ -104,8 +122,8 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
           </Link>
         </div>
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex gap-8 text-lg text-gray-300 font-medium items-center">
+        {/* Desktop nav — centered in available space */}
+        <div className="hidden md:flex flex-1 justify-center gap-6 text-base text-gray-300 font-medium items-center">
           {regularItems.map((item) =>
             item.children && item.children.length > 0 ? (
               <div
@@ -162,15 +180,23 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
           )}
         </div>
 
-        {/* Desktop CTA */}
-        <div className="hidden md:flex flex-shrink-0 items-center pl-6 gap-3">
-          {userRole === 'public' && (
+        {/* Desktop CTA — pinned right */}
+        <div className="hidden md:flex shrink-0 items-center gap-3">
+          {userRole === 'public' ? (
             <Link
               href="/login"
               className="border border-white/20 text-gray-300 hover:text-white hover:border-white/40 px-5 py-2 rounded-full text-base font-medium transition-all inline-flex items-center gap-1.5"
             >
               <LogIn size={16} strokeWidth={1.5} />
               Login
+            </Link>
+          ) : (
+            <Link
+              href="/profile"
+              className={`border px-5 py-2 rounded-full text-base font-medium transition-all inline-flex items-center gap-1.5 ${pathname === '/profile' ? 'border-white/40 text-white' : 'border-white/20 text-gray-300 hover:text-white hover:border-white/40'}`}
+            >
+              <UserRound size={16} strokeWidth={1.5} />
+              Profiel
             </Link>
           )}
           {ctaItems.map((item) => (
@@ -179,7 +205,7 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
               href={item.href || '#'}
               target={item.openInNewTab ? '_blank' : undefined}
               rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
-              className="bg-[#d42422] text-[#ffffff] px-6 py-2.5 rounded-full text-lg font-medium hover:bg-red-700 transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2 shadow-[0_0_15px_rgba(212,36,34,0.4)]"
+              className="bg-[#d42422] text-[#ffffff] px-6 py-2.5 rounded-full text-base font-medium hover:bg-red-700 transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2 shadow-[0_0_15px_rgba(212,36,34,0.4)]"
             >
               {item.label} <ArrowRight className="w-5 h-5" strokeWidth={1.5} />
             </Link>
@@ -187,13 +213,13 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
         </div>
 
         {/* Mobile controls */}
-        <div className="md:hidden flex items-center gap-4">
+        <div className="md:hidden flex items-center gap-4 ml-auto">
           {hasAnyPermission && (
             <Link href="/admin" className="text-gray-500 hover:text-white p-2">
               <Lock size={20} strokeWidth={1.5} />
             </Link>
           )}
-          <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 hover:text-white focus:outline-none p-2">
+          <button onClick={toggleMobileMenu} aria-expanded={isOpen} aria-label="Menu" className="text-gray-300 hover:text-white focus:outline-none p-2">
             {isOpen ? <X size={28} strokeWidth={1.5} /> : <Menu size={28} strokeWidth={1.5} />}
           </button>
         </div>
@@ -201,7 +227,12 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-[#020618] border-b border-white/10 absolute left-0 top-[72px] w-full max-h-[calc(100vh-4.5rem)] overflow-y-auto shadow-2xl">
+        <div
+          // dvh is the visible viewport, so the last items aren't hidden behind mobile browser toolbars like with vh.
+          // Browsers without dvh support fall back to vh.
+          style={{ '--nav-h': `${navHeight}px` } as CSSProperties}
+          className="md:hidden bg-[#020618] border-b border-white/10 absolute left-0 top-full w-full max-h-[calc(100vh-var(--nav-h))] supports-[height:100dvh]:max-h-[calc(100dvh-var(--nav-h))] overflow-y-auto overscroll-contain shadow-2xl"
+        >
           <div className="px-4 pt-2 pb-6 space-y-1">
             {regularItems.map((item) =>
               item.children && item.children.length > 0 ? (
@@ -254,7 +285,7 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
                 </Link>
               ),
             )}
-            {userRole === 'public' && (
+            {userRole === 'public' ? (
               <Link
                 href="/login"
                 onClick={() => setIsOpen(false)}
@@ -262,6 +293,15 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
               >
                 <LogIn size={18} strokeWidth={1.5} />
                 Login
+              </Link>
+            ) : (
+              <Link
+                href="/profile"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 px-3 py-2 rounded-md text-lg font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all"
+              >
+                <UserRound size={18} strokeWidth={1.5} />
+                Profiel
               </Link>
             )}
             {ctaItems.map((item) => (

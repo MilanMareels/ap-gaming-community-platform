@@ -210,7 +210,7 @@ export type DynamicFormFieldGroupByOutputType = {
   _max: DynamicFormFieldMaxAggregateOutputType | null
 }
 
-type GetDynamicFormFieldGroupByPayload<T extends DynamicFormFieldGroupByArgs> = Prisma.PrismaPromise<
+export type GetDynamicFormFieldGroupByPayload<T extends DynamicFormFieldGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<DynamicFormFieldGroupByOutputType, T['by']> &
       {
@@ -1360,6 +1360,11 @@ export type DynamicFormFieldFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Skip the first `n` DynamicFormFields.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of DynamicFormFields.
+   */
   distinct?: Prisma.DynamicFormFieldScalarFieldEnum | Prisma.DynamicFormFieldScalarFieldEnum[]
 }
 

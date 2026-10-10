@@ -243,7 +243,7 @@ export type BracketGroupByOutputType = {
   _max: BracketMaxAggregateOutputType | null
 }
 
-type GetBracketGroupByPayload<T extends BracketGroupByArgs> = Prisma.PrismaPromise<
+export type GetBracketGroupByPayload<T extends BracketGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<BracketGroupByOutputType, T['by']> &
       {
@@ -1546,6 +1546,11 @@ export type BracketFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Skip the first `n` Brackets.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Brackets.
+   */
   distinct?: Prisma.BracketScalarFieldEnum | Prisma.BracketScalarFieldEnum[]
 }
 

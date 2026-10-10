@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { ReservationStatus } from '../../dtos/reservations/reservation.dto.js';
-import type { CreateWhitelistDto, UpdateUserDto, UserDetailDto, UserListItemDto } from '../../dtos/users/user.dto.js';
+import type { CreateWhitelistDto, UpdateUserDto, UserDetailDto, UserListResponseDto } from '../../dtos/users/user.dto.js';
 
 const WHITELIST_PREFIX = 'admin_whitelist.';
 
@@ -9,7 +9,9 @@ const WHITELIST_PREFIX = 'admin_whitelist.';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(args: { search?: string; adminOnly?: boolean; noShowsOnly?: boolean }): Promise<UserListItemDto[]> {
+  async list(args: { search?: string; adminOnly?: boolean; noShowsOnly?: boolean; page?: number; pageSize?: number }): Promise<UserListResponseDto> {
+    const pageSize = args.pageSize ?? 25;
+
     const where: Record<string, unknown> = {};
 
     if (args.search) {
@@ -28,6 +30,11 @@ export class UsersService {
       where.reservations = { some: { status: ReservationStatus.NO_SHOW } };
     }
 
+    const total = await this.prisma.user.count({ where });
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    // Clamp so a stale page number (e.g. after deleting the last user on the last page) still returns results
+    const page = Math.min(args.page ?? 1, totalPages);
+
     const users = await this.prisma.user.findMany({
       where,
       include: {
@@ -42,7 +49,8 @@ export class UsersService {
         },
       },
       orderBy: { id: 'desc' },
-      take: 500,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     });
 
     const noShowCounts = await this.prisma.reservation.groupBy({
@@ -52,7 +60,7 @@ export class UsersService {
     });
     const noShowMap = new Map(noShowCounts.map((entry) => [entry.userId, entry._count._all]));
 
-    return users.map((user) => ({
+    const items = users.map((user) => ({
       id: user.id,
       name: user.name,
       email: user.email,
@@ -64,6 +72,8 @@ export class UsersService {
       noShowCount: noShowMap.get(user.id) ?? 0,
       roles: user.userRoles.map((ur) => ur.role.name),
     }));
+
+    return { items, total, page, pageSize, totalPages };
   }
 
   async getById(id: number): Promise<UserDetailDto> {

@@ -168,6 +168,41 @@ describe('MailService', () => {
     });
   });
 
+  describe('Template Rendering', () => {
+    it('should render the current year in the copyright footer', async () => {
+      jest.useFakeTimers({ now: new Date('2031-06-01T12:00:00Z'), advanceTimers: true });
+      try {
+        await service.sendMail('test@example.com', 'Test', 'reservation/cancellation', {});
+      } finally {
+        jest.useRealTimers();
+      }
+
+      const { html } = mockTransporter.sendMail.mock.calls[0][0];
+      expect(html).toContain('2031 AP Gaming Hub');
+      expect(html).not.toContain('{{');
+    });
+
+    it('should render the no-show template without errors', async () => {
+      await service.sendMail('test@example.com', 'Test', 'reservation/no-show', {
+        name: 's123456',
+        noShowCount: 2,
+        noShowLimit: 3,
+        remaining: 1,
+        isFirst: false,
+        isBlocked: false,
+        inventory: 'PC',
+        startTime: 'maandag 12 oktober 2026 om 14:00',
+        endTime: 'maandag 12 oktober 2026 om 16:00',
+        guideUrl: 'https://example.com/reservations/how-to-cancel',
+        profileUrl: 'https://example.com/profile',
+      });
+
+      const { html } = mockTransporter.sendMail.mock.calls[0][0];
+      expect(html).toContain('Nog 1 no-show en je kan geen reservaties meer maken.');
+      expect(html).toContain('https://example.com/reservations/how-to-cancel');
+    });
+  });
+
   describe('Error Handling', () => {
     it('should throw error on SMTP failure', async () => {
       mockTransporter.sendMail.mockRejectedValue(

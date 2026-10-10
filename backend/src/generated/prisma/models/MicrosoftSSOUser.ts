@@ -182,7 +182,7 @@ export type MicrosoftSSOUserGroupByOutputType = {
   _max: MicrosoftSSOUserMaxAggregateOutputType | null
 }
 
-type GetMicrosoftSSOUserGroupByPayload<T extends MicrosoftSSOUserGroupByArgs> = Prisma.PrismaPromise<
+export type GetMicrosoftSSOUserGroupByPayload<T extends MicrosoftSSOUserGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<MicrosoftSSOUserGroupByOutputType, T['by']> &
       {
@@ -1097,6 +1097,11 @@ export type MicrosoftSSOUserFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Skip the first `n` MicrosoftSSOUsers.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of MicrosoftSSOUsers.
+   */
   distinct?: Prisma.MicrosoftSSOUserScalarFieldEnum | Prisma.MicrosoftSSOUserScalarFieldEnum[]
 }
 

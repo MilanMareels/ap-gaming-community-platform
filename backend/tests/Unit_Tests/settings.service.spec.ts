@@ -57,7 +57,7 @@ describe('SettingsService', () => {
       await service.getPublicSettings();
 
       expect(prisma.setting.findMany).toHaveBeenCalledWith({
-        where: { key: { in: ['googleFormUrl'] } },
+        where: { key: { in: ['googleFormUrl', 'twitchChannel'] } },
       });
     });
 

@@ -182,7 +182,7 @@ export type GoogleSSOUserGroupByOutputType = {
   _max: GoogleSSOUserMaxAggregateOutputType | null
 }
 
-type GetGoogleSSOUserGroupByPayload<T extends GoogleSSOUserGroupByArgs> = Prisma.PrismaPromise<
+export type GetGoogleSSOUserGroupByPayload<T extends GoogleSSOUserGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<GoogleSSOUserGroupByOutputType, T['by']> &
       {
@@ -1097,6 +1097,11 @@ export type GoogleSSOUserFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Skip the first `n` GoogleSSOUsers.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of GoogleSSOUsers.
+   */
   distinct?: Prisma.GoogleSSOUserScalarFieldEnum | Prisma.GoogleSSOUserScalarFieldEnum[]
 }
 

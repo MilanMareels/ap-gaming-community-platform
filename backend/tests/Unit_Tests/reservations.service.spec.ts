@@ -67,6 +67,7 @@ describe('ReservationsService', () => {
     };
 
     const mockMailService = {
+      sendMail: jest.fn().mockResolvedValue(undefined),
       sendMailWithAttachments: jest.fn().mockResolvedValue(undefined),
       generateQRCode: jest.fn().mockResolvedValue(Buffer.from('fake-qr-code')),
     };
@@ -480,6 +481,171 @@ describe('ReservationsService', () => {
       expect(emailData).toHaveProperty('startTime');
       expect(emailData).toHaveProperty('endTime');
       expect(emailData).toHaveProperty('email');
+    });
+  });
+
+  describe('No-show emails', () => {
+    const reservationRow = (status: ReservationStatus) => ({
+      id: 7,
+      cuid: 'res-cuid',
+      userId: mockUser.id,
+      email: mockUser.email,
+      inventory: 'pc',
+      controllers: 1,
+      startTime: new Date('2026-10-12T14:00:00.000Z'),
+      endTime: new Date('2026-10-12T16:00:00.000Z'),
+      status,
+    });
+
+    const markNoShow = async (noShowCount: number) => {
+      prisma.reservation.findUnique.mockResolvedValue(reservationRow(ReservationStatus.RESERVED));
+      prisma.reservation.update.mockResolvedValue({ ...reservationRow(ReservationStatus.NO_SHOW), user: mockUser });
+      prisma.reservation.count.mockResolvedValue(noShowCount);
+      await service.updateStatus(7, { status: ReservationStatus.NO_SHOW });
+      return mailService.sendMail.mock.calls[0];
+    };
+
+    it('should send a friendly reminder on the first no-show', async () => {
+      const [to, subject, template, data] = await markNoShow(1);
+
+      expect(to).toBe(mockUser.email);
+      expect(subject).toBe('We hebben je gemist - AP Gaming Hub');
+      expect(template).toBe('reservation/no-show');
+      expect(data).toMatchObject({ noShowCount: 1, noShowLimit: 3, remaining: 2, isFirst: true, isBlocked: false, name: mockUser.sNumber });
+    });
+
+    it('should warn about an upcoming block on the second no-show', async () => {
+      const [, subject, , data] = await markNoShow(2);
+
+      expect(subject).toBe('Waarschuwing: herhaalde no-show - AP Gaming Hub');
+      expect(data).toMatchObject({ noShowCount: 2, remaining: 1, isFirst: false, isBlocked: false });
+    });
+
+    it('should tell the user they are blocked on the third no-show', async () => {
+      const [, subject, , data] = await markNoShow(3);
+
+      expect(subject).toBe('Je kan niet meer reserveren - AP Gaming Hub');
+      expect(data).toMatchObject({ noShowCount: 3, remaining: 0, isFirst: false, isBlocked: true });
+    });
+
+    it('should count no-shows for the reservation owner', async () => {
+      await markNoShow(1);
+
+      expect(prisma.reservation.count).toHaveBeenCalledWith({
+        where: { userId: mockUser.id, status: ReservationStatus.NO_SHOW },
+      });
+    });
+
+    it('should not send an email when the reservation already was a no-show', async () => {
+      prisma.reservation.findUnique.mockResolvedValue(reservationRow(ReservationStatus.NO_SHOW));
+      prisma.reservation.update.mockResolvedValue({ ...reservationRow(ReservationStatus.NO_SHOW), user: mockUser });
+
+      await service.updateStatus(7, { status: ReservationStatus.NO_SHOW });
+
+      expect(mailService.sendMail).not.toHaveBeenCalled();
+    });
+
+    it('should not send a no-show email for other status changes', async () => {
+      prisma.reservation.findUnique.mockResolvedValue(reservationRow(ReservationStatus.RESERVED));
+      prisma.reservation.update.mockResolvedValue({ ...reservationRow(ReservationStatus.PRESENT), user: mockUser });
+
+      await service.updateStatus(7, { status: ReservationStatus.PRESENT });
+
+      expect(mailService.sendMail).not.toHaveBeenCalled();
+    });
+
+    it('should still update the status when sending the email fails', async () => {
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      mailService.sendMail.mockRejectedValue(new Error('SMTP down'));
+      prisma.reservation.findUnique.mockResolvedValue(reservationRow(ReservationStatus.RESERVED));
+      prisma.reservation.update.mockResolvedValue({ ...reservationRow(ReservationStatus.NO_SHOW), user: mockUser });
+      prisma.reservation.count.mockResolvedValue(1);
+
+      const result = await service.updateStatus(7, { status: ReservationStatus.NO_SHOW });
+
+      expect(result.status).toBe(ReservationStatus.NO_SHOW);
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('Own reservations', () => {
+    it('should return the user reservations with their no-show status', async () => {
+      prisma.reservation.findMany.mockResolvedValue([
+        { cuid: 'a', inventory: 'pc', controllers: 1, startTime: new Date(), endTime: new Date(), status: ReservationStatus.NO_SHOW },
+        { cuid: 'b', inventory: 'ps5', controllers: 2, startTime: new Date(), endTime: new Date(), status: ReservationStatus.RESERVED },
+      ]);
+
+      const result = await service.getMine(mockUser.id);
+
+      expect(prisma.reservation.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { userId: mockUser.id } }));
+      expect(result.reservations).toHaveLength(2);
+      expect(result).toMatchObject({ noShowCount: 1, noShowLimit: 3, isBlocked: false });
+    });
+
+    it('should mark the user as blocked once the no-show limit is reached', async () => {
+      prisma.reservation.findMany.mockResolvedValue(
+        Array.from({ length: 3 }, (_, i) => ({
+          cuid: `c${i}`,
+          inventory: 'pc',
+          controllers: 1,
+          startTime: new Date(),
+          endTime: new Date(),
+          status: ReservationStatus.NO_SHOW,
+        })),
+      );
+
+      const result = await service.getMine(mockUser.id);
+
+      expect(result.isBlocked).toBe(true);
+    });
+
+    it('should cancel an upcoming reservation owned by the user', async () => {
+      prisma.reservation.findFirst.mockResolvedValue({
+        id: 7,
+        userId: mockUser.id,
+        status: ReservationStatus.RESERVED,
+        startTime: new Date(getIsoDate(1)),
+      });
+      prisma.reservation.update.mockResolvedValue({
+        id: 7,
+        cuid: 'res-cuid',
+        email: mockUser.email,
+        inventory: 'pc',
+        controllers: 1,
+        startTime: new Date(getIsoDate(1)),
+        endTime: new Date(getIsoDate(1)),
+        status: ReservationStatus.CANCELLED,
+        user: mockUser,
+      });
+
+      await service.cancelMine(mockUser.id, 'res-cuid');
+
+      expect(prisma.reservation.update).toHaveBeenCalledWith(expect.objectContaining({ data: { status: ReservationStatus.CANCELLED } }));
+      expect(mailService.sendMail).toHaveBeenCalledWith(mockUser.email, expect.any(String), 'reservation/cancellation', expect.any(Object));
+    });
+
+    it('should not let a user cancel a reservation of someone else', async () => {
+      prisma.reservation.findFirst.mockResolvedValue({
+        id: 7,
+        userId: 999,
+        status: ReservationStatus.RESERVED,
+        startTime: new Date(getIsoDate(1)),
+      });
+
+      await expect(service.cancelMine(mockUser.id, 'res-cuid')).rejects.toThrow(NotFoundException);
+      expect(prisma.reservation.update).not.toHaveBeenCalled();
+    });
+
+    it('should not cancel a reservation that has already started', async () => {
+      prisma.reservation.findFirst.mockResolvedValue({
+        id: 7,
+        userId: mockUser.id,
+        status: ReservationStatus.RESERVED,
+        startTime: new Date(getIsoDate(-1)),
+      });
+
+      await expect(service.cancelMine(mockUser.id, 'res-cuid')).rejects.toThrow(BadRequestException);
+      expect(prisma.reservation.update).not.toHaveBeenCalled();
     });
   });
 });

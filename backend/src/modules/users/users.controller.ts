@@ -1,7 +1,14 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
-import { CreateWhitelistDto, UpdateUserDto, UserDetailDto, UserListItemDto, UserListQueryDto, WhitelistEntryDto } from '../../dtos/users/user.dto.js';
+import {
+  CreateWhitelistDto,
+  UpdateUserDto,
+  UserDetailDto,
+  UserListQueryDto,
+  UserListResponseDto,
+  WhitelistEntryDto,
+} from '../../dtos/users/user.dto.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
@@ -17,12 +24,14 @@ export class UsersController {
 
   @Get()
   @ApiOperation({ summary: 'List users with filters (Admin only)' })
-  @ApiOkResponse({ type: [UserListItemDto] })
-  list(@Query() query: UserListQueryDto): Promise<UserListItemDto[]> {
+  @ApiOkResponse({ type: UserListResponseDto })
+  list(@Query() query: UserListQueryDto): Promise<UserListResponseDto> {
     return this.usersService.list({
       search: query.search,
       adminOnly: query.adminOnly === 'true',
       noShowsOnly: query.noShowsOnly === 'true',
+      page: query.page,
+      pageSize: query.pageSize,
     });
   }
 

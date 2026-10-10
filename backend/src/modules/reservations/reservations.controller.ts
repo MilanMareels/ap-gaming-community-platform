@@ -6,6 +6,7 @@ import { InventoryAdjustmentsService } from '../inventory-adjustments/inventory-
 import {
   CreateReservationDto,
   AdminCreateReservationDto,
+  MyReservationsResponseDto,
   ReservationQueryDto,
   ReservationSlotDto,
   ReservationVerificationDto,
@@ -39,6 +40,28 @@ export class ReservationsController {
     const user = (req as Request & { user?: JwtPayload }).user;
     if (!user) throw new UnauthorizedException('Unauthorized');
     return this.reservationsService.createForUser(user.sub, dto);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get reservations and no-show status of the authenticated user' })
+  @ApiOkResponse({ type: MyReservationsResponseDto })
+  getMine(@Req() req: Request) {
+    const user = (req as Request & { user?: JwtPayload }).user;
+    if (!user) throw new UnauthorizedException('Unauthorized');
+    return this.reservationsService.getMine(user.sub);
+  }
+
+  @Patch('me/:cuid/cancel')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Cancel an own reservation of the authenticated user' })
+  @ApiOkResponse({ type: PrismaModel.Reservation })
+  @ApiNotFoundResponse({ description: 'Reservation not found', type: HttpExceptionDto })
+  @ApiBadRequestResponse({ description: 'Reservation is already cancelled or has already started', type: HttpExceptionDto })
+  cancelMine(@Param('cuid') cuid: string, @Req() req: Request) {
+    const user = (req as Request & { user?: JwtPayload }).user;
+    if (!user) throw new UnauthorizedException('Unauthorized');
+    return this.reservationsService.cancelMine(user.sub, cuid);
   }
 
   @Public()
