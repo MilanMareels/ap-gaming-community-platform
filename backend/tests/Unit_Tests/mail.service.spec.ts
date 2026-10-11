@@ -8,8 +8,8 @@ describe('MailService', () => {
 
   beforeEach(async () => {
     mockTransporter = {
-      sendMail: jest.fn<any>().mockResolvedValue({ messageId: 'test-id' }),
-      verify: jest.fn<any>().mockResolvedValue(true),
+      sendMail: jest.fn<() => Promise<{ messageId: string }>>().mockResolvedValue({ messageId: 'test-id' }),
+      verify: jest.fn<() => Promise<boolean>>().mockResolvedValue(true),
     };
 
     // Mock the module directly

@@ -202,7 +202,7 @@ export default function AdminReservationsPage() {
             <div key={r.id} className="bg-linear-to-br from-slate-900 via-slate-900 to-slate-900/80 rounded-xl border border-slate-800 overflow-hidden hover:border-slate-700 transition-all">
               <div className="p-4">
                 <div className="flex items-start justify-between gap-2 mb-3">
-                  <Link href={`/admin/users?search=${encodeURIComponent(r.email)}`} className="flex items-center gap-3 group/user">
+                  <Link href={`/admin/users/${r.userId}`} className="flex items-center gap-3 group/user">
                     <div className="w-9 h-9 rounded-full bg-linear-to-br from-red-500/20 to-red-600/10 border border-red-500/20 flex items-center justify-center text-xs font-bold text-red-400 shrink-0">
                       {getInitials(r.user?.name)}
                     </div>
@@ -275,7 +275,7 @@ export default function AdminReservationsPage() {
               {paginated.map((r) => (
                 <tr key={r.id} className="hover:bg-slate-800/30 transition-colors">
                   <td className="px-4 py-3.5">
-                    <Link href={`/admin/users?search=${encodeURIComponent(r.email)}`} className="group/user">
+                    <Link href={`/admin/users/${r.userId}`} className="group/user">
                       <div className="font-medium text-white group-hover/user:text-red-400 transition-colors">{r.user?.name || 'Unknown'}</div>
                       <div className="text-xs text-gray-500 mt-0.5">
                         {r.email}

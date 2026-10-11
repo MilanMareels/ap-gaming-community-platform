@@ -33,7 +33,14 @@ export class PermissionGuard implements CanActivate {
       return true;
     }
 
-    const userPermissions = await this.rbacService.getPermissionsForUser(request.user.sub);
+    // When impersonating a role, use the permissions baked into the JWT
+    // (they reflect only that role's permissions, not the user's actual ones)
+    let userPermissions: Set<string>;
+    if (request.user.impersonatingRoleId) {
+      userPermissions = new Set(request.user.permissions ?? []);
+    } else {
+      userPermissions = await this.rbacService.getPermissionsForUser(request.user.sub);
+    }
 
     const hasPermission = requiredPermissions.some((p) => userPermissions.has(p));
     if (!hasPermission) {

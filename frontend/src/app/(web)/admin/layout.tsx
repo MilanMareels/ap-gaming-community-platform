@@ -21,6 +21,7 @@ import {
   Settings,
   PanelLeftClose,
   PanelLeftOpen,
+  Eye,
 } from 'lucide-react';
 import { apiClient } from '@/api';
 import type { components } from '@/api';
@@ -76,7 +77,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: 'Systeem',
     items: [
-      { id: 'users', label: 'Gebruikers', href: '/admin/users', icon: UserCog, permissions: ['users.manage'] },
+      { id: 'users', label: 'Gebruikers', href: '/admin/users', icon: UserCog, permissions: ['users.view', 'users.manage'] },
       { id: 'roles', label: 'Rollen', href: '/admin/roles', icon: Shield, permissions: ['roles.manage'] },
       { id: 'timetable', label: 'Openingsuren', href: '/admin/timetable', icon: Clock, permissions: ['timetable.manage'] },
     ],
@@ -134,7 +135,7 @@ export default function AdminLayout({
         window.location.href = `/login?returnUrl=${encodeURIComponent(pathname)}`;
         return;
       }
-      if (!res.data.isAdmin && (!res.data.permissions || res.data.permissions.length === 0)) {
+      if (!res.data.roles?.includes('Admin') && (!res.data.permissions || res.data.permissions.length === 0)) {
         window.location.href = `/login?returnUrl=${encodeURIComponent(pathname)}`;
         return;
       }
@@ -155,10 +156,19 @@ export default function AdminLayout({
     }
   };
 
+  const handleStopImpersonation = async () => {
+    try {
+      await apiClient.POST('/auth/impersonate/stop');
+      window.location.reload();
+    } catch (err) {
+      console.error('Failed to stop impersonation:', err);
+    }
+  };
+
   const hasPermission = useCallback(
     (p: string) => {
       if (!user) return false;
-      if (user.isAdmin) return true;
+      if ((user.roles ?? []).includes('Admin')) return true;
       return (user.permissions ?? []).includes(p);
     },
     [user],
@@ -181,10 +191,12 @@ export default function AdminLayout({
 
   const userPermissions = new Set(user.permissions ?? []);
 
+  const isAdminRole = (user.roles ?? []).includes('Admin');
+
   const visibleGroups = NAV_GROUPS.map((group) => ({
     ...group,
     items: group.items.filter(
-      (item) => user.isAdmin || item.permissions.some((p) => userPermissions.has(p)),
+      (item) => isAdminRole || item.permissions.some((p) => userPermissions.has(p)),
     ),
   })).filter((group) => group.items.length > 0);
 
@@ -304,7 +316,7 @@ export default function AdminLayout({
               <>
                 <div className='overflow-hidden flex-1 min-w-0'>
                   <div className='text-sm font-medium truncate'>{user.name || user.email}</div>
-                  <div className='text-[11px] text-gray-500 truncate'>{user.isAdmin ? 'Admin' : 'Beheerder'}</div>
+                  <div className='text-[11px] text-gray-500 truncate'>{isAdminRole ? 'Admin' : 'Beheerder'}</div>
                 </div>
                 <button
                   onClick={handleLogout}
@@ -321,6 +333,24 @@ export default function AdminLayout({
 
       {/* Main content */}
       <main className={`min-h-screen transition-all duration-200 pt-14 lg:pt-0 ${collapsed ? 'lg:ml-16' : 'lg:ml-64'}`}>
+        {user.impersonation && (
+          <div className='bg-amber-500/90 text-black px-4 py-2 flex items-center justify-between gap-3 text-sm font-medium'>
+            <div className='flex items-center gap-2'>
+              <Eye size={16} />
+              <span>
+                {user.impersonation.userId
+                  ? `Je bekijkt de site als ${user.impersonation.userName || `gebruiker #${user.impersonation.userId}`}`
+                  : `Je bekijkt de site als de rol "${user.impersonation.roleName}"`}
+              </span>
+            </div>
+            <button
+              onClick={handleStopImpersonation}
+              className='bg-black/20 hover:bg-black/30 text-black px-3 py-1 rounded-lg text-xs font-bold transition-colors'
+            >
+              Stop impersonatie
+            </button>
+          </div>
+        )}
         <div className='p-4 md:p-6 lg:p-8'>
           {children}
         </div>

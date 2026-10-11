@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ShieldCheck, ShieldOff, Trash2, Unlink, Pencil, X, Loader2, Users, Search, Shield, BarChart3 } from 'lucide-react';
+import { Trash2, Unlink, Pencil, X, Loader2, Users, Search, Shield, BarChart3, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Badge } from '@/components/ui/Badge';
@@ -84,8 +84,10 @@ const inputClass = 'w-full bg-slate-950 border border-slate-700 rounded-lg py-2.
 const labelClass = 'block text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-1.5';
 
 export default function AdminUsersPage() {
-  const { user: currentUser } = useAdmin();
+  const { user: currentUser, hasPermission } = useAdmin();
   const searchParams = useSearchParams();
+  const canManageUsers = hasPermission('users.manage');
+  const canViewStats = hasPermission('statistics.view');
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [search, setSearch] = useState(searchParams.get('search') ?? '');
   const [adminOnly, setAdminOnly] = useState(false);
@@ -229,18 +231,27 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-4 py-3.5 text-right">
                       <div className="flex gap-1.5 justify-end">
-                        <Link href={`/admin/statistics/user/${u.id}`}>
-                          <button className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors" title="Statistieken">
-                            <BarChart3 size={16} />
+                        <Link href={`/admin/users/${u.id}`}>
+                          <button className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors" title="Details">
+                            <Eye size={16} />
                           </button>
                         </Link>
-                        <button
-                          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors"
-                          title="Beheer"
-                          onClick={() => setSelectedId(u.id)}
-                        >
-                          <Pencil size={16} />
-                        </button>
+                        {canViewStats && (
+                          <Link href={`/admin/statistics/user/${u.id}`}>
+                            <button className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors" title="Statistieken">
+                              <BarChart3 size={16} />
+                            </button>
+                          </Link>
+                        )}
+                        {canManageUsers && (
+                          <button
+                            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors"
+                            title="Snel bewerken"
+                            onClick={() => setSelectedId(u.id)}
+                          >
+                            <Pencil size={16} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -297,6 +308,7 @@ function UserDetailDrawer({
   const isSelf = detail?.id === currentUserId;
 
   const { hasPermission } = useAdmin();
+  const canManageUsers = hasPermission('users.manage');
   const canManageRoles = hasPermission('users.roles.manage');
 
   const load = useCallback(async () => {
@@ -399,9 +411,11 @@ function UserDetailDrawer({
                 <div className="text-xl font-bold text-white">{detail.name || <span className="text-gray-500">(geen naam)</span>}</div>
                 <div className="text-sm text-gray-400">{detail.email}</div>
                 <div className="text-xs text-gray-500 font-mono">s-nummer: {detail.sNumber}</div>
-                <Button size="sm" variant="secondary" onClick={() => setEditing(true)} className="mt-3">
-                  <Pencil size={14} /> Bewerken
-                </Button>
+                {canManageUsers && (
+                  <Button size="sm" variant="secondary" onClick={() => setEditing(true)} className="mt-3">
+                    <Pencil size={14} /> Bewerken
+                  </Button>
+                )}
               </section>
             ) : (
               <section className="space-y-3">
@@ -447,37 +461,6 @@ function UserDetailDrawer({
               </section>
             )}
 
-            <section>
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">Rol</div>
-              {detail.isAdmin ? (
-                <div className="flex items-center justify-between">
-                  <Badge variant="danger">Admin</Badge>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    disabled={busy}
-                    onClick={() =>
-                      action(
-                        () => api(`/users/${userId}/admin`, { method: 'DELETE' }),
-                        isSelf ? 'Je staat op het punt jezelf te demoten. Weet je het zeker?' : undefined,
-                      )
-                    }
-                  >
-                    <ShieldOff size={14} /> Demote
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="primary"
-                  disabled={busy}
-                  onClick={() => action(() => api(`/users/${userId}/promote`, { method: 'POST' }))}
-                >
-                  <ShieldCheck size={14} /> Promote to admin
-                </Button>
-              )}
-            </section>
-
             {canManageRoles && allRoles.length > 0 && (
               <section>
                 <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">Rollen</div>
@@ -513,43 +496,45 @@ function UserDetailDrawer({
               </section>
             )}
 
-            <section>
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">SSO koppelingen</div>
-              <ul className="space-y-2">
-                <li className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-lg p-3">
-                  <div>
-                    <div className="font-medium text-white">Microsoft</div>
-                    <div className="text-xs text-gray-500">{detail.microsoftLinks.length > 0 ? `${detail.microsoftLinks.length} koppeling(en)` : 'Niet gekoppeld'}</div>
-                  </div>
-                  {detail.microsoftLinks.length > 0 && (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      disabled={busy}
-                      onClick={() => action(() => api(`/users/${userId}/sso/microsoft`, { method: 'DELETE' }), 'Microsoft-koppeling verwijderen?')}
-                    >
-                      <Unlink size={14} />
-                    </Button>
-                  )}
-                </li>
-                <li className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-lg p-3">
-                  <div>
-                    <div className="font-medium text-white">Google</div>
-                    <div className="text-xs text-gray-500">{detail.googleLinks.length > 0 ? `${detail.googleLinks.length} koppeling(en)` : 'Niet gekoppeld'}</div>
-                  </div>
-                  {detail.googleLinks.length > 0 && (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      disabled={busy}
-                      onClick={() => action(() => api(`/users/${userId}/sso/google`, { method: 'DELETE' }), 'Google-koppeling verwijderen?')}
-                    >
-                      <Unlink size={14} />
-                    </Button>
-                  )}
-                </li>
-              </ul>
-            </section>
+            {canManageUsers && (
+              <section>
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">SSO koppelingen</div>
+                <ul className="space-y-2">
+                  <li className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-lg p-3">
+                    <div>
+                      <div className="font-medium text-white">Microsoft</div>
+                      <div className="text-xs text-gray-500">{detail.microsoftLinks.length > 0 ? `${detail.microsoftLinks.length} koppeling(en)` : 'Niet gekoppeld'}</div>
+                    </div>
+                    {detail.microsoftLinks.length > 0 && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        disabled={busy}
+                        onClick={() => action(() => api(`/users/${userId}/sso/microsoft`, { method: 'DELETE' }), 'Microsoft-koppeling verwijderen?')}
+                      >
+                        <Unlink size={14} />
+                      </Button>
+                    )}
+                  </li>
+                  <li className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-lg p-3">
+                    <div>
+                      <div className="font-medium text-white">Google</div>
+                      <div className="text-xs text-gray-500">{detail.googleLinks.length > 0 ? `${detail.googleLinks.length} koppeling(en)` : 'Niet gekoppeld'}</div>
+                    </div>
+                    {detail.googleLinks.length > 0 && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        disabled={busy}
+                        onClick={() => action(() => api(`/users/${userId}/sso/google`, { method: 'DELETE' }), 'Google-koppeling verwijderen?')}
+                      >
+                        <Unlink size={14} />
+                      </Button>
+                    )}
+                  </li>
+                </ul>
+              </section>
+            )}
 
             <section>
               <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">Reservaties</div>
@@ -568,23 +553,25 @@ function UserDetailDrawer({
               )}
             </section>
 
-            <section className="border-t border-slate-800 pt-4">
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">Gevaarlijke zone</div>
-              <Button
-                size="sm"
-                variant="danger"
-                disabled={busy || isSelf}
-                onClick={() =>
-                  action(
-                    () => api(`/users/${userId}`, { method: 'DELETE' }),
-                    `Definitief verwijderen? Dit verwijdert de gebruiker en alle ${detail.reservationCount} reservaties.`,
-                  ).then(onClose)
-                }
-              >
-                <Trash2 size={14} /> Verwijder gebruiker
-              </Button>
-              {isSelf && <p className="text-xs text-gray-500 mt-2">Je kan je eigen account niet verwijderen.</p>}
-            </section>
+            {canManageUsers && (
+              <section className="border-t border-slate-800 pt-4">
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">Gevaarlijke zone</div>
+                <Button
+                  size="sm"
+                  variant="danger"
+                  disabled={busy || isSelf}
+                  onClick={() =>
+                    action(
+                      () => api(`/users/${userId}`, { method: 'DELETE' }),
+                      `Definitief verwijderen? Dit verwijdert de gebruiker en alle ${detail.reservationCount} reservaties.`,
+                    ).then(onClose)
+                  }
+                >
+                  <Trash2 size={14} /> Verwijder gebruiker
+                </Button>
+                {isSelf && <p className="text-xs text-gray-500 mt-2">Je kan je eigen account niet verwijderen.</p>}
+              </section>
+            )}
           </div>
         )}
       </div>

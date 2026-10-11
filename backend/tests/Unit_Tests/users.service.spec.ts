@@ -21,8 +21,8 @@ describe('UsersService', () => {
 
   beforeEach(async () => {
     const mockPrisma = {
-      user: { count: jest.fn(), findMany: jest.fn<any>().mockResolvedValue([]) },
-      reservation: { groupBy: jest.fn<any>().mockResolvedValue([]) },
+      user: { count: jest.fn(), findMany: jest.fn<() => Promise<unknown[]>>().mockResolvedValue([]) },
+      reservation: { groupBy: jest.fn<() => Promise<unknown[]>>().mockResolvedValue([]) },
     };
 
     const module = await Test.createTestingModule({

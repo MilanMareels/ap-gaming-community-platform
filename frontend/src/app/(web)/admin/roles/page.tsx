@@ -1,13 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, Shield, Users, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, Shield, Users, X, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { PageHeader } from '@/components/admin/PageHeader';
 import { EmptyState } from '@/components/admin/EmptyState';
 import { apiClient } from '@/api';
 import { getApiErrorMessage } from '@/util/api-error';
+import { useAdmin } from '../layout';
 
 interface Role {
   id: number;
@@ -27,9 +28,9 @@ interface Permission {
 const PERMISSION_CATEGORIES: Record<string, string[]> = {
   Events: ['events.manage', 'events.registrations.view'],
   Reservaties: ['reservations.manage', 'reservations.noshows.manage'],
-  Content: ['roster.manage', 'timetable.manage', 'navigation.manage'],
+  Content: ['roster.manage', 'timetable.manage', 'navigation.manage', 'forms.manage', 'jobs.manage'],
   Toernooien: ['brackets.manage', 'time-trials.manage', 'point-trials.manage'],
-  Beheer: ['users.manage', 'users.roles.manage', 'roles.manage', 'settings.manage'],
+  Beheer: ['users.view', 'users.manage', 'users.notes.delete_others', 'users.roles.manage', 'roles.manage', 'settings.manage', 'statistics.view', 'inventory-adjustments.manage'],
 };
 
 const inputClass = 'w-full bg-slate-950 border border-slate-700 rounded-lg py-2.5 px-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/20 transition-colors';
@@ -47,6 +48,18 @@ export default function AdminRolesPage() {
   const [formDescription, setFormDescription] = useState('');
   const [formPermissions, setFormPermissions] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
+
+  const { user: currentUser } = useAdmin();
+  const isRealAdmin = (currentUser.roles ?? []).includes('Admin') && !currentUser.impersonation;
+
+  const handleImpersonateRole = async (roleId: number) => {
+    try {
+      await fetch(`/api/auth/impersonate/role/${roleId}`, { method: 'POST', credentials: 'include' });
+      window.location.href = '/admin';
+    } catch {
+      // ignore
+    }
+  };
 
   const fetchData = useCallback(async () => {
     try {
@@ -321,6 +334,15 @@ export default function AdminRolesPage() {
                   <Users size={14} /> {role.userCount}
                 </span>
                 <div className="flex gap-1 opacity-50 group-hover:opacity-100 transition-opacity">
+                  {isRealAdmin && (
+                    <button
+                      onClick={() => handleImpersonateRole(role.id)}
+                      className="p-2 rounded-lg text-gray-400 hover:text-amber-400 hover:bg-amber-900/20 transition-colors"
+                      title={`Bekijk site als "${role.name}"`}
+                    >
+                      <Eye size={16} />
+                    </button>
+                  )}
                   <button
                     onClick={() => openEditForm(role)}
                     className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors"

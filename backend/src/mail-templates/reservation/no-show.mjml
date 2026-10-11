@@ -22,8 +22,8 @@
         <mj-text font-size="16px" color="#1f2937"> Beste {{ name }}, </mj-text>
         {% if isBlocked %}
         <mj-text font-size="14px" color="#4b5563">
-          Je bent niet komen opdagen voor je reservatie en hebt daarmee <strong>{{ noShowCount }} no-shows</strong> op je naam staan. Zoals
-          aangekondigd kan je daardoor <strong>geen nieuwe reservaties meer maken</strong>.
+          Je bent niet komen opdagen voor je reservatie en hebt daarmee <strong>{{ noShowCount }} no-shows</strong> dit semester op je naam staan. Zoals
+          aangekondigd kan je daardoor <strong>geen nieuwe reservaties meer maken tot het volgende semester</strong>.
         </mj-text>
         <mj-text font-size="14px" color="#4b5563">
           Denk je dat dit een vergissing is, of wil je graag opnieuw kunnen reserveren? Spreek een medewerker aan in de Gaming Hub of
@@ -35,14 +35,14 @@
         </mj-text>
         <mj-text font-size="14px" color="#4b5563">
           Kan je de volgende keer niet komen? Annuleer je reservatie dan op voorhand. Zo geef je jouw plek vrij voor een andere student. Let
-          op: na <strong>{{ noShowLimit }} no-shows</strong> kan je geen reservaties meer maken.
+          op: na <strong>{{ noShowLimit }} no-shows per semester</strong> kan je geen reservaties meer maken. Bij een nieuw semester worden je no-shows gereset.
         </mj-text>
         {% else %}
         <mj-text font-size="14px" color="#4b5563">
           Je bent opnieuw niet komen opdagen voor je reservatie. Dit is al je <strong>{{ noShowCount }}e no-show</strong>.
         </mj-text>
         <mj-text font-size="14px" color="#b91c1c" font-weight="bold">
-          Nog {{ remaining }} no-show{% if remaining != 1 %}s{% endif %} en je kan geen reservaties meer maken.
+          Nog {{ remaining }} no-show{% if remaining != 1 %}s{% endif %} dit semester en je kan geen reservaties meer maken.
         </mj-text>
         <mj-text font-size="14px" color="#4b5563">
           Kan je niet komen? Annuleer je reservatie dan altijd op voorhand. Annuleren is gratis en telt niet mee als no-show.
@@ -53,7 +53,7 @@
 
     <mj-section background-color="#ffffff" padding="10px 30px 20px">
       <mj-column>
-        <mj-text align="center" font-size="12px" font-weight="bold" color="#6b7280" padding-bottom="8px"> JOUW NO-SHOWS </mj-text>
+        <mj-text align="center" font-size="12px" font-weight="bold" color="#6b7280" padding-bottom="8px"> JOUW NO-SHOWS (DIT SEMESTER) </mj-text>
         <mj-text align="center">
           <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 0 auto">
             <tr>
