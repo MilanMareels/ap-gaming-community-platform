@@ -142,6 +142,7 @@ describe('RosterService', () => {
           handle: dto.handle,
           rank: dto.rank,
           role: dto.role,
+          imageUrl: null,
         },
         include: {
           user: true,
@@ -210,6 +211,7 @@ describe('RosterService', () => {
           handle: dto.handle,
           rank: dto.rank,
           role: dto.role,
+          imageUrl: null,
         },
         include: {
           user: true,

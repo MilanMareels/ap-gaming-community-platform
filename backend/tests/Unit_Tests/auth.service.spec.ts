@@ -43,7 +43,7 @@ describe('AuthService', () => {
       adminUser: { count: jest.fn<() => Promise<number>>().mockResolvedValue(1), create: jest.fn() },
       setting: { findUnique: jest.fn<() => Promise<null>>().mockResolvedValue(null), delete: jest.fn() },
       role: { findUnique: jest.fn() },
-      userRole: { upsert: jest.fn() },
+      userRole: { upsert: jest.fn(), count: jest.fn<() => Promise<number>>().mockResolvedValue(1) },
     };
 
     const module = await Test.createTestingModule({
