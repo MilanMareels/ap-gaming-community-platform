@@ -13,6 +13,7 @@ import {
   StickyNote,
   Send,
   X,
+  Eye,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
@@ -105,6 +106,7 @@ export default function UserDetailPage() {
   const canManageRoles = hasPermission('users.roles.manage');
   const canDeleteOtherNotes = hasPermission('users.notes.delete_others');
   const canViewStats = hasPermission('statistics.view');
+  const isRealAdmin = (currentUser.roles ?? []).includes('Admin') && !currentUser.impersonation;
   const isSelf = detail?.id === currentUser.id;
 
   const load = useCallback(async () => {
@@ -196,6 +198,16 @@ export default function UserDetailPage() {
     }
   };
 
+  const handleImpersonateUser = async () => {
+    if (!confirm(`Wil je de site bekijken als ${detail?.name || 'deze gebruiker'}?`)) return;
+    try {
+      await api(`/auth/impersonate/user/${userId}`, { method: 'POST' });
+      window.location.href = '/admin';
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to impersonate');
+    }
+  };
+
   const handleDeleteNote = async (noteId: number) => {
     if (!confirm('Ben je zeker dat je deze notitie wilt verwijderen?')) return;
     setDeletingNoteId(noteId);
@@ -245,13 +257,20 @@ export default function UserDetailPage() {
         title={detail.name || '(geen naam)'}
         description={`${detail.email} · ${detail.sNumber}`}
         actions={
-          canViewStats ? (
-            <Link href={`/admin/statistics/user/${userId}`}>
-              <Button variant="secondary" size="sm">
-                <BarChart3 size={14} /> Statistieken
+          <>
+            {isRealAdmin && !isSelf && (
+              <Button variant="secondary" size="sm" onClick={handleImpersonateUser}>
+                <Eye size={14} /> Impersoneer
               </Button>
-            </Link>
-          ) : undefined
+            )}
+            {canViewStats && (
+              <Link href={`/admin/statistics/user/${userId}`}>
+                <Button variant="secondary" size="sm">
+                  <BarChart3 size={14} /> Statistieken
+                </Button>
+              </Link>
+            )}
+          </>
         }
       />
 
@@ -303,11 +322,11 @@ export default function UserDetailPage() {
               <div className={sectionTitle}>Rollen</div>
               <div className="space-y-2">
                 {allRoles.map((role) => (
-                  <label
+                  <div
                     key={role.id}
-                    className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-lg p-3 cursor-pointer hover:border-slate-700 transition-colors"
+                    className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-lg p-3 hover:border-slate-700 transition-colors"
                   >
-                    <div className="flex items-center gap-2.5">
+                    <label className="flex items-center gap-2.5 cursor-pointer flex-1">
                       <input
                         type="checkbox"
                         checked={userRoleIds.has(role.id)}
@@ -323,9 +342,28 @@ export default function UserDetailPage() {
                         </div>
                         {role.description && <div className="text-xs text-gray-500 mt-0.5">{role.description}</div>}
                       </div>
+                    </label>
+                    <div className="flex items-center gap-2">
+                      {togglingRole === role.id && <Loader2 size={14} className="animate-spin text-gray-400" />}
+                      {isRealAdmin && (
+                        <button
+                          onClick={async () => {
+                            if (!confirm(`Wil je de site bekijken als de rol "${role.name}"?`)) return;
+                            try {
+                              await api(`/auth/impersonate/role/${role.id}`, { method: 'POST' });
+                              window.location.href = '/admin';
+                            } catch (err) {
+                              setError(err instanceof Error ? err.message : 'Failed to impersonate role');
+                            }
+                          }}
+                          className="p-1.5 rounded-lg text-gray-500 hover:text-amber-400 hover:bg-amber-500/10 transition-colors"
+                          title={`Impersoneer rol "${role.name}"`}
+                        >
+                          <Eye size={14} />
+                        </button>
+                      )}
                     </div>
-                    {togglingRole === role.id && <Loader2 size={14} className="animate-spin text-gray-400" />}
-                  </label>
+                  </div>
                 ))}
               </div>
             </div>

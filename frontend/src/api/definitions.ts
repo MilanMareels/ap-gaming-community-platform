@@ -174,6 +174,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/impersonate/user/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Impersonate a user (Admin only) */
+        post: operations["AuthController_impersonateUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/impersonate/role/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Impersonate a role (Admin only) */
+        post: operations["AuthController_impersonateRole"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/impersonate/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Stop impersonating and revert to real user */
+        post: operations["AuthController_stopImpersonation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/rbac/roles": {
         parameters: {
             query?: never;
@@ -1707,6 +1758,20 @@ export interface components {
             /** @example true */
             success: boolean;
         };
+        ImpersonationInfoDto: {
+            /** @description The real admin user ID behind the impersonation */
+            realUserId: number;
+            /** @description Name of the real admin user */
+            realUserName?: string | null;
+            /** @description User ID being impersonated (user impersonation) */
+            userId?: number;
+            /** @description Name of the user being impersonated */
+            userName?: string | null;
+            /** @description Role ID being impersonated (role impersonation) */
+            roleId?: number;
+            /** @description Name of the role being impersonated */
+            roleName?: string;
+        };
         AuthProfileResponseDto: {
             id: number;
             name: string | null;
@@ -1718,6 +1783,8 @@ export interface components {
             roles: string[];
             /** @description Permission keys the user has */
             permissions: string[];
+            /** @description Present when impersonating a user or role */
+            impersonation?: components["schemas"]["ImpersonationInfoDto"];
         };
         RoleResponseDto: {
             id: number;
@@ -3223,6 +3290,61 @@ export interface operations {
             };
             /** @description Unauthorized */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_impersonateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_impersonateRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_stopImpersonation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };

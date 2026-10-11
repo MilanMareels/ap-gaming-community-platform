@@ -127,6 +127,40 @@ export class AuthController {
     return this.authService.unlinkProvider(normalized, user.sub);
   }
 
+  // --------------- Impersonation ---------------
+
+  @Post('impersonate/user/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Impersonate a user (Admin only)' })
+  async impersonateUser(@Param('id') id: string, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const user = this.requireUser(req);
+    const realUserId = user.realUserId ?? user.sub;
+    const token = await this.authService.impersonateUser(realUserId, +id);
+    this.setAuthCookie(res, token);
+    return { success: true };
+  }
+
+  @Post('impersonate/role/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Impersonate a role (Admin only)' })
+  async impersonateRole(@Param('id') id: string, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const user = this.requireUser(req);
+    const realUserId = user.realUserId ?? user.sub;
+    const token = await this.authService.impersonateRole(realUserId, +id);
+    this.setAuthCookie(res, token);
+    return { success: true };
+  }
+
+  @Post('impersonate/stop')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Stop impersonating and revert to real user' })
+  async stopImpersonation(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const user = this.requireUser(req);
+    const token = await this.authService.stopImpersonation(user);
+    this.setAuthCookie(res, token);
+    return { success: true };
+  }
+
   // --------------- Session ---------------
 
   @Post('logout')

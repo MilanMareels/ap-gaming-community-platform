@@ -125,7 +125,7 @@ describe('RosterService', () => {
       prisma.user.create.mockResolvedValue(mockUser);
       prisma.rosterEntry.create.mockResolvedValue(mockEntry);
 
-      const result = await service.createEntry(dto as any);
+      const result = await service.createEntry(dto as any, null);
 
       expect(prisma.user.create).toHaveBeenCalledWith({
         data: {
@@ -169,7 +169,7 @@ describe('RosterService', () => {
       prisma.user.update.mockResolvedValue(updatedUser);
       prisma.rosterEntry.create.mockResolvedValue(mockEntry);
 
-      const result = await service.createEntry(dto as any);
+      const result = await service.createEntry(dto as any, null);
 
       expect(prisma.user.create).not.toHaveBeenCalled();
       expect(prisma.user.update).toHaveBeenCalledWith({
@@ -199,7 +199,7 @@ describe('RosterService', () => {
       prisma.user.findFirst.mockResolvedValue(existingUser);
       prisma.rosterEntry.create.mockResolvedValue(mockEntry);
 
-      const result = await service.createEntry(dto as any);
+      const result = await service.createEntry(dto as any, null);
 
       expect(prisma.user.create).not.toHaveBeenCalled();
       expect(prisma.user.update).not.toHaveBeenCalled();

@@ -40,8 +40,8 @@ describe('AuthService', () => {
     const mockPrisma = {
       user: { findUnique: jest.fn(), findFirst: jest.fn(), create: jest.fn(), update: jest.fn() },
       microsoftSSOUser: { findUnique: jest.fn(), create: jest.fn() },
-      adminUser: { count: jest.fn<any>().mockResolvedValue(1), create: jest.fn() },
-      setting: { findUnique: jest.fn<any>().mockResolvedValue(null), delete: jest.fn() },
+      adminUser: { count: jest.fn<() => Promise<number>>().mockResolvedValue(1), create: jest.fn() },
+      setting: { findUnique: jest.fn<() => Promise<null>>().mockResolvedValue(null), delete: jest.fn() },
       role: { findUnique: jest.fn() },
       userRole: { upsert: jest.fn() },
     };

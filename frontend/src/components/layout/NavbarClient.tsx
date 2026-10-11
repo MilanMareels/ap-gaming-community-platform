@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Gamepad2, Lock, LogIn, Menu, X, ArrowRight, ChevronDown, UserRound } from 'lucide-react';
+import { Gamepad2, Lock, LogIn, Menu, X, ArrowRight, ChevronDown, UserRound, Eye } from 'lucide-react';
 import { DynamicIcon, iconNames } from 'lucide-react/dynamic';
 import type { NavLinkWithChildren } from '@/api';
 
@@ -22,6 +22,7 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
   const [userRole, setUserRole] = useState<UserRole>('public');
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [hasAnyPermission, setHasAnyPermission] = useState(false);
+  const [impersonation, setImpersonation] = useState<{ realUserId: number; userName?: string | null; roleName?: string; userId?: number } | null>(null);
   const [navHeight, setNavHeight] = useState(0);
   const dropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navRef = useRef<HTMLElement>(null);
@@ -63,6 +64,7 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
         else setUserRole('authenticated');
         if (data.roles) setUserRoles(data.roles);
         if (data.permissions?.length > 0 || data.roles?.length > 0) setHasAnyPermission(true);
+        if (data.impersonation) setImpersonation(data.impersonation);
       })
       .catch(() => {});
   }, []);
@@ -107,8 +109,34 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
     setMobileExpanded((prev) => (prev === id ? null : id));
   };
 
+  const handleStopImpersonation = async () => {
+    try {
+      await fetch('/api/auth/impersonate/stop', { method: 'POST', credentials: 'include' });
+      window.location.reload();
+    } catch {
+      // ignore
+    }
+  };
+
   return (
-    <nav ref={navRef} className="fixed w-full top-0 z-50 bg-[#020618]/80 backdrop-blur-md border-b border-white/10">
+    <>
+      {impersonation && (
+        <div className="fixed w-full top-0 z-60 bg-amber-500/90 text-black px-4 py-1.5 flex items-center justify-center gap-3 text-sm font-medium">
+          <Eye size={14} />
+          <span>
+            {impersonation.userId
+              ? `Je bekijkt de site als ${impersonation.userName || `gebruiker #${impersonation.userId}`}`
+              : `Je bekijkt de site als de rol "${impersonation.roleName}"`}
+          </span>
+          <button
+            onClick={handleStopImpersonation}
+            className="bg-black/20 hover:bg-black/30 text-black px-3 py-0.5 rounded-lg text-xs font-bold transition-colors"
+          >
+            Stop
+          </button>
+        </div>
+      )}
+    <nav ref={navRef} className={`fixed w-full ${impersonation ? 'top-8' : 'top-0'} z-50 bg-[#020618]/80 backdrop-blur-md border-b border-white/10`}>
       <div className="flex items-center px-6 py-4 max-w-7xl mx-auto">
         {/* Logo */}
         <div className="flex items-center shrink-0">
@@ -320,5 +348,6 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
         </div>
       )}
     </nav>
+    </>
   );
 }

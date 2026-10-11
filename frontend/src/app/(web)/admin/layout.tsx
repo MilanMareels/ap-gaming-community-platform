@@ -21,6 +21,7 @@ import {
   Settings,
   PanelLeftClose,
   PanelLeftOpen,
+  Eye,
 } from 'lucide-react';
 import { apiClient } from '@/api';
 import type { components } from '@/api';
@@ -152,6 +153,15 @@ export default function AdminLayout({
       router.push('/');
     } catch (err) {
       console.error('Logout failed:', err);
+    }
+  };
+
+  const handleStopImpersonation = async () => {
+    try {
+      await apiClient.POST('/auth/impersonate/stop');
+      window.location.reload();
+    } catch (err) {
+      console.error('Failed to stop impersonation:', err);
     }
   };
 
@@ -323,6 +333,24 @@ export default function AdminLayout({
 
       {/* Main content */}
       <main className={`min-h-screen transition-all duration-200 pt-14 lg:pt-0 ${collapsed ? 'lg:ml-16' : 'lg:ml-64'}`}>
+        {user.impersonation && (
+          <div className='bg-amber-500/90 text-black px-4 py-2 flex items-center justify-between gap-3 text-sm font-medium'>
+            <div className='flex items-center gap-2'>
+              <Eye size={16} />
+              <span>
+                {user.impersonation.userId
+                  ? `Je bekijkt de site als ${user.impersonation.userName || `gebruiker #${user.impersonation.userId}`}`
+                  : `Je bekijkt de site als de rol "${user.impersonation.roleName}"`}
+              </span>
+            </div>
+            <button
+              onClick={handleStopImpersonation}
+              className='bg-black/20 hover:bg-black/30 text-black px-3 py-1 rounded-lg text-xs font-bold transition-colors'
+            >
+              Stop impersonatie
+            </button>
+          </div>
+        )}
         <div className='p-4 md:p-6 lg:p-8'>
           {children}
         </div>

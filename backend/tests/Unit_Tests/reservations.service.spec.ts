@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ReservationsService } from '../../src/modules/reservations/reservations.service.js';
 import { PrismaService } from '../../src/modules/prisma/prisma.service.js';
@@ -67,13 +67,13 @@ describe('ReservationsService', () => {
     };
 
     const mockMailService = {
-      sendMail: jest.fn().mockResolvedValue(undefined),
-      sendMailWithAttachments: jest.fn().mockResolvedValue(undefined),
-      generateQRCode: jest.fn().mockResolvedValue(Buffer.from('fake-qr-code')),
+      sendMail: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
+      sendMailWithAttachments: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
+      generateQRCode: jest.fn<() => Promise<Buffer>>().mockResolvedValue(Buffer.from('fake-qr-code')),
     };
 
     const mockInventoryAdjustmentsService = {
-      getEffectiveAdjustment: jest.fn().mockResolvedValue(0),
+      getEffectiveAdjustment: jest.fn<() => Promise<number>>().mockResolvedValue(0),
     };
 
     const module = await Test.createTestingModule({
