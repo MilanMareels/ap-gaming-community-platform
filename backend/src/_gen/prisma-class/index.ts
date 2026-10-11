@@ -1,4 +1,5 @@
 import { UserRelations as _UserRelations } from './user_relations.js';
+import { UserNoteRelations as _UserNoteRelations } from './user_note_relations.js';
 import { AdminUserRelations as _AdminUserRelations } from './admin_user_relations.js';
 import { GoogleSSOUserRelations as _GoogleSSOUserRelations } from './google_s_s_o_user_relations.js';
 import { MicrosoftSSOUserRelations as _MicrosoftSSOUserRelations } from './microsoft_s_s_o_user_relations.js';
@@ -33,6 +34,7 @@ import { PointTrialParticipantRelations as _PointTrialParticipantRelations } fro
 import { PointTrialEntryRelations as _PointTrialEntryRelations } from './point_trial_entry_relations.js';
 import { InventoryAdjustmentRelations as _InventoryAdjustmentRelations } from './inventory_adjustment_relations.js';
 import { User as _User } from './user.js';
+import { UserNote as _UserNote } from './user_note.js';
 import { AdminUser as _AdminUser } from './admin_user.js';
 import { GoogleSSOUser as _GoogleSSOUser } from './google_s_s_o_user.js';
 import { MicrosoftSSOUser as _MicrosoftSSOUser } from './microsoft_s_s_o_user.js';
@@ -69,6 +71,7 @@ import { InventoryAdjustment as _InventoryAdjustment } from './inventory_adjustm
 
 export namespace PrismaModel {
   export class UserRelations extends _UserRelations {}
+  export class UserNoteRelations extends _UserNoteRelations {}
   export class AdminUserRelations extends _AdminUserRelations {}
   export class GoogleSSOUserRelations extends _GoogleSSOUserRelations {}
   export class MicrosoftSSOUserRelations extends _MicrosoftSSOUserRelations {}
@@ -103,6 +106,7 @@ export namespace PrismaModel {
   export class PointTrialEntryRelations extends _PointTrialEntryRelations {}
   export class InventoryAdjustmentRelations extends _InventoryAdjustmentRelations {}
   export class User extends _User {}
+  export class UserNote extends _UserNote {}
   export class AdminUser extends _AdminUser {}
   export class GoogleSSOUser extends _GoogleSSOUser {}
   export class MicrosoftSSOUser extends _MicrosoftSSOUser {}
@@ -139,6 +143,7 @@ export namespace PrismaModel {
 
   export const extraModels = [
     UserRelations,
+    UserNoteRelations,
     AdminUserRelations,
     GoogleSSOUserRelations,
     MicrosoftSSOUserRelations,
@@ -173,6 +178,7 @@ export namespace PrismaModel {
     PointTrialEntryRelations,
     InventoryAdjustmentRelations,
     User,
+    UserNote,
     AdminUser,
     GoogleSSOUser,
     MicrosoftSSOUser,

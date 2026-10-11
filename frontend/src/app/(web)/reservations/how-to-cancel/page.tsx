@@ -50,7 +50,7 @@ const STRIKES = [
   {
     count: 3,
     title: 'Geblokkeerd',
-    text: 'Je kan geen nieuwe reservaties meer maken tot een medewerker je deblokkeert.',
+    text: 'Je kan geen nieuwe reservaties meer maken tot het volgende semester of tot een medewerker je deblokkeert.',
     icon: Lock,
     accent: 'text-red-400',
     ring: 'border-red-500/50',
@@ -187,8 +187,8 @@ export default function HowToCancelPage() {
         {/* No-show policy */}
         <Section title="Wat gebeurt er bij een no-show?">
           <p className="text-gray-400 text-center max-w-2xl mx-auto -mt-4 mb-8">
-            Kom je niet opdagen zonder te annuleren? Dan noteren we een no-show. Na <strong className="text-white">3 no-shows</strong> kan je niet
-            meer reserveren.
+            Kom je niet opdagen zonder te annuleren? Dan noteren we een no-show. Na <strong className="text-white">3 no-shows per semester</strong> kan je niet
+            meer reserveren. Bij een nieuw semester worden je no-shows gereset.
           </p>
           <div className="grid gap-6 md:grid-cols-3">
             {STRIKES.map((strike, i) => {

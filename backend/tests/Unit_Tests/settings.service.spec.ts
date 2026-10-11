@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { BadRequestException } from '@nestjs/common';
 import { SettingsService } from '../../src/modules/settings/settings.service.js';
 import { PrismaService } from '../../src/modules/prisma/prisma.service.js';
 
@@ -20,12 +19,6 @@ describe('SettingsService', () => {
       user: {
         findUnique: jest.fn(),
         create: jest.fn(),
-      },
-      adminUser: {
-        findMany: jest.fn(),
-        findFirst: jest.fn(),
-        create: jest.fn(),
-        delete: jest.fn(),
       },
     };
 
@@ -108,104 +101,4 @@ describe('SettingsService', () => {
     });
   });
 
-  describe('Admin Users', () => {
-    it('should return all admins', async () => {
-      const mockAdmins = [{ id: 1, userId: 2, user: {} }];
-      prisma.adminUser.findMany.mockResolvedValue(mockAdmins);
-
-      const result = await service.getAllAdmins();
-
-      expect(result).toEqual(mockAdmins);
-      expect(prisma.adminUser.findMany).toHaveBeenCalledWith({
-        include: { user: true },
-      });
-    });
-
-    it('should remove an admin', async () => {
-      prisma.adminUser.delete.mockResolvedValue({ id: 1 });
-
-      await service.removeAdmin(1);
-
-      expect(prisma.adminUser.delete).toHaveBeenCalledWith({
-        where: { id: 1 },
-      });
-    });
-
-    it('should throw BadRequestException if user is already an admin', async () => {
-      const dto = {
-        email: 'test@ap.be',
-        sNumber: 's123',
-        gmailEmail: 'test@gmail.com',
-      };
-      prisma.user.findUnique.mockResolvedValue({ id: 1 });
-      prisma.adminUser.findFirst.mockResolvedValue({ id: 1, userId: 1 });
-
-      await expect(service.createAdmin(dto as any)).rejects.toThrow(
-        BadRequestException,
-      );
-    });
-
-    it('should create admin for an existing user', async () => {
-      const dto = {
-        email: 'test@ap.be',
-        sNumber: 's123',
-        gmailEmail: 'TEST@gmail.com',
-      };
-      const mockUser = { id: 5, email: dto.email, sNumber: dto.sNumber };
-      const expectedWhitelistKey = 'admin_whitelist.test@gmail.com';
-
-      prisma.user.findUnique.mockResolvedValue(mockUser);
-      prisma.adminUser.findFirst.mockResolvedValue(null);
-      prisma.setting.upsert.mockResolvedValue({});
-      prisma.adminUser.create.mockResolvedValue({
-        id: 1,
-        userId: 5,
-        user: mockUser,
-      });
-
-      const result = await service.createAdmin(dto as any);
-
-      expect(prisma.user.create).not.toHaveBeenCalled();
-      expect(prisma.setting.upsert).toHaveBeenCalledWith({
-        where: { key: expectedWhitelistKey },
-        update: { value: '5' },
-        create: { key: expectedWhitelistKey, value: '5' },
-      });
-      expect(prisma.adminUser.create).toHaveBeenCalledWith({
-        data: { userId: 5 },
-        include: { user: true },
-      });
-      expect(result.userId).toBe(5);
-    });
-
-    it('should create a new user and then make them an admin', async () => {
-      const dto = {
-        email: 'new@ap.be',
-        sNumber: 's999',
-        gmailEmail: 'new@gmail.com',
-      };
-      const mockUser = { id: 10, email: dto.email, sNumber: dto.sNumber };
-
-      prisma.user.findUnique.mockResolvedValue(null);
-      prisma.user.create.mockResolvedValue(mockUser);
-      prisma.adminUser.findFirst.mockResolvedValue(null);
-      prisma.setting.upsert.mockResolvedValue({});
-      prisma.adminUser.create.mockResolvedValue({
-        id: 2,
-        userId: 10,
-        user: mockUser,
-      });
-
-      const result = await service.createAdmin(dto as any);
-
-      expect(prisma.user.create).toHaveBeenCalledWith({
-        data: { email: dto.email, sNumber: dto.sNumber },
-      });
-      expect(prisma.adminUser.create).toHaveBeenCalledWith({
-        data: { userId: 10 },
-        include: { user: true },
-      });
-      expect(result.userId).toBe(10);
-    });
-  });
 });

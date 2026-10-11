@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, Injectable, Logger, NotFoundExc
 import { JwtService } from '@nestjs/jwt';
 import configuration from '../../common/config.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import type { AuthProfileResponseDto } from '../../dtos/auth/auth-profile-response.dto.js';
 import type { JwtPayload } from './types/jwt-payload.type.js';
 import type { GoogleTokenResponse } from './types/google-token-response.type.js';
 import type { GoogleUserInfo } from './types/google-userinfo.type.js';
@@ -152,7 +153,6 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { id: claims.sub },
       include: {
-        adminUsers: true,
         userRoles: {
           include: {
             role: {
@@ -171,18 +171,159 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
-    const roles = user.userRoles.map((ur) => ur.role.name);
-    const permissions = [...new Set(user.userRoles.flatMap((ur) => ur.role.permissions.map((rp) => rp.permission.key)))];
+    // When impersonating a role, use the JWT-embedded roles/permissions
+    // instead of the DB (which would return the real admin's full permissions)
+    const roles = claims.impersonatingRoleId ? (claims.roles ?? []) : user.userRoles.map((ur) => ur.role.name);
+    const permissions = claims.impersonatingRoleId
+      ? (claims.permissions ?? [])
+      : [...new Set(user.userRoles.flatMap((ur) => ur.role.permissions.map((rp) => rp.permission.key)))];
 
-    return {
+    const profile: AuthProfileResponseDto = {
       id: user.id,
       name: user.name,
       email: user.email,
       sNumber: user.sNumber,
-      isAdmin: user.adminUsers.length > 0 || roles.includes('Admin'),
+      isAdmin: roles.includes('Admin'),
       roles,
       permissions,
     };
+
+    // Attach impersonation info if present
+    if (claims.realUserId) {
+      const realUser = await this.prisma.user.findUnique({
+        where: { id: claims.realUserId },
+        select: { id: true, name: true },
+      });
+
+      const impersonation: AuthProfileResponseDto['impersonation'] = {
+        realUserId: claims.realUserId,
+        realUserName: realUser?.name ?? null,
+      };
+
+      if (claims.impersonatingUserId) {
+        impersonation.userId = claims.impersonatingUserId;
+        impersonation.userName = user.name;
+      }
+
+      if (claims.impersonatingRoleId) {
+        const role = await this.prisma.role.findUnique({
+          where: { id: claims.impersonatingRoleId },
+          select: { name: true },
+        });
+        impersonation.roleId = claims.impersonatingRoleId;
+        impersonation.roleName = role?.name ?? 'Unknown';
+      }
+
+      profile.impersonation = impersonation;
+    }
+
+    return profile;
+  }
+
+  // --------------- Impersonation ---------------
+
+  async impersonateUser(realUserId: number, targetUserId: number) {
+    await this.assertIsAdmin(realUserId);
+
+    const targetUser = await this.prisma.user.findUnique({
+      where: { id: targetUserId },
+      select: { id: true, email: true },
+    });
+    if (!targetUser) throw new NotFoundException('Target user not found');
+
+    return this.generateImpersonationToken(targetUserId, targetUser.email, {
+      realUserId,
+      impersonatingUserId: targetUserId,
+    });
+  }
+
+  async impersonateRole(realUserId: number, roleId: number) {
+    await this.assertIsAdmin(realUserId);
+
+    const role = await this.prisma.role.findUnique({
+      where: { id: roleId },
+      include: {
+        permissions: { include: { permission: true } },
+      },
+    });
+    if (!role) throw new NotFoundException('Role not found');
+
+    // Build a token for the real user but with only this role's permissions
+    const realUser = await this.prisma.user.findUnique({
+      where: { id: realUserId },
+      select: { id: true, email: true },
+    });
+    if (!realUser) throw new NotFoundException('User not found');
+
+    const permissions = [...new Set(role.permissions.map((rp) => rp.permission.key))];
+
+    const payload: JwtPayload = {
+      sub: realUserId,
+      email: realUser.email,
+      isAdmin: role.name === 'Admin',
+      roles: [role.name],
+      permissions,
+      realUserId,
+      impersonatingRoleId: roleId,
+    };
+
+    return this.jwtService.signAsync(payload as Record<string, unknown>, { expiresIn: '1d' });
+  }
+
+  async stopImpersonation(claims: JwtPayload) {
+    if (!claims.realUserId) {
+      throw new BadRequestException('Not currently impersonating');
+    }
+
+    const realUser = await this.prisma.user.findUnique({
+      where: { id: claims.realUserId },
+      select: { id: true, email: true },
+    });
+    if (!realUser) throw new NotFoundException('Original user not found');
+
+    return this.generateToken(realUser.id, realUser.email);
+  }
+
+  private async assertIsAdmin(userId: number) {
+    const roles = await this.prisma.userRole.findMany({
+      where: { userId },
+      include: { role: { select: { name: true } } },
+    });
+    const isAdmin = roles.some((ur) => ur.role.name === 'Admin');
+    if (!isAdmin) {
+      throw new UnauthorizedException('Only admins can impersonate');
+    }
+  }
+
+  private async generateImpersonationToken(
+    subjectUserId: number,
+    email: string,
+    extra: { realUserId: number; impersonatingUserId?: number; impersonatingRoleId?: number },
+  ) {
+    const userRoles = await this.prisma.userRole.findMany({
+      where: { userId: subjectUserId },
+      include: {
+        role: {
+          include: {
+            permissions: { include: { permission: true } },
+          },
+        },
+      },
+    });
+
+    const roles = userRoles.map((ur) => ur.role.name);
+    const permissions = [...new Set(userRoles.flatMap((ur) => ur.role.permissions.map((rp) => rp.permission.key)))];
+
+    const payload: JwtPayload = {
+      sub: subjectUserId,
+      email,
+      isAdmin: roles.includes('Admin'),
+      roles,
+      permissions,
+      ...extra,
+    };
+
+    return this.jwtService.signAsync(payload as Record<string, unknown>, { expiresIn: '1d' });
   }
 
   // --------------- Google internals ---------------
@@ -384,9 +525,10 @@ export class AuthService {
     });
 
     // Keep parity with Google: first user becomes admin.
-    const adminCount = await this.prisma.adminUser.count();
-    if (adminCount === 0) {
-      await this.prisma.adminUser.create({ data: { userId: newUser.id } });
+    const adminRoleCount = await this.prisma.userRole.count({
+      where: { role: { name: 'Admin' } },
+    });
+    if (adminRoleCount === 0) {
       await this.assignAdminRole(newUser.id);
     }
 
@@ -550,7 +692,6 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: { email: args.email, name: args.name, sNumber: args.sNumberFallback },
     });
-    await this.prisma.adminUser.create({ data: { userId: user.id } });
     await this.assignAdminRole(user.id);
     return user;
   }
@@ -567,8 +708,6 @@ export class AuthService {
   }
 
   private async generateToken(userId: number, email: string) {
-    const adminUser = await this.prisma.adminUser.findFirst({ where: { userId } });
-
     const userRoles = await this.prisma.userRole.findMany({
       where: { userId },
       include: {
@@ -588,7 +727,7 @@ export class AuthService {
     const payload: JwtPayload = {
       sub: userId,
       email,
-      isAdmin: Boolean(adminUser) || roles.includes('Admin'),
+      isAdmin: roles.includes('Admin'),
       roles,
       permissions,
     };

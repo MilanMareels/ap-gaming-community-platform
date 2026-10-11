@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Delete, Param, UseGuards, Patch } from '@nestjs/common';
+import { Controller, Get, Body, UseGuards, Patch } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { SettingsService } from './settings.service.js';
-import { CreateAdminDto, UpdateSettingDto } from '../../dtos/admin/admin.dto.js';
+import { UpdateSettingDto } from '../../dtos/admin/admin.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
@@ -57,25 +57,5 @@ export class SettingsController {
   @ApiOkResponse({ type: PrismaModel.Setting })
   updateSetting(@Body() dto: UpdateSettingDto) {
     return this.settingsService.updateSetting(dto);
-  }
-
-  @Get('admins')
-  @ApiOperation({ summary: 'Get all admin users (Admin only)' })
-  @ApiOkResponse({ type: [PrismaModel.AdminUser] })
-  getAllAdmins() {
-    return this.settingsService.getAllAdmins();
-  }
-
-  @Post('admins')
-  @ApiOperation({ summary: 'Add a new admin (Admin only)' })
-  @ApiOkResponse({ type: PrismaModel.AdminUser })
-  createAdmin(@Body() dto: CreateAdminDto) {
-    return this.settingsService.createAdmin(dto);
-  }
-
-  @Delete('admins/:id')
-  @ApiOperation({ summary: 'Remove an admin (Admin only)' })
-  removeAdmin(@Param('id') id: string) {
-    return this.settingsService.removeAdmin(+id);
   }
 }

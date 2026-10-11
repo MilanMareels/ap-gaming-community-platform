@@ -174,6 +174,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/impersonate/user/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Impersonate a user (Admin only) */
+        post: operations["AuthController_impersonateUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/impersonate/role/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Impersonate a role (Admin only) */
+        post: operations["AuthController_impersonateRole"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/impersonate/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Stop impersonating and revert to real user */
+        post: operations["AuthController_stopImpersonation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/rbac/roles": {
         parameters: {
             query?: never;
@@ -451,6 +502,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reservations/no-shows/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Reset all no-shows (Admin only, semester reset) */
+        patch: operations["ReservationsController_resetAllNoShows"];
+        trace?: never;
+    };
     "/reservations/{userId}/no-show": {
         parameters: {
             query?: never;
@@ -716,41 +784,6 @@ export interface paths {
         patch: operations["SettingsController_updateSetting"];
         trace?: never;
     };
-    "/settings/admins": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get all admin users (Admin only) */
-        get: operations["SettingsController_getAllAdmins"];
-        put?: never;
-        /** Add a new admin (Admin only) */
-        post: operations["SettingsController_createAdmin"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/settings/admins/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Remove an admin (Admin only) */
-        delete: operations["SettingsController_removeAdmin"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/events": {
         parameters: {
             query?: never;
@@ -928,40 +961,6 @@ export interface paths {
         patch: operations["UsersController_update"];
         trace?: never;
     };
-    "/users/{id}/promote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Promote user to admin (Admin only) */
-        post: operations["UsersController_promote"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/{id}/admin": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Demote user from admin (Admin only) */
-        delete: operations["UsersController_demote"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/users/{id}/sso/{provider}": {
         parameters: {
             query?: never;
@@ -974,6 +973,40 @@ export interface paths {
         post?: never;
         /** Unlink an SSO provider from a user (Admin only) */
         delete: operations["UsersController_unlinkSso"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add an admin note to a user (Admin only) */
+        post: operations["UsersController_createNote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{id}/notes/{noteId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a note (own notes always, others require users.notes.delete_others) */
+        delete: operations["UsersController_deleteNote"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1725,6 +1758,20 @@ export interface components {
             /** @example true */
             success: boolean;
         };
+        ImpersonationInfoDto: {
+            /** @description The real admin user ID behind the impersonation */
+            realUserId: number;
+            /** @description Name of the real admin user */
+            realUserName?: string | null;
+            /** @description User ID being impersonated (user impersonation) */
+            userId?: number;
+            /** @description Name of the user being impersonated */
+            userName?: string | null;
+            /** @description Role ID being impersonated (role impersonation) */
+            roleId?: number;
+            /** @description Name of the role being impersonated */
+            roleName?: string;
+        };
         AuthProfileResponseDto: {
             id: number;
             name: string | null;
@@ -1736,6 +1783,8 @@ export interface components {
             roles: string[];
             /** @description Permission keys the user has */
             permissions: string[];
+            /** @description Present when impersonating a user or role */
+            impersonation?: components["schemas"]["ImpersonationInfoDto"];
         };
         RoleResponseDto: {
             id: number;
@@ -2265,27 +2314,6 @@ export interface components {
             /** @example https://forms.google.com/... */
             value: string;
         };
-        AdminUser: {
-            id: number;
-            userId: number;
-        };
-        CreateAdminDto: {
-            /**
-             * @description Student email address (used as the User account email)
-             * @example admin@student.ap.be
-             */
-            email: string;
-            /**
-             * @description Student number
-             * @example s123456
-             */
-            sNumber: string;
-            /**
-             * @description Gmail address used for Google SSO login
-             * @example admin@gmail.com
-             */
-            gmailEmail: string;
-        };
         CreateEventDto: {
             /** @example League of Legends Tournament */
             title: string;
@@ -2375,6 +2403,20 @@ export interface components {
             endTime: string;
             status: string;
         };
+        UserNoteDto: {
+            id: number;
+            content: string;
+            authorId: number;
+            authorName: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CreateUserNoteDto: {
+            /** @description Note content */
+            content: string;
+        };
         UserDetailDto: {
             id: number;
             name: string | null;
@@ -2386,6 +2428,7 @@ export interface components {
             reservationCount: number;
             noShowCount: number;
             recentReservations: components["schemas"]["UserRecentReservationDto"][];
+            notes: components["schemas"]["UserNoteDto"][];
         };
         UpdateUserDto: {
             name?: string;
@@ -2722,7 +2765,6 @@ export interface components {
         };
         UserRelations: {
             reservations: components["schemas"]["Reservation"][];
-            adminUsers: components["schemas"]["AdminUser"][];
             googleSSOUsers: components["schemas"]["GoogleSSOUser"][];
             microsoftSSOUsers: components["schemas"]["MicrosoftSSOUser"][];
             rosterEntries: components["schemas"]["RosterEntry"][];
@@ -2739,9 +2781,6 @@ export interface components {
             name?: string;
             email: string;
             sNumber: string;
-        };
-        AdminUserRelations: {
-            user: components["schemas"]["User"];
         };
         GoogleSSOUserRelations: {
             user: components["schemas"]["User"];
@@ -3251,6 +3290,61 @@ export interface operations {
             };
             /** @description Unauthorized */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_impersonateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_impersonateRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_stopImpersonation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3773,6 +3867,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Reservation"][];
+                };
+            };
+        };
+    };
+    ReservationsController_resetAllNoShows: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        count: number;
+                    };
                 };
             };
         };
@@ -4370,67 +4485,6 @@ export interface operations {
             };
         };
     };
-    SettingsController_getAllAdmins: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminUser"][];
-                };
-            };
-        };
-    };
-    SettingsController_createAdmin: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateAdminDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminUser"];
-                };
-            };
-        };
-    };
-    SettingsController_removeAdmin: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     EventsController_findUpcoming: {
         parameters: {
             query?: never;
@@ -4834,31 +4888,13 @@ export interface operations {
             };
         };
     };
-    UsersController_promote: {
+    UsersController_unlinkSso: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    UsersController_demote: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
+                provider: string;
             };
             cookie?: never;
         };
@@ -4872,13 +4908,38 @@ export interface operations {
             };
         };
     };
-    UsersController_unlinkSso: {
+    UsersController_createNote: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 id: string;
-                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUserNoteDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserNoteDto"];
+                };
+            };
+        };
+    };
+    UsersController_deleteNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                noteId: string;
             };
             cookie?: never;
         };
