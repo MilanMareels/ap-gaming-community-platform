@@ -111,6 +111,33 @@ export class UserRecentReservationDto {
   status!: string;
 }
 
+export class UserNoteDto {
+  @ApiProperty()
+  id!: number;
+
+  @ApiProperty()
+  content!: string;
+
+  @ApiProperty()
+  authorId!: number;
+
+  @ApiProperty({ nullable: true })
+  authorName!: string | null;
+
+  @ApiProperty()
+  createdAt!: Date;
+
+  @ApiProperty()
+  updatedAt!: Date;
+}
+
+export class CreateUserNoteDto {
+  @ApiProperty({ description: 'Note content' })
+  @IsString()
+  @IsNotEmpty()
+  content!: string;
+}
+
 export class UserDetailDto {
   @ApiProperty()
   id!: number;
@@ -141,6 +168,9 @@ export class UserDetailDto {
 
   @ApiProperty({ type: [UserRecentReservationDto] })
   recentReservations!: UserRecentReservationDto[];
+
+  @ApiProperty({ type: [UserNoteDto] })
+  notes!: UserNoteDto[];
 }
 
 export class UpdateUserDto {

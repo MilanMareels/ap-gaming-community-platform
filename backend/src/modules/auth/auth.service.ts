@@ -152,7 +152,6 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { id: claims.sub },
       include: {
-        adminUsers: true,
         userRoles: {
           include: {
             role: {
@@ -179,7 +178,7 @@ export class AuthService {
       name: user.name,
       email: user.email,
       sNumber: user.sNumber,
-      isAdmin: user.adminUsers.length > 0 || roles.includes('Admin'),
+      isAdmin: roles.includes('Admin'),
       roles,
       permissions,
     };
@@ -384,9 +383,10 @@ export class AuthService {
     });
 
     // Keep parity with Google: first user becomes admin.
-    const adminCount = await this.prisma.adminUser.count();
-    if (adminCount === 0) {
-      await this.prisma.adminUser.create({ data: { userId: newUser.id } });
+    const adminRoleCount = await this.prisma.userRole.count({
+      where: { role: { name: 'Admin' } },
+    });
+    if (adminRoleCount === 0) {
       await this.assignAdminRole(newUser.id);
     }
 
@@ -550,7 +550,6 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: { email: args.email, name: args.name, sNumber: args.sNumberFallback },
     });
-    await this.prisma.adminUser.create({ data: { userId: user.id } });
     await this.assignAdminRole(user.id);
     return user;
   }
@@ -567,8 +566,6 @@ export class AuthService {
   }
 
   private async generateToken(userId: number, email: string) {
-    const adminUser = await this.prisma.adminUser.findFirst({ where: { userId } });
-
     const userRoles = await this.prisma.userRole.findMany({
       where: { userId },
       include: {
@@ -588,7 +585,7 @@ export class AuthService {
     const payload: JwtPayload = {
       sub: userId,
       email,
-      isAdmin: Boolean(adminUser) || roles.includes('Admin'),
+      isAdmin: roles.includes('Admin'),
       roles,
       permissions,
     };

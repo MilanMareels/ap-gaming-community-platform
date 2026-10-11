@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { ReservationStatus } from '../../dtos/reservations/reservation.dto.js';
-import type { CreateWhitelistDto, UpdateUserDto, UserDetailDto, UserListResponseDto } from '../../dtos/users/user.dto.js';
+import type { CreateWhitelistDto, CreateUserNoteDto, UpdateUserDto, UserDetailDto, UserListResponseDto, UserNoteDto } from '../../dtos/users/user.dto.js';
 
 const WHITELIST_PREFIX = 'admin_whitelist.';
 
@@ -23,7 +23,7 @@ export class UsersService {
     }
 
     if (args.adminOnly) {
-      where.adminUsers = { some: {} };
+      where.userRoles = { some: { role: { name: 'Admin' } } };
     }
 
     if (args.noShowsOnly) {
@@ -38,7 +38,6 @@ export class UsersService {
     const users = await this.prisma.user.findMany({
       where,
       include: {
-        adminUsers: { select: { id: true } },
         googleSSOUsers: { select: { id: true } },
         microsoftSSOUsers: { select: { id: true } },
         userRoles: { select: { role: { select: { name: true } } } },
@@ -65,7 +64,7 @@ export class UsersService {
       name: user.name,
       email: user.email,
       sNumber: user.sNumber,
-      isAdmin: user.adminUsers.length > 0,
+      isAdmin: user.userRoles.some((ur) => ur.role.name === 'Admin'),
       googleLinked: user.googleSSOUsers.length > 0,
       microsoftLinked: user.microsoftSSOUsers.length > 0,
       reservationCount: user._count.reservations,
@@ -80,7 +79,7 @@ export class UsersService {
     const user = await this.prisma.user.findUnique({
       where: { id },
       include: {
-        adminUsers: { select: { id: true } },
+        userRoles: { select: { role: { select: { name: true } } } },
         googleSSOUsers: { select: { id: true, ssoId: true } },
         microsoftSSOUsers: { select: { id: true, ssoId: true } },
         reservations: {
@@ -94,6 +93,10 @@ export class UsersService {
             endTime: true,
             status: true,
           },
+        },
+        notesAbout: {
+          orderBy: { createdAt: 'desc' },
+          include: { author: { select: { id: true, name: true } } },
         },
       },
     });
@@ -110,12 +113,20 @@ export class UsersService {
       name: user.name,
       email: user.email,
       sNumber: user.sNumber,
-      isAdmin: user.adminUsers.length > 0,
+      isAdmin: user.userRoles.some((ur) => ur.role.name === 'Admin'),
       googleLinks: user.googleSSOUsers,
       microsoftLinks: user.microsoftSSOUsers,
       reservationCount,
       noShowCount,
       recentReservations: user.reservations,
+      notes: user.notesAbout.map((n) => ({
+        id: n.id,
+        content: n.content,
+        authorId: n.authorId,
+        authorName: n.author.name,
+        createdAt: n.createdAt,
+        updatedAt: n.updatedAt,
+      })),
     };
   }
 
@@ -138,26 +149,6 @@ export class UsersService {
         email: dto.email ?? undefined,
       },
     });
-  }
-
-  async promoteToAdmin(id: number) {
-    await this.assertExists(id);
-    const existing = await this.prisma.adminUser.findFirst({ where: { userId: id } });
-    if (existing) return existing;
-    return this.prisma.adminUser.create({ data: { userId: id } });
-  }
-
-  async demoteFromAdmin(id: number, currentUserId: number) {
-    if (id === currentUserId) {
-      const adminCount = await this.prisma.adminUser.count();
-      if (adminCount <= 1) {
-        throw new BadRequestException('Cannot demote yourself when you are the only admin');
-      }
-    }
-
-    const result = await this.prisma.adminUser.deleteMany({ where: { userId: id } });
-    if (result.count === 0) throw new NotFoundException('User is not an admin');
-    return { success: true };
   }
 
   async unlinkSso(id: number, provider: 'google' | 'microsoft') {
@@ -213,6 +204,34 @@ export class UsersService {
   async deleteWhitelist(email: string) {
     const key = `${WHITELIST_PREFIX}${email.toLowerCase()}`;
     await this.prisma.setting.deleteMany({ where: { key } });
+    return { success: true };
+  }
+
+  async createNote(userId: number, authorId: number, dto: CreateUserNoteDto): Promise<UserNoteDto> {
+    await this.assertExists(userId);
+    const note = await this.prisma.userNote.create({
+      data: { userId, authorId, content: dto.content },
+      include: { author: { select: { id: true, name: true } } },
+    });
+    return {
+      id: note.id,
+      content: note.content,
+      authorId: note.authorId,
+      authorName: note.author.name,
+      createdAt: note.createdAt,
+      updatedAt: note.updatedAt,
+    };
+  }
+
+  async deleteNote(noteId: number, currentUserId: number, canDeleteOthers: boolean) {
+    const note = await this.prisma.userNote.findUnique({ where: { id: noteId } });
+    if (!note) throw new NotFoundException('Note not found');
+
+    if (note.authorId !== currentUserId && !canDeleteOthers) {
+      throw new BadRequestException('You can only delete your own notes');
+    }
+
+    await this.prisma.userNote.delete({ where: { id: noteId } });
     return { success: true };
   }
 

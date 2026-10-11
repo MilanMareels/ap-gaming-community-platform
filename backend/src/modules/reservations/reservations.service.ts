@@ -204,7 +204,7 @@ export class ReservationsService {
     });
 
     if (noShowCount >= NO_SHOW_LIMIT) {
-      throw new BadRequestException('You already have three no-shows. You can no longer make new reservations.');
+      throw new BadRequestException('You already have three no-shows this semester. You can no longer make new reservations until the next semester.');
     }
 
     const existingReservation = await this.prisma.reservation.findFirst({
@@ -568,6 +568,14 @@ export class ReservationsService {
         data: { status: ReservationStatus.CANCELLED }, // Andere status nodig voor deblock??
       });
     }
+  }
+
+  async resetAllNoShows() {
+    const result = await this.prisma.reservation.updateMany({
+      where: { status: ReservationStatus.NO_SHOW },
+      data: { status: ReservationStatus.CANCELLED },
+    });
+    return { count: result.count };
   }
 
   async getStatistics(from?: string, to?: string) {

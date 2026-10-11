@@ -155,6 +155,15 @@ export class ReservationsController {
     return this.reservationsService.getNoShows();
   }
 
+  @Patch('no-shows/reset')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('reservations.noshows.manage', 'reservations.manage')
+  @ApiOperation({ summary: 'Reset all no-shows (Admin only, semester reset)' })
+  @ApiOkResponse({ description: 'Number of no-shows that were reset' })
+  resetAllNoShows() {
+    return this.reservationsService.resetAllNoShows();
+  }
+
   @Patch(':userId/no-show')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @RequirePermissions('reservations.noshows.manage', 'reservations.manage')

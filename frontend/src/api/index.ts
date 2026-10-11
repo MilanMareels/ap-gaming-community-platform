@@ -14,7 +14,6 @@ export type Setting = ApiSchemas['Setting'];
 export type RosterGame = ApiSchemas['RosterGame'];
 export type RosterEntry = ApiSchemas['RosterEntry'];
 export type User = ApiSchemas['User'];
-export type AdminUser = ApiSchemas['AdminUser'];
 export type CreateReservationDto = ApiSchemas['CreateReservationDto'];
 export type AdminCreateReservationDto = ApiSchemas['AdminCreateReservationDto'];
 export type UpdateReservationDto = ApiSchemas['UpdateReservationDto'];
@@ -28,11 +27,9 @@ export type CreateRosterEntryDto = ApiSchemas['CreateRosterEntryDto'];
 export type CreateTimeTableEntryDto = ApiSchemas['CreateTimeTableEntryDto'];
 export type UpdateTimeTableEntryDto = ApiSchemas['UpdateTimeTableEntryDto'];
 export type UpdateSettingDto = ApiSchemas['UpdateSettingDto'];
-export type CreateAdminDto = ApiSchemas['CreateAdminDto'];
 
 /** Augmented types that include relation fields (matching Prisma include) */
 export type ReservationWithUser = Reservation & { user: User };
-export type AdminUserWithUser = AdminUser & { user: User };
 export type RosterEntryWithRelations = RosterEntry & {
   user: User;
   game: RosterGame;

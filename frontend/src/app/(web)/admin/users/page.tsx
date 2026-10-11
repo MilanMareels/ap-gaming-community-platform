@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ShieldCheck, ShieldOff, Trash2, Unlink, Pencil, X, Loader2, Users, Search, Shield, BarChart3 } from 'lucide-react';
+import { Trash2, Unlink, Pencil, X, Loader2, Users, Search, Shield, BarChart3, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Badge } from '@/components/ui/Badge';
@@ -229,6 +229,11 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-4 py-3.5 text-right">
                       <div className="flex gap-1.5 justify-end">
+                        <Link href={`/admin/users/${u.id}`}>
+                          <button className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors" title="Details">
+                            <Eye size={16} />
+                          </button>
+                        </Link>
                         <Link href={`/admin/statistics/user/${u.id}`}>
                           <button className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors" title="Statistieken">
                             <BarChart3 size={16} />
@@ -236,7 +241,7 @@ export default function AdminUsersPage() {
                         </Link>
                         <button
                           className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors"
-                          title="Beheer"
+                          title="Snel bewerken"
                           onClick={() => setSelectedId(u.id)}
                         >
                           <Pencil size={16} />
@@ -446,37 +451,6 @@ function UserDetailDrawer({
                 </div>
               </section>
             )}
-
-            <section>
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">Rol</div>
-              {detail.isAdmin ? (
-                <div className="flex items-center justify-between">
-                  <Badge variant="danger">Admin</Badge>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    disabled={busy}
-                    onClick={() =>
-                      action(
-                        () => api(`/users/${userId}/admin`, { method: 'DELETE' }),
-                        isSelf ? 'Je staat op het punt jezelf te demoten. Weet je het zeker?' : undefined,
-                      )
-                    }
-                  >
-                    <ShieldOff size={14} /> Demote
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="primary"
-                  disabled={busy}
-                  onClick={() => action(() => api(`/users/${userId}/promote`, { method: 'POST' }))}
-                >
-                  <ShieldCheck size={14} /> Promote to admin
-                </Button>
-              )}
-            </section>
 
             {canManageRoles && allRoles.length > 0 && (
               <section>

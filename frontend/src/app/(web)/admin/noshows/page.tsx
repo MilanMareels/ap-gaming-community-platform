@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Ban, ShieldOff, Search } from 'lucide-react';
+import { Ban, ShieldOff, Search, RotateCcw } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { apiClient } from '@/api';
 import type { ReservationWithUser } from '@/api';
@@ -56,6 +56,16 @@ export default function AdminNoShowsPage() {
     }
   };
 
+  const handleResetAll = async () => {
+    if (!confirm('Ben je zeker dat je alle no-shows wilt resetten? Dit is bedoeld voor een semesterwissel.')) return;
+    try {
+      await apiClient.PATCH('/reservations/no-shows/reset', {});
+      await fetchNoShows();
+    } catch (err) {
+      console.error('Failed to reset no-shows:', err);
+    }
+  };
+
   const grouped: NoShowGroup[] = Object.values(
     noShows
       .filter((r) => {
@@ -86,7 +96,21 @@ export default function AdminNoShowsPage() {
 
   return (
     <>
-      <PageHeader title="No-Shows" description="Lijst van studenten die niet zijn komen opdagen." />
+      <PageHeader
+        title="No-Shows"
+        description="Lijst van studenten die niet zijn komen opdagen. No-shows tellen per semester en worden bij een nieuw semester gereset."
+        actions={
+          noShows.length > 0 ? (
+            <button
+              onClick={handleResetAll}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors"
+            >
+              <RotateCcw size={16} />
+              Alle no-shows resetten
+            </button>
+          ) : undefined
+        }
+      />
 
       <div className="bg-linear-to-br from-slate-900 via-slate-900 to-slate-900/90 rounded-xl border border-slate-800 overflow-hidden">
         <div className="p-4 border-b border-slate-800/60 bg-slate-900/50">

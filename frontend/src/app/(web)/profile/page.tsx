@@ -251,7 +251,7 @@ function NoShowStatus({ data }: { data: MyReservationsResponse }) {
     ? {
         icon: <ShieldBan className="text-red-400" size={22} />,
         title: 'Je kan momenteel niet reserveren',
-        text: `Je hebt ${noShowCount} no-shows. Spreek een medewerker aan in de Gaming Hub of contacteer ons via Discord om dit te bespreken.`,
+        text: `Je hebt ${noShowCount} no-shows dit semester. Spreek een medewerker aan in de Gaming Hub of contacteer ons via Discord om dit te bespreken. Bij een nieuw semester worden je no-shows gereset.`,
         border: 'border-red-500/40',
       }
     : noShowCount === 0
@@ -263,8 +263,8 @@ function NoShowStatus({ data }: { data: MyReservationsResponse }) {
         }
       : {
           icon: <AlertTriangle className={noShowCount === 1 ? 'text-yellow-400' : 'text-orange-400'} size={22} />,
-          title: `Nog ${remaining} no-show${remaining === 1 ? '' : 's'} tot je niet meer kan reserveren`,
-          text: 'Annuleer je reservatie altijd op voorhand als je niet kan komen. Annuleren telt niet als no-show.',
+          title: `Nog ${remaining} no-show${remaining === 1 ? '' : 's'} dit semester tot je niet meer kan reserveren`,
+          text: 'Annuleer je reservatie altijd op voorhand als je niet kan komen. Annuleren telt niet als no-show. No-shows worden per semester geteld.',
           border: noShowCount === 1 ? 'border-yellow-500/30' : 'border-orange-500/40',
         };
 
@@ -284,7 +284,7 @@ function NoShowStatus({ data }: { data: MyReservationsResponse }) {
       </div>
       <div className="flex flex-col items-center gap-2">
         <NoShowTracker count={noShowCount} limit={noShowLimit} size={40} />
-        <span className="text-xs uppercase tracking-wider text-gray-500">No-shows</span>
+        <span className="text-xs uppercase tracking-wider text-gray-500">No-shows (dit semester)</span>
       </div>
     </motion.div>
   );

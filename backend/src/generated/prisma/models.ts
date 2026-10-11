@@ -9,6 +9,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User.js'
+export type * from './models/UserNote.js'
 export type * from './models/AdminUser.js'
 export type * from './models/GoogleSSOUser.js'
 export type * from './models/MicrosoftSSOUser.js'

@@ -17,7 +17,8 @@ const PERMISSIONS = [
   { key: 'reservations.noshows.manage', description: 'Manage no-shows' },
   { key: 'roster.manage', description: 'Manage teams/roster' },
   { key: 'timetable.manage', description: 'Manage timetable' },
-  { key: 'users.manage', description: 'Manage users' },
+  { key: 'users.view', description: 'View user details and notes' },
+  { key: 'users.manage', description: 'Manage users (edit, delete, SSO, whitelist)' },
   { key: 'users.roles.manage', description: 'Assign/remove roles from users' },
   { key: 'navigation.manage', description: 'Manage navigation links' },
   { key: 'settings.manage', description: 'Manage settings' },
@@ -29,6 +30,7 @@ const PERMISSIONS = [
   { key: 'statistics.view', description: 'View reservation statistics and insights' },
   { key: 'forms.manage', description: 'Manage forms, submissions, and comments' },
   { key: 'jobs.manage', description: 'Manage job postings (vacatures)' },
+  { key: 'users.notes.delete_others', description: 'Delete notes written by other admins' },
 ];
 
 async function seedPermissionsAndRoles() {
@@ -64,23 +66,6 @@ async function seedPermissionsAndRoles() {
   }
   console.log(`Admin role now has ${allPermissions.length} permissions.`);
 
-  // Migrate existing AdminUser records to UserRole
-  const adminUsers = await prisma.adminUser.findMany();
-  let migrated = 0;
-  for (const au of adminUsers) {
-    const existing = await prisma.userRole.findUnique({
-      where: { userId_roleId: { userId: au.userId, roleId: adminRole.id } },
-    });
-    if (!existing) {
-      await prisma.userRole.create({
-        data: { userId: au.userId, roleId: adminRole.id },
-      });
-      migrated++;
-    }
-  }
-  if (migrated > 0) {
-    console.log(`Migrated ${migrated} admin user(s) to Admin role.`);
-  }
 }
 
 async function seedNavLinks() {

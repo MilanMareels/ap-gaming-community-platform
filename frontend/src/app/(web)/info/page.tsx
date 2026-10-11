@@ -22,7 +22,7 @@ const FAQS: { question: string; answer: string; link?: { href: string; label: st
   {
     question: 'Wat als ik niet kom opdagen bij mijn reservatie?',
     answer:
-      'Kom je niet opdagen zonder te annuleren, dan krijg je een no-show. Bij je eerste no-show krijg je een herinnering, bij de tweede een waarschuwing en na drie no-shows kan je niet meer reserveren.',
+      'Kom je niet opdagen zonder te annuleren, dan krijg je een no-show. Bij je eerste no-show krijg je een herinnering, bij de tweede een waarschuwing en na drie no-shows per semester kan je niet meer reserveren. Bij een nieuw semester worden je no-shows gereset.',
     link: { href: '/reservations/how-to-cancel', label: 'Meer over het no-show beleid' },
   },
   {

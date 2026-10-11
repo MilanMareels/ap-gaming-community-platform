@@ -170,14 +170,6 @@ export class RbacAdminService {
       data: { userId, roleId },
     });
 
-    // If assigning the Admin role, also create AdminUser for backward compat
-    if (role.name === 'Admin') {
-      const hasAdminUser = await this.prisma.adminUser.findFirst({ where: { userId } });
-      if (!hasAdminUser) {
-        await this.prisma.adminUser.create({ data: { userId } });
-      }
-    }
-
     this.rbacService.clearCacheForUser(userId);
   }
 
@@ -191,11 +183,6 @@ export class RbacAdminService {
     await this.prisma.userRole.delete({
       where: { id: userRole.id },
     });
-
-    // If removing the Admin role, also remove AdminUser for backward compat
-    if (userRole.role.name === 'Admin') {
-      await this.prisma.adminUser.deleteMany({ where: { userId } });
-    }
 
     this.rbacService.clearCacheForUser(userId);
   }

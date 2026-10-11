@@ -59,10 +59,10 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
       })
       .then((data) => {
         if (!data?.id) return;
-        if (data.isAdmin) setUserRole('admin');
+        if (data.roles?.includes('Admin')) setUserRole('admin');
         else setUserRole('authenticated');
         if (data.roles) setUserRoles(data.roles);
-        if (data.permissions?.length > 0) setHasAnyPermission(true);
+        if (data.permissions?.length > 0 || data.roles?.length > 0) setHasAnyPermission(true);
       })
       .catch(() => {});
   }, []);
