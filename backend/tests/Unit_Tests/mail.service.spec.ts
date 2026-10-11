@@ -198,7 +198,7 @@ describe('MailService', () => {
       });
 
       const { html } = mockTransporter.sendMail.mock.calls[0][0];
-      expect(html).toContain('Nog 1 no-show en je kan geen reservaties meer maken.');
+      expect(html).toContain('Nog 1 no-show dit semester en je kan geen reservaties meer maken.');
       expect(html).toContain('https://example.com/reservations/how-to-cancel');
     });
   });
