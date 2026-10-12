@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Trash2, Gamepad2, Plus, Pencil, QrCode, CalendarDays, Search } from 'lucide-react';
+import { Trash2, Gamepad2, Plus, Pencil, QrCode, CalendarDays, Search, UserPlus, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Pagination } from '@/components/ui/Pagination';
@@ -36,6 +36,22 @@ function todayLocal(): string {
 function getInitials(name: string | undefined): string {
   if (!name) return '?';
   return name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function ReservationTypeBadge({ reservationCount }: { reservationCount?: number }) {
+  const isNew = !reservationCount || reservationCount <= 1;
+  return (
+    <span
+      title={isNew ? 'Nieuwe bezoeker' : 'Terugkerende bezoeker'}
+      className={`inline-flex items-center justify-center w-5 h-5 rounded shrink-0 ${
+        isNew
+          ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
+          : 'bg-blue-500/20 border border-blue-500/30 text-blue-400'
+      }`}
+    >
+      {isNew ? <UserPlus size={12} /> : <UserCheck size={12} />}
+    </span>
+  );
 }
 
 export default function AdminReservationsPage() {
@@ -207,7 +223,10 @@ export default function AdminReservationsPage() {
                       {getInitials(r.user?.name)}
                     </div>
                     <div>
-                      <p className="font-medium text-white text-sm group-hover/user:text-red-400 transition-colors">{r.user?.name || 'Unknown'}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-medium text-white text-sm group-hover/user:text-red-400 transition-colors">{r.user?.name || 'Unknown'}</p>
+                        <ReservationTypeBadge reservationCount={r.user?.reservationCount} />
+                      </div>
                       <p className="text-xs text-gray-500 mt-0.5">{r.user?.sNumber || r.email}</p>
                     </div>
                   </Link>
@@ -276,7 +295,10 @@ export default function AdminReservationsPage() {
                 <tr key={r.id} className="hover:bg-slate-800/30 transition-colors">
                   <td className="px-4 py-3.5">
                     <Link href={`/admin/users/${r.userId}`} className="group/user">
-                      <div className="font-medium text-white group-hover/user:text-red-400 transition-colors">{r.user?.name || 'Unknown'}</div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-medium text-white group-hover/user:text-red-400 transition-colors">{r.user?.name || 'Unknown'}</span>
+                        <ReservationTypeBadge reservationCount={r.user?.reservationCount} />
+                      </div>
                       <div className="text-xs text-gray-500 mt-0.5">
                         {r.email}
                         {r.user?.sNumber && <span className="text-gray-600 ml-1">({r.user.sNumber})</span>}
