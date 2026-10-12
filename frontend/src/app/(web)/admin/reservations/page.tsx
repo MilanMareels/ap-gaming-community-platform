@@ -62,6 +62,7 @@ export default function AdminReservationsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingReservation, setEditingReservation] = useState<ReservationWithUser | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [showCancelled, setShowCancelled] = useState(false);
 
   async function fetchReservations() {
     try {
@@ -78,7 +79,7 @@ export default function AdminReservationsPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [filterDate, searchQuery]);
+  }, [filterDate, searchQuery, showCancelled]);
 
   const handleUpdateStatus = async (id: number, status: ReservationStatus) => {
     try {
@@ -116,6 +117,7 @@ export default function AdminReservationsPage() {
 
   const filtered = reservations
     .filter((r) => {
+      if (!showCancelled && r.status === 'CANCELLED') return false;
       if (filterDate && dateFromISO(r.startTime) !== filterDate) return false;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
@@ -207,6 +209,15 @@ export default function AdminReservationsPage() {
                   Reset
                 </button>
               )}
+              <label className="flex items-center gap-2 pb-3 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={showCancelled}
+                  onChange={(e) => setShowCancelled(e.target.checked)}
+                  className="accent-red-500 w-3.5 h-3.5 cursor-pointer"
+                />
+                <span className="text-xs text-gray-500">Geannuleerd tonen</span>
+              </label>
               <div className="ml-auto text-xs text-gray-500 pb-3">{filtered.length} resultaten</div>
             </div>
           </div>
