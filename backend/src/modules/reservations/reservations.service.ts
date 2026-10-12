@@ -486,15 +486,38 @@ export class ReservationsService {
       where.OR = [{ email: { contains: search, mode: 'insensitive' } }, { user: { sNumber: { contains: search, mode: 'insensitive' } } }];
     }
 
-    return this.prisma.reservation.findMany({
+    // Build a filtered _count so the badge reflects whether the user was
+    // new at the viewed point in time (only counts reservations up to that date).
+    const countFilter: any = {};
+    if (date) {
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+      countFilter.startTime = { lte: endOfDay };
+    }
+
+    const reservations = await this.prisma.reservation.findMany({
       where,
       include: {
-        user: true,
+        user: {
+          include: {
+            _count: {
+              select: { reservations: countFilter.startTime ? { where: countFilter } : true },
+            },
+          },
+        },
       },
       orderBy: {
         startTime: 'asc',
       },
     });
+
+    return reservations.map((r) => ({
+      ...r,
+      user: {
+        ...r.user,
+        reservationCount: r.user._count.reservations,
+      },
+    }));
   }
 
   async updateStatus(id: number, dto: UpdateReservationStatusDto) {

@@ -29,7 +29,7 @@ export type UpdateTimeTableEntryDto = ApiSchemas['UpdateTimeTableEntryDto'];
 export type UpdateSettingDto = ApiSchemas['UpdateSettingDto'];
 
 /** Augmented types that include relation fields (matching Prisma include) */
-export type ReservationWithUser = Reservation & { user: User };
+export type ReservationWithUser = Reservation & { user: User & { reservationCount?: number } };
 export type RosterEntryWithRelations = RosterEntry & {
   user: User;
   game: RosterGame;
