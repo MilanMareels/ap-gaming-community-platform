@@ -32,6 +32,9 @@ export class NavLink {
   @ApiProperty({ type: Boolean })
   isProtected: boolean = false;
 
+  @ApiProperty({ type: Boolean })
+  enabled: boolean = true;
+
   @ApiProperty({ type: Date })
   createdAt: Date;
 

@@ -8,6 +8,19 @@ export class NavigationService {
 
   async getNavTree() {
     return this.prisma.navLink.findMany({
+      where: { parentId: null, enabled: true },
+      orderBy: { position: 'asc' },
+      include: {
+        children: {
+          where: { enabled: true },
+          orderBy: { position: 'asc' },
+        },
+      },
+    });
+  }
+
+  async getAdminNavTree() {
+    return this.prisma.navLink.findMany({
       where: { parentId: null },
       orderBy: { position: 'asc' },
       include: {
@@ -47,6 +60,7 @@ export class NavigationService {
         visibility: dto.visibility ?? 'public',
         isCta: dto.isCta ?? false,
         openInNewTab: dto.openInNewTab ?? false,
+        enabled: dto.enabled ?? true,
       },
     });
   }
@@ -78,6 +92,7 @@ export class NavigationService {
     if (dto.visibility !== undefined) data.visibility = dto.visibility;
     if (dto.isCta !== undefined) data.isCta = dto.isCta;
     if (dto.openInNewTab !== undefined) data.openInNewTab = dto.openInNewTab;
+    if (dto.enabled !== undefined) data.enabled = dto.enabled;
 
     return this.prisma.navLink.update({ where: { id }, data });
   }

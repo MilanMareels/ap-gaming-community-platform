@@ -53,7 +53,6 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   UserNote: 'UserNote',
-  AdminUser: 'AdminUser',
   GoogleSSOUser: 'GoogleSSOUser',
   MicrosoftSSOUser: 'MicrosoftSSOUser',
   Role: 'Role',
@@ -71,6 +70,7 @@ export const ModelName = {
   DynamicFormSubmissionAnswer: 'DynamicFormSubmissionAnswer',
   DynamicFormSubmissionComment: 'DynamicFormSubmissionComment',
   Job: 'Job',
+  DynamicFormAccess: 'DynamicFormAccess',
   Reservation: 'Reservation',
   TimeTableEntry: 'TimeTableEntry',
   Event: 'Event',
@@ -124,14 +124,6 @@ export const UserNoteScalarFieldEnum = {
 } as const
 
 export type UserNoteScalarFieldEnum = (typeof UserNoteScalarFieldEnum)[keyof typeof UserNoteScalarFieldEnum]
-
-
-export const AdminUserScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId'
-} as const
-
-export type AdminUserScalarFieldEnum = (typeof AdminUserScalarFieldEnum)[keyof typeof AdminUserScalarFieldEnum]
 
 
 export const GoogleSSOUserScalarFieldEnum = {
@@ -220,6 +212,7 @@ export const NavLinkScalarFieldEnum = {
   isCta: 'isCta',
   openInNewTab: 'openInNewTab',
   isProtected: 'isProtected',
+  enabled: 'enabled',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -328,6 +321,15 @@ export const JobScalarFieldEnum = {
 } as const
 
 export type JobScalarFieldEnum = (typeof JobScalarFieldEnum)[keyof typeof JobScalarFieldEnum]
+
+
+export const DynamicFormAccessScalarFieldEnum = {
+  id: 'id',
+  formId: 'formId',
+  roleId: 'roleId'
+} as const
+
+export type DynamicFormAccessScalarFieldEnum = (typeof DynamicFormAccessScalarFieldEnum)[keyof typeof DynamicFormAccessScalarFieldEnum]
 
 
 export const ReservationScalarFieldEnum = {

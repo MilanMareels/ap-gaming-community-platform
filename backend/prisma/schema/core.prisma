@@ -26,6 +26,7 @@ model NavLink {
   isCta        Boolean @default(false)
   openInNewTab Boolean @default(false)
   isProtected  Boolean @default(false)
+  enabled      Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
