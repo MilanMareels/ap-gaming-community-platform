@@ -234,7 +234,7 @@ export default function AdminFormBuilderPage() {
   const refreshAccess = useCallback(async () => {
     const [rolesRes, accessRes] = await Promise.all([
       apiClient.GET('/rbac/roles'),
-      apiClient.GET('/forms/{id}/access', { params: { path: { id: String(formId) } } }),
+      apiClient.GET('/forms/{id}/access' as any, { params: { path: { id: String(formId) } } }),
     ]);
     if (rolesRes.data) setAllRoles((rolesRes.data as Array<{ id: number; name: string }>));
     if (accessRes.data) setAccessRoleIds((accessRes.data as Array<{ roleId: number }>).map((a) => a.roleId));
@@ -260,7 +260,7 @@ export default function AdminFormBuilderPage() {
 
   const handleSaveAccess = async () => {
     setSavingAccess(true);
-    await apiClient.PUT('/forms/{id}/access', {
+    await apiClient.PUT('/forms/{id}/access' as any, {
       params: { path: { id: String(formId) } },
       body: { roleIds: accessRoleIds },
     });
