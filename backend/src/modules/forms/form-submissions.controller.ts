@@ -29,6 +29,7 @@ export class FormSubmissionsController implements OnModuleInit {
 
   // --- Public submission ---
 
+  @UseGuards(JwtAuthGuard)
   @Public()
   @Post('public/:cuid/submit')
   @ApiOperation({ summary: 'Submit a form response' })
@@ -115,6 +116,7 @@ export class FormSubmissionsController implements OnModuleInit {
 
   // --- Public submission viewer ---
 
+  @UseGuards(JwtAuthGuard)
   @Public()
   @Get('submission/:cuid')
   @ApiOperation({ summary: 'Get submission with comments (public viewer)' })
@@ -123,6 +125,7 @@ export class FormSubmissionsController implements OnModuleInit {
     return this.submissionsService.getSubmissionByCuid(cuid, user?.sub ?? null);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Public()
   @Post('submission/:cuid/comments')
   @ApiOperation({ summary: 'Add comment to submission (public)' })
