@@ -64,9 +64,13 @@ function SortableField({
   const options = (config as { options?: string[] }).options || [];
   const allowedExtensions = (config as { allowedExtensions?: string[] }).allowedExtensions || [];
   const textContent = (config as { content?: string }).content || '';
+  const [extensionsRaw, setExtensionsRaw] = useState(allowedExtensions.join(','));
 
   const handleSave = () => {
-    onUpdate(field.id, { label, required, config: Object.keys(config).length > 0 ? config : undefined });
+    const finalConfig = field.type === 'FILE_UPLOAD' && extensionsRaw
+      ? { ...config, allowedExtensions: extensionsRaw.split(',').map((s) => s.trim()).filter(Boolean) }
+      : config;
+    onUpdate(field.id, { label, required, config: Object.keys(finalConfig).length > 0 ? finalConfig : undefined });
     setEditing(false);
   };
 
@@ -159,8 +163,9 @@ function SortableField({
                 type="text"
                 className="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white text-sm mt-1"
                 placeholder=".pdf,.jpg,.png,.docx"
-                value={allowedExtensions.join(',')}
-                onChange={(e) => setConfig({ ...config, allowedExtensions: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) })}
+                value={extensionsRaw}
+                onChange={(e) => setExtensionsRaw(e.target.value)}
+                onBlur={() => setConfig({ ...config, allowedExtensions: extensionsRaw.split(',').map((s) => s.trim()).filter(Boolean) })}
               />
             </div>
           )}
@@ -204,6 +209,7 @@ export default function AdminFormBuilderPage() {
   const [newFieldLabel, setNewFieldLabel] = useState('');
   const [newFieldRequired, setNewFieldRequired] = useState(false);
   const [newFieldConfig, setNewFieldConfig] = useState<Record<string, unknown>>({});
+  const [newExtensionsRaw, setNewExtensionsRaw] = useState('');
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -244,12 +250,16 @@ export default function AdminFormBuilderPage() {
     setNewFieldLabel('');
     setNewFieldRequired(false);
     setNewFieldConfig({});
+    setNewExtensionsRaw('');
   };
 
   const handleAddField = async () => {
     const label = newFieldLabel.trim() || FIELD_TYPE_LABELS[newFieldType];
     const position = form ? form.fields.length : 0;
-    const config = Object.keys(newFieldConfig).length > 0 ? newFieldConfig : undefined;
+    const finalConfig = newFieldType === 'FILE_UPLOAD' && newExtensionsRaw
+      ? { ...newFieldConfig, allowedExtensions: newExtensionsRaw.split(',').map((s) => s.trim()).filter(Boolean) }
+      : newFieldConfig;
+    const config = Object.keys(finalConfig).length > 0 ? finalConfig : undefined;
     await apiClient.POST('/forms/{id}/fields', {
       params: { path: { id: String(formId) } },
       body: {
@@ -449,8 +459,9 @@ export default function AdminFormBuilderPage() {
                 type="text"
                 className="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white text-sm mt-1"
                 placeholder=".pdf,.jpg,.png,.docx"
-                value={((newFieldConfig as { allowedExtensions?: string[] }).allowedExtensions || []).join(',')}
-                onChange={(e) => setNewFieldConfig({ ...newFieldConfig, allowedExtensions: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) })}
+                value={newExtensionsRaw}
+                onChange={(e) => setNewExtensionsRaw(e.target.value)}
+                onBlur={() => setNewFieldConfig({ ...newFieldConfig, allowedExtensions: newExtensionsRaw.split(',').map((s) => s.trim()).filter(Boolean) })}
               />
             </div>
           )}
