@@ -37,6 +37,11 @@ export class CreateRosterEntryDto {
   @ApiProperty({ example: 1 })
   @IsNotEmpty()
   gameId!: number;
+
+  @ApiPropertyOptional({ example: 'rosters/roster-abc123.png', description: 'S3 storage key for the uploaded image' })
+  @IsString()
+  @IsOptional()
+  imageKey?: string;
 }
 
 export class UpdateRosterEntryDto {
@@ -54,4 +59,9 @@ export class UpdateRosterEntryDto {
   @IsString()
   @IsOptional()
   role?: string | null;
+
+  @ApiPropertyOptional({ example: 'rosters/roster-abc123.png', description: 'S3 storage key for the uploaded image' })
+  @IsString()
+  @IsOptional()
+  imageKey?: string;
 }

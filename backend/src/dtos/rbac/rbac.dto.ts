@@ -67,6 +67,17 @@ export class PermissionResponseDto {
   description?: string | null;
 }
 
+export class RoleUserDto {
+  @ApiProperty()
+  id!: number;
+
+  @ApiPropertyOptional()
+  name?: string | null;
+
+  @ApiProperty()
+  email!: string;
+}
+
 export class RoleDetailResponseDto {
   @ApiProperty()
   id!: number;
@@ -82,6 +93,9 @@ export class RoleDetailResponseDto {
 
   @ApiProperty({ type: [String] })
   permissions!: string[];
+
+  @ApiPropertyOptional({ type: [RoleUserDto] })
+  users?: RoleUserDto[];
 }
 
 export class SuccessResponseDto {

@@ -49,6 +49,7 @@ export type NavLinkMinAggregateOutputType = {
   isCta: boolean | null
   openInNewTab: boolean | null
   isProtected: boolean | null
+  enabled: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -64,6 +65,7 @@ export type NavLinkMaxAggregateOutputType = {
   isCta: boolean | null
   openInNewTab: boolean | null
   isProtected: boolean | null
+  enabled: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -79,6 +81,7 @@ export type NavLinkCountAggregateOutputType = {
   isCta: number
   openInNewTab: number
   isProtected: number
+  enabled: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -108,6 +111,7 @@ export type NavLinkMinAggregateInputType = {
   isCta?: true
   openInNewTab?: true
   isProtected?: true
+  enabled?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -123,6 +127,7 @@ export type NavLinkMaxAggregateInputType = {
   isCta?: true
   openInNewTab?: true
   isProtected?: true
+  enabled?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -138,6 +143,7 @@ export type NavLinkCountAggregateInputType = {
   isCta?: true
   openInNewTab?: true
   isProtected?: true
+  enabled?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -240,6 +246,7 @@ export type NavLinkGroupByOutputType = {
   isCta: boolean
   openInNewTab: boolean
   isProtected: boolean
+  enabled: boolean
   createdAt: Date
   updatedAt: Date
   _count: NavLinkCountAggregateOutputType | null
@@ -278,6 +285,7 @@ export type NavLinkWhereInput = {
   isCta?: Prisma.BoolFilter<"NavLink"> | boolean
   openInNewTab?: Prisma.BoolFilter<"NavLink"> | boolean
   isProtected?: Prisma.BoolFilter<"NavLink"> | boolean
+  enabled?: Prisma.BoolFilter<"NavLink"> | boolean
   createdAt?: Prisma.DateTimeFilter<"NavLink"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"NavLink"> | Date | string
   parent?: Prisma.XOR<Prisma.NavLinkNullableScalarRelationFilter, Prisma.NavLinkWhereInput> | null
@@ -295,6 +303,7 @@ export type NavLinkOrderByWithRelationInput = {
   isCta?: Prisma.SortOrder
   openInNewTab?: Prisma.SortOrder
   isProtected?: Prisma.SortOrder
+  enabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   parent?: Prisma.NavLinkOrderByWithRelationInput
@@ -315,6 +324,7 @@ export type NavLinkWhereUniqueInput = Prisma.AtLeast<{
   isCta?: Prisma.BoolFilter<"NavLink"> | boolean
   openInNewTab?: Prisma.BoolFilter<"NavLink"> | boolean
   isProtected?: Prisma.BoolFilter<"NavLink"> | boolean
+  enabled?: Prisma.BoolFilter<"NavLink"> | boolean
   createdAt?: Prisma.DateTimeFilter<"NavLink"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"NavLink"> | Date | string
   parent?: Prisma.XOR<Prisma.NavLinkNullableScalarRelationFilter, Prisma.NavLinkWhereInput> | null
@@ -332,6 +342,7 @@ export type NavLinkOrderByWithAggregationInput = {
   isCta?: Prisma.SortOrder
   openInNewTab?: Prisma.SortOrder
   isProtected?: Prisma.SortOrder
+  enabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.NavLinkCountOrderByAggregateInput
@@ -355,6 +366,7 @@ export type NavLinkScalarWhereWithAggregatesInput = {
   isCta?: Prisma.BoolWithAggregatesFilter<"NavLink"> | boolean
   openInNewTab?: Prisma.BoolWithAggregatesFilter<"NavLink"> | boolean
   isProtected?: Prisma.BoolWithAggregatesFilter<"NavLink"> | boolean
+  enabled?: Prisma.BoolWithAggregatesFilter<"NavLink"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"NavLink"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"NavLink"> | Date | string
 }
@@ -368,6 +380,7 @@ export type NavLinkCreateInput = {
   isCta?: boolean
   openInNewTab?: boolean
   isProtected?: boolean
+  enabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   parent?: Prisma.NavLinkCreateNestedOneWithoutChildrenInput
@@ -385,6 +398,7 @@ export type NavLinkUncheckedCreateInput = {
   isCta?: boolean
   openInNewTab?: boolean
   isProtected?: boolean
+  enabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   children?: Prisma.NavLinkUncheckedCreateNestedManyWithoutParentInput
@@ -399,6 +413,7 @@ export type NavLinkUpdateInput = {
   isCta?: Prisma.BoolFieldUpdateOperationsInput | boolean
   openInNewTab?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isProtected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   parent?: Prisma.NavLinkUpdateOneWithoutChildrenNestedInput
@@ -416,6 +431,7 @@ export type NavLinkUncheckedUpdateInput = {
   isCta?: Prisma.BoolFieldUpdateOperationsInput | boolean
   openInNewTab?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isProtected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   children?: Prisma.NavLinkUncheckedUpdateManyWithoutParentNestedInput
@@ -432,6 +448,7 @@ export type NavLinkCreateManyInput = {
   isCta?: boolean
   openInNewTab?: boolean
   isProtected?: boolean
+  enabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -445,6 +462,7 @@ export type NavLinkUpdateManyMutationInput = {
   isCta?: Prisma.BoolFieldUpdateOperationsInput | boolean
   openInNewTab?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isProtected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -460,6 +478,7 @@ export type NavLinkUncheckedUpdateManyInput = {
   isCta?: Prisma.BoolFieldUpdateOperationsInput | boolean
   openInNewTab?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isProtected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -490,6 +509,7 @@ export type NavLinkCountOrderByAggregateInput = {
   isCta?: Prisma.SortOrder
   openInNewTab?: Prisma.SortOrder
   isProtected?: Prisma.SortOrder
+  enabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -511,6 +531,7 @@ export type NavLinkMaxOrderByAggregateInput = {
   isCta?: Prisma.SortOrder
   openInNewTab?: Prisma.SortOrder
   isProtected?: Prisma.SortOrder
+  enabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -526,6 +547,7 @@ export type NavLinkMinOrderByAggregateInput = {
   isCta?: Prisma.SortOrder
   openInNewTab?: Prisma.SortOrder
   isProtected?: Prisma.SortOrder
+  enabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -611,6 +633,7 @@ export type NavLinkCreateWithoutChildrenInput = {
   isCta?: boolean
   openInNewTab?: boolean
   isProtected?: boolean
+  enabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   parent?: Prisma.NavLinkCreateNestedOneWithoutChildrenInput
@@ -627,6 +650,7 @@ export type NavLinkUncheckedCreateWithoutChildrenInput = {
   isCta?: boolean
   openInNewTab?: boolean
   isProtected?: boolean
+  enabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -645,6 +669,7 @@ export type NavLinkCreateWithoutParentInput = {
   isCta?: boolean
   openInNewTab?: boolean
   isProtected?: boolean
+  enabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   children?: Prisma.NavLinkCreateNestedManyWithoutParentInput
@@ -660,6 +685,7 @@ export type NavLinkUncheckedCreateWithoutParentInput = {
   isCta?: boolean
   openInNewTab?: boolean
   isProtected?: boolean
+  enabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   children?: Prisma.NavLinkUncheckedCreateNestedManyWithoutParentInput
@@ -695,6 +721,7 @@ export type NavLinkUpdateWithoutChildrenInput = {
   isCta?: Prisma.BoolFieldUpdateOperationsInput | boolean
   openInNewTab?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isProtected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   parent?: Prisma.NavLinkUpdateOneWithoutChildrenNestedInput
@@ -711,6 +738,7 @@ export type NavLinkUncheckedUpdateWithoutChildrenInput = {
   isCta?: Prisma.BoolFieldUpdateOperationsInput | boolean
   openInNewTab?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isProtected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -745,6 +773,7 @@ export type NavLinkScalarWhereInput = {
   isCta?: Prisma.BoolFilter<"NavLink"> | boolean
   openInNewTab?: Prisma.BoolFilter<"NavLink"> | boolean
   isProtected?: Prisma.BoolFilter<"NavLink"> | boolean
+  enabled?: Prisma.BoolFilter<"NavLink"> | boolean
   createdAt?: Prisma.DateTimeFilter<"NavLink"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"NavLink"> | Date | string
 }
@@ -759,6 +788,7 @@ export type NavLinkCreateManyParentInput = {
   isCta?: boolean
   openInNewTab?: boolean
   isProtected?: boolean
+  enabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -772,6 +802,7 @@ export type NavLinkUpdateWithoutParentInput = {
   isCta?: Prisma.BoolFieldUpdateOperationsInput | boolean
   openInNewTab?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isProtected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   children?: Prisma.NavLinkUpdateManyWithoutParentNestedInput
@@ -787,6 +818,7 @@ export type NavLinkUncheckedUpdateWithoutParentInput = {
   isCta?: Prisma.BoolFieldUpdateOperationsInput | boolean
   openInNewTab?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isProtected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   children?: Prisma.NavLinkUncheckedUpdateManyWithoutParentNestedInput
@@ -802,6 +834,7 @@ export type NavLinkUncheckedUpdateManyWithoutParentInput = {
   isCta?: Prisma.BoolFieldUpdateOperationsInput | boolean
   openInNewTab?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isProtected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -848,6 +881,7 @@ export type NavLinkSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   isCta?: boolean
   openInNewTab?: boolean
   isProtected?: boolean
+  enabled?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   parent?: boolean | Prisma.NavLink$parentArgs<ExtArgs>
@@ -866,6 +900,7 @@ export type NavLinkSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   isCta?: boolean
   openInNewTab?: boolean
   isProtected?: boolean
+  enabled?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   parent?: boolean | Prisma.NavLink$parentArgs<ExtArgs>
@@ -882,6 +917,7 @@ export type NavLinkSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   isCta?: boolean
   openInNewTab?: boolean
   isProtected?: boolean
+  enabled?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   parent?: boolean | Prisma.NavLink$parentArgs<ExtArgs>
@@ -898,11 +934,12 @@ export type NavLinkSelectScalar = {
   isCta?: boolean
   openInNewTab?: boolean
   isProtected?: boolean
+  enabled?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type NavLinkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "href" | "icon" | "parentId" | "position" | "visibility" | "isCta" | "openInNewTab" | "isProtected" | "createdAt" | "updatedAt", ExtArgs["result"]["navLink"]>
+export type NavLinkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "href" | "icon" | "parentId" | "position" | "visibility" | "isCta" | "openInNewTab" | "isProtected" | "enabled" | "createdAt" | "updatedAt", ExtArgs["result"]["navLink"]>
 export type NavLinkInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   parent?: boolean | Prisma.NavLink$parentArgs<ExtArgs>
   children?: boolean | Prisma.NavLink$childrenArgs<ExtArgs>
@@ -932,6 +969,7 @@ export type $NavLinkPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     isCta: boolean
     openInNewTab: boolean
     isProtected: boolean
+    enabled: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["navLink"]>
@@ -1369,6 +1407,7 @@ export interface NavLinkFieldRefs {
   readonly isCta: Prisma.FieldRef<"NavLink", 'Boolean'>
   readonly openInNewTab: Prisma.FieldRef<"NavLink", 'Boolean'>
   readonly isProtected: Prisma.FieldRef<"NavLink", 'Boolean'>
+  readonly enabled: Prisma.FieldRef<"NavLink", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"NavLink", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"NavLink", 'DateTime'>
 }

@@ -117,20 +117,37 @@ export default function AdminRosterPage() {
     setPlayerForm(emptyPlayerForm);
   };
 
+  const uploadImage = async (file: File): Promise<string> => {
+    const ext = file.name.split('.').pop() || 'png';
+    const key = `rosters/roster-${crypto.randomUUID()}.${ext}`;
+    const res = await apiClient.POST('/files/upload-url', {
+      body: { key, contentType: file.type },
+    });
+    const { url } = res.data as { url: string };
+    await fetch(url, {
+      method: 'PUT',
+      body: file,
+      headers: { 'Content-Type': file.type },
+    });
+    return key;
+  };
+
   const handleSubmitPlayer = async () => {
     if (editingEntry) {
       // Update existing
       setSaving(true);
       try {
-        const formData = new FormData();
-        formData.append('handle', playerForm.handle);
-        formData.append('rank', playerForm.rank);
-        formData.append('role', playerForm.role);
-        if (imageFile) formData.append('image', imageFile);
+        let imageKey: string | undefined;
+        if (imageFile) imageKey = await uploadImage(imageFile);
 
         await apiClient.PATCH('/roster/entries/{id}' as any, {
           params: { path: { id: editingEntry.id.toString() } },
-          body: formData as any,
+          body: {
+            handle: playerForm.handle,
+            rank: playerForm.rank,
+            role: playerForm.role,
+            ...(imageKey && { imageKey }),
+          },
         });
 
         closePlayerModal();
@@ -145,18 +162,21 @@ export default function AdminRosterPage() {
       if (!selectedGameId || !playerForm.name.trim() || !playerForm.sNumber.trim() || !playerForm.handle.trim()) return;
       setSaving(true);
       try {
-        const formData = new FormData();
-        formData.append('name', playerForm.name);
-        formData.append('sNumber', playerForm.sNumber);
-        formData.append('handle', playerForm.handle);
-        formData.append('rank', playerForm.rank);
-        formData.append('gameId', selectedGameId.toString());
+        let imageKey: string | undefined;
+        if (imageFile) imageKey = await uploadImage(imageFile);
 
         const trimmedRole = playerForm.role.trim();
-        if (trimmedRole) formData.append('role', trimmedRole);
-        if (imageFile) formData.append('image', imageFile);
-
-        await apiClient.POST('/roster/entries', { body: formData as any });
+        await apiClient.POST('/roster/entries', {
+          body: {
+            name: playerForm.name,
+            sNumber: playerForm.sNumber,
+            handle: playerForm.handle,
+            rank: playerForm.rank,
+            gameId: selectedGameId,
+            ...(trimmedRole && { role: trimmedRole }),
+            ...(imageKey && { imageKey }),
+          } as any,
+        });
 
         closePlayerModal();
         await fetchData();
@@ -299,7 +319,7 @@ export default function AdminRosterPage() {
                       <div className="flex items-center gap-3">
                         {entry.imageUrl ? (
                           <img
-                            src={`/api/${entry.imageUrl}`}
+                            src={`/api/files/${entry.imageUrl}`}
                             alt={entry.handle}
                             className="w-9 h-9 rounded-full object-cover border border-slate-700 shrink-0"
                           />
@@ -455,7 +475,7 @@ export default function AdminRosterPage() {
               {isEditing && (
                 <div className="flex items-center gap-3 p-3 bg-slate-950/60 border border-slate-800/60 rounded-xl">
                   {editingEntry.imageUrl ? (
-                    <img src={`/api/${editingEntry.imageUrl}`} alt={editingEntry.handle} className="w-10 h-10 rounded-full object-cover border border-slate-700 shrink-0" />
+                    <img src={`/api/files/${editingEntry.imageUrl}`} alt={editingEntry.handle} className="w-10 h-10 rounded-full object-cover border border-slate-700 shrink-0" />
                   ) : (
                     <div className="w-10 h-10 rounded-full bg-linear-to-br from-red-500/20 to-red-600/10 border border-red-500/20 flex items-center justify-center text-xs text-red-400 font-bold shrink-0">
                       {editingEntry.handle.slice(0, 2).toUpperCase()}

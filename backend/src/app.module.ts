@@ -15,6 +15,7 @@ import { RbacModule } from './modules/rbac/rbac.module.js';
 import { InventoryAdjustmentsModule } from './modules/inventory-adjustments/inventory-adjustments.module.js';
 import { FormsModule } from './modules/forms/forms.module.js';
 import { JobsModule } from './modules/jobs/jobs.module.js';
+import { StorageModule } from './modules/storage/storage.module.js';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { JobsModule } from './modules/jobs/jobs.module.js';
     InventoryAdjustmentsModule,
     FormsModule,
     JobsModule,
+    StorageModule,
   ],
   controllers: [],
   providers: [],

@@ -259,6 +259,7 @@ export type DynamicFormWhereInput = {
   fields?: Prisma.DynamicFormFieldListRelationFilter
   submissions?: Prisma.DynamicFormSubmissionListRelationFilter
   jobs?: Prisma.JobListRelationFilter
+  accessRoles?: Prisma.DynamicFormAccessListRelationFilter
 }
 
 export type DynamicFormOrderByWithRelationInput = {
@@ -275,6 +276,7 @@ export type DynamicFormOrderByWithRelationInput = {
   fields?: Prisma.DynamicFormFieldOrderByRelationAggregateInput
   submissions?: Prisma.DynamicFormSubmissionOrderByRelationAggregateInput
   jobs?: Prisma.JobOrderByRelationAggregateInput
+  accessRoles?: Prisma.DynamicFormAccessOrderByRelationAggregateInput
 }
 
 export type DynamicFormWhereUniqueInput = Prisma.AtLeast<{
@@ -294,6 +296,7 @@ export type DynamicFormWhereUniqueInput = Prisma.AtLeast<{
   fields?: Prisma.DynamicFormFieldListRelationFilter
   submissions?: Prisma.DynamicFormSubmissionListRelationFilter
   jobs?: Prisma.JobListRelationFilter
+  accessRoles?: Prisma.DynamicFormAccessListRelationFilter
 }, "id" | "cuid">
 
 export type DynamicFormOrderByWithAggregationInput = {
@@ -343,6 +346,7 @@ export type DynamicFormCreateInput = {
   fields?: Prisma.DynamicFormFieldCreateNestedManyWithoutFormInput
   submissions?: Prisma.DynamicFormSubmissionCreateNestedManyWithoutFormInput
   jobs?: Prisma.JobCreateNestedManyWithoutFormInput
+  accessRoles?: Prisma.DynamicFormAccessCreateNestedManyWithoutFormInput
 }
 
 export type DynamicFormUncheckedCreateInput = {
@@ -359,6 +363,7 @@ export type DynamicFormUncheckedCreateInput = {
   fields?: Prisma.DynamicFormFieldUncheckedCreateNestedManyWithoutFormInput
   submissions?: Prisma.DynamicFormSubmissionUncheckedCreateNestedManyWithoutFormInput
   jobs?: Prisma.JobUncheckedCreateNestedManyWithoutFormInput
+  accessRoles?: Prisma.DynamicFormAccessUncheckedCreateNestedManyWithoutFormInput
 }
 
 export type DynamicFormUpdateInput = {
@@ -374,6 +379,7 @@ export type DynamicFormUpdateInput = {
   fields?: Prisma.DynamicFormFieldUpdateManyWithoutFormNestedInput
   submissions?: Prisma.DynamicFormSubmissionUpdateManyWithoutFormNestedInput
   jobs?: Prisma.JobUpdateManyWithoutFormNestedInput
+  accessRoles?: Prisma.DynamicFormAccessUpdateManyWithoutFormNestedInput
 }
 
 export type DynamicFormUncheckedUpdateInput = {
@@ -390,6 +396,7 @@ export type DynamicFormUncheckedUpdateInput = {
   fields?: Prisma.DynamicFormFieldUncheckedUpdateManyWithoutFormNestedInput
   submissions?: Prisma.DynamicFormSubmissionUncheckedUpdateManyWithoutFormNestedInput
   jobs?: Prisma.JobUncheckedUpdateManyWithoutFormNestedInput
+  accessRoles?: Prisma.DynamicFormAccessUncheckedUpdateManyWithoutFormNestedInput
 }
 
 export type DynamicFormCreateManyInput = {
@@ -531,6 +538,20 @@ export type DynamicFormUpdateOneWithoutJobsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.DynamicFormUpdateToOneWithWhereWithoutJobsInput, Prisma.DynamicFormUpdateWithoutJobsInput>, Prisma.DynamicFormUncheckedUpdateWithoutJobsInput>
 }
 
+export type DynamicFormCreateNestedOneWithoutAccessRolesInput = {
+  create?: Prisma.XOR<Prisma.DynamicFormCreateWithoutAccessRolesInput, Prisma.DynamicFormUncheckedCreateWithoutAccessRolesInput>
+  connectOrCreate?: Prisma.DynamicFormCreateOrConnectWithoutAccessRolesInput
+  connect?: Prisma.DynamicFormWhereUniqueInput
+}
+
+export type DynamicFormUpdateOneRequiredWithoutAccessRolesNestedInput = {
+  create?: Prisma.XOR<Prisma.DynamicFormCreateWithoutAccessRolesInput, Prisma.DynamicFormUncheckedCreateWithoutAccessRolesInput>
+  connectOrCreate?: Prisma.DynamicFormCreateOrConnectWithoutAccessRolesInput
+  upsert?: Prisma.DynamicFormUpsertWithoutAccessRolesInput
+  connect?: Prisma.DynamicFormWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DynamicFormUpdateToOneWithWhereWithoutAccessRolesInput, Prisma.DynamicFormUpdateWithoutAccessRolesInput>, Prisma.DynamicFormUncheckedUpdateWithoutAccessRolesInput>
+}
+
 export type DynamicFormCreateWithoutFieldsInput = {
   cuid?: string
   title: string
@@ -543,6 +564,7 @@ export type DynamicFormCreateWithoutFieldsInput = {
   updatedAt?: Date | string
   submissions?: Prisma.DynamicFormSubmissionCreateNestedManyWithoutFormInput
   jobs?: Prisma.JobCreateNestedManyWithoutFormInput
+  accessRoles?: Prisma.DynamicFormAccessCreateNestedManyWithoutFormInput
 }
 
 export type DynamicFormUncheckedCreateWithoutFieldsInput = {
@@ -558,6 +580,7 @@ export type DynamicFormUncheckedCreateWithoutFieldsInput = {
   updatedAt?: Date | string
   submissions?: Prisma.DynamicFormSubmissionUncheckedCreateNestedManyWithoutFormInput
   jobs?: Prisma.JobUncheckedCreateNestedManyWithoutFormInput
+  accessRoles?: Prisma.DynamicFormAccessUncheckedCreateNestedManyWithoutFormInput
 }
 
 export type DynamicFormCreateOrConnectWithoutFieldsInput = {
@@ -588,6 +611,7 @@ export type DynamicFormUpdateWithoutFieldsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissions?: Prisma.DynamicFormSubmissionUpdateManyWithoutFormNestedInput
   jobs?: Prisma.JobUpdateManyWithoutFormNestedInput
+  accessRoles?: Prisma.DynamicFormAccessUpdateManyWithoutFormNestedInput
 }
 
 export type DynamicFormUncheckedUpdateWithoutFieldsInput = {
@@ -603,6 +627,7 @@ export type DynamicFormUncheckedUpdateWithoutFieldsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissions?: Prisma.DynamicFormSubmissionUncheckedUpdateManyWithoutFormNestedInput
   jobs?: Prisma.JobUncheckedUpdateManyWithoutFormNestedInput
+  accessRoles?: Prisma.DynamicFormAccessUncheckedUpdateManyWithoutFormNestedInput
 }
 
 export type DynamicFormCreateWithoutSubmissionsInput = {
@@ -617,6 +642,7 @@ export type DynamicFormCreateWithoutSubmissionsInput = {
   updatedAt?: Date | string
   fields?: Prisma.DynamicFormFieldCreateNestedManyWithoutFormInput
   jobs?: Prisma.JobCreateNestedManyWithoutFormInput
+  accessRoles?: Prisma.DynamicFormAccessCreateNestedManyWithoutFormInput
 }
 
 export type DynamicFormUncheckedCreateWithoutSubmissionsInput = {
@@ -632,6 +658,7 @@ export type DynamicFormUncheckedCreateWithoutSubmissionsInput = {
   updatedAt?: Date | string
   fields?: Prisma.DynamicFormFieldUncheckedCreateNestedManyWithoutFormInput
   jobs?: Prisma.JobUncheckedCreateNestedManyWithoutFormInput
+  accessRoles?: Prisma.DynamicFormAccessUncheckedCreateNestedManyWithoutFormInput
 }
 
 export type DynamicFormCreateOrConnectWithoutSubmissionsInput = {
@@ -662,6 +689,7 @@ export type DynamicFormUpdateWithoutSubmissionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.DynamicFormFieldUpdateManyWithoutFormNestedInput
   jobs?: Prisma.JobUpdateManyWithoutFormNestedInput
+  accessRoles?: Prisma.DynamicFormAccessUpdateManyWithoutFormNestedInput
 }
 
 export type DynamicFormUncheckedUpdateWithoutSubmissionsInput = {
@@ -677,6 +705,7 @@ export type DynamicFormUncheckedUpdateWithoutSubmissionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.DynamicFormFieldUncheckedUpdateManyWithoutFormNestedInput
   jobs?: Prisma.JobUncheckedUpdateManyWithoutFormNestedInput
+  accessRoles?: Prisma.DynamicFormAccessUncheckedUpdateManyWithoutFormNestedInput
 }
 
 export type DynamicFormCreateWithoutJobsInput = {
@@ -691,6 +720,7 @@ export type DynamicFormCreateWithoutJobsInput = {
   updatedAt?: Date | string
   fields?: Prisma.DynamicFormFieldCreateNestedManyWithoutFormInput
   submissions?: Prisma.DynamicFormSubmissionCreateNestedManyWithoutFormInput
+  accessRoles?: Prisma.DynamicFormAccessCreateNestedManyWithoutFormInput
 }
 
 export type DynamicFormUncheckedCreateWithoutJobsInput = {
@@ -706,6 +736,7 @@ export type DynamicFormUncheckedCreateWithoutJobsInput = {
   updatedAt?: Date | string
   fields?: Prisma.DynamicFormFieldUncheckedCreateNestedManyWithoutFormInput
   submissions?: Prisma.DynamicFormSubmissionUncheckedCreateNestedManyWithoutFormInput
+  accessRoles?: Prisma.DynamicFormAccessUncheckedCreateNestedManyWithoutFormInput
 }
 
 export type DynamicFormCreateOrConnectWithoutJobsInput = {
@@ -736,6 +767,7 @@ export type DynamicFormUpdateWithoutJobsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.DynamicFormFieldUpdateManyWithoutFormNestedInput
   submissions?: Prisma.DynamicFormSubmissionUpdateManyWithoutFormNestedInput
+  accessRoles?: Prisma.DynamicFormAccessUpdateManyWithoutFormNestedInput
 }
 
 export type DynamicFormUncheckedUpdateWithoutJobsInput = {
@@ -751,6 +783,85 @@ export type DynamicFormUncheckedUpdateWithoutJobsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.DynamicFormFieldUncheckedUpdateManyWithoutFormNestedInput
   submissions?: Prisma.DynamicFormSubmissionUncheckedUpdateManyWithoutFormNestedInput
+  accessRoles?: Prisma.DynamicFormAccessUncheckedUpdateManyWithoutFormNestedInput
+}
+
+export type DynamicFormCreateWithoutAccessRolesInput = {
+  cuid?: string
+  title: string
+  description?: string | null
+  requiresAuth?: boolean
+  confirmationEmail?: boolean
+  discordWebhookUrl?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  fields?: Prisma.DynamicFormFieldCreateNestedManyWithoutFormInput
+  submissions?: Prisma.DynamicFormSubmissionCreateNestedManyWithoutFormInput
+  jobs?: Prisma.JobCreateNestedManyWithoutFormInput
+}
+
+export type DynamicFormUncheckedCreateWithoutAccessRolesInput = {
+  id?: number
+  cuid?: string
+  title: string
+  description?: string | null
+  requiresAuth?: boolean
+  confirmationEmail?: boolean
+  discordWebhookUrl?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  fields?: Prisma.DynamicFormFieldUncheckedCreateNestedManyWithoutFormInput
+  submissions?: Prisma.DynamicFormSubmissionUncheckedCreateNestedManyWithoutFormInput
+  jobs?: Prisma.JobUncheckedCreateNestedManyWithoutFormInput
+}
+
+export type DynamicFormCreateOrConnectWithoutAccessRolesInput = {
+  where: Prisma.DynamicFormWhereUniqueInput
+  create: Prisma.XOR<Prisma.DynamicFormCreateWithoutAccessRolesInput, Prisma.DynamicFormUncheckedCreateWithoutAccessRolesInput>
+}
+
+export type DynamicFormUpsertWithoutAccessRolesInput = {
+  update: Prisma.XOR<Prisma.DynamicFormUpdateWithoutAccessRolesInput, Prisma.DynamicFormUncheckedUpdateWithoutAccessRolesInput>
+  create: Prisma.XOR<Prisma.DynamicFormCreateWithoutAccessRolesInput, Prisma.DynamicFormUncheckedCreateWithoutAccessRolesInput>
+  where?: Prisma.DynamicFormWhereInput
+}
+
+export type DynamicFormUpdateToOneWithWhereWithoutAccessRolesInput = {
+  where?: Prisma.DynamicFormWhereInput
+  data: Prisma.XOR<Prisma.DynamicFormUpdateWithoutAccessRolesInput, Prisma.DynamicFormUncheckedUpdateWithoutAccessRolesInput>
+}
+
+export type DynamicFormUpdateWithoutAccessRolesInput = {
+  cuid?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresAuth?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmationEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  discordWebhookUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fields?: Prisma.DynamicFormFieldUpdateManyWithoutFormNestedInput
+  submissions?: Prisma.DynamicFormSubmissionUpdateManyWithoutFormNestedInput
+  jobs?: Prisma.JobUpdateManyWithoutFormNestedInput
+}
+
+export type DynamicFormUncheckedUpdateWithoutAccessRolesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  cuid?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresAuth?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmationEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  discordWebhookUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fields?: Prisma.DynamicFormFieldUncheckedUpdateManyWithoutFormNestedInput
+  submissions?: Prisma.DynamicFormSubmissionUncheckedUpdateManyWithoutFormNestedInput
+  jobs?: Prisma.JobUncheckedUpdateManyWithoutFormNestedInput
 }
 
 
@@ -762,12 +873,14 @@ export type DynamicFormCountOutputType = {
   fields: number
   submissions: number
   jobs: number
+  accessRoles: number
 }
 
 export type DynamicFormCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fields?: boolean | DynamicFormCountOutputTypeCountFieldsArgs
   submissions?: boolean | DynamicFormCountOutputTypeCountSubmissionsArgs
   jobs?: boolean | DynamicFormCountOutputTypeCountJobsArgs
+  accessRoles?: boolean | DynamicFormCountOutputTypeCountAccessRolesArgs
 }
 
 /**
@@ -801,6 +914,13 @@ export type DynamicFormCountOutputTypeCountJobsArgs<ExtArgs extends runtime.Type
   where?: Prisma.JobWhereInput
 }
 
+/**
+ * DynamicFormCountOutputType without action
+ */
+export type DynamicFormCountOutputTypeCountAccessRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DynamicFormAccessWhereInput
+}
+
 
 export type DynamicFormSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -816,6 +936,7 @@ export type DynamicFormSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   fields?: boolean | Prisma.DynamicForm$fieldsArgs<ExtArgs>
   submissions?: boolean | Prisma.DynamicForm$submissionsArgs<ExtArgs>
   jobs?: boolean | Prisma.DynamicForm$jobsArgs<ExtArgs>
+  accessRoles?: boolean | Prisma.DynamicForm$accessRolesArgs<ExtArgs>
   _count?: boolean | Prisma.DynamicFormCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["dynamicForm"]>
 
@@ -863,6 +984,7 @@ export type DynamicFormInclude<ExtArgs extends runtime.Types.Extensions.Internal
   fields?: boolean | Prisma.DynamicForm$fieldsArgs<ExtArgs>
   submissions?: boolean | Prisma.DynamicForm$submissionsArgs<ExtArgs>
   jobs?: boolean | Prisma.DynamicForm$jobsArgs<ExtArgs>
+  accessRoles?: boolean | Prisma.DynamicForm$accessRolesArgs<ExtArgs>
   _count?: boolean | Prisma.DynamicFormCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DynamicFormIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -874,6 +996,7 @@ export type $DynamicFormPayload<ExtArgs extends runtime.Types.Extensions.Interna
     fields: Prisma.$DynamicFormFieldPayload<ExtArgs>[]
     submissions: Prisma.$DynamicFormSubmissionPayload<ExtArgs>[]
     jobs: Prisma.$JobPayload<ExtArgs>[]
+    accessRoles: Prisma.$DynamicFormAccessPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1283,6 +1406,7 @@ export interface Prisma__DynamicFormClient<T, Null = never, ExtArgs extends runt
   fields<T extends Prisma.DynamicForm$fieldsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DynamicForm$fieldsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DynamicFormFieldPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   submissions<T extends Prisma.DynamicForm$submissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DynamicForm$submissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DynamicFormSubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   jobs<T extends Prisma.DynamicForm$jobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DynamicForm$jobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  accessRoles<T extends Prisma.DynamicForm$accessRolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DynamicForm$accessRolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DynamicFormAccessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1784,6 +1908,30 @@ export type DynamicForm$jobsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.JobScalarFieldEnum | Prisma.JobScalarFieldEnum[]
+}
+
+/**
+ * DynamicForm.accessRoles
+ */
+export type DynamicForm$accessRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DynamicFormAccess
+   */
+  select?: Prisma.DynamicFormAccessSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DynamicFormAccess
+   */
+  omit?: Prisma.DynamicFormAccessOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DynamicFormAccessInclude<ExtArgs> | null
+  where?: Prisma.DynamicFormAccessWhereInput
+  orderBy?: Prisma.DynamicFormAccessOrderByWithRelationInput | Prisma.DynamicFormAccessOrderByWithRelationInput[]
+  cursor?: Prisma.DynamicFormAccessWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DynamicFormAccessScalarFieldEnum | Prisma.DynamicFormAccessScalarFieldEnum[]
 }
 
 /**

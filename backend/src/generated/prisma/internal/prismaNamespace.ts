@@ -399,7 +399,6 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   UserNote: 'UserNote',
-  AdminUser: 'AdminUser',
   GoogleSSOUser: 'GoogleSSOUser',
   MicrosoftSSOUser: 'MicrosoftSSOUser',
   Role: 'Role',
@@ -417,6 +416,7 @@ export const ModelName = {
   DynamicFormSubmissionAnswer: 'DynamicFormSubmissionAnswer',
   DynamicFormSubmissionComment: 'DynamicFormSubmissionComment',
   Job: 'Job',
+  DynamicFormAccess: 'DynamicFormAccess',
   Reservation: 'Reservation',
   TimeTableEntry: 'TimeTableEntry',
   Event: 'Event',
@@ -447,7 +447,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "userNote" | "adminUser" | "googleSSOUser" | "microsoftSSOUser" | "role" | "permission" | "rolePermission" | "userRole" | "setting" | "form" | "navLink" | "rosterGame" | "rosterEntry" | "dynamicForm" | "dynamicFormField" | "dynamicFormSubmission" | "dynamicFormSubmissionAnswer" | "dynamicFormSubmissionComment" | "job" | "reservation" | "timeTableEntry" | "event" | "bracket" | "bracketParticipant" | "bracketMatch" | "bracketMatchParticipant" | "eventRegistration" | "timeTrial" | "timeTrialParticipant" | "timeTrialRun" | "pointTrial" | "pointTrialParticipant" | "pointTrialEntry" | "inventoryAdjustment"
+    modelProps: "user" | "userNote" | "googleSSOUser" | "microsoftSSOUser" | "role" | "permission" | "rolePermission" | "userRole" | "setting" | "form" | "navLink" | "rosterGame" | "rosterEntry" | "dynamicForm" | "dynamicFormField" | "dynamicFormSubmission" | "dynamicFormSubmissionAnswer" | "dynamicFormSubmissionComment" | "job" | "dynamicFormAccess" | "reservation" | "timeTableEntry" | "event" | "bracket" | "bracketParticipant" | "bracketMatch" | "bracketMatchParticipant" | "eventRegistration" | "timeTrial" | "timeTrialParticipant" | "timeTrialRun" | "pointTrial" | "pointTrialParticipant" | "pointTrialEntry" | "inventoryAdjustment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -596,80 +596,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserNoteCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserNoteCountAggregateOutputType> | number
-        }
-      }
-    }
-    AdminUser: {
-      payload: Prisma.$AdminUserPayload<ExtArgs>
-      fields: Prisma.AdminUserFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.AdminUserFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.AdminUserFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserPayload>
-        }
-        findFirst: {
-          args: Prisma.AdminUserFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.AdminUserFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserPayload>
-        }
-        findMany: {
-          args: Prisma.AdminUserFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserPayload>[]
-        }
-        create: {
-          args: Prisma.AdminUserCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserPayload>
-        }
-        createMany: {
-          args: Prisma.AdminUserCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.AdminUserCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserPayload>[]
-        }
-        delete: {
-          args: Prisma.AdminUserDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserPayload>
-        }
-        update: {
-          args: Prisma.AdminUserUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserPayload>
-        }
-        deleteMany: {
-          args: Prisma.AdminUserDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.AdminUserUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.AdminUserUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserPayload>[]
-        }
-        upsert: {
-          args: Prisma.AdminUserUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserPayload>
-        }
-        aggregate: {
-          args: Prisma.AdminUserAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateAdminUser>
-        }
-        groupBy: {
-          args: Prisma.AdminUserGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AdminUserGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.AdminUserCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AdminUserCountAggregateOutputType> | number
         }
       }
     }
@@ -1931,6 +1857,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DynamicFormAccess: {
+      payload: Prisma.$DynamicFormAccessPayload<ExtArgs>
+      fields: Prisma.DynamicFormAccessFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DynamicFormAccessFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DynamicFormAccessPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DynamicFormAccessFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DynamicFormAccessPayload>
+        }
+        findFirst: {
+          args: Prisma.DynamicFormAccessFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DynamicFormAccessPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DynamicFormAccessFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DynamicFormAccessPayload>
+        }
+        findMany: {
+          args: Prisma.DynamicFormAccessFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DynamicFormAccessPayload>[]
+        }
+        create: {
+          args: Prisma.DynamicFormAccessCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DynamicFormAccessPayload>
+        }
+        createMany: {
+          args: Prisma.DynamicFormAccessCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DynamicFormAccessCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DynamicFormAccessPayload>[]
+        }
+        delete: {
+          args: Prisma.DynamicFormAccessDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DynamicFormAccessPayload>
+        }
+        update: {
+          args: Prisma.DynamicFormAccessUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DynamicFormAccessPayload>
+        }
+        deleteMany: {
+          args: Prisma.DynamicFormAccessDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DynamicFormAccessUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DynamicFormAccessUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DynamicFormAccessPayload>[]
+        }
+        upsert: {
+          args: Prisma.DynamicFormAccessUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DynamicFormAccessPayload>
+        }
+        aggregate: {
+          args: Prisma.DynamicFormAccessAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDynamicFormAccess>
+        }
+        groupBy: {
+          args: Prisma.DynamicFormAccessGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DynamicFormAccessGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DynamicFormAccessCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DynamicFormAccessCountAggregateOutputType> | number
+        }
+      }
+    }
     Reservation: {
       payload: Prisma.$ReservationPayload<ExtArgs>
       fields: Prisma.ReservationFieldRefs
@@ -3102,14 +3102,6 @@ export const UserNoteScalarFieldEnum = {
 export type UserNoteScalarFieldEnum = (typeof UserNoteScalarFieldEnum)[keyof typeof UserNoteScalarFieldEnum]
 
 
-export const AdminUserScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId'
-} as const
-
-export type AdminUserScalarFieldEnum = (typeof AdminUserScalarFieldEnum)[keyof typeof AdminUserScalarFieldEnum]
-
-
 export const GoogleSSOUserScalarFieldEnum = {
   id: 'id',
   ssoId: 'ssoId',
@@ -3196,6 +3188,7 @@ export const NavLinkScalarFieldEnum = {
   isCta: 'isCta',
   openInNewTab: 'openInNewTab',
   isProtected: 'isProtected',
+  enabled: 'enabled',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -3304,6 +3297,15 @@ export const JobScalarFieldEnum = {
 } as const
 
 export type JobScalarFieldEnum = (typeof JobScalarFieldEnum)[keyof typeof JobScalarFieldEnum]
+
+
+export const DynamicFormAccessScalarFieldEnum = {
+  id: 'id',
+  formId: 'formId',
+  roleId: 'roleId'
+} as const
+
+export type DynamicFormAccessScalarFieldEnum = (typeof DynamicFormAccessScalarFieldEnum)[keyof typeof DynamicFormAccessScalarFieldEnum]
 
 
 export const ReservationScalarFieldEnum = {
@@ -3897,7 +3899,6 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   userNote?: Prisma.UserNoteOmit
-  adminUser?: Prisma.AdminUserOmit
   googleSSOUser?: Prisma.GoogleSSOUserOmit
   microsoftSSOUser?: Prisma.MicrosoftSSOUserOmit
   role?: Prisma.RoleOmit
@@ -3915,6 +3916,7 @@ export type GlobalOmitConfig = {
   dynamicFormSubmissionAnswer?: Prisma.DynamicFormSubmissionAnswerOmit
   dynamicFormSubmissionComment?: Prisma.DynamicFormSubmissionCommentOmit
   job?: Prisma.JobOmit
+  dynamicFormAccess?: Prisma.DynamicFormAccessOmit
   reservation?: Prisma.ReservationOmit
   timeTableEntry?: Prisma.TimeTableEntryOmit
   event?: Prisma.EventOmit

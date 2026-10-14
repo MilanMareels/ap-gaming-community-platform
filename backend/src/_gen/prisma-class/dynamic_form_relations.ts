@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { DynamicFormField } from './dynamic_form_field.js';
 import { DynamicFormSubmission } from './dynamic_form_submission.js';
 import { Job } from './job.js';
+import { DynamicFormAccess } from './dynamic_form_access.js';
 
 export class DynamicFormRelations {
 
@@ -13,4 +14,7 @@ export class DynamicFormRelations {
 
   @ApiProperty({ isArray: true, type: () => Job })
   jobs: Job[];
+
+  @ApiProperty({ isArray: true, type: () => DynamicFormAccess })
+  accessRoles: DynamicFormAccess[];
 }

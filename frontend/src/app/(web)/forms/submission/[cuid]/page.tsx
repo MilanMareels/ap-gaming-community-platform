@@ -144,7 +144,7 @@ export default function PublicSubmissionPage() {
                   <div className="text-sm">
                     {answer.filePath ? (
                       <a
-                        href={`/api/${answer.filePath}`}
+                        href={`/api/files/${answer.filePath}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-red-400 hover:text-red-300 flex items-center gap-1"

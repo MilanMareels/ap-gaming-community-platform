@@ -24,10 +24,10 @@ export class NavigationController {
   @Get('admin')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @RequirePermissions('navigation.manage')
-  @ApiOperation({ summary: 'Get all nav links flat (Admin only)' })
+  @ApiOperation({ summary: 'Get navigation tree including disabled items (Admin only)' })
   @ApiOkResponse({ type: [PrismaModel.NavLink] })
-  getAllFlat() {
-    return this.navigationService.getAllFlat();
+  getAdminNavTree() {
+    return this.navigationService.getAdminNavTree();
   }
 
   @Post()

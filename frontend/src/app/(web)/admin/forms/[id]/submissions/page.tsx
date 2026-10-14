@@ -2,32 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Trash2, ChevronDown, ChevronUp, Send, ExternalLink, Download } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { apiClient } from '@/api';
-
-interface SubmissionAnswer {
-  id: number;
-  value: string | null;
-  values: string[] | null;
-  filePath: string | null;
-  fileName: string | null;
-  field: {
-    id: number;
-    label: string;
-    type: string;
-  };
-}
-
-interface SubmissionComment {
-  id: number;
-  content: string;
-  authorName: string | null;
-  isAdmin: boolean;
-  createdAt: string;
-  user: { id: number; name: string | null } | null;
-}
 
 interface Submission {
   id: number;
@@ -36,10 +14,16 @@ interface Submission {
   submitterName: string | null;
   createdAt: string;
   user: { id: number; name: string | null; email: string } | null;
+  form: { id: number; title: string };
   _count?: { comments: number };
-  answers?: SubmissionAnswer[];
-  comments?: SubmissionComment[];
-  form?: { id: number; title: string };
+}
+
+interface PaginatedResponse {
+  items: Submission[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 export default function AdminFormSubmissionsPage() {
@@ -47,77 +31,19 @@ export default function AdminFormSubmissionsPage() {
   const router = useRouter();
   const formId = Number(params.id);
 
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [expanded, setExpanded] = useState<number | null>(null);
-  const [detail, setDetail] = useState<Submission | null>(null);
-  const [commentText, setCommentText] = useState('');
-  const [sending, setSending] = useState(false);
+  const [data, setData] = useState<PaginatedResponse | null>(null);
+  const [page, setPage] = useState(1);
 
   const refresh = useCallback(async () => {
-    const res = await apiClient.GET('/forms/{id}/submissions', { params: { path: { id: String(formId) } } });
-    if (res.data) setSubmissions(res.data as unknown as Submission[]);
-  }, [formId]);
+    const res = await apiClient.GET('/forms/{id}/submissions', {
+      params: { path: { id: String(formId) }, query: { page: String(page) } as any },
+    });
+    if (res.data) setData(res.data as unknown as PaginatedResponse);
+  }, [formId, page]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
-  const handleExpand = async (submission: Submission) => {
-    if (expanded === submission.id) {
-      setExpanded(null);
-      setDetail(null);
-      return;
-    }
-
-    const res = await apiClient.GET('/forms/submissions/{submissionId}', {
-      params: { path: { submissionId: String(submission.id) } },
-    });
-    if (res.data) {
-      setDetail(res.data as unknown as Submission);
-      setExpanded(submission.id);
-      setCommentText('');
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    if (!confirm('Weet je zeker dat je deze inzending wilt verwijderen?')) return;
-    await apiClient.DELETE('/forms/submissions/{submissionId}', {
-      params: { path: { submissionId: String(id) } },
-    });
-    if (expanded === id) {
-      setExpanded(null);
-      setDetail(null);
-    }
-    refresh();
-  };
-
-  const handleSendComment = async () => {
-    if (!commentText.trim() || !detail) return;
-    setSending(true);
-    await apiClient.POST('/forms/submissions/{submissionId}/comments', {
-      params: { path: { submissionId: String(detail.id) } },
-      body: { content: commentText.trim() },
-    });
-    setCommentText('');
-    setSending(false);
-    // Refresh detail
-    const res = await apiClient.GET('/forms/submissions/{submissionId}', {
-      params: { path: { submissionId: String(detail.id) } },
-    });
-    if (res.data) setDetail(res.data as unknown as Submission);
-    refresh();
-  };
-
-  const renderAnswerValue = (answer: SubmissionAnswer) => {
-    if (answer.field.type === 'TEXT_BLOCK') return null;
-    if (answer.filePath) {
-      return (
-        <a href={`/api/${answer.filePath}`} target="_blank" rel="noopener noreferrer" className="text-red-400 hover:text-red-300 flex items-center gap-1">
-          <Download size={12} /> {answer.fileName}
-        </a>
-      );
-    }
-    if (answer.values) return (answer.values as string[]).join(', ');
-    return answer.value || '-';
-  };
+  const submissions = data?.items ?? [];
 
   return (
     <div>
@@ -133,98 +59,57 @@ export default function AdminFormSubmissionsPage() {
       ) : (
         <div className="space-y-2">
           {submissions.map((sub) => (
-            <div key={sub.id} className="bg-slate-900 border border-slate-800 rounded-lg">
-              <div
-                className="flex items-center gap-3 p-4 cursor-pointer hover:bg-slate-800/50"
-                onClick={() => handleExpand(sub)}
-              >
-                <div className="flex-1">
-                  <span className="font-medium">
-                    {sub.submitterName || sub.user?.name || sub.submitterEmail || sub.user?.email || 'Anoniem'}
-                  </span>
-                  {sub.submitterEmail && (
-                    <span className="text-gray-400 text-sm ml-2">{sub.submitterEmail}</span>
-                  )}
-                </div>
-                {sub._count && sub._count.comments > 0 && (
-                  <Badge variant="info">{sub._count.comments} reactie(s)</Badge>
-                )}
-                <span className="text-gray-500 text-sm">
-                  {new Date(sub.createdAt).toLocaleString('nl-NL')}
+            <div
+              key={sub.id}
+              className="bg-slate-900 border border-slate-800 rounded-lg flex items-center gap-3 p-4 cursor-pointer hover:bg-slate-800/50 transition-colors"
+              onClick={() => router.push(`/admin/submissions/${sub.id}`)}
+            >
+              <div className="flex-1 min-w-0">
+                <span className="font-medium">
+                  {sub.submitterName || sub.user?.name || sub.submitterEmail || sub.user?.email || 'Anoniem'}
                 </span>
-                <Button size="sm" variant="danger" onClick={(e) => { e.stopPropagation(); handleDelete(sub.id); }}>
-                  <Trash2 size={14} />
-                </Button>
-                {expanded === sub.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                {sub.submitterEmail && (
+                  <span className="text-gray-400 text-sm ml-2">{sub.submitterEmail}</span>
+                )}
               </div>
-
-              {expanded === sub.id && detail && (
-                <div className="border-t border-slate-800 p-4">
-                  {/* Answers */}
-                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Antwoorden</h4>
-                  <div className="space-y-2 mb-6">
-                    {detail.answers?.filter((a) => a.field.type !== 'TEXT_BLOCK').map((answer) => (
-                      <div key={answer.id} className="bg-slate-800 rounded p-3">
-                        <div className="text-xs text-gray-400 font-bold uppercase">{answer.field.label}</div>
-                        <div className="text-sm mt-1">{renderAnswerValue(answer)}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Public viewer link */}
-                  <div className="mb-6">
-                    <a
-                      href={`/forms/submission/${sub.cuid}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-red-400 hover:text-red-300 flex items-center gap-1"
-                    >
-                      <ExternalLink size={12} /> Publieke link voor inzender
-                    </a>
-                  </div>
-
-                  {/* Comments */}
-                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">
-                    Reacties ({detail.comments?.length || 0})
-                  </h4>
-                  <div className="space-y-2 mb-4">
-                    {detail.comments?.map((comment) => (
-                      <div
-                        key={comment.id}
-                        className={`rounded p-3 ${comment.isAdmin ? 'bg-red-950/30 border border-red-900/30' : 'bg-slate-800'}`}
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-bold">
-                            {comment.user?.name || comment.authorName || 'Onbekend'}
-                          </span>
-                          {comment.isAdmin && <Badge variant="danger">Admin</Badge>}
-                          <span className="text-xs text-gray-500">
-                            {new Date(comment.createdAt).toLocaleString('nl-NL')}
-                          </span>
-                        </div>
-                        <p className="text-sm">{comment.content}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Add comment */}
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      className="flex-1 bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white text-sm"
-                      placeholder="Schrijf een reactie..."
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSendComment()}
-                    />
-                    <Button size="sm" onClick={handleSendComment} disabled={sending || !commentText.trim()}>
-                      <Send size={14} />
-                    </Button>
-                  </div>
-                </div>
+              {sub._count && sub._count.comments > 0 && (
+                <Badge variant="info">{sub._count.comments} reactie(s)</Badge>
               )}
+              <span className="text-gray-500 text-sm whitespace-nowrap">
+                {new Date(sub.createdAt).toLocaleString('nl-NL')}
+              </span>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {data && data.totalPages > 1 && (
+        <div className="flex items-center justify-between mt-6">
+          <span className="text-sm text-gray-500">
+            {data.total} inzending{data.total !== 1 ? 'en' : ''} totaal
+          </span>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              <ChevronLeft size={14} />
+            </Button>
+            <span className="text-sm text-gray-400">
+              {page} / {data.totalPages}
+            </span>
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={page >= data.totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              <ChevronRight size={14} />
+            </Button>
+          </div>
         </div>
       )}
     </div>

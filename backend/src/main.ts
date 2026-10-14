@@ -8,15 +8,10 @@ import { AppModule } from './app.module.js';
 import { PrismaModel } from './_gen/prisma-class/index.js';
 import configuration from './common/config.js';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const config = configuration();
-
-  app.useStaticAssets(join(process.cwd(), 'uploads'), {
-    prefix: '/api/uploads/',
-  });
 
   if (config.nodeEnv === 'production') {
     app.getHttpAdapter().getInstance().set('trust proxy', true);

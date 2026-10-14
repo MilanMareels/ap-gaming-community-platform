@@ -28,11 +28,6 @@ export type User = Prisma.UserModel
  */
 export type UserNote = Prisma.UserNoteModel
 /**
- * Model AdminUser
- * 
- */
-export type AdminUser = Prisma.AdminUserModel
-/**
  * Model GoogleSSOUser
  * 
  */
@@ -117,6 +112,11 @@ export type DynamicFormSubmissionComment = Prisma.DynamicFormSubmissionCommentMo
  * 
  */
 export type Job = Prisma.JobModel
+/**
+ * Model DynamicFormAccess
+ * 
+ */
+export type DynamicFormAccess = Prisma.DynamicFormAccessModel
 /**
  * Model Reservation
  * 

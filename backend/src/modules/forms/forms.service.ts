@@ -127,6 +127,63 @@ export class FormsService {
     });
   }
 
+  // --- Form access management ---
+
+  async getFormAccess(formId: number) {
+    await this.ensureFormExists(formId);
+    return this.prisma.dynamicFormAccess.findMany({
+      where: { formId },
+      include: { role: { select: { id: true, name: true } } },
+    });
+  }
+
+  async setFormAccess(formId: number, roleIds: number[]) {
+    await this.ensureFormExists(formId);
+    await this.prisma.$transaction([
+      this.prisma.dynamicFormAccess.deleteMany({ where: { formId } }),
+      ...roleIds.map((roleId) =>
+        this.prisma.dynamicFormAccess.create({
+          data: { formId, roleId },
+        }),
+      ),
+    ]);
+  }
+
+  async getAccessibleFormIds(userId: number): Promise<number[]> {
+    const accessEntries = await this.prisma.dynamicFormAccess.findMany({
+      where: {
+        role: {
+          userRoles: { some: { userId } },
+        },
+      },
+      select: { formId: true },
+    });
+    return [...new Set(accessEntries.map((a) => a.formId))];
+  }
+
+  async canUserAccessForm(userId: number, formId: number): Promise<boolean> {
+    const count = await this.prisma.dynamicFormAccess.count({
+      where: {
+        formId,
+        role: {
+          userRoles: { some: { userId } },
+        },
+      },
+    });
+    return count > 0;
+  }
+
+  async findAccessible(userId: number) {
+    const formIds = await this.getAccessibleFormIds(userId);
+    return this.prisma.dynamicForm.findMany({
+      where: { id: { in: formIds } },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: { select: { submissions: true, fields: true } },
+      },
+    });
+  }
+
   private async ensureFormExists(id: number) {
     const form = await this.prisma.dynamicForm.findUnique({ where: { id } });
     if (!form) throw new NotFoundException('Form not found');
