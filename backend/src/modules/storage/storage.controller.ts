@@ -34,13 +34,17 @@ export class StorageController {
   @Public()
   @Get('*key')
   @ApiOperation({ summary: 'Download a file (redirects to presigned S3 URL)' })
-  async getFile(@Param('key') key: string, @Res() res: Response) {
-    const fileExists = await this.storageService.exists(key);
+  async getFile(@Param('key') key: string | string[], @Res() res: Response) {
+    // NestJS may deliver the wildcard as an array of segments or a string
+    const resolvedKey = Array.isArray(key) ? key.join('/') : key;
+
+    const fileExists = await this.storageService.exists(resolvedKey);
     if (!fileExists) {
-      throw new NotFoundException('File not found');
+      res.status(404).json({ message: 'File not found' });
+      return;
     }
 
-    const url = await this.storageService.getSignedDownloadUrl(key, 3600);
+    const url = await this.storageService.getSignedDownloadUrl(resolvedKey, 3600);
     res.redirect(302, url);
   }
 }
