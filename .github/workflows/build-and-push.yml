@@ -45,7 +45,7 @@ jobs:
         with:
           context: ./backend
           push: true
-          platforms: linux/amd64
+          platforms: linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
@@ -84,7 +84,7 @@ jobs:
         with:
           context: ./frontend
           push: true
-          platforms: linux/amd64
+          platforms: linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
@@ -123,6 +123,6 @@ jobs:
         with:
           context: ./nginx
           push: true
-          platforms: linux/amd64
+          platforms: linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
