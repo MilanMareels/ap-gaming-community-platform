@@ -182,6 +182,7 @@ export default function PublicFormPage() {
       const response = await fetch(`/api/forms/public/${cuid}/submit`, {
         method: 'POST',
         body: formData,
+        credentials: 'include',
       });
 
       if (!response.ok) {
