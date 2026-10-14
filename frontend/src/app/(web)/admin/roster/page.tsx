@@ -123,7 +123,7 @@ export default function AdminRosterPage() {
     const res = await apiClient.POST('/files/upload-url', {
       body: { key, contentType: file.type },
     });
-    const { url } = res.data as { url: string };
+    const { url } = res.data as unknown as { url: string };
     await fetch(url, {
       method: 'PUT',
       body: file,
