@@ -140,40 +140,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/logout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Clear auth cookie and logout */
-        post: operations["AuthController_logout"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/auth/profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get profile of authenticated user */
-        get: operations["AuthController_profile"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/auth/impersonate/user/{id}": {
         parameters: {
             query?: never;
@@ -219,6 +185,40 @@ export interface paths {
         put?: never;
         /** Stop impersonating and revert to real user */
         post: operations["AuthController_stopImpersonation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clear auth cookie and logout */
+        post: operations["AuthController_logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get profile of authenticated user */
+        get: operations["AuthController_profile"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -653,7 +653,7 @@ export interface paths {
         /** Get all roster entries */
         get: operations["RosterController_findAllEntries"];
         put?: never;
-        /** Add a roster entry with optional image (Admin only) */
+        /** Add a roster entry (Admin only) */
         post: operations["RosterController_createEntry"];
         delete?: never;
         options?: never;
@@ -675,7 +675,8 @@ export interface paths {
         delete: operations["RosterController_deleteEntry"];
         options?: never;
         head?: never;
-        patch?: never;
+        /** Update a roster entry (Admin only) */
+        patch: operations["RosterController_updateEntry"];
         trace?: never;
     };
     "/timetable": {
@@ -897,7 +898,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List users with filters (Admin only) */
+        /** List users */
         get: operations["UsersController_list"];
         put?: never;
         post?: never;
@@ -914,10 +915,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List pending SSO whitelist entries (Admin only) */
+        /** List pending SSO whitelist entries */
         get: operations["UsersController_listWhitelist"];
         put?: never;
-        /** Pre-authorize an external SSO email for a user (Admin only) */
+        /** Pre-authorize an external SSO email for a user */
         post: operations["UsersController_createWhitelist"];
         delete?: never;
         options?: never;
@@ -935,7 +936,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** Remove a whitelist entry (Admin only) */
+        /** Remove a whitelist entry */
         delete: operations["UsersController_deleteWhitelist"];
         options?: never;
         head?: never;
@@ -949,15 +950,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get user detail (Admin only) */
+        /** Get user detail */
         get: operations["UsersController_getById"];
         put?: never;
         post?: never;
-        /** Delete a user and cascade their reservations (Admin only) */
+        /** Delete a user and cascade their reservations */
         delete: operations["UsersController_delete"];
         options?: never;
         head?: never;
-        /** Update a user (Admin only) */
+        /** Update a user */
         patch: operations["UsersController_update"];
         trace?: never;
     };
@@ -971,7 +972,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** Unlink an SSO provider from a user (Admin only) */
+        /** Unlink an SSO provider from a user */
         delete: operations["UsersController_unlinkSso"];
         options?: never;
         head?: never;
@@ -987,7 +988,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Add an admin note to a user (Admin only) */
+        /** Add an admin note to a user */
         post: operations["UsersController_createNote"];
         delete?: never;
         options?: never;
@@ -1037,8 +1038,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get all nav links flat (Admin only) */
-        get: operations["NavigationController_getAllFlat"];
+        /** Get navigation tree including disabled items (Admin only) */
+        get: operations["NavigationController_getAdminNavTree"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1399,6 +1400,127 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/forms/public/{cuid}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit a form response */
+        post: operations["FormSubmissionsController_submitForm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/admin/submissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all accessible submissions across forms */
+        get: operations["FormSubmissionsController_getAllSubmissions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{id}/submissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List submissions for a form */
+        get: operations["FormSubmissionsController_getSubmissions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/submissions/{submissionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single submission with answers */
+        get: operations["FormSubmissionsController_getSubmissionById"];
+        put?: never;
+        post?: never;
+        /** Delete a submission (Admin only) */
+        delete: operations["FormSubmissionsController_deleteSubmission"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/submissions/{submissionId}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get comments for a submission */
+        get: operations["FormSubmissionsController_getAdminComments"];
+        put?: never;
+        /** Add admin comment to a submission */
+        post: operations["FormSubmissionsController_addAdminComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/submission/{cuid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get submission with comments (public viewer) */
+        get: operations["FormSubmissionsController_getPublicSubmission"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/submission/{cuid}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add comment to submission (public) */
+        post: operations["FormSubmissionsController_addPublicComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/forms/admin": {
         parameters: {
             query?: never;
@@ -1425,6 +1547,23 @@ export interface paths {
         };
         /** List active forms as simple list for selectors */
         get: operations["FormsController_findAllSimple"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/admin/accessible": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List forms the user has access to */
+        get: operations["FormsController_findAccessible"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1537,6 +1676,24 @@ export interface paths {
         patch: operations["FormsController_updateField"];
         trace?: never;
     };
+    "/forms/{id}/access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get roles with access to this form */
+        get: operations["FormsController_getFormAccess"];
+        /** Set which roles can view this form's submissions */
+        put: operations["FormsController_setFormAccess"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/forms/public/{cuid}": {
         parameters: {
             query?: never;
@@ -1548,109 +1705,6 @@ export interface paths {
         get: operations["FormsController_findPublic"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/forms/public/{cuid}/submit": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Submit a form response */
-        post: operations["FormSubmissionsController_submitForm"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/forms/{id}/submissions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List submissions for a form (Admin only) */
-        get: operations["FormSubmissionsController_getSubmissions"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/forms/submissions/{submissionId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a single submission with answers (Admin only) */
-        get: operations["FormSubmissionsController_getSubmissionById"];
-        put?: never;
-        post?: never;
-        /** Delete a submission (Admin only) */
-        delete: operations["FormSubmissionsController_deleteSubmission"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/forms/submissions/{submissionId}/comments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Add admin comment to a submission */
-        post: operations["FormSubmissionsController_addAdminComment"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/forms/submission/{cuid}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get submission with comments (public viewer) */
-        get: operations["FormSubmissionsController_getPublicSubmission"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/forms/submission/{cuid}/comments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Add comment to submission (public) */
-        post: operations["FormSubmissionsController_addPublicComment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1728,6 +1782,40 @@ export interface paths {
         patch: operations["JobsController_update"];
         trace?: never;
     };
+    "/files/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Get a presigned URL for direct upload to S3 */
+        post: operations["StorageController_getUploadUrl"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download a file (redirects to presigned S3 URL) */
+        get: operations["StorageController_getFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1762,11 +1850,11 @@ export interface components {
             /** @description The real admin user ID behind the impersonation */
             realUserId: number;
             /** @description Name of the real admin user */
-            realUserName?: string | null;
+            realUserName?: string;
             /** @description User ID being impersonated (user impersonation) */
             userId?: number;
             /** @description Name of the user being impersonated */
-            userName?: string | null;
+            userName?: string;
             /** @description Role ID being impersonated (role impersonation) */
             roleId?: number;
             /** @description Name of the role being impersonated */
@@ -1794,12 +1882,18 @@ export interface components {
             permissions: string[];
             userCount: number;
         };
+        RoleUserDto: {
+            id: number;
+            name?: string;
+            email: string;
+        };
         RoleDetailResponseDto: {
             id: number;
             name: string;
             description?: string;
             isSystem: boolean;
             permissions: string[];
+            users?: components["schemas"]["RoleUserDto"][];
         };
         CreateRoleDto: {
             /** @example Event Manager */
@@ -2251,6 +2345,24 @@ export interface components {
             role?: string | null;
             /** @example 1 */
             gameId: number;
+            /**
+             * @description S3 storage key for the uploaded image
+             * @example rosters/roster-abc123.png
+             */
+            imageKey?: string;
+        };
+        UpdateRosterEntryDto: {
+            /** @example xXProGamerXx */
+            handle?: string;
+            /** @example Diamond */
+            rank?: string;
+            /** @example Support */
+            role?: string | null;
+            /**
+             * @description S3 storage key for the uploaded image
+             * @example rosters/roster-abc123.png
+             */
+            imageKey?: string;
         };
         /** @enum {string} */
         TimeTableType: "OPEN" | "CLOSED";
@@ -2413,10 +2525,6 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
         };
-        CreateUserNoteDto: {
-            /** @description Note content */
-            content: string;
-        };
         UserDetailDto: {
             id: number;
             name: string | null;
@@ -2435,6 +2543,10 @@ export interface components {
             sNumber?: string;
             email?: string;
         };
+        CreateUserNoteDto: {
+            /** @description Note content */
+            content: string;
+        };
         NavLink: {
             id: number;
             label: string;
@@ -2446,6 +2558,7 @@ export interface components {
             isCta: boolean;
             openInNewTab: boolean;
             isProtected: boolean;
+            enabled: boolean;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -2471,6 +2584,8 @@ export interface components {
             isCta?: boolean;
             /** @example false */
             openInNewTab?: boolean;
+            /** @example true */
+            enabled?: boolean;
         };
         ReorderItemDto: {
             /** @example 1 */
@@ -2501,6 +2616,8 @@ export interface components {
             isCta?: boolean;
             /** @example false */
             openInNewTab?: boolean;
+            /** @example true */
+            enabled?: boolean;
         };
         CreateBracketDto: {
             /** @example 2 */
@@ -2598,6 +2715,41 @@ export interface components {
              */
             points: number;
         };
+        SubmitFormAnswerDto: {
+            /** @example 1 */
+            fieldId: number;
+            /** @example Mijn antwoord */
+            value?: string;
+            /**
+             * @example [
+             *       "Optie A",
+             *       "Optie B"
+             *     ]
+             */
+            values?: string[];
+        };
+        SubmitFormFileDto: {
+            /** @example 1 */
+            fieldId: number;
+            /** @example forms/1/abc123.pdf */
+            storageKey: string;
+            /** @example document.pdf */
+            fileName: string;
+        };
+        SubmitFormDto: {
+            /** @example user@example.com */
+            submitterEmail?: string;
+            /** @example Jan Janssens */
+            submitterName?: string;
+            answers: components["schemas"]["SubmitFormAnswerDto"][];
+            files?: components["schemas"]["SubmitFormFileDto"][];
+        };
+        CreateCommentDto: {
+            /** @example Bedankt voor je inzending! */
+            content: string;
+            /** @example Jan Janssens */
+            authorName?: string;
+        };
         CreateFormDto: {
             /** @example Feedback formulier */
             title: string;
@@ -2661,11 +2813,14 @@ export interface components {
              */
             config?: Record<string, never>;
         };
-        CreateCommentDto: {
-            /** @example Bedankt voor je inzending! */
-            content: string;
-            /** @example Jan Janssens */
-            authorName?: string;
+        SetFormAccessDto: {
+            /**
+             * @example [
+             *       1,
+             *       2
+             *     ]
+             */
+            roleIds: number[];
         };
         CreateJobDto: {
             /** @example Event Coordinator */
@@ -2690,6 +2845,12 @@ export interface components {
             isActive?: boolean;
             /** @example 2 */
             formId?: number;
+        };
+        RequestUploadUrlDto: {
+            /** @example forms/1/photo.jpg */
+            key: string;
+            /** @example image/jpeg */
+            contentType: string;
         };
         GoogleSSOUser: {
             id: number;
@@ -2763,6 +2924,16 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        UserNote: {
+            id: number;
+            userId: number;
+            authorId: number;
+            content: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
         UserRelations: {
             reservations: components["schemas"]["Reservation"][];
             googleSSOUsers: components["schemas"]["GoogleSSOUser"][];
@@ -2775,12 +2946,18 @@ export interface components {
             userRoles: components["schemas"]["UserRole"][];
             dynamicFormSubmissions: components["schemas"]["DynamicFormSubmission"][];
             dynamicFormSubmissionComments: components["schemas"]["DynamicFormSubmissionComment"][];
+            notesAbout: components["schemas"]["UserNote"][];
+            notesAuthored: components["schemas"]["UserNote"][];
         };
         User: {
             id: number;
             name?: string;
             email: string;
             sNumber: string;
+        };
+        UserNoteRelations: {
+            user: components["schemas"]["User"];
+            author: components["schemas"]["User"];
         };
         GoogleSSOUserRelations: {
             user: components["schemas"]["User"];
@@ -2793,9 +2970,15 @@ export interface components {
             roleId: number;
             permissionId: number;
         };
+        DynamicFormAccess: {
+            id: number;
+            formId: number;
+            roleId: number;
+        };
         RoleRelations: {
             permissions: components["schemas"]["RolePermission"][];
             userRoles: components["schemas"]["UserRole"][];
+            formAccess: components["schemas"]["DynamicFormAccess"][];
         };
         PermissionRelations: {
             rolePermissions: components["schemas"]["RolePermission"][];
@@ -2863,6 +3046,7 @@ export interface components {
             fields: components["schemas"]["DynamicFormField"][];
             submissions: components["schemas"]["DynamicFormSubmission"][];
             jobs: components["schemas"]["Job"][];
+            accessRoles: components["schemas"]["DynamicFormAccess"][];
         };
         DynamicForm: {
             id: number;
@@ -2907,6 +3091,10 @@ export interface components {
         };
         JobRelations: {
             form?: components["schemas"]["DynamicForm"];
+        };
+        DynamicFormAccessRelations: {
+            form: components["schemas"]["DynamicForm"];
+            role: components["schemas"]["Role"];
         };
         ReservationRelations: {
             user: components["schemas"]["User"];
@@ -3252,51 +3440,6 @@ export interface operations {
             };
         };
     };
-    AuthController_logout: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LogoutResponseDto"];
-                };
-            };
-        };
-    };
-    AuthController_profile: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AuthProfileResponseDto"];
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     AuthController_impersonateUser: {
         parameters: {
             query?: never;
@@ -3345,6 +3488,51 @@ export interface operations {
         requestBody?: never;
         responses: {
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogoutResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_profile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthProfileResponseDto"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3880,15 +4068,12 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Number of no-shows that were reset */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": {
-                        count: number;
-                    };
-                };
+                content?: never;
             };
         };
     };
@@ -4248,7 +4433,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "multipart/form-data": components["schemas"]["CreateRosterEntryDto"];
+                "application/json": components["schemas"]["CreateRosterEntryDto"];
             };
         };
         responses: {
@@ -4278,6 +4463,31 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    RosterController_updateEntry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRosterEntryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RosterEntry"];
+                };
             };
         };
     };
@@ -4995,7 +5205,7 @@ export interface operations {
             };
         };
     };
-    NavigationController_getAllFlat: {
+    NavigationController_getAdminNavTree: {
         parameters: {
             query?: never;
             header?: never;
@@ -5939,6 +6149,193 @@ export interface operations {
             };
         };
     };
+    FormSubmissionsController_submitForm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubmitFormDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_getAllSubmissions: {
+        parameters: {
+            query: {
+                page: string;
+                limit: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_getSubmissions: {
+        parameters: {
+            query: {
+                page: string;
+                limit: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_getSubmissionById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                submissionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_deleteSubmission: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                submissionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_getAdminComments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                submissionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_addAdminComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                submissionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCommentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_getPublicSubmission: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormSubmissionsController_addPublicComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCommentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     FormsController_findAll: {
         parameters: {
             query?: never;
@@ -5957,6 +6354,23 @@ export interface operations {
         };
     };
     FormsController_findAllSimple: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FormsController_findAccessible: {
         parameters: {
             query?: never;
             header?: never;
@@ -6145,45 +6559,7 @@ export interface operations {
             };
         };
     };
-    FormsController_findPublic: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                cuid: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    FormSubmissionsController_submitForm: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                cuid: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    FormSubmissionsController_getSubmissions: {
+    FormsController_getFormAccess: {
         parameters: {
             query?: never;
             header?: never;
@@ -6202,60 +6578,22 @@ export interface operations {
             };
         };
     };
-    FormSubmissionsController_getSubmissionById: {
+    FormsController_setFormAccess: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                submissionId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    FormSubmissionsController_deleteSubmission: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                submissionId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    FormSubmissionsController_addAdminComment: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                submissionId: string;
+                id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateCommentDto"];
+                "application/json": components["schemas"]["SetFormAccessDto"];
             };
         };
         responses: {
-            201: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6263,7 +6601,7 @@ export interface operations {
             };
         };
     };
-    FormSubmissionsController_getPublicSubmission: {
+    FormsController_findPublic: {
         parameters: {
             query?: never;
             header?: never;
@@ -6275,29 +6613,6 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    FormSubmissionsController_addPublicComment: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                cuid: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateCommentDto"];
-            };
-        };
-        responses: {
-            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6431,6 +6746,46 @@ export interface operations {
                 "application/json": components["schemas"]["UpdateJobDto"];
             };
         };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StorageController_getUploadUrl: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequestUploadUrlDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StorageController_getFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
