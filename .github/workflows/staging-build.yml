@@ -15,7 +15,7 @@ env:
 jobs:
   build-backend:
     name: Build Backend (Staging)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
       packages: write
@@ -56,7 +56,7 @@ jobs:
 
   build-frontend:
     name: Build Frontend (Staging)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
       packages: write
@@ -97,7 +97,7 @@ jobs:
 
   build-nginx:
     name: Build Nginx (Staging)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
       packages: write
