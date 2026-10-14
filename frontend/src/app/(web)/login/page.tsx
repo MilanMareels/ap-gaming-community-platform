@@ -5,13 +5,13 @@ import { useSearchParams } from 'next/navigation';
 import { AlertCircle } from 'lucide-react';
 
 function buildLoginHref(provider: 'google' | 'microsoft', returnUrl: string) {
-  const safe = returnUrl || '/admin/reservations';
+  const safe = returnUrl || '/admin';
   return `/api/auth/${provider}/login?returnUrl=${encodeURIComponent(safe)}`;
 }
 
 function LoginContent() {
   const searchParams = useSearchParams();
-  const [returnUrl, setReturnUrl] = useState('/admin/reservations');
+  const [returnUrl, setReturnUrl] = useState('/admin');
   const authFailed = searchParams.get('authfailed') === '1';
 
   useEffect(() => {
