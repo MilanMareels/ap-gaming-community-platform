@@ -71,11 +71,12 @@ export default function AdminNavigationPage() {
     visibility: 'public',
     isCta: false,
     openInNewTab: false,
+    enabled: true,
   });
 
   const fetchNavItems = useCallback(async () => {
     try {
-      const res = await apiClient.GET('/navigation', {});
+      const res = await apiClient.GET('/navigation/admin', {});
       if (res.data) setNavItems(res.data as NavLinkTree[]);
     } catch (err) {
       setError('Kon navigatie niet laden');
@@ -151,7 +152,7 @@ export default function AdminNavigationPage() {
     setFormMode('none');
     setFormParentId(null);
     setEditingId(null);
-    setFormData({ label: '', href: '', icon: '', visibility: 'public', isCta: false, openInNewTab: false });
+    setFormData({ label: '', href: '', icon: '', visibility: 'public', isCta: false, openInNewTab: false, enabled: true });
   };
 
   const startCreate = (mode: 'createLink' | 'createDropdown', parentId: number | null = null) => {
@@ -174,6 +175,7 @@ export default function AdminNavigationPage() {
       visibility: item.visibility,
       isCta: item.isCta,
       openInNewTab: item.openInNewTab,
+      enabled: item.enabled ?? true,
     });
   };
 
@@ -190,6 +192,7 @@ export default function AdminNavigationPage() {
             visibility: formData.visibility,
             isCta: formData.isCta,
             openInNewTab: formData.openInNewTab,
+            enabled: formData.enabled,
           },
         });
       } else {
@@ -211,6 +214,7 @@ export default function AdminNavigationPage() {
             visibility: formData.visibility,
             isCta: formData.isCta,
             openInNewTab: formData.openInNewTab,
+            enabled: formData.enabled,
           },
         });
       }
@@ -417,7 +421,7 @@ interface SortableNavItemProps {
   item: NavLink;
   isChild?: boolean;
   isEditing: boolean;
-  formData: { label: string; href: string; icon: string; visibility: string; isCta: boolean; openInNewTab: boolean };
+  formData: { label: string; href: string; icon: string; visibility: string; isCta: boolean; openInNewTab: boolean; enabled: boolean };
   setFormData: React.Dispatch<React.SetStateAction<SortableNavItemProps['formData']>>;
   onEdit: () => void;
   onDelete: () => void;
@@ -475,7 +479,7 @@ function SortableNavItem({
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-3 px-4 py-3 border-b border-slate-800/60 last:border-b-0 hover:bg-slate-800/30 transition-colors group"
+      className={`flex items-center gap-3 px-4 py-3 border-b border-slate-800/60 last:border-b-0 hover:bg-slate-800/30 transition-colors group ${!item.enabled ? 'opacity-50' : ''}`}
     >
       {/* Drag handle */}
       <button {...attributes} {...listeners} className="cursor-grab text-gray-600 hover:text-gray-400 touch-none">
@@ -493,6 +497,7 @@ function SortableNavItem({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="font-medium text-white truncate">{item.label}</span>
+          {!item.enabled && <Badge variant="default">Uitgeschakeld</Badge>}
           {item.isCta && <Badge variant="danger">CTA</Badge>}
           {isDropdownParent && hasChildren && <Badge variant="info">Dropdown</Badge>}
           {isDropdownParent && !hasChildren && <Badge variant="warning">Dropdown (leeg)</Badge>}
@@ -532,7 +537,7 @@ function SortableNavItem({
 // ---------- Nav Link Form ----------
 
 interface NavLinkFormProps {
-  formData: { label: string; href: string; icon: string; visibility: string; isCta: boolean; openInNewTab: boolean };
+  formData: { label: string; href: string; icon: string; visibility: string; isCta: boolean; openInNewTab: boolean; enabled: boolean };
   setFormData: React.Dispatch<React.SetStateAction<NavLinkFormProps['formData']>>;
   onSubmit: () => void;
   onCancel: () => void;
@@ -617,6 +622,15 @@ function NavLinkForm({ formData, setFormData, onSubmit, onCancel, isDropdown, is
               className="accent-red-600"
             />
             Nieuw tabblad
+          </label>
+          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.enabled}
+              onChange={(e) => setFormData((prev) => ({ ...prev, enabled: e.target.checked }))}
+              className="accent-red-600"
+            />
+            Actief
           </label>
         </div>
       </div>

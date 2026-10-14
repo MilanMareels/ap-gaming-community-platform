@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle, Upload, X, Eye } from 'lucide-react';
 import Link from 'next/link';
@@ -153,8 +153,6 @@ export default function PublicFormPage() {
     setError('');
 
     try {
-      const formData = new FormData();
-
       // Build answers array (excluding file uploads and text blocks)
       const answerPayload = form.fields
         .filter((f) => f.type !== 'FILE_UPLOAD' && f.type !== 'TEXT_BLOCK')
@@ -165,23 +163,41 @@ export default function PublicFormPage() {
           return { fieldId: f.id, value: (answers[f.id] as string) || '' };
         });
 
-      formData.append('answers', JSON.stringify(answerPayload));
-      if (email) formData.append('submitterEmail', email);
-      if (name) formData.append('submitterName', name);
+      // Upload files to S3 via presigned URLs
+      const filePayload: { fieldId: number; storageKey: string; fileName: string }[] = [];
+      for (const [fieldIdStr, file] of Object.entries(files)) {
+        const fieldId = Number(fieldIdStr);
+        const ext = file.name.split('.').pop() || 'bin';
+        const key = `forms/${form.id}/${crypto.randomUUID()}.${ext}`;
 
-      // Add files and mapping
-      const fileFieldMapping: Record<string, number> = {};
-      let fileIndex = 0;
-      for (const [fieldId, file] of Object.entries(files)) {
-        formData.append('files', file);
-        fileFieldMapping[String(fileIndex)] = Number(fieldId);
-        fileIndex++;
+        const urlRes = await fetch('/api/files/upload-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key, contentType: file.type }),
+          credentials: 'include',
+        });
+        if (!urlRes.ok) throw new Error('Kon uploadlink niet ophalen.');
+        const { url } = await urlRes.json();
+
+        const uploadRes = await fetch(url, {
+          method: 'PUT',
+          body: file,
+          headers: { 'Content-Type': file.type },
+        });
+        if (!uploadRes.ok) throw new Error('Bestand uploaden mislukt.');
+
+        filePayload.push({ fieldId, storageKey: key, fileName: file.name });
       }
-      formData.append('fileFieldMapping', JSON.stringify(fileFieldMapping));
 
       const response = await fetch(`/api/forms/public/${cuid}/submit`, {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          answers: answerPayload,
+          files: filePayload,
+          ...(email && { submitterEmail: email }),
+          ...(name && { submitterName: name }),
+        }),
         credentials: 'include',
       });
 

@@ -109,7 +109,7 @@ export default function RosterPage() {
 
                         {entry.imageUrl ? (
                           <img
-                            src={`api/${entry.imageUrl}`}
+                            src={`/api/files/${entry.imageUrl}`}
                             alt={entry.handle}
                             className="w-full h-full object-cover object-top relative z-10 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
                           />

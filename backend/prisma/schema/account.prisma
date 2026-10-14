@@ -59,6 +59,7 @@ model Role {
 
   permissions RolePermission[]
   userRoles   UserRole[]
+  formAccess  DynamicFormAccess[]
 
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt

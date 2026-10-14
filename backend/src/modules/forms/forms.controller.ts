@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import { Controller, Get, Put, Post, Patch, Delete, Body, Param, Req, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsInt } from 'class-validator';
 import { FormsService } from './forms.service.js';
 import { CreateFormDto, UpdateFormDto } from '../../dtos/forms/form.dto.js';
 import { CreateFormFieldDto, UpdateFormFieldDto, ReorderFormFieldsDto } from '../../dtos/forms/form-field.dto.js';
@@ -7,11 +8,24 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { Public } from '../auth/public.decorator.js';
+import { RbacService } from '../rbac/rbac.service.js';
+import type { Request } from 'express';
+import type { JwtPayload } from '../auth/types/jwt-payload.type.js';
+
+class SetFormAccessDto {
+  @ApiProperty({ example: [1, 2], type: [Number] })
+  @IsArray()
+  @IsInt({ each: true })
+  roleIds!: number[];
+}
 
 @ApiTags('Forms')
 @Controller('forms')
 export class FormsController {
-  constructor(private readonly formsService: FormsService) {}
+  constructor(
+    private readonly formsService: FormsService,
+    private readonly rbacService: RbacService,
+  ) {}
 
   @Get('admin')
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -27,6 +41,19 @@ export class FormsController {
   @ApiOperation({ summary: 'List active forms as simple list for selectors' })
   findAllSimple() {
     return this.formsService.findAllSimple();
+  }
+
+  @Get('admin/accessible')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('forms.manage', 'forms.submissions.view')
+  @ApiOperation({ summary: 'List forms the user has access to' })
+  async findAccessible(@Req() req: Request) {
+    const user = (req as Request & { user?: JwtPayload }).user!;
+    const permissions = await this.rbacService.getPermissionsForUser(user.sub);
+    if (permissions.has('forms.manage')) {
+      return this.formsService.findAll();
+    }
+    return this.formsService.findAccessible(user.sub);
   }
 
   @Get('admin/:id')
@@ -93,6 +120,24 @@ export class FormsController {
   @ApiOperation({ summary: 'Delete a form field (Admin only)' })
   deleteField(@Param('id') id: string, @Param('fieldId') fieldId: string) {
     return this.formsService.deleteField(+id, +fieldId);
+  }
+
+  // --- Access management ---
+
+  @Get(':id/access')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('forms.manage')
+  @ApiOperation({ summary: 'Get roles with access to this form' })
+  getFormAccess(@Param('id') id: string) {
+    return this.formsService.getFormAccess(+id);
+  }
+
+  @Put(':id/access')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('forms.manage')
+  @ApiOperation({ summary: 'Set which roles can view this form\'s submissions' })
+  setFormAccess(@Param('id') id: string, @Body() dto: SetFormAccessDto) {
+    return this.formsService.setFormAccess(+id, dto.roleIds);
   }
 
   // --- Public endpoint ---

@@ -31,6 +31,7 @@ const PERMISSIONS = [
   { key: 'forms.manage', description: 'Manage forms, submissions, and comments' },
   { key: 'jobs.manage', description: 'Manage job postings (vacatures)' },
   { key: 'users.notes.delete_others', description: 'Delete notes written by other admins' },
+  { key: 'forms.submissions.view', description: 'View form submissions (for assigned forms)' },
 ];
 
 async function seedPermissionsAndRoles() {

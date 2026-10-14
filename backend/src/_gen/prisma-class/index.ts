@@ -1,6 +1,5 @@
 import { UserRelations as _UserRelations } from './user_relations.js';
 import { UserNoteRelations as _UserNoteRelations } from './user_note_relations.js';
-import { AdminUserRelations as _AdminUserRelations } from './admin_user_relations.js';
 import { GoogleSSOUserRelations as _GoogleSSOUserRelations } from './google_s_s_o_user_relations.js';
 import { MicrosoftSSOUserRelations as _MicrosoftSSOUserRelations } from './microsoft_s_s_o_user_relations.js';
 import { RoleRelations as _RoleRelations } from './role_relations.js';
@@ -18,6 +17,7 @@ import { DynamicFormSubmissionRelations as _DynamicFormSubmissionRelations } fro
 import { DynamicFormSubmissionAnswerRelations as _DynamicFormSubmissionAnswerRelations } from './dynamic_form_submission_answer_relations.js';
 import { DynamicFormSubmissionCommentRelations as _DynamicFormSubmissionCommentRelations } from './dynamic_form_submission_comment_relations.js';
 import { JobRelations as _JobRelations } from './job_relations.js';
+import { DynamicFormAccessRelations as _DynamicFormAccessRelations } from './dynamic_form_access_relations.js';
 import { ReservationRelations as _ReservationRelations } from './reservation_relations.js';
 import { TimeTableEntryRelations as _TimeTableEntryRelations } from './time_table_entry_relations.js';
 import { EventRelations as _EventRelations } from './event_relations.js';
@@ -35,7 +35,6 @@ import { PointTrialEntryRelations as _PointTrialEntryRelations } from './point_t
 import { InventoryAdjustmentRelations as _InventoryAdjustmentRelations } from './inventory_adjustment_relations.js';
 import { User as _User } from './user.js';
 import { UserNote as _UserNote } from './user_note.js';
-import { AdminUser as _AdminUser } from './admin_user.js';
 import { GoogleSSOUser as _GoogleSSOUser } from './google_s_s_o_user.js';
 import { MicrosoftSSOUser as _MicrosoftSSOUser } from './microsoft_s_s_o_user.js';
 import { Role as _Role } from './role.js';
@@ -53,6 +52,7 @@ import { DynamicFormSubmission as _DynamicFormSubmission } from './dynamic_form_
 import { DynamicFormSubmissionAnswer as _DynamicFormSubmissionAnswer } from './dynamic_form_submission_answer.js';
 import { DynamicFormSubmissionComment as _DynamicFormSubmissionComment } from './dynamic_form_submission_comment.js';
 import { Job as _Job } from './job.js';
+import { DynamicFormAccess as _DynamicFormAccess } from './dynamic_form_access.js';
 import { Reservation as _Reservation } from './reservation.js';
 import { TimeTableEntry as _TimeTableEntry } from './time_table_entry.js';
 import { Event as _Event } from './event.js';
@@ -72,7 +72,6 @@ import { InventoryAdjustment as _InventoryAdjustment } from './inventory_adjustm
 export namespace PrismaModel {
   export class UserRelations extends _UserRelations {}
   export class UserNoteRelations extends _UserNoteRelations {}
-  export class AdminUserRelations extends _AdminUserRelations {}
   export class GoogleSSOUserRelations extends _GoogleSSOUserRelations {}
   export class MicrosoftSSOUserRelations extends _MicrosoftSSOUserRelations {}
   export class RoleRelations extends _RoleRelations {}
@@ -90,6 +89,7 @@ export namespace PrismaModel {
   export class DynamicFormSubmissionAnswerRelations extends _DynamicFormSubmissionAnswerRelations {}
   export class DynamicFormSubmissionCommentRelations extends _DynamicFormSubmissionCommentRelations {}
   export class JobRelations extends _JobRelations {}
+  export class DynamicFormAccessRelations extends _DynamicFormAccessRelations {}
   export class ReservationRelations extends _ReservationRelations {}
   export class TimeTableEntryRelations extends _TimeTableEntryRelations {}
   export class EventRelations extends _EventRelations {}
@@ -107,7 +107,6 @@ export namespace PrismaModel {
   export class InventoryAdjustmentRelations extends _InventoryAdjustmentRelations {}
   export class User extends _User {}
   export class UserNote extends _UserNote {}
-  export class AdminUser extends _AdminUser {}
   export class GoogleSSOUser extends _GoogleSSOUser {}
   export class MicrosoftSSOUser extends _MicrosoftSSOUser {}
   export class Role extends _Role {}
@@ -125,6 +124,7 @@ export namespace PrismaModel {
   export class DynamicFormSubmissionAnswer extends _DynamicFormSubmissionAnswer {}
   export class DynamicFormSubmissionComment extends _DynamicFormSubmissionComment {}
   export class Job extends _Job {}
+  export class DynamicFormAccess extends _DynamicFormAccess {}
   export class Reservation extends _Reservation {}
   export class TimeTableEntry extends _TimeTableEntry {}
   export class Event extends _Event {}
@@ -144,7 +144,6 @@ export namespace PrismaModel {
   export const extraModels = [
     UserRelations,
     UserNoteRelations,
-    AdminUserRelations,
     GoogleSSOUserRelations,
     MicrosoftSSOUserRelations,
     RoleRelations,
@@ -162,6 +161,7 @@ export namespace PrismaModel {
     DynamicFormSubmissionAnswerRelations,
     DynamicFormSubmissionCommentRelations,
     JobRelations,
+    DynamicFormAccessRelations,
     ReservationRelations,
     TimeTableEntryRelations,
     EventRelations,
@@ -179,7 +179,6 @@ export namespace PrismaModel {
     InventoryAdjustmentRelations,
     User,
     UserNote,
-    AdminUser,
     GoogleSSOUser,
     MicrosoftSSOUser,
     Role,
@@ -197,6 +196,7 @@ export namespace PrismaModel {
     DynamicFormSubmissionAnswer,
     DynamicFormSubmissionComment,
     Job,
+    DynamicFormAccess,
     Reservation,
     TimeTableEntry,
     Event,

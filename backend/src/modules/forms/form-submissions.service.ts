@@ -3,8 +3,6 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { MailService } from '../mail/mail.service.js';
 import { DiscordWebhookService } from './discord-webhook.service.js';
 import { CreateCommentDto } from '../../dtos/forms/form-comment.dto.js';
-import { rename, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
 import path from 'path';
 
 interface SubmitPayload {
@@ -15,12 +13,11 @@ interface SubmitPayload {
     value?: string;
     values?: string[];
   }>;
-}
-
-interface FileInfo {
-  fieldId: number;
-  filePath: string;
-  fileName: string;
+  files?: Array<{
+    fieldId: number;
+    storageKey: string;
+    fileName: string;
+  }>;
 }
 
 @Injectable()
@@ -37,7 +34,6 @@ export class FormSubmissionsService {
     formCuid: string,
     payload: SubmitPayload,
     userId: number | null,
-    files: FileInfo[],
   ) {
     const form = await this.prisma.dynamicForm.findUnique({
       where: { cuid: formCuid },
@@ -59,6 +55,8 @@ export class FormSubmissionsService {
       }
     }
 
+    const files = payload.files ?? [];
+
     // Validate file extensions
     for (const file of files) {
       const field = form.fields.find((f) => f.id === file.fieldId);
@@ -71,21 +69,6 @@ export class FormSubmissionsService {
           throw new BadRequestException(`File extension ${ext} is not allowed for field "${field.label}"`);
         }
       }
-    }
-
-    // Move files from temp to permanent location
-    const formUploadDir = path.join(process.cwd(), 'uploads', 'forms', String(form.id));
-    if (files.length > 0 && !existsSync(formUploadDir)) {
-      await mkdir(formUploadDir, { recursive: true });
-    }
-
-    const movedFiles: FileInfo[] = [];
-    for (const file of files) {
-      const fileName = path.basename(file.filePath);
-      const newPath = path.join('uploads', 'forms', String(form.id), fileName);
-      const absoluteNewPath = path.join(process.cwd(), newPath);
-      await rename(path.join(process.cwd(), file.filePath), absoluteNewPath);
-      movedFiles.push({ ...file, filePath: newPath });
     }
 
     // Create submission with answers
@@ -107,9 +90,9 @@ export class FormSubmissionsService {
                 value: a.value ?? null,
                 values: a.values ?? undefined,
               })),
-            ...movedFiles.map((f) => ({
+            ...files.map((f) => ({
               fieldId: f.fieldId,
-              filePath: f.filePath,
+              filePath: f.storageKey,
               fileName: f.fileName,
             })),
           ],
@@ -149,15 +132,72 @@ export class FormSubmissionsService {
     return { success: true, submissionCuid: submission.cuid };
   }
 
-  async getSubmissions(formId: number) {
-    return this.prisma.dynamicFormSubmission.findMany({
-      where: { formId },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        user: { select: { id: true, name: true, email: true } },
-        _count: { select: { comments: true } },
+  async getSubmissions(formId: number, page = 1, limit = 25) {
+    const where = { formId };
+    const [items, total] = await Promise.all([
+      this.prisma.dynamicFormSubmission.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          form: { select: { id: true, title: true } },
+          user: { select: { id: true, name: true, email: true } },
+          _count: { select: { comments: true } },
+        },
+      }),
+      this.prisma.dynamicFormSubmission.count({ where }),
+    ]);
+    return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
+  }
+
+  async getAllSubmissions(page = 1, limit = 25) {
+    const [items, total] = await Promise.all([
+      this.prisma.dynamicFormSubmission.findMany({
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          form: { select: { id: true, title: true } },
+          user: { select: { id: true, name: true, email: true } },
+          _count: { select: { comments: true } },
+        },
+      }),
+      this.prisma.dynamicFormSubmission.count(),
+    ]);
+    return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
+  }
+
+  async getAccessibleSubmissions(userId: number, page = 1, limit = 25) {
+    const formIds = await this.getAccessibleFormIds(userId);
+    const where = { formId: { in: formIds } };
+    const [items, total] = await Promise.all([
+      this.prisma.dynamicFormSubmission.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          form: { select: { id: true, title: true } },
+          user: { select: { id: true, name: true, email: true } },
+          _count: { select: { comments: true } },
+        },
+      }),
+      this.prisma.dynamicFormSubmission.count({ where }),
+    ]);
+    return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
+  }
+
+  private async getAccessibleFormIds(userId: number): Promise<number[]> {
+    const accessEntries = await this.prisma.dynamicFormAccess.findMany({
+      where: {
+        role: {
+          userRoles: { some: { userId } },
+        },
       },
+      select: { formId: true },
     });
+    return [...new Set(accessEntries.map((a) => a.formId))];
   }
 
   async getSubmissionById(submissionId: number) {

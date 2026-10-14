@@ -28,7 +28,7 @@ interface Permission {
 const PERMISSION_CATEGORIES: Record<string, string[]> = {
   Events: ['events.manage', 'events.registrations.view'],
   Reservaties: ['reservations.manage', 'reservations.noshows.manage'],
-  Content: ['roster.manage', 'timetable.manage', 'navigation.manage', 'forms.manage', 'jobs.manage'],
+  Content: ['roster.manage', 'timetable.manage', 'navigation.manage', 'forms.manage', 'forms.submissions.view', 'jobs.manage'],
   Toernooien: ['brackets.manage', 'time-trials.manage', 'point-trials.manage'],
   Beheer: ['users.view', 'users.manage', 'users.notes.delete_others', 'users.roles.manage', 'roles.manage', 'settings.manage', 'statistics.view', 'inventory-adjustments.manage'],
 };
@@ -48,9 +48,28 @@ export default function AdminRolesPage() {
   const [formDescription, setFormDescription] = useState('');
   const [formPermissions, setFormPermissions] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
+  const [viewingUsers, setViewingUsers] = useState<{ roleName: string; users: { id: number; name: string | null; email: string }[] } | null>(null);
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   const { user: currentUser } = useAdmin();
   const isRealAdmin = (currentUser.roles ?? []).includes('Admin') && !currentUser.impersonation;
+
+  const handleViewUsers = async (role: Role) => {
+    setLoadingUsers(true);
+    try {
+      const res = await apiClient.GET('/rbac/roles/{id}', {
+        params: { path: { id: role.id } },
+      });
+      if (res.data) {
+        const data = res.data as { users?: { id: number; name: string | null; email: string }[] };
+        setViewingUsers({ roleName: role.name, users: data.users ?? [] });
+      }
+    } catch {
+      setError('Kon gebruikers niet laden');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
 
   const handleImpersonateRole = async (roleId: number) => {
     try {
@@ -330,9 +349,14 @@ export default function AdminRolesPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1 text-xs text-gray-500">
+                <button
+                  onClick={() => handleViewUsers(role)}
+                  disabled={loadingUsers}
+                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-400 transition-colors cursor-pointer"
+                  title="Bekijk gebruikers met deze rol"
+                >
                   <Users size={14} /> {role.userCount}
-                </span>
+                </button>
                 <div className="flex gap-1 opacity-50 group-hover:opacity-100 transition-opacity">
                   {isRealAdmin && (
                     <button
@@ -380,6 +404,48 @@ export default function AdminRolesPage() {
           </div>
         )}
       </div>
+
+      {/* Users modal */}
+      {viewingUsers && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" onClick={() => setViewingUsers(null)} />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+            <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md shadow-2xl pointer-events-auto">
+              <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+                <h3 className="text-sm font-bold text-white">
+                  Gebruikers met rol &ldquo;{viewingUsers.roleName}&rdquo;
+                </h3>
+                <button onClick={() => setViewingUsers(null)} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-slate-800 transition-colors">
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="px-5 py-4 max-h-80 overflow-y-auto">
+                {viewingUsers.users.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-4">Geen gebruikers met deze rol.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {viewingUsers.users.map((u) => (
+                      <a
+                        key={u.id}
+                        href={`/admin/users/${u.id}`}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800/60 transition-colors"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold shrink-0">
+                          {u.name ? u.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase() : u.email[0].toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-white truncate">{u.name || 'Onbekend'}</div>
+                          <div className="text-xs text-gray-500 truncate">{u.email}</div>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }

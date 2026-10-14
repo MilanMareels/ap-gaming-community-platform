@@ -41,6 +41,11 @@ export class CreateNavLinkDto {
   @IsBoolean()
   @IsOptional()
   openInNewTab?: boolean;
+
+  @ApiPropertyOptional({ example: true })
+  @IsBoolean()
+  @IsOptional()
+  enabled?: boolean;
 }
 
 export class UpdateNavLinkDto {
@@ -83,6 +88,11 @@ export class UpdateNavLinkDto {
   @IsBoolean()
   @IsOptional()
   openInNewTab?: boolean;
+
+  @ApiPropertyOptional({ example: true })
+  @IsBoolean()
+  @IsOptional()
+  enabled?: boolean;
 }
 
 export class ReorderItemDto {

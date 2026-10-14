@@ -10,7 +10,7 @@ import { MailModule } from '../mail/mail.module.js';
 
 @Module({
   imports: [AuthModule, RbacModule, MailModule],
-  controllers: [FormsController, FormSubmissionsController],
+  controllers: [FormSubmissionsController, FormsController],
   providers: [FormsService, FormSubmissionsService, DiscordWebhookService],
   exports: [FormsService],
 })

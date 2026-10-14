@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Plus, Trash2, GripVertical, ArrowLeft, ExternalLink, Save, X } from 'lucide-react';
+import { Plus, Trash2, GripVertical, ArrowLeft, ExternalLink, Save, X, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -64,9 +64,13 @@ function SortableField({
   const options = (config as { options?: string[] }).options || [];
   const allowedExtensions = (config as { allowedExtensions?: string[] }).allowedExtensions || [];
   const textContent = (config as { content?: string }).content || '';
+  const [extensionsRaw, setExtensionsRaw] = useState(allowedExtensions.join(','));
 
   const handleSave = () => {
-    onUpdate(field.id, { label, required, config: Object.keys(config).length > 0 ? config : undefined });
+    const finalConfig = field.type === 'FILE_UPLOAD' && extensionsRaw
+      ? { ...config, allowedExtensions: extensionsRaw.split(',').map((s) => s.trim()).filter(Boolean) }
+      : config;
+    onUpdate(field.id, { label, required, config: Object.keys(finalConfig).length > 0 ? finalConfig : undefined });
     setEditing(false);
   };
 
@@ -159,8 +163,9 @@ function SortableField({
                 type="text"
                 className="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white text-sm mt-1"
                 placeholder=".pdf,.jpg,.png,.docx"
-                value={allowedExtensions.join(',')}
-                onChange={(e) => setConfig({ ...config, allowedExtensions: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) })}
+                value={extensionsRaw}
+                onChange={(e) => setExtensionsRaw(e.target.value)}
+                onBlur={() => setConfig({ ...config, allowedExtensions: extensionsRaw.split(',').map((s) => s.trim()).filter(Boolean) })}
               />
             </div>
           )}
@@ -204,6 +209,12 @@ export default function AdminFormBuilderPage() {
   const [newFieldLabel, setNewFieldLabel] = useState('');
   const [newFieldRequired, setNewFieldRequired] = useState(false);
   const [newFieldConfig, setNewFieldConfig] = useState<Record<string, unknown>>({});
+  const [newExtensionsRaw, setNewExtensionsRaw] = useState('');
+
+  // Access management state
+  const [allRoles, setAllRoles] = useState<Array<{ id: number; name: string }>>([]);
+  const [accessRoleIds, setAccessRoleIds] = useState<number[]>([]);
+  const [savingAccess, setSavingAccess] = useState(false);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -220,7 +231,16 @@ export default function AdminFormBuilderPage() {
     }
   }, [formId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  const refreshAccess = useCallback(async () => {
+    const [rolesRes, accessRes] = await Promise.all([
+      apiClient.GET('/rbac/roles'),
+      apiClient.GET('/forms/{id}/access', { params: { path: { id: String(formId) } } }),
+    ]);
+    if (rolesRes.data) setAllRoles((rolesRes.data as Array<{ id: number; name: string }>));
+    if (accessRes.data) setAccessRoleIds((accessRes.data as Array<{ roleId: number }>).map((a) => a.roleId));
+  }, [formId]);
+
+  useEffect(() => { refresh(); refreshAccess(); }, [refresh, refreshAccess]);
 
   const handleSaveMetadata = async () => {
     setSaving(true);
@@ -238,18 +258,37 @@ export default function AdminFormBuilderPage() {
     refresh();
   };
 
+  const handleSaveAccess = async () => {
+    setSavingAccess(true);
+    await apiClient.PUT('/forms/{id}/access', {
+      params: { path: { id: String(formId) } },
+      body: { roleIds: accessRoleIds },
+    });
+    setSavingAccess(false);
+  };
+
+  const toggleAccessRole = (roleId: number) => {
+    setAccessRoleIds((prev) =>
+      prev.includes(roleId) ? prev.filter((id) => id !== roleId) : [...prev, roleId],
+    );
+  };
+
   const resetNewField = () => {
     setAddingField(false);
     setNewFieldType('SHORT_TEXT');
     setNewFieldLabel('');
     setNewFieldRequired(false);
     setNewFieldConfig({});
+    setNewExtensionsRaw('');
   };
 
   const handleAddField = async () => {
     const label = newFieldLabel.trim() || FIELD_TYPE_LABELS[newFieldType];
     const position = form ? form.fields.length : 0;
-    const config = Object.keys(newFieldConfig).length > 0 ? newFieldConfig : undefined;
+    const finalConfig = newFieldType === 'FILE_UPLOAD' && newExtensionsRaw
+      ? { ...newFieldConfig, allowedExtensions: newExtensionsRaw.split(',').map((s) => s.trim()).filter(Boolean) }
+      : newFieldConfig;
+    const config = Object.keys(finalConfig).length > 0 ? finalConfig : undefined;
     await apiClient.POST('/forms/{id}/fields', {
       params: { path: { id: String(formId) } },
       body: {
@@ -362,6 +401,36 @@ export default function AdminFormBuilderPage() {
         </Button>
       </div>
 
+      {/* Access management */}
+      <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 mb-6 space-y-4">
+        <h3 className="text-sm font-bold text-gray-400 uppercase flex items-center gap-2">
+          <Shield size={14} /> Toegang tot inzendingen
+        </h3>
+        <p className="text-sm text-gray-500">
+          Selecteer welke rollen de inzendingen van dit formulier mogen bekijken. Gebruikers met de permissie &quot;forms.manage&quot; hebben altijd toegang.
+        </p>
+        {allRoles.length === 0 ? (
+          <p className="text-gray-500 text-sm">Geen rollen gevonden.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+            {allRoles.map((role) => (
+              <label key={role.id} className="flex items-center gap-2 text-sm bg-slate-800 rounded px-3 py-2 cursor-pointer hover:bg-slate-750">
+                <input
+                  type="checkbox"
+                  checked={accessRoleIds.includes(role.id)}
+                  onChange={() => toggleAccessRole(role.id)}
+                  className="rounded"
+                />
+                {role.name}
+              </label>
+            ))}
+          </div>
+        )}
+        <Button size="sm" onClick={handleSaveAccess} disabled={savingAccess}>
+          <Save size={14} /> {savingAccess ? 'Opslaan...' : 'Toegang opslaan'}
+        </Button>
+      </div>
+
       {/* Fields */}
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-bold text-gray-400 uppercase">Velden ({form.fields.length})</h3>
@@ -449,8 +518,9 @@ export default function AdminFormBuilderPage() {
                 type="text"
                 className="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white text-sm mt-1"
                 placeholder=".pdf,.jpg,.png,.docx"
-                value={((newFieldConfig as { allowedExtensions?: string[] }).allowedExtensions || []).join(',')}
-                onChange={(e) => setNewFieldConfig({ ...newFieldConfig, allowedExtensions: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) })}
+                value={newExtensionsRaw}
+                onChange={(e) => setNewExtensionsRaw(e.target.value)}
+                onBlur={() => setNewFieldConfig({ ...newFieldConfig, allowedExtensions: newExtensionsRaw.split(',').map((s) => s.trim()).filter(Boolean) })}
               />
             </div>
           )}
