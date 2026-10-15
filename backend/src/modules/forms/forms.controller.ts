@@ -49,7 +49,9 @@ export class FormsController {
   @ApiOperation({ summary: 'List forms the user has access to' })
   async findAccessible(@Req() req: Request) {
     const user = (req as Request & { user?: JwtPayload }).user!;
-    const permissions = await this.rbacService.getPermissionsForUser(user.sub);
+    const permissions = user.impersonatingRoleId
+      ? new Set(user.permissions ?? [])
+      : await this.rbacService.getPermissionsForUser(user.sub);
     if (permissions.has('forms.manage')) {
       return this.formsService.findAll();
     }
