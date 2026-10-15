@@ -60,7 +60,7 @@ export class FormSubmissionsController {
     const user = (req as Request & { user?: JwtPayload }).user!;
     const p = Math.max(1, Number(page) || 1);
     const l = Math.min(100, Math.max(1, Number(limit) || 25));
-    const permissions = await this.rbacService.getPermissionsForUser(user.sub);
+    const permissions = await this.getEffectivePermissions(user);
     if (permissions.has('forms.manage')) {
       return this.submissionsService.getAllSubmissions(p, l);
     }
@@ -78,7 +78,7 @@ export class FormSubmissionsController {
     @Query('limit') limit?: string,
   ) {
     const user = (req as Request & { user?: JwtPayload }).user!;
-    await this.assertFormAccess(user.sub, +id);
+    await this.assertFormAccess(user, +id);
     const p = Math.max(1, Number(page) || 1);
     const l = Math.min(100, Math.max(1, Number(limit) || 25));
     return this.submissionsService.getSubmissions(+id, p, l);
@@ -91,7 +91,7 @@ export class FormSubmissionsController {
   async getSubmissionById(@Param('submissionId') submissionId: string, @Req() req: Request) {
     const user = (req as Request & { user?: JwtPayload }).user!;
     const submission = await this.submissionsService.getSubmissionById(+submissionId);
-    await this.assertFormAccess(user.sub, submission.form.id);
+    await this.assertFormAccess(user, submission.form.id);
     return submission;
   }
 
@@ -114,7 +114,7 @@ export class FormSubmissionsController {
   ) {
     const user = (req as Request & { user?: JwtPayload }).user!;
     const submission = await this.submissionsService.getSubmissionById(+submissionId);
-    await this.assertFormAccess(user.sub, submission.form.id);
+    await this.assertFormAccess(user, submission.form.id);
     return this.submissionsService.addAdminComment(+submissionId, user.sub, dto);
   }
 
@@ -125,18 +125,28 @@ export class FormSubmissionsController {
   async getAdminComments(@Param('submissionId') submissionId: string, @Req() req: Request) {
     const user = (req as Request & { user?: JwtPayload }).user!;
     const submission = await this.submissionsService.getSubmissionById(+submissionId);
-    await this.assertFormAccess(user.sub, submission.form.id);
+    await this.assertFormAccess(user, submission.form.id);
     return submission.comments;
+  }
+
+  /**
+   * Resolve effective permissions, respecting role impersonation.
+   */
+  private async getEffectivePermissions(user: JwtPayload): Promise<Set<string>> {
+    if (user.impersonatingRoleId) {
+      return new Set(user.permissions ?? []);
+    }
+    return this.rbacService.getPermissionsForUser(user.sub);
   }
 
   /**
    * If the user only has forms.submissions.view (not forms.manage),
    * verify they have access to this specific form via DynamicFormAccess.
    */
-  private async assertFormAccess(userId: number, formId: number) {
-    const permissions = await this.rbacService.getPermissionsForUser(userId);
+  private async assertFormAccess(user: JwtPayload, formId: number) {
+    const permissions = await this.getEffectivePermissions(user);
     if (permissions.has('forms.manage')) return;
-    const hasAccess = await this.formsService.canUserAccessForm(userId, formId);
+    const hasAccess = await this.formsService.canUserAccessForm(user.sub, formId);
     if (!hasAccess) throw new ForbiddenException('Je hebt geen toegang tot dit formulier.');
   }
 
