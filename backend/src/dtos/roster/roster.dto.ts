@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsInt, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateRosterGameDto {
   @ApiProperty({ example: 'League of Legends' })
@@ -64,4 +65,22 @@ export class UpdateRosterEntryDto {
   @IsString()
   @IsOptional()
   imageKey?: string;
+}
+
+export class ReorderRosterEntryItemDto {
+  @ApiProperty({ example: 1 })
+  @IsInt()
+  id!: number;
+
+  @ApiProperty({ example: 0 })
+  @IsInt()
+  order!: number;
+}
+
+export class ReorderRosterEntriesDto {
+  @ApiProperty({ type: [ReorderRosterEntryItemDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ReorderRosterEntryItemDto)
+  items!: ReorderRosterEntryItemDto[];
 }

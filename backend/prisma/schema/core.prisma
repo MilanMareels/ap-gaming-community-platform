@@ -52,4 +52,5 @@ model RosterEntry {
   role   String?
 
   imageUrl String?
+  order    Int     @default(0)
 }

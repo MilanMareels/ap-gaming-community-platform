@@ -22,4 +22,7 @@ export class RosterEntry {
 
   @ApiPropertyOptional({ type: String })
   imageUrl: string | null;
+
+  @ApiProperty({ type: Number })
+  order: number = 0;
 }
