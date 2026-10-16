@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { CreateRosterEntryDto, UpdateRosterEntryDto } from '../../dtos/roster/roster.dto.js';
+import { CreateRosterEntryDto, ReorderRosterEntriesDto, UpdateRosterEntryDto } from '../../dtos/roster/roster.dto.js';
 
 @Injectable()
 export class RosterService {
@@ -14,6 +14,7 @@ export class RosterService {
           include: {
             user: true,
           },
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -35,9 +36,7 @@ export class RosterService {
         user: true,
         game: true,
       },
-      orderBy: {
-        id: 'desc',
-      },
+      orderBy: { order: 'asc' },
     });
   }
 
@@ -61,6 +60,11 @@ export class RosterService {
       });
     }
 
+    const maxOrder = await this.prisma.rosterEntry.aggregate({
+      where: { gameId: Number(dto.gameId) },
+      _max: { order: true },
+    });
+
     return this.prisma.rosterEntry.create({
       data: {
         userId: user.id,
@@ -69,6 +73,7 @@ export class RosterService {
         rank: dto.rank,
         role: dto.role,
         imageUrl: imagePath,
+        order: (maxOrder._max.order ?? -1) + 1,
       },
       include: {
         user: true,
@@ -92,6 +97,17 @@ export class RosterService {
         game: true,
       },
     });
+  }
+
+  async reorderEntries(dto: ReorderRosterEntriesDto) {
+    await this.prisma.$transaction(
+      dto.items.map((item) =>
+        this.prisma.rosterEntry.update({
+          where: { id: item.id },
+          data: { order: item.order },
+        }),
+      ),
+    );
   }
 
   async deleteEntry(id: number) {

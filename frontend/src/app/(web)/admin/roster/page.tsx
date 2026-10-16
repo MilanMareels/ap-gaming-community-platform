@@ -1,7 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Gamepad2, Users, X, Search, Pencil } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Plus, Trash2, Gamepad2, Users, X, Search, Pencil, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/admin/PageHeader';
 import { EmptyState } from '@/components/admin/EmptyState';
@@ -201,6 +217,40 @@ export default function AdminRosterPage() {
   };
 
   const isEditing = editingEntry !== null;
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const gameEntries = entries.filter((e) => e.game.id === selectedGameId);
+    const oldIndex = gameEntries.findIndex((e) => e.id === active.id);
+    const newIndex = gameEntries.findIndex((e) => e.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = [...gameEntries];
+    const [moved] = reordered.splice(oldIndex, 1);
+    reordered.splice(newIndex, 0, moved);
+
+    // Optimistically update local state
+    const otherEntries = entries.filter((e) => e.game.id !== selectedGameId);
+    setEntries([...otherEntries, ...reordered]);
+
+    const reorderPayload = reordered.map((entry, idx) => ({ id: entry.id, order: idx }));
+
+    try {
+      await apiClient.PATCH('/roster/entries/reorder' as any, {
+        body: { items: reorderPayload },
+      });
+    } catch {
+      await fetchData();
+    }
+  };
+
   const selectedGame = games.find((g) => g.id === selectedGameId);
   const filteredEntries = entries
     .filter((e) => e.game.id === selectedGameId)
@@ -302,89 +352,49 @@ export default function AdminRosterPage() {
 
           {/* Table */}
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="bg-slate-950 text-gray-500">
-                  <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider">Speler</th>
-                  <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider">Gamer Tag</th>
-                  <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider">Rol</th>
-                  <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider">Rank</th>
-                  <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-right">Acties</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60">
-                {filteredEntries.map((entry) => (
-                  <tr key={entry.id} className="hover:bg-slate-800/30 transition-colors group">
-                    <td className="px-4 py-3.5">
-                      <div className="flex items-center gap-3">
-                        {entry.imageUrl ? (
-                          <img
-                            src={`/api/files/${entry.imageUrl}`}
-                            alt={entry.handle}
-                            className="w-9 h-9 rounded-full object-cover border border-slate-700 shrink-0"
-                          />
-                        ) : (
-                          <div className="w-9 h-9 rounded-full bg-linear-to-br from-red-500/20 to-red-600/10 border border-red-500/20 flex items-center justify-center text-xs text-red-400 font-bold shrink-0">
-                            {entry.handle.slice(0, 2).toUpperCase()}
-                          </div>
-                        )}
-                        <div>
-                          <div className="font-medium text-white">{entry.user.name || entry.user.sNumber}</div>
-                          <div className="text-xs text-gray-500 mt-0.5">{entry.user.sNumber}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <span className="font-semibold text-white">{entry.handle}</span>
-                    </td>
-                    <td className="px-4 py-3.5 text-gray-400">
-                      {entry.role || <span className="text-gray-600">—</span>}
-                    </td>
-                    <td className="px-4 py-3.5">
-                      {entry.rank ? (
-                        <span className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-1 rounded-lg font-semibold">{entry.rank}</span>
-                      ) : (
-                        <span className="text-gray-600">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3.5 text-right">
-                      <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => openEditModal(entry)}
-                          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors"
-                          title="Bewerken"
-                        >
-                          <Pencil size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteEntry(entry.id)}
-                          className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-900/20 transition-colors"
-                          title="Verwijderen"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="bg-slate-950 text-gray-500">
+                    <th className="w-10"></th>
+                    <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider">Speler</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider">Gamer Tag</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider">Rol</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider">Rank</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-right">Acties</th>
                   </tr>
-                ))}
-                {filteredEntries.length === 0 && (
-                  <tr>
-                    <td colSpan={5}>
-                      <EmptyState
-                        icon={Users}
-                        title="Geen spelers gevonden"
-                        description={searchQuery ? 'Pas je zoekopdracht aan.' : 'Voeg een speler toe aan dit team.'}
-                        action={!searchQuery ? (
-                          <Button size="sm" variant="primary" onClick={openCreateModal}>
-                            <Plus size={16} /> Speler Toevoegen
-                          </Button>
-                        ) : undefined}
+                </thead>
+                <SortableContext items={filteredEntries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {filteredEntries.map((entry) => (
+                      <SortableRow
+                        key={entry.id}
+                        entry={entry}
+                        onEdit={openEditModal}
+                        onDelete={handleDeleteEntry}
+                        isDragDisabled={!!searchQuery}
                       />
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                    ))}
+                    {filteredEntries.length === 0 && (
+                      <tr>
+                        <td colSpan={6}>
+                          <EmptyState
+                            icon={Users}
+                            title="Geen spelers gevonden"
+                            description={searchQuery ? 'Pas je zoekopdracht aan.' : 'Voeg een speler toe aan dit team.'}
+                            action={!searchQuery ? (
+                              <Button size="sm" variant="primary" onClick={openCreateModal}>
+                                <Plus size={16} /> Speler Toevoegen
+                              </Button>
+                            ) : undefined}
+                          />
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </SortableContext>
+              </table>
+            </DndContext>
           </div>
         </div>
       ) : null}
@@ -558,5 +568,88 @@ export default function AdminRosterPage() {
         </div>
       )}
     </>
+  );
+}
+
+function SortableRow({ entry, onEdit, onDelete, isDragDisabled }: {
+  entry: RosterEntryWithRelations;
+  onEdit: (entry: RosterEntryWithRelations) => void;
+  onDelete: (id: number) => void;
+  isDragDisabled: boolean;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: entry.id,
+    disabled: isDragDisabled,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style} className="hover:bg-slate-800/30 transition-colors group">
+      <td className="pl-2 w-10">
+        <button
+          {...attributes}
+          {...listeners}
+          className={`p-1.5 rounded text-gray-600 ${isDragDisabled ? 'cursor-not-allowed opacity-30' : 'hover:text-gray-400 cursor-grab active:cursor-grabbing'}`}
+          tabIndex={-1}
+        >
+          <GripVertical size={16} />
+        </button>
+      </td>
+      <td className="px-4 py-3.5">
+        <div className="flex items-center gap-3">
+          {entry.imageUrl ? (
+            <img
+              src={`/api/files/${entry.imageUrl}`}
+              alt={entry.handle}
+              className="w-9 h-9 rounded-full object-cover border border-slate-700 shrink-0"
+            />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-linear-to-br from-red-500/20 to-red-600/10 border border-red-500/20 flex items-center justify-center text-xs text-red-400 font-bold shrink-0">
+              {entry.handle.slice(0, 2).toUpperCase()}
+            </div>
+          )}
+          <div>
+            <div className="font-medium text-white">{entry.user.name || entry.user.sNumber}</div>
+            <div className="text-xs text-gray-500 mt-0.5">{entry.user.sNumber}</div>
+          </div>
+        </div>
+      </td>
+      <td className="px-4 py-3.5">
+        <span className="font-semibold text-white">{entry.handle}</span>
+      </td>
+      <td className="px-4 py-3.5 text-gray-400">
+        {entry.role || <span className="text-gray-600">—</span>}
+      </td>
+      <td className="px-4 py-3.5">
+        {entry.rank ? (
+          <span className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-1 rounded-lg font-semibold">{entry.rank}</span>
+        ) : (
+          <span className="text-gray-600">—</span>
+        )}
+      </td>
+      <td className="px-4 py-3.5 text-right">
+        <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={() => onEdit(entry)}
+            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors"
+            title="Bewerken"
+          >
+            <Pencil size={16} />
+          </button>
+          <button
+            onClick={() => onDelete(entry.id)}
+            className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-900/20 transition-colors"
+            title="Verwijderen"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </td>
+    </tr>
   );
 }
