@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Patch, Body, Delete, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { RosterService } from './roster.service.js';
-import { CreateRosterEntryDto, CreateRosterGameDto, UpdateRosterEntryDto } from '../../dtos/roster/roster.dto.js';
+import { CreateRosterEntryDto, CreateRosterGameDto, ReorderRosterEntriesDto, UpdateRosterEntryDto } from '../../dtos/roster/roster.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
@@ -53,6 +53,14 @@ export class RosterController {
   @ApiCreatedResponse({ type: PrismaModel.RosterEntry })
   createEntry(@Body() dto: CreateRosterEntryDto) {
     return this.rosterService.createEntry(dto, dto.imageKey ?? null);
+  }
+
+  @Patch('entries/reorder')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('roster.manage')
+  @ApiOperation({ summary: 'Reorder roster entries (Admin only)' })
+  reorderEntries(@Body() dto: ReorderRosterEntriesDto) {
+    return this.rosterService.reorderEntries(dto);
   }
 
   @Patch('entries/:id')

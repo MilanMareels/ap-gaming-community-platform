@@ -243,7 +243,7 @@ export default function AdminReservationsPage() {
                   </Link>
                   {renderStatusSelect(r)}
                 </div>
-                <div className="grid grid-cols-3 gap-2 text-xs mb-3">
+                <div className="grid grid-cols-4 gap-2 text-xs mb-3">
                   <div className="rounded-lg bg-slate-950/60 border border-slate-800/60 p-2.5">
                     <p className="text-gray-500 text-[10px] uppercase font-semibold">Datum</p>
                     <p className="font-medium text-white mt-0.5">{dateFromISO(r.startTime)}</p>
@@ -255,6 +255,10 @@ export default function AdminReservationsPage() {
                   <div className="rounded-lg bg-slate-950/60 border border-slate-800/60 p-2.5">
                     <p className="text-gray-500 text-[10px] uppercase font-semibold">Hardware</p>
                     <p className="font-medium text-red-400 mt-0.5">{r.inventory.toUpperCase()}</p>
+                  </div>
+                  <div className="rounded-lg bg-slate-950/60 border border-slate-800/60 p-2.5">
+                    <p className="text-gray-500 text-[10px] uppercase font-semibold">Controllers</p>
+                    <p className="font-medium text-white mt-0.5 flex items-center gap-1"><Gamepad2 size={12} /> {r.controllers}</p>
                   </div>
                 </div>
               </div>

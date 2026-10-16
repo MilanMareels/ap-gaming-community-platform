@@ -30,12 +30,14 @@ export type RosterEntryAvgAggregateOutputType = {
   id: number | null
   userId: number | null
   gameId: number | null
+  order: number | null
 }
 
 export type RosterEntrySumAggregateOutputType = {
   id: number | null
   userId: number | null
   gameId: number | null
+  order: number | null
 }
 
 export type RosterEntryMinAggregateOutputType = {
@@ -46,6 +48,7 @@ export type RosterEntryMinAggregateOutputType = {
   rank: string | null
   role: string | null
   imageUrl: string | null
+  order: number | null
 }
 
 export type RosterEntryMaxAggregateOutputType = {
@@ -56,6 +59,7 @@ export type RosterEntryMaxAggregateOutputType = {
   rank: string | null
   role: string | null
   imageUrl: string | null
+  order: number | null
 }
 
 export type RosterEntryCountAggregateOutputType = {
@@ -66,6 +70,7 @@ export type RosterEntryCountAggregateOutputType = {
   rank: number
   role: number
   imageUrl: number
+  order: number
   _all: number
 }
 
@@ -74,12 +79,14 @@ export type RosterEntryAvgAggregateInputType = {
   id?: true
   userId?: true
   gameId?: true
+  order?: true
 }
 
 export type RosterEntrySumAggregateInputType = {
   id?: true
   userId?: true
   gameId?: true
+  order?: true
 }
 
 export type RosterEntryMinAggregateInputType = {
@@ -90,6 +97,7 @@ export type RosterEntryMinAggregateInputType = {
   rank?: true
   role?: true
   imageUrl?: true
+  order?: true
 }
 
 export type RosterEntryMaxAggregateInputType = {
@@ -100,6 +108,7 @@ export type RosterEntryMaxAggregateInputType = {
   rank?: true
   role?: true
   imageUrl?: true
+  order?: true
 }
 
 export type RosterEntryCountAggregateInputType = {
@@ -110,6 +119,7 @@ export type RosterEntryCountAggregateInputType = {
   rank?: true
   role?: true
   imageUrl?: true
+  order?: true
   _all?: true
 }
 
@@ -207,6 +217,7 @@ export type RosterEntryGroupByOutputType = {
   rank: string
   role: string | null
   imageUrl: string | null
+  order: number
   _count: RosterEntryCountAggregateOutputType | null
   _avg: RosterEntryAvgAggregateOutputType | null
   _sum: RosterEntrySumAggregateOutputType | null
@@ -240,6 +251,7 @@ export type RosterEntryWhereInput = {
   rank?: Prisma.StringFilter<"RosterEntry"> | string
   role?: Prisma.StringNullableFilter<"RosterEntry"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"RosterEntry"> | string | null
+  order?: Prisma.IntFilter<"RosterEntry"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   game?: Prisma.XOR<Prisma.RosterGameScalarRelationFilter, Prisma.RosterGameWhereInput>
 }
@@ -252,6 +264,7 @@ export type RosterEntryOrderByWithRelationInput = {
   rank?: Prisma.SortOrder
   role?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  order?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   game?: Prisma.RosterGameOrderByWithRelationInput
 }
@@ -267,6 +280,7 @@ export type RosterEntryWhereUniqueInput = Prisma.AtLeast<{
   rank?: Prisma.StringFilter<"RosterEntry"> | string
   role?: Prisma.StringNullableFilter<"RosterEntry"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"RosterEntry"> | string | null
+  order?: Prisma.IntFilter<"RosterEntry"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   game?: Prisma.XOR<Prisma.RosterGameScalarRelationFilter, Prisma.RosterGameWhereInput>
 }, "id">
@@ -279,6 +293,7 @@ export type RosterEntryOrderByWithAggregationInput = {
   rank?: Prisma.SortOrder
   role?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  order?: Prisma.SortOrder
   _count?: Prisma.RosterEntryCountOrderByAggregateInput
   _avg?: Prisma.RosterEntryAvgOrderByAggregateInput
   _max?: Prisma.RosterEntryMaxOrderByAggregateInput
@@ -297,6 +312,7 @@ export type RosterEntryScalarWhereWithAggregatesInput = {
   rank?: Prisma.StringWithAggregatesFilter<"RosterEntry"> | string
   role?: Prisma.StringNullableWithAggregatesFilter<"RosterEntry"> | string | null
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"RosterEntry"> | string | null
+  order?: Prisma.IntWithAggregatesFilter<"RosterEntry"> | number
 }
 
 export type RosterEntryCreateInput = {
@@ -304,6 +320,7 @@ export type RosterEntryCreateInput = {
   rank: string
   role?: string | null
   imageUrl?: string | null
+  order?: number
   user: Prisma.UserCreateNestedOneWithoutRosterEntriesInput
   game: Prisma.RosterGameCreateNestedOneWithoutRosterEntriesInput
 }
@@ -316,6 +333,7 @@ export type RosterEntryUncheckedCreateInput = {
   rank: string
   role?: string | null
   imageUrl?: string | null
+  order?: number
 }
 
 export type RosterEntryUpdateInput = {
@@ -323,6 +341,7 @@ export type RosterEntryUpdateInput = {
   rank?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
   user?: Prisma.UserUpdateOneRequiredWithoutRosterEntriesNestedInput
   game?: Prisma.RosterGameUpdateOneRequiredWithoutRosterEntriesNestedInput
 }
@@ -335,6 +354,7 @@ export type RosterEntryUncheckedUpdateInput = {
   rank?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type RosterEntryCreateManyInput = {
@@ -345,6 +365,7 @@ export type RosterEntryCreateManyInput = {
   rank: string
   role?: string | null
   imageUrl?: string | null
+  order?: number
 }
 
 export type RosterEntryUpdateManyMutationInput = {
@@ -352,6 +373,7 @@ export type RosterEntryUpdateManyMutationInput = {
   rank?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type RosterEntryUncheckedUpdateManyInput = {
@@ -362,6 +384,7 @@ export type RosterEntryUncheckedUpdateManyInput = {
   rank?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type RosterEntryListRelationFilter = {
@@ -382,12 +405,14 @@ export type RosterEntryCountOrderByAggregateInput = {
   rank?: Prisma.SortOrder
   role?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  order?: Prisma.SortOrder
 }
 
 export type RosterEntryAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   gameId?: Prisma.SortOrder
+  order?: Prisma.SortOrder
 }
 
 export type RosterEntryMaxOrderByAggregateInput = {
@@ -398,6 +423,7 @@ export type RosterEntryMaxOrderByAggregateInput = {
   rank?: Prisma.SortOrder
   role?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  order?: Prisma.SortOrder
 }
 
 export type RosterEntryMinOrderByAggregateInput = {
@@ -408,12 +434,14 @@ export type RosterEntryMinOrderByAggregateInput = {
   rank?: Prisma.SortOrder
   role?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  order?: Prisma.SortOrder
 }
 
 export type RosterEntrySumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   gameId?: Prisma.SortOrder
+  order?: Prisma.SortOrder
 }
 
 export type RosterEntryCreateNestedManyWithoutUserInput = {
@@ -505,6 +533,7 @@ export type RosterEntryCreateWithoutUserInput = {
   rank: string
   role?: string | null
   imageUrl?: string | null
+  order?: number
   game: Prisma.RosterGameCreateNestedOneWithoutRosterEntriesInput
 }
 
@@ -515,6 +544,7 @@ export type RosterEntryUncheckedCreateWithoutUserInput = {
   rank: string
   role?: string | null
   imageUrl?: string | null
+  order?: number
 }
 
 export type RosterEntryCreateOrConnectWithoutUserInput = {
@@ -554,6 +584,7 @@ export type RosterEntryScalarWhereInput = {
   rank?: Prisma.StringFilter<"RosterEntry"> | string
   role?: Prisma.StringNullableFilter<"RosterEntry"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"RosterEntry"> | string | null
+  order?: Prisma.IntFilter<"RosterEntry"> | number
 }
 
 export type RosterEntryCreateWithoutGameInput = {
@@ -561,6 +592,7 @@ export type RosterEntryCreateWithoutGameInput = {
   rank: string
   role?: string | null
   imageUrl?: string | null
+  order?: number
   user: Prisma.UserCreateNestedOneWithoutRosterEntriesInput
 }
 
@@ -571,6 +603,7 @@ export type RosterEntryUncheckedCreateWithoutGameInput = {
   rank: string
   role?: string | null
   imageUrl?: string | null
+  order?: number
 }
 
 export type RosterEntryCreateOrConnectWithoutGameInput = {
@@ -606,6 +639,7 @@ export type RosterEntryCreateManyUserInput = {
   rank: string
   role?: string | null
   imageUrl?: string | null
+  order?: number
 }
 
 export type RosterEntryUpdateWithoutUserInput = {
@@ -613,6 +647,7 @@ export type RosterEntryUpdateWithoutUserInput = {
   rank?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
   game?: Prisma.RosterGameUpdateOneRequiredWithoutRosterEntriesNestedInput
 }
 
@@ -623,6 +658,7 @@ export type RosterEntryUncheckedUpdateWithoutUserInput = {
   rank?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type RosterEntryUncheckedUpdateManyWithoutUserInput = {
@@ -632,6 +668,7 @@ export type RosterEntryUncheckedUpdateManyWithoutUserInput = {
   rank?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type RosterEntryCreateManyGameInput = {
@@ -641,6 +678,7 @@ export type RosterEntryCreateManyGameInput = {
   rank: string
   role?: string | null
   imageUrl?: string | null
+  order?: number
 }
 
 export type RosterEntryUpdateWithoutGameInput = {
@@ -648,6 +686,7 @@ export type RosterEntryUpdateWithoutGameInput = {
   rank?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
   user?: Prisma.UserUpdateOneRequiredWithoutRosterEntriesNestedInput
 }
 
@@ -658,6 +697,7 @@ export type RosterEntryUncheckedUpdateWithoutGameInput = {
   rank?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type RosterEntryUncheckedUpdateManyWithoutGameInput = {
@@ -667,6 +707,7 @@ export type RosterEntryUncheckedUpdateManyWithoutGameInput = {
   rank?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -679,6 +720,7 @@ export type RosterEntrySelect<ExtArgs extends runtime.Types.Extensions.InternalA
   rank?: boolean
   role?: boolean
   imageUrl?: boolean
+  order?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   game?: boolean | Prisma.RosterGameDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["rosterEntry"]>
@@ -691,6 +733,7 @@ export type RosterEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   rank?: boolean
   role?: boolean
   imageUrl?: boolean
+  order?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   game?: boolean | Prisma.RosterGameDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["rosterEntry"]>
@@ -703,6 +746,7 @@ export type RosterEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   rank?: boolean
   role?: boolean
   imageUrl?: boolean
+  order?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   game?: boolean | Prisma.RosterGameDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["rosterEntry"]>
@@ -715,9 +759,10 @@ export type RosterEntrySelectScalar = {
   rank?: boolean
   role?: boolean
   imageUrl?: boolean
+  order?: boolean
 }
 
-export type RosterEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "gameId" | "handle" | "rank" | "role" | "imageUrl", ExtArgs["result"]["rosterEntry"]>
+export type RosterEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "gameId" | "handle" | "rank" | "role" | "imageUrl" | "order", ExtArgs["result"]["rosterEntry"]>
 export type RosterEntryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   game?: boolean | Prisma.RosterGameDefaultArgs<ExtArgs>
@@ -745,6 +790,7 @@ export type $RosterEntryPayload<ExtArgs extends runtime.Types.Extensions.Interna
     rank: string
     role: string | null
     imageUrl: string | null
+    order: number
   }, ExtArgs["result"]["rosterEntry"]>
   composites: {}
 }
@@ -1177,6 +1223,7 @@ export interface RosterEntryFieldRefs {
   readonly rank: Prisma.FieldRef<"RosterEntry", 'String'>
   readonly role: Prisma.FieldRef<"RosterEntry", 'String'>
   readonly imageUrl: Prisma.FieldRef<"RosterEntry", 'String'>
+  readonly order: Prisma.FieldRef<"RosterEntry", 'Int'>
 }
     
 
