@@ -17,8 +17,11 @@ describe('RosterService', () => {
       rosterEntry: {
         findMany: jest.fn(),
         create: jest.fn(),
+        update: jest.fn(),
         delete: jest.fn(),
+        aggregate: jest.fn(),
       },
+      $transaction: jest.fn((args: unknown[]) => Promise.all(args)),
       user: {
         findFirst: jest.fn(),
         create: jest.fn(),
@@ -51,6 +54,7 @@ describe('RosterService', () => {
             include: {
               user: true,
             },
+            orderBy: { order: 'asc' },
           },
         },
       });
@@ -80,8 +84,8 @@ describe('RosterService', () => {
   });
 
   describe('Roster Entries', () => {
-    it('should return all entries ordered by id desc', async () => {
-      const mockEntries = [{ id: 2 }, { id: 1 }];
+    it('should return all entries ordered by order asc', async () => {
+      const mockEntries = [{ id: 1 }, { id: 2 }];
       prisma.rosterEntry.findMany.mockResolvedValue(mockEntries);
 
       const result = await service.findAllEntries();
@@ -92,9 +96,7 @@ describe('RosterService', () => {
           user: true,
           game: true,
         },
-        orderBy: {
-          id: 'desc',
-        },
+        orderBy: { order: 'asc' },
       });
     });
 
@@ -123,6 +125,7 @@ describe('RosterService', () => {
 
       prisma.user.findFirst.mockResolvedValue(null);
       prisma.user.create.mockResolvedValue(mockUser);
+      prisma.rosterEntry.aggregate.mockResolvedValue({ _max: { order: null } });
       prisma.rosterEntry.create.mockResolvedValue(mockEntry);
 
       const result = await service.createEntry(dto as any, null);
@@ -143,6 +146,7 @@ describe('RosterService', () => {
           rank: dto.rank,
           role: dto.role,
           imageUrl: null,
+          order: 0,
         },
         include: {
           user: true,
@@ -168,6 +172,7 @@ describe('RosterService', () => {
 
       prisma.user.findFirst.mockResolvedValue(existingUser);
       prisma.user.update.mockResolvedValue(updatedUser);
+      prisma.rosterEntry.aggregate.mockResolvedValue({ _max: { order: 2 } });
       prisma.rosterEntry.create.mockResolvedValue(mockEntry);
 
       const result = await service.createEntry(dto as any, null);
@@ -198,6 +203,7 @@ describe('RosterService', () => {
       const mockEntry = { id: 3, userId: 10, gameId: 2 };
 
       prisma.user.findFirst.mockResolvedValue(existingUser);
+      prisma.rosterEntry.aggregate.mockResolvedValue({ _max: { order: 1 } });
       prisma.rosterEntry.create.mockResolvedValue(mockEntry);
 
       const result = await service.createEntry(dto as any, null);
@@ -212,6 +218,7 @@ describe('RosterService', () => {
           rank: dto.rank,
           role: dto.role,
           imageUrl: null,
+          order: 2,
         },
         include: {
           user: true,
