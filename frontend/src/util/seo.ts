@@ -9,6 +9,8 @@ export const SITE_DESCRIPTION =
 export const SITE_LOCALE = 'nl_BE';
 export const TITLE_TEMPLATE = `%s | ${SITE_NAME}`;
 export const THEME_COLOR = '#020618';
+/** Link-preview images: 1200×630 layout rendered at 2× so they stay sharp on high-DPI screens. */
+export const OG_IMAGE_SIZE = { width: 2400, height: 1260 };
 
 export const EVENT_CATEGORY_LABELS: Record<'SINGLE_DAY' | 'MULTI_DAY' | 'TOURNAMENT_BRACKET' | 'TOURNAMENT_TIMED' | 'TOURNAMENT_POINTS', string> = {
   SINGLE_DAY: 'Evenement',
@@ -64,7 +66,7 @@ interface PageSeo {
 
 /** Full per-page metadata: title, description, canonical, Open Graph and Twitter card. */
 export function pageMetadata({ title, description = SITE_DESCRIPTION, path, image: imageUrl, absoluteTitle, noindex }: PageSeo): Metadata {
-  const image = { url: imageUrl, width: 1200, height: 630, alt: title };
+  const image = { url: imageUrl, ...OG_IMAGE_SIZE, alt: title };
 
   return {
     // Re-declaring the template keeps it applied to nested segments; a plain string title would reset it.
