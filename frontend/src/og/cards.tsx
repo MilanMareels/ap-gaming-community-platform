@@ -18,7 +18,7 @@ import { Chip, DateTile, Frame, Muted, RankRow, Row, Stack, Stat, TrophyIcon, cl
 import { type Photo, photo } from './render';
 
 /** Bump to invalidate every cached card after a design change. */
-const DESIGN_VERSION = 1;
+const DESIGN_VERSION = 2;
 
 export interface Card {
   /** Hash of the design version and the data shown; changes whenever the image would. */
