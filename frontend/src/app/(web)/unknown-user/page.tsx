@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import { ShieldX } from 'lucide-react';
+import { pageMetadata } from '@/util/seo';
+
+export const metadata = pageMetadata({ title: 'Geen toegang', noindex: true });
 
 export default function UnknownUserPage() {
   return (

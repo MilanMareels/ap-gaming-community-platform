@@ -6,7 +6,7 @@ import { ArrowLeft, Trash2, Send, ExternalLink, Download } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { apiClient } from '@/api';
-import { useAdmin } from '../../layout';
+import { useAdmin } from '../../AdminShell';
 
 interface SubmissionAnswer {
   id: number;

@@ -10,7 +10,7 @@ import { Pagination } from '@/components/ui/Pagination';
 import { PageHeader } from '@/components/admin/PageHeader';
 import { EmptyState } from '@/components/admin/EmptyState';
 import { getApiErrorMessage } from '@/util/api-error';
-import { useAdmin } from '../layout';
+import { useAdmin } from '../AdminShell';
 
 type UserListItem = {
   id: number;

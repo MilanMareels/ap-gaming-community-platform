@@ -8,7 +8,7 @@ import { PageHeader } from '@/components/admin/PageHeader';
 import { EmptyState } from '@/components/admin/EmptyState';
 import { apiClient } from '@/api';
 import { getApiErrorMessage } from '@/util/api-error';
-import { useAdmin } from '../layout';
+import { useAdmin } from '../AdminShell';
 
 interface Role {
   id: number;

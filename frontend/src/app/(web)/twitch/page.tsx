@@ -1,4 +1,12 @@
 import TwitchEmbed from '@/components/twitch/TwitchEmbed';
+import { pageMetadata } from '@/util/seo';
+
+export const metadata = pageMetadata({
+  title: 'Live op Twitch',
+  description: 'Kijk live mee met de Twitch-stream van AP Gaming.',
+  path: '/twitch',
+  imageSubtitle: 'Live',
+});
 
 export default function TwitchPage() {
   return (
