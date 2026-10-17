@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { cardImage } from '@/og/cards';
-import { SITE_DESCRIPTION, SITE_LOCALE, SITE_NAME, SITE_TAGLINE, THEME_COLOR, TITLE_TEMPLATE, getSiteUrl } from '@/util/seo';
+import { OG_IMAGE_SIZE, SITE_DESCRIPTION, SITE_LOCALE, SITE_NAME, SITE_TAGLINE, THEME_COLOR, TITLE_TEMPLATE, getSiteUrl } from '@/util/seo';
 import './globals.css';
 
 const inter = Inter({
@@ -11,7 +11,7 @@ const inter = Inter({
 
 export async function generateMetadata(): Promise<Metadata> {
   const defaultTitle = `${SITE_NAME} | ${SITE_TAGLINE}`;
-  const image = { url: await cardImage('page', 'home'), width: 1200, height: 630, alt: SITE_NAME };
+  const image = { url: await cardImage('page', 'home'), ...OG_IMAGE_SIZE, alt: SITE_NAME };
 
   return {
     metadataBase: new URL(await getSiteUrl()),
