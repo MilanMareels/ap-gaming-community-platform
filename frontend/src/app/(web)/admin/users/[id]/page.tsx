@@ -20,7 +20,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/admin/PageHeader';
 import { getApiErrorMessage } from '@/util/api-error';
-import { useAdmin } from '../../layout';
+import { useAdmin } from '../../AdminShell';
 
 type SsoLink = { id: number; ssoId: string };
 

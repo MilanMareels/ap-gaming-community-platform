@@ -6,14 +6,16 @@ import { UpdatePointTrialStatusDto } from '../../dtos/point-trials/point-trial.d
 export class PointTrialsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findByEventId(eventId: number) {
+  /** Participant emails are only included for staff (`includeContact`); the public leaderboard shows names. */
+  async findByEventId(eventId: number, includeContact = false) {
     return this.prisma.pointTrial.findUnique({
       where: { eventId },
       include: {
         participants: {
           orderBy: { bestPoints: { sort: 'desc', nulls: 'last' } },
+          omit: { email: !includeContact },
           include: {
-            user: { select: { id: true, name: true, email: true } },
+            user: { select: { id: true, name: true, email: includeContact } },
             entries: { orderBy: { points: 'desc' } },
           },
         },

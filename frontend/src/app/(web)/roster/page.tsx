@@ -133,7 +133,7 @@ export default function RosterPage() {
                           </h3>
                           <p className="text-gray-400 font-medium mb-6 flex items-center gap-2">
                             <span className="w-6 h-[2px] bg-[#d42422]"></span>
-                            {entry.user?.name || entry.user?.sNumber || 'Unknown Operative'}
+                            {entry.user?.name || 'Unknown Operative'}
                           </p>
 
                           <div className="grid grid-cols-2 gap-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">

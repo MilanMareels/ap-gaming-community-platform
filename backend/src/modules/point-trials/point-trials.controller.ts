@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { PointTrialsService } from './point-trials.service.js';
 import { PointTrialEntriesService } from './point-trial-entries.service.js';
@@ -8,6 +8,9 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { Public } from '../auth/public.decorator.js';
+import { RbacService } from '../rbac/rbac.service.js';
+import type { Request } from 'express';
+import type { JwtPayload } from '../auth/types/jwt-payload.type.js';
 import { HttpExceptionDto } from '../../dtos/http-exception.dto.js';
 
 @ApiTags('Point Trials')
@@ -16,16 +19,20 @@ export class PointTrialsController {
   constructor(
     private readonly pointTrialsService: PointTrialsService,
     private readonly entriesService: PointTrialEntriesService,
+    private readonly rbacService: RbacService,
   ) {}
 
   // --- Point Trial CRUD ---
 
+  @UseGuards(JwtAuthGuard)
   @Public()
   @Get()
-  @ApiOperation({ summary: 'Get point trial for an event (public)' })
+  @ApiOperation({ summary: 'Get point trial for an event (public; participant emails only for point trial managers)' })
   @ApiOkResponse({ description: 'Point trial with participants and best scores' })
-  findByEvent(@Param('eventId') eventId: string) {
-    return this.pointTrialsService.findByEventId(+eventId);
+  async findByEvent(@Param('eventId') eventId: string, @Req() req: Request) {
+    const user = (req as Request & { user?: JwtPayload }).user;
+    const includeContact = await this.rbacService.hasAnyPermission(user, ['point-trials.manage']);
+    return this.pointTrialsService.findByEventId(+eventId, includeContact);
   }
 
   @Post()
