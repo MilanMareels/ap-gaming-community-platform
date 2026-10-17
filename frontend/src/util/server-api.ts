@@ -31,13 +31,51 @@ export interface PublicForm {
   cuid: string;
   title: string;
   description: string | null;
+  fields?: { id: number }[];
+}
+
+export type EventWithCount = Event & { _count?: { registrations: number } };
+
+export interface PublicBracket {
+  status: 'DRAFT' | 'GENERATED' | 'IN_PROGRESS' | 'COMPLETED';
+  totalRounds: number;
+  participants: { id: number; name: string; seed: number | null }[];
+  matches: {
+    round: number;
+    position: number;
+    status: string;
+    participants: { isWinner: boolean; participant: { name: string } | null }[];
+  }[];
+}
+
+export interface PublicTimeTrial {
+  status: 'ACTIVE' | 'COMPLETED';
+  participants: { id: number; name: string; bestTimeMs: number | null }[];
+}
+
+export interface PublicPointTrial {
+  status: 'ACTIVE' | 'COMPLETED';
+  participants: { id: number; name: string; bestPoints: number | null }[];
+}
+
+export interface PublicRosterGame {
+  id: number;
+  name: string;
+  rosterEntries: { handle: string; rank: string; role: string | null }[];
 }
 
 const isId = (id: string) => /^\d+$/.test(id);
 
-export const getEvent = (id: string) => (isId(id) ? fetchPublic<Event>(`/events/${id}`) : Promise.resolve(null));
+export const getEvent = (id: string) => (isId(id) ? fetchPublic<EventWithCount>(`/events/${id}`) : Promise.resolve(null));
 export const getUpcomingEvents = () => fetchPublic<Event[]>('/events');
 export const getJob = (id: string) => (isId(id) ? fetchPublic<PublicJob>(`/jobs/${id}`) : Promise.resolve(null));
 export const getActiveJobs = () => fetchPublic<PublicJob[]>('/jobs');
 export const getPublicForm = (cuid: string) => fetchPublic<PublicForm>(`/forms/public/${encodeURIComponent(cuid)}`);
 export const getTimetable = () => fetchPublic<TimeTableEntry[]>('/timetable');
+export const getBracket = (eventId: string) => (isId(eventId) ? fetchPublic<PublicBracket>(`/events/${eventId}/bracket`) : Promise.resolve(null));
+export const getTimeTrial = (eventId: string) =>
+  isId(eventId) ? fetchPublic<PublicTimeTrial>(`/events/${eventId}/time-trial`) : Promise.resolve(null);
+export const getPointTrial = (eventId: string) =>
+  isId(eventId) ? fetchPublic<PublicPointTrial>(`/events/${eventId}/point-trial`) : Promise.resolve(null);
+export const getRosterGames = () => fetchPublic<PublicRosterGame[]>('/roster/games');
+export const getInventory = () => fetchPublic<{ key: string; value: string }[]>('/settings/inventory');
