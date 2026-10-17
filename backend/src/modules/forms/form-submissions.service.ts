@@ -284,8 +284,14 @@ export class FormSubmissionsService {
   async addPublicComment(submissionCuid: string, dto: CreateCommentDto, userId: number | null) {
     const submission = await this.prisma.dynamicFormSubmission.findUnique({
       where: { cuid: submissionCuid },
+      include: { form: { select: { requiresAuth: true } } },
     });
     if (!submission) throw new NotFoundException('Submission not found');
+
+    // Same rule as viewing: submissions of login-only forms are only open to their submitter
+    if (submission.form.requiresAuth && (!userId || userId !== submission.userId)) {
+      throw new UnauthorizedException('Je hebt geen toegang tot deze inzending.');
+    }
 
     let authorName = 'Anoniem';
     if (userId) {

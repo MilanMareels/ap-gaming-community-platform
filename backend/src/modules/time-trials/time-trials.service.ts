@@ -6,14 +6,16 @@ import { UpdateTimeTrialStatusDto } from '../../dtos/time-trials/time-trial.dto.
 export class TimeTrialsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findByEventId(eventId: number) {
+  /** Participant emails are only included for staff (`includeContact`); the public leaderboard shows names. */
+  async findByEventId(eventId: number, includeContact = false) {
     return this.prisma.timeTrial.findUnique({
       where: { eventId },
       include: {
         participants: {
           orderBy: { bestTimeMs: { sort: 'asc', nulls: 'last' } },
+          omit: { email: !includeContact },
           include: {
-            user: { select: { id: true, name: true, email: true } },
+            user: { select: { id: true, name: true, email: includeContact } },
             runs: { orderBy: { timeMs: 'asc' } },
           },
         },

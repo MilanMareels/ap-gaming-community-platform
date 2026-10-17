@@ -1026,7 +1026,9 @@ export class ReservationsService {
       throw new NotFoundException('Reservation not found');
     }
 
-    return this.cancelReservation(reservation);
+    // Anyone holding the (forwardable) email link can call this, so leave out the owner's email and id
+    const { id, status, inventory, controllers, startTime, endTime } = await this.cancelReservation(reservation);
+    return { id, cuid, status, inventory, controllers, startTime, endTime };
   }
 
   private async cancelReservation(reservation: { id: number; status: string; startTime: Date }) {
@@ -1038,15 +1040,16 @@ export class ReservationsService {
       throw new BadRequestException('You cannot cancel a reservation that has already started or passed');
     }
 
-    const updatedReservation = await this.prisma.reservation.update({
+    const { user, ...updatedReservation } = await this.prisma.reservation.update({
       where: { id: reservation.id },
       data: { status: ReservationStatus.CANCELLED },
-      include: { user: true },
+      include: { user: { select: { sNumber: true } } },
     });
 
+    // The user row stays out of the response: cancel-by-link is unauthenticated
     await this.sendReservationCancelationConfirmationEmail(
       updatedReservation.email,
-      updatedReservation.user.sNumber,
+      user.sNumber,
       updatedReservation.cuid,
       updatedReservation.inventory,
       updatedReservation.controllers,

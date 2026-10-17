@@ -6,13 +6,15 @@ import { CreateBracketDto, UpdateBracketDto } from '../../dtos/brackets/bracket.
 export class BracketsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findByEventId(eventId: number) {
+  /** Participant emails are only included for staff (`includeContact`); the public bracket shows names. */
+  async findByEventId(eventId: number, includeContact = false) {
     const bracket = await this.prisma.bracket.findUnique({
       where: { eventId },
       include: {
         participants: {
           orderBy: { seed: { sort: 'asc', nulls: 'last' } },
-          include: { user: { select: { id: true, name: true, email: true } } },
+          omit: { email: !includeContact },
+          include: { user: { select: { id: true, name: true, email: includeContact } } },
         },
         matches: {
           orderBy: [{ round: 'asc' }, { position: 'asc' }],
@@ -20,7 +22,7 @@ export class BracketsService {
             participants: {
               orderBy: { id: 'asc' },
               include: {
-                participant: true,
+                participant: { omit: { email: !includeContact } },
               },
             },
           },

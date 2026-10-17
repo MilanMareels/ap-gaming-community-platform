@@ -2,17 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateRosterEntryDto, ReorderRosterEntriesDto, UpdateRosterEntryDto } from '../../dtos/roster/roster.dto.js';
 
+/** Public roster responses only show a player's name; email and student number are for roster managers. */
+const rosterUser = (includePlayerDetails: boolean) => (includePlayerDetails ? true : { select: { id: true, name: true } });
+
 @Injectable()
 export class RosterService {
   constructor(private readonly prisma: PrismaService) {}
 
   // Roster Games
-  async findAllGames() {
+  async findAllGames(includePlayerDetails = false) {
     return this.prisma.rosterGame.findMany({
       include: {
         rosterEntries: {
           include: {
-            user: true,
+            user: rosterUser(includePlayerDetails),
           },
           orderBy: { order: 'asc' },
         },
@@ -30,10 +33,10 @@ export class RosterService {
     await this.prisma.rosterGame.delete({ where: { id } });
   }
 
-  async findAllEntries() {
+  async findAllEntries(includePlayerDetails = false) {
     return this.prisma.rosterEntry.findMany({
       include: {
-        user: true,
+        user: rosterUser(includePlayerDetails),
         game: true,
       },
       orderBy: { order: 'asc' },

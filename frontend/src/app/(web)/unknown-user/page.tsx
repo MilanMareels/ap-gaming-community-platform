@@ -1,5 +1,12 @@
 import Link from 'next/link';
 import { ShieldX } from 'lucide-react';
+import type { Metadata } from 'next';
+import { cardImage } from '@/og/cards';
+import { pageMetadata } from '@/util/seo';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata({ title: 'Geen toegang', noindex: true, image: await cardImage('page', 'unknown-user') });
+}
 
 export default function UnknownUserPage() {
   return (

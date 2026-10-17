@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAdmin } from './layout';
+import { useAdmin } from './AdminShell';
 
 const NAV_ITEMS_ORDERED = [
   { href: '/admin/reservations', permissions: ['reservations.manage'] },
