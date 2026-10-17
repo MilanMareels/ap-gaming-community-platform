@@ -9,7 +9,14 @@ export const SITE_DESCRIPTION =
 export const SITE_LOCALE = 'nl_BE';
 export const TITLE_TEMPLATE = `%s | ${SITE_NAME}`;
 export const THEME_COLOR = '#020618';
-export const BRAND_COLOR = '#d42422';
+
+export const EVENT_CATEGORY_LABELS: Record<'SINGLE_DAY' | 'MULTI_DAY' | 'TOURNAMENT_BRACKET' | 'TOURNAMENT_TIMED' | 'TOURNAMENT_POINTS', string> = {
+  SINGLE_DAY: 'Evenement',
+  MULTI_DAY: 'Meerdaags evenement',
+  TOURNAMENT_BRACKET: 'Toernooi',
+  TOURNAMENT_TIMED: 'Time trial',
+  TOURNAMENT_POINTS: 'Puntentoernooi',
+};
 
 export const ORGANIZATION = {
   name: 'AP Gaming Community',
@@ -43,29 +50,21 @@ export async function getSiteUrl(): Promise<string> {
   return `${proto}://${host}`;
 }
 
-export function ogImageUrl(title: string, subtitle?: string): string {
-  const params = new URLSearchParams({ title });
-  if (subtitle) params.set('subtitle', subtitle);
-  return `/og?${params.toString()}`;
-}
-
 interface PageSeo {
   title: string;
   description?: string;
   /** Path relative to the site root, used for the canonical URL and og:url. Omit for private/tokenised URLs. */
   path?: string;
-  /** Overrides the title shown on the generated preview image. */
-  imageTitle?: string;
-  /** Small label shown above the title on the generated preview image. */
-  imageSubtitle?: string;
+  /** Preview image URL, from cardImage() in @/og/cards. */
+  image: string;
   /** Use the title as-is instead of applying the "%s | AP Gaming Hub" template. */
   absoluteTitle?: boolean;
   noindex?: boolean;
 }
 
 /** Full per-page metadata: title, description, canonical, Open Graph and Twitter card. */
-export function pageMetadata({ title, description = SITE_DESCRIPTION, path, imageTitle, imageSubtitle, absoluteTitle, noindex }: PageSeo): Metadata {
-  const image = { url: ogImageUrl(imageTitle ?? title, imageSubtitle), width: 1200, height: 630, alt: title };
+export function pageMetadata({ title, description = SITE_DESCRIPTION, path, image: imageUrl, absoluteTitle, noindex }: PageSeo): Metadata {
+  const image = { url: imageUrl, width: 1200, height: 630, alt: title };
 
   return {
     // Re-declaring the template keeps it applied to nested segments; a plain string title would reset it.

@@ -1,5 +1,5 @@
 import type { Event } from '@/api';
-import { HUB_LOCATION, ORGANIZATION, SITE_DESCRIPTION, SITE_NAME, ogImageUrl, formatEventDate } from '@/util/seo';
+import { HUB_LOCATION, ORGANIZATION, SITE_DESCRIPTION, SITE_NAME } from '@/util/seo';
 
 type JsonLdData = Record<string, unknown>;
 
@@ -40,7 +40,7 @@ export function siteJsonLd(siteUrl: string): JsonLdData[] {
   ];
 }
 
-export function eventJsonLd(event: Event, siteUrl: string): JsonLdData {
+export function eventJsonLd(event: Event, siteUrl: string, imagePath: string): JsonLdData {
   const url = `${siteUrl}/events/${event.id}`;
   return {
     '@context': 'https://schema.org',
@@ -52,7 +52,7 @@ export function eventJsonLd(event: Event, siteUrl: string): JsonLdData {
     eventStatus: 'https://schema.org/EventScheduled',
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     url,
-    image: [`${siteUrl}${ogImageUrl(event.title, formatEventDate(event.startTime, event.endTime))}`],
+    image: [`${siteUrl}${imagePath}`],
     location: hubPlace(),
     organizer: { '@type': 'Organization', '@id': organizationId(siteUrl), name: ORGANIZATION.name, url: siteUrl },
     inLanguage: 'nl-BE',

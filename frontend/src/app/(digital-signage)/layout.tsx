@@ -1,6 +1,9 @@
-import { pageMetadata } from '@/util/seo';
+import type { Metadata } from 'next';
 
-export const metadata = pageMetadata({ title: 'Digital signage', noindex: true });
+export const metadata: Metadata = {
+  title: 'Digital signage',
+  robots: { index: false, follow: false },
+};
 
 export default function DigitalSignageLayout({
   children,
