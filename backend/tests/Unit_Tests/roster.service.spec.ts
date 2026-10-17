@@ -41,13 +41,30 @@ describe('RosterService', () => {
   });
 
   describe('Roster Games', () => {
-    it('should return all games with roster entries and users', async () => {
+    it('should return all games with roster entries and only public user fields', async () => {
       const mockGames = [{ id: 1, name: 'Valorant', rosterEntries: [] }];
       prisma.rosterGame.findMany.mockResolvedValue(mockGames);
 
       const result = await service.findAllGames();
 
       expect(result).toEqual(mockGames);
+      expect(prisma.rosterGame.findMany).toHaveBeenCalledWith({
+        include: {
+          rosterEntries: {
+            include: {
+              user: { select: { id: true, name: true } },
+            },
+            orderBy: { order: 'asc' },
+          },
+        },
+      });
+    });
+
+    it('should include full user details for roster managers', async () => {
+      prisma.rosterGame.findMany.mockResolvedValue([]);
+
+      await service.findAllGames(true);
+
       expect(prisma.rosterGame.findMany).toHaveBeenCalledWith({
         include: {
           rosterEntries: {
@@ -84,13 +101,27 @@ describe('RosterService', () => {
   });
 
   describe('Roster Entries', () => {
-    it('should return all entries ordered by order asc', async () => {
+    it('should return all entries ordered by order asc with only public user fields', async () => {
       const mockEntries = [{ id: 1 }, { id: 2 }];
       prisma.rosterEntry.findMany.mockResolvedValue(mockEntries);
 
       const result = await service.findAllEntries();
 
       expect(result).toEqual(mockEntries);
+      expect(prisma.rosterEntry.findMany).toHaveBeenCalledWith({
+        include: {
+          user: { select: { id: true, name: true } },
+          game: true,
+        },
+        orderBy: { order: 'asc' },
+      });
+    });
+
+    it('should include full user details on entries for roster managers', async () => {
+      prisma.rosterEntry.findMany.mockResolvedValue([]);
+
+      await service.findAllEntries(true);
+
       expect(prisma.rosterEntry.findMany).toHaveBeenCalledWith({
         include: {
           user: true,

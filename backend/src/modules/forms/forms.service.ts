@@ -28,9 +28,11 @@ export class FormsService {
     return form;
   }
 
+  /** Public form for rendering; the Discord webhook URL is a secret and stays server-side. */
   async findByCuid(cuid: string) {
     const form = await this.prisma.dynamicForm.findUnique({
       where: { cuid },
+      omit: { discordWebhookUrl: true },
       include: {
         fields: { orderBy: { position: 'asc' } },
       },
