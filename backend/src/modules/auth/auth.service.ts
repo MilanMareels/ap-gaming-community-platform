@@ -1,6 +1,8 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, type JwtSignOptions } from '@nestjs/jwt';
+import { createHash } from 'node:crypto';
 import configuration from '../../common/config.js';
+import { MOBILE_HANDOFF_CODE_TTL, MOBILE_TOKEN_TTL } from './constants/auth.constants.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { AuthProfileResponseDto } from '../../dtos/auth/auth-profile-response.dto.js';
 import type { JwtPayload } from './types/jwt-payload.type.js';
@@ -14,6 +16,12 @@ export type SsoProvider = 'google' | 'microsoft';
 export type OAuthState = {
   returnUrl?: string;
   linkMode?: boolean;
+};
+
+type MobileHandoffPayload = {
+  sub: number;
+  challenge: string;
+  typ: 'mobile-handoff';
 };
 
 @Injectable()
@@ -707,7 +715,39 @@ export class AuthService {
     }
   }
 
-  private async generateToken(userId: number, email: string) {
+  // --------------- Mobile app handoff ---------------
+
+  /** Short-lived code handed to the mobile app after it signed in through the web UI, bound to the app's PKCE challenge. */
+  async createMobileHandoffCode(claims: JwtPayload, challenge: string) {
+    const payload: MobileHandoffPayload = { sub: claims.realUserId ?? claims.sub, challenge, typ: 'mobile-handoff' };
+    return this.jwtService.signAsync(payload as Record<string, unknown>, { secret: this.mobileHandoffSecret(), expiresIn: MOBILE_HANDOFF_CODE_TTL });
+  }
+
+  async exchangeMobileHandoffCode(code: string, verifier: string) {
+    let payload: MobileHandoffPayload;
+    try {
+      payload = await this.jwtService.verifyAsync<MobileHandoffPayload>(code, { secret: this.mobileHandoffSecret() });
+    } catch {
+      throw new UnauthorizedException('Invalid or expired login code');
+    }
+
+    const expectedChallenge = createHash('sha256').update(verifier).digest('base64url');
+    if (payload.typ !== 'mobile-handoff' || payload.challenge !== expectedChallenge) {
+      throw new UnauthorizedException('Invalid or expired login code');
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { id: payload.sub }, select: { id: true, email: true } });
+    if (!user) throw new UnauthorizedException('User not found');
+
+    return this.generateToken(user.id, user.email, MOBILE_TOKEN_TTL);
+  }
+
+  // Separate secret so a handoff code can never be used as a regular auth token
+  private mobileHandoffSecret() {
+    return `${this.config.jwt.secret}:mobile-handoff`;
+  }
+
+  private async generateToken(userId: number, email: string, expiresIn: JwtSignOptions['expiresIn'] = '1d') {
     const userRoles = await this.prisma.userRole.findMany({
       where: { userId },
       include: {
@@ -732,7 +772,7 @@ export class AuthService {
       permissions,
     };
 
-    return this.jwtService.signAsync(payload as Record<string, unknown>, { expiresIn: '1d' });
+    return this.jwtService.signAsync(payload as Record<string, unknown>, { expiresIn });
   }
 
   // Used by guards/controllers to assert a user exists (and refresh JWT post-link, if needed).
