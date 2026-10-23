@@ -1,4 +1,18 @@
-import { BadRequestException, Controller, Delete, Get, Param, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Query,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import configuration from '../../common/config.js';
@@ -11,9 +25,16 @@ import { LogoutResponseDto } from '../../dtos/auth/logout-response.dto.js';
 import { MicrosoftAuthUrlResponseDto } from '../../dtos/auth/microsoft-auth-url-response.dto.js';
 import { MicrosoftCallbackQueryDto } from '../../dtos/auth/microsoft-callback-query.dto.js';
 import { MicrosoftLoginQueryDto } from '../../dtos/auth/microsoft-login-query.dto.js';
+import { MobileHandoffQueryDto, MobileTokenRequestDto, MobileTokenResponseDto } from '../../dtos/auth/mobile-auth.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { AuthService, type SsoProvider } from './auth.service.js';
-import { AUTH_COOKIE_NAME, AUTH_DEFAULT_RETURN_URL, AUTH_LEGACY_COOKIE_NAME, AUTH_UNKNOWN_USER_PATH } from './constants/auth.constants.js';
+import {
+  AUTH_COOKIE_NAME,
+  AUTH_DEFAULT_RETURN_URL,
+  AUTH_LEGACY_COOKIE_NAME,
+  AUTH_UNKNOWN_USER_PATH,
+  MOBILE_APP_CALLBACK_URL,
+} from './constants/auth.constants.js';
 import { Public } from './public.decorator.js';
 import type { JwtPayload } from './types/jwt-payload.type.js';
 
@@ -104,6 +125,34 @@ export class AuthController {
 
     this.setAuthCookie(res, callbackResult.token);
     return res.redirect(`${this.config.frontend.url}${state.returnUrl || AUTH_DEFAULT_RETURN_URL}`);
+  }
+
+  // --------------- Mobile app ---------------
+
+  @Public()
+  @Get('mobile/handoff')
+  @ApiOperation({ summary: 'Hand the web session over to the mobile app (sends the user through web login first if needed)' })
+  async mobileHandoff(@Query() query: MobileHandoffQueryDto, @Req() req: Request, @Res() res: Response) {
+    const token = this.extractToken(req);
+    const claims = token ? await this.authService.verifyToken(token).catch(() => undefined) : undefined;
+
+    if (!claims) {
+      const returnUrl = `/api/auth/mobile/handoff?challenge=${encodeURIComponent(query.challenge)}`;
+      return res.redirect(`${this.config.frontend.url}/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+    }
+
+    const code = await this.authService.createMobileHandoffCode(claims, query.challenge);
+    return res.redirect(`${MOBILE_APP_CALLBACK_URL}?code=${encodeURIComponent(code)}`);
+  }
+
+  @Public()
+  @Post('mobile/token')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Exchange a mobile handoff code and PKCE verifier for a bearer token' })
+  @ApiOkResponse({ type: MobileTokenResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Invalid or expired login code' })
+  async mobileToken(@Body() body: MobileTokenRequestDto): Promise<MobileTokenResponseDto> {
+    return { token: await this.authService.exchangeMobileHandoffCode(body.code, body.verifier) };
   }
 
   // --------------- Link / Unlink ---------------
@@ -234,8 +283,13 @@ export class AuthController {
     return user;
   }
 
+  // Same precedence as JwtAuthGuard: the web uses the cookie, the mobile app sends a bearer token
   private extractToken(req: Request): string | undefined {
-    return (req.cookies?.[AUTH_COOKIE_NAME] as string | undefined) || (req.cookies?.[AUTH_LEGACY_COOKIE_NAME] as string | undefined);
+    const cookieToken = (req.cookies?.[AUTH_COOKIE_NAME] as string | undefined) || (req.cookies?.[AUTH_LEGACY_COOKIE_NAME] as string | undefined);
+    if (cookieToken) return cookieToken;
+
+    const authHeader = req.headers.authorization;
+    return authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
   }
 
   private setAuthCookie(res: Response, token: string) {
