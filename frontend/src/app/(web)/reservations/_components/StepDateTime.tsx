@@ -20,38 +20,42 @@ interface StepDateTimeProps {
 }
 
 export function StepDateTime({ data, updateData, availableStartTimes, timetable }: StepDateTimeProps) {
-  // Generate next available days based on timetable
+  // Today (if open) + the first upcoming open day within 3 days
   const dateOptions = useMemo(() => {
-    const options = [];
+    const options: { value: string; label: string }[] = [];
     const today = new Date();
 
-    // Check availability only for today + next 3 days
-    for (let i = 0; i <= 3; i++) {
+    const formatDate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    const labelFor = (d: Date, offset: number) => {
+      if (offset === 0) return 'Vandaag';
+      if (offset === 1) return 'Morgen';
+      let label = new Intl.DateTimeFormat('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' }).format(d);
+      return label.charAt(0).toUpperCase() + label.slice(1);
+    };
+
+    const isOpen = (d: Date) => timetable.some((t) => t.dayOfWeek === d.getDay() && t.type === 'OPEN');
+
+    // Always include today if open
+    if (isOpen(today)) {
+      options.push({ value: formatDate(today), label: labelFor(today, 0) });
+    }
+
+    // Find the first open day after today (up to 3 days ahead)
+    for (let i = 1; i <= 3; i++) {
       const d = new Date(today);
       d.setDate(today.getDate() + i);
-      const dayOfWeek = d.getDay();
-
-      // Check if there is an OPEN slot for this day
-      const isOpen = timetable.some((t) => t.dayOfWeek === dayOfWeek && t.type === 'OPEN');
-
-      if (isOpen) {
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        const dateStr = `${year}-${month}-${day}`;
-
-        let label = '';
-        if (i === 0) label = 'Vandaag';
-        else if (i === 1) label = 'Morgen';
-        else {
-          label = new Intl.DateTimeFormat('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' }).format(d);
-          // Capitalize first letter
-          label = label.charAt(0).toUpperCase() + label.slice(1);
-        }
-
-        options.push({ value: dateStr, label: label });
+      if (isOpen(d)) {
+        options.push({ value: formatDate(d), label: labelFor(d, i) });
+        break;
       }
     }
+
     return options;
   }, [timetable]);
 
