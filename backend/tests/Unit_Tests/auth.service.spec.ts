@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { describe, it, expect, beforeAll, beforeEach, jest } from '@jest/globals';
 import { JwtService } from '@nestjs/jwt';
+import { createHash } from 'node:crypto';
 import { AuthService } from '../../src/modules/auth/auth.service.js';
 import { PrismaService } from '../../src/modules/prisma/prisma.service.js';
 import type { MicrosoftUserInfo } from '../../src/modules/auth/types/microsoft-userinfo.type.js';
@@ -126,6 +127,58 @@ describe('AuthService', () => {
 
       expect(prisma.user.findFirst).not.toHaveBeenCalled();
       expect(prisma.user.create).toHaveBeenCalled();
+    });
+  });
+
+  describe('Mobile app handoff', () => {
+    const verifier = 'a'.repeat(43);
+    const challenge = createHash('sha256').update(verifier).digest('base64url');
+    const claims = { sub: 42, email: legacyUser.email, isAdmin: false, roles: [], permissions: [] };
+    let jwt: JwtService;
+    let mobileService: AuthService;
+
+    beforeEach(async () => {
+      jwt = new JwtService({ secret: process.env.JWT_SECRET_KEY });
+      prisma.user.findUnique.mockResolvedValue(legacyUser);
+      (prisma as any).userRole.findMany = jest.fn<() => Promise<unknown[]>>().mockResolvedValue([]);
+
+      const module = await Test.createTestingModule({
+        providers: [AuthService, { provide: PrismaService, useValue: prisma }, { provide: JwtService, useValue: jwt }],
+      }).compile();
+      mobileService = module.get(AuthService);
+    });
+
+    it('should exchange a handoff code for an auth token when the verifier matches', async () => {
+      const code = await mobileService.createMobileHandoffCode(claims, challenge);
+      const token = await mobileService.exchangeMobileHandoffCode(code, verifier);
+
+      const payload = await mobileService.verifyToken(token);
+      expect(payload.sub).toBe(42);
+    });
+
+    it('should hand over the real admin when impersonating', async () => {
+      const code = await mobileService.createMobileHandoffCode({ ...claims, sub: 7, realUserId: 42 }, challenge);
+      await mobileService.exchangeMobileHandoffCode(code, verifier);
+
+      expect(prisma.user.findUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 42 } }));
+    });
+
+    it('should reject a code with the wrong verifier', async () => {
+      const code = await mobileService.createMobileHandoffCode(claims, challenge);
+
+      await expect(mobileService.exchangeMobileHandoffCode(code, 'b'.repeat(43))).rejects.toThrow('Invalid or expired login code');
+    });
+
+    it('should not accept a handoff code as a regular auth token', async () => {
+      const code = await mobileService.createMobileHandoffCode(claims, challenge);
+
+      await expect(mobileService.verifyToken(code)).rejects.toThrow();
+    });
+
+    it('should not accept a regular auth token as a handoff code', async () => {
+      const token = await jwt.signAsync({ ...claims, challenge, typ: 'mobile-handoff' });
+
+      await expect(mobileService.exchangeMobileHandoffCode(token, verifier)).rejects.toThrow('Invalid or expired login code');
     });
   });
 });

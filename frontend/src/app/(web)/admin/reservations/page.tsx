@@ -63,6 +63,8 @@ export default function AdminReservationsPage() {
   const [editingReservation, setEditingReservation] = useState<ReservationWithUser | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [showCancelled, setShowCancelled] = useState(false);
+  const [bookedOnly, setBookedOnly] = useState(false);
+  const [deviceFilter, setDeviceFilter] = useState<string | null>(null);
 
   async function fetchReservations() {
     try {
@@ -79,7 +81,7 @@ export default function AdminReservationsPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [filterDate, searchQuery, showCancelled]);
+  }, [filterDate, searchQuery, showCancelled, bookedOnly, deviceFilter]);
 
   const handleUpdateStatus = async (id: number, status: ReservationStatus) => {
     try {
@@ -118,6 +120,8 @@ export default function AdminReservationsPage() {
   const filtered = reservations
     .filter((r) => {
       if (!showCancelled && r.status === 'CANCELLED') return false;
+      if (bookedOnly && r.status !== 'RESERVED') return false;
+      if (deviceFilter && r.inventory !== deviceFilter) return false;
       if (filterDate && dateFromISO(r.startTime) !== filterDate) return false;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
@@ -212,6 +216,15 @@ export default function AdminReservationsPage() {
               <label className="flex items-center gap-2 pb-3 cursor-pointer select-none">
                 <input
                   type="checkbox"
+                  checked={bookedOnly}
+                  onChange={(e) => setBookedOnly(e.target.checked)}
+                  className="accent-red-500 w-3.5 h-3.5 cursor-pointer"
+                />
+                <span className="text-xs text-gray-500">Alleen geboekt</span>
+              </label>
+              <label className="flex items-center gap-2 pb-3 cursor-pointer select-none">
+                <input
+                  type="checkbox"
                   checked={showCancelled}
                   onChange={(e) => setShowCancelled(e.target.checked)}
                   className="accent-red-500 w-3.5 h-3.5 cursor-pointer"
@@ -219,6 +232,22 @@ export default function AdminReservationsPage() {
                 <span className="text-xs text-gray-500">Geannuleerd tonen</span>
               </label>
               <div className="ml-auto text-xs text-gray-500 pb-3">{filtered.length} resultaten</div>
+            </div>
+            {/* Quick device filter buttons */}
+            <div className="flex gap-2 mt-2">
+              {[{ value: null, label: 'Alle' }, { value: 'pc', label: 'PC' }, { value: 'ps5', label: 'PS5' }, { value: 'switch', label: 'Switch' }].map((opt) => (
+                <button
+                  key={opt.label}
+                  onClick={() => setDeviceFilter(deviceFilter === opt.value ? null : opt.value)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                    deviceFilter === opt.value
+                      ? 'bg-red-500/15 border-red-500/50 text-red-400'
+                      : 'bg-slate-950 border-slate-700 text-gray-400 hover:border-slate-600 hover:text-gray-300'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
           </div>
         </div>

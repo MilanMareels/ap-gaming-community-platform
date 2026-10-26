@@ -16,6 +16,7 @@ import { InventoryAdjustmentsModule } from './modules/inventory-adjustments/inve
 import { FormsModule } from './modules/forms/forms.module.js';
 import { JobsModule } from './modules/jobs/jobs.module.js';
 import { StorageModule } from './modules/storage/storage.module.js';
+import { SchedulerModule } from './modules/scheduler/scheduler.module.js';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { StorageModule } from './modules/storage/storage.module.js';
     FormsModule,
     JobsModule,
     StorageModule,
+    SchedulerModule,
   ],
   controllers: [],
   providers: [],

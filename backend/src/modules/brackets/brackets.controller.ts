@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { BracketsService } from './brackets.service.js';
 import { BracketParticipantsService } from './bracket-participants.service.js';
@@ -11,6 +11,9 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { Public } from '../auth/public.decorator.js';
+import { RbacService } from '../rbac/rbac.service.js';
+import type { Request } from 'express';
+import type { JwtPayload } from '../auth/types/jwt-payload.type.js';
 import { HttpExceptionDto } from '../../dtos/http-exception.dto.js';
 
 @ApiTags('Brackets')
@@ -21,16 +24,20 @@ export class BracketsController {
     private readonly participantsService: BracketParticipantsService,
     private readonly matchesService: BracketMatchesService,
     private readonly generatorService: BracketGeneratorService,
+    private readonly rbacService: RbacService,
   ) {}
 
   // --- Bracket CRUD ---
 
+  @UseGuards(JwtAuthGuard)
   @Public()
   @Get()
-  @ApiOperation({ summary: 'Get bracket for an event (public)' })
+  @ApiOperation({ summary: 'Get bracket for an event (public; participant emails only for bracket managers)' })
   @ApiOkResponse({ description: 'Bracket with participants and matches' })
-  findByEvent(@Param('eventId') eventId: string) {
-    return this.bracketsService.findByEventId(+eventId);
+  async findByEvent(@Param('eventId') eventId: string, @Req() req: Request) {
+    const user = (req as Request & { user?: JwtPayload }).user;
+    const includeContact = await this.rbacService.hasAnyPermission(user, ['brackets.manage']);
+    return this.bracketsService.findByEventId(+eventId, includeContact);
   }
 
   @Post()

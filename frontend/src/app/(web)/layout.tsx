@@ -1,13 +1,18 @@
 import { Navbar, Footer } from '@/components/layout';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { JsonLd, siteJsonLd } from '@/components/seo/JsonLd';
+import { getSiteUrl } from '@/util/seo';
 
-export default function WebLayout({
+export default async function WebLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const siteUrl = await getSiteUrl();
+
   return (
     <>
+      <JsonLd data={siteJsonLd(siteUrl)} />
       <div
         className="fixed inset-0 z-[-1] pointer-events-none opacity-50"
         style={{
