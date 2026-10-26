@@ -601,6 +601,49 @@ export class ReservationsService {
     return { count: result.count };
   }
 
+  /**
+   * Mark reservations as NO_SHOW when they are still RESERVED and their start time
+   * is more than 15 minutes in the past. Sends the no-show email for each one.
+   * Called by the scheduler every few minutes.
+   */
+  async markOverdueNoShows(): Promise<number> {
+    const cutoff = new Date(Date.now() - 15 * 60 * 1000);
+
+    const overdue = await this.prisma.reservation.findMany({
+      where: {
+        status: ReservationStatus.RESERVED,
+        startTime: { lt: cutoff },
+      },
+      include: { user: true },
+    });
+
+    for (const reservation of overdue) {
+      await this.prisma.reservation.update({
+        where: { id: reservation.id },
+        data: { status: ReservationStatus.NO_SHOW },
+      });
+
+      const noShowCount = await this.prisma.reservation.count({
+        where: { userId: reservation.userId, status: ReservationStatus.NO_SHOW },
+      });
+
+      await this.sendNoShowEmail(
+        reservation.email,
+        reservation.user.name ?? (reservation.user.sNumber !== 'N/A' ? reservation.user.sNumber : 'gamer'),
+        noShowCount,
+        reservation.inventory,
+        reservation.startTime,
+        reservation.endTime,
+      );
+    }
+
+    if (overdue.length > 0) {
+      console.log(`[NoShowScheduler] Marked ${overdue.length} reservation(s) as no-show`);
+    }
+
+    return overdue.length;
+  }
+
   async getStatistics(from?: string, to?: string) {
     const where: Record<string, unknown> = {};
     if (from || to) {
