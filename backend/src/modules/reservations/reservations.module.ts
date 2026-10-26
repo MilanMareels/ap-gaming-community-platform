@@ -10,5 +10,6 @@ import { InventoryAdjustmentsModule } from '../inventory-adjustments/inventory-a
   imports: [AuthModule, RbacModule, MailModule, InventoryAdjustmentsModule],
   controllers: [ReservationsController],
   providers: [ReservationsService],
+  exports: [ReservationsService],
 })
 export class ReservationsModule {}

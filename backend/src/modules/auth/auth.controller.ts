@@ -1,4 +1,18 @@
-import { BadRequestException, Controller, Delete, Get, Param, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Query,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import configuration from '../../common/config.js';
@@ -11,9 +25,16 @@ import { LogoutResponseDto } from '../../dtos/auth/logout-response.dto.js';
 import { MicrosoftAuthUrlResponseDto } from '../../dtos/auth/microsoft-auth-url-response.dto.js';
 import { MicrosoftCallbackQueryDto } from '../../dtos/auth/microsoft-callback-query.dto.js';
 import { MicrosoftLoginQueryDto } from '../../dtos/auth/microsoft-login-query.dto.js';
+import { MobileHandoffQueryDto, MobileTokenRequestDto, MobileTokenResponseDto } from '../../dtos/auth/mobile-auth.dto.js';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { AuthService, type SsoProvider } from './auth.service.js';
-import { AUTH_COOKIE_NAME, AUTH_DEFAULT_RETURN_URL, AUTH_LEGACY_COOKIE_NAME, AUTH_UNKNOWN_USER_PATH } from './constants/auth.constants.js';
+import {
+  AUTH_COOKIE_NAME,
+  AUTH_DEFAULT_RETURN_URL,
+  AUTH_LEGACY_COOKIE_NAME,
+  AUTH_UNKNOWN_USER_PATH,
+  MOBILE_APP_CALLBACK_URL,
+} from './constants/auth.constants.js';
 import { Public } from './public.decorator.js';
 import type { JwtPayload } from './types/jwt-payload.type.js';
 
@@ -41,8 +62,10 @@ export class AuthController {
   @Public()
   @Get('google/login')
   @ApiOperation({ summary: 'Redirect to Google login page' })
-  async googleLogin(@Query() query: GoogleLoginQueryDto & { linkMode?: string }, @Res() res: Response) {
-    const url = await this.authService.buildGoogleLoginUrl(this.toState(query));
+  async googleLogin(@Query() query: GoogleLoginQueryDto & { linkMode?: string }, @Req() req: Request, @Res() res: Response) {
+    const state = this.toState(query);
+    const sessionToken = state.linkMode ? this.extractToken(req) : undefined;
+    const url = await this.authService.buildGoogleLoginUrl(state, sessionToken);
     return res.redirect(url);
   }
 
@@ -53,7 +76,7 @@ export class AuthController {
     const state = this.authService.decodeState(query.state);
 
     if (state.linkMode) {
-      return this.handleLinkCallback('google', query.code, state.returnUrl, req, res);
+      return this.handleLinkCallback('google', query.code, state, req, res);
     }
 
     const callbackResult = await this.authService.handleGoogleCallback(query.code);
@@ -81,8 +104,10 @@ export class AuthController {
   @Public()
   @Get('microsoft/login')
   @ApiOperation({ summary: 'Redirect to Microsoft login page' })
-  async microsoftLogin(@Query() query: MicrosoftLoginQueryDto, @Res() res: Response) {
-    const url = await this.authService.buildMicrosoftLoginUrl(this.toState(query));
+  async microsoftLogin(@Query() query: MicrosoftLoginQueryDto & { linkMode?: string }, @Req() req: Request, @Res() res: Response) {
+    const state = this.toState(query);
+    const sessionToken = state.linkMode ? this.extractToken(req) : undefined;
+    const url = await this.authService.buildMicrosoftLoginUrl(state, sessionToken);
     return res.redirect(url);
   }
 
@@ -93,7 +118,7 @@ export class AuthController {
     const state = this.authService.decodeState(query.state);
 
     if (state.linkMode) {
-      return this.handleLinkCallback('microsoft', query.code, state.returnUrl, req, res);
+      return this.handleLinkCallback('microsoft', query.code, state, req, res);
     }
 
     const callbackResult = await this.authService.handleMicrosoftCallback(query.code);
@@ -104,6 +129,34 @@ export class AuthController {
 
     this.setAuthCookie(res, callbackResult.token);
     return res.redirect(`${this.config.frontend.url}${state.returnUrl || AUTH_DEFAULT_RETURN_URL}`);
+  }
+
+  // --------------- Mobile app ---------------
+
+  @Public()
+  @Get('mobile/handoff')
+  @ApiOperation({ summary: 'Hand the web session over to the mobile app (sends the user through web login first if needed)' })
+  async mobileHandoff(@Query() query: MobileHandoffQueryDto, @Req() req: Request, @Res() res: Response) {
+    const token = this.extractToken(req);
+    const claims = token ? await this.authService.verifyToken(token).catch(() => undefined) : undefined;
+
+    if (!claims) {
+      const returnUrl = `/api/auth/mobile/handoff?challenge=${encodeURIComponent(query.challenge)}`;
+      return res.redirect(`${this.config.frontend.url}/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+    }
+
+    const code = await this.authService.createMobileHandoffCode(claims, query.challenge);
+    return res.redirect(`${MOBILE_APP_CALLBACK_URL}?code=${encodeURIComponent(code)}`);
+  }
+
+  @Public()
+  @Post('mobile/token')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Exchange a mobile handoff code and PKCE verifier for a bearer token' })
+  @ApiOkResponse({ type: MobileTokenResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Invalid or expired login code' })
+  async mobileToken(@Body() body: MobileTokenRequestDto): Promise<MobileTokenResponseDto> {
+    return { token: await this.authService.exchangeMobileHandoffCode(body.code, body.verifier) };
   }
 
   // --------------- Link / Unlink ---------------
@@ -194,11 +247,18 @@ export class AuthController {
     };
   }
 
-  private async handleLinkCallback(provider: SsoProvider, code: string, returnUrl: string | undefined, req: Request, res: Response) {
+  private async handleLinkCallback(provider: SsoProvider, code: string, state: import('./auth.service.js').OAuthState, req: Request, res: Response) {
     const token = this.extractToken(req);
     if (!token) {
       // User isn't logged in; can't link. Fall back to normal login flow.
       return res.redirect(`${this.config.frontend.url}/login?linkError=not-authenticated`);
+    }
+
+    // Verify the state was created by this session — prevents CSRF account-linking hijack.
+    try {
+      this.authService.verifyLinkModeSession(state, token);
+    } catch {
+      return res.redirect(`${this.config.frontend.url}${state.returnUrl || '/admin/settings'}?linkError=session-mismatch`);
     }
 
     let claims: JwtPayload;
@@ -217,10 +277,10 @@ export class AuthController {
     } catch (error) {
       const message = error instanceof Error ? error.message : 'link-failed';
       const safe = encodeURIComponent(message.slice(0, 200));
-      return res.redirect(`${this.config.frontend.url}${returnUrl || '/admin/settings'}?linkError=${safe}`);
+      return res.redirect(`${this.config.frontend.url}${state.returnUrl || '/admin/settings'}?linkError=${safe}`);
     }
 
-    return res.redirect(`${this.config.frontend.url}${returnUrl || '/admin/settings'}?linked=${provider}`);
+    return res.redirect(`${this.config.frontend.url}${state.returnUrl || '/admin/settings'}?linked=${provider}`);
   }
 
   private parseProvider(value: string): SsoProvider {
@@ -234,8 +294,13 @@ export class AuthController {
     return user;
   }
 
+  // Same precedence as JwtAuthGuard: the web uses the cookie, the mobile app sends a bearer token
   private extractToken(req: Request): string | undefined {
-    return (req.cookies?.[AUTH_COOKIE_NAME] as string | undefined) || (req.cookies?.[AUTH_LEGACY_COOKIE_NAME] as string | undefined);
+    const cookieToken = (req.cookies?.[AUTH_COOKIE_NAME] as string | undefined) || (req.cookies?.[AUTH_LEGACY_COOKIE_NAME] as string | undefined);
+    if (cookieToken) return cookieToken;
+
+    const authHeader = req.headers.authorization;
+    return authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
   }
 
   private setAuthCookie(res: Response, token: string) {

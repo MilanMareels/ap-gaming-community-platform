@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Delete, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Delete, Param, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { RosterService } from './roster.service.js';
 import { CreateRosterEntryDto, CreateRosterGameDto, ReorderRosterEntriesDto, UpdateRosterEntryDto } from '../../dtos/roster/roster.dto.js';
@@ -6,19 +6,30 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard.js';
 import { PermissionGuard } from '../../guards/permission.guard.js';
 import { RequirePermissions } from '../../decorators/require-permissions.decorator.js';
 import { Public } from '../auth/public.decorator.js';
+import { RbacService } from '../rbac/rbac.service.js';
+import type { Request } from 'express';
+import type { JwtPayload } from '../auth/types/jwt-payload.type.js';
 import { PrismaModel } from '../../_gen/prisma-class/index.js';
 
 @ApiTags('Roster')
 @Controller('roster')
 export class RosterController {
-  constructor(private readonly rosterService: RosterService) {}
+  constructor(
+    private readonly rosterService: RosterService,
+    private readonly rbacService: RbacService,
+  ) {}
 
+  private canSeePlayerDetails(req: Request) {
+    return this.rbacService.hasAnyPermission((req as Request & { user?: JwtPayload }).user, ['roster.manage']);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Public()
   @Get('games')
-  @ApiOperation({ summary: 'Get all roster games with entries' })
+  @ApiOperation({ summary: 'Get all roster games with entries (player email/student number only for roster managers)' })
   @ApiOkResponse({ type: [PrismaModel.RosterGame] })
-  findAllGames() {
-    return this.rosterService.findAllGames();
+  async findAllGames(@Req() req: Request) {
+    return this.rosterService.findAllGames(await this.canSeePlayerDetails(req));
   }
 
   @Post('games')
@@ -38,12 +49,13 @@ export class RosterController {
     return this.rosterService.deleteGame(+id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Public()
   @Get('entries')
-  @ApiOperation({ summary: 'Get all roster entries' })
+  @ApiOperation({ summary: 'Get all roster entries (player email/student number only for roster managers)' })
   @ApiOkResponse({ type: [PrismaModel.RosterEntry] })
-  findAllEntries() {
-    return this.rosterService.findAllEntries();
+  async findAllEntries(@Req() req: Request) {
+    return this.rosterService.findAllEntries(await this.canSeePlayerDetails(req));
   }
 
   @Post('entries')

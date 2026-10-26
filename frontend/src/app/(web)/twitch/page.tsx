@@ -1,4 +1,16 @@
 import TwitchEmbed from '@/components/twitch/TwitchEmbed';
+import type { Metadata } from 'next';
+import { cardImage } from '@/og/cards';
+import { pageMetadata } from '@/util/seo';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata({
+    title: 'Live op Twitch',
+    description: 'Kijk live mee met de Twitch-stream van AP Gaming.',
+    path: '/twitch',
+    image: await cardImage('page', 'twitch'),
+  });
+}
 
 export default function TwitchPage() {
   return (
