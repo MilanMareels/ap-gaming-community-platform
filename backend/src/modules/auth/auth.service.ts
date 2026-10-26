@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService, type JwtSignOptions } from '@nestjs/jwt';
-import { createHash } from 'node:crypto';
+import { createHash, createHmac, randomBytes } from 'node:crypto';
 import configuration from '../../common/config.js';
 import { MOBILE_HANDOFF_CODE_TTL, MOBILE_TOKEN_TTL } from './constants/auth.constants.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -16,6 +16,10 @@ export type SsoProvider = 'google' | 'microsoft';
 export type OAuthState = {
   returnUrl?: string;
   linkMode?: boolean;
+  /** Random nonce to prevent replay / CSRF. */
+  nonce?: string;
+  /** SHA-256 of the session token, binding link-mode state to the initiating session. */
+  sessionHash?: string;
 };
 
 type MobileHandoffPayload = {
@@ -34,13 +38,88 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  encodeState(state: OAuthState): string | undefined {
+  /**
+   * Build a signed, CSRF-resistant OAuth state parameter.
+   * The state includes a random nonce and is HMAC-signed with SESSION_SECRET_KEY.
+   * For link-mode, the caller's session token hash is embedded so only the same
+   * browser session can redeem the callback.
+   */
+  encodeState(state: OAuthState, sessionToken?: string): string | undefined {
     if (!state.returnUrl && !state.linkMode) return undefined;
-    return Buffer.from(JSON.stringify(state), 'utf8').toString('base64url');
+
+    // Always include a random nonce to prevent replay attacks.
+    state.nonce = randomBytes(16).toString('hex');
+
+    // In link-mode, bind the state to the requesting session so another browser
+    // can't replay the callback URL to hijack account linking.
+    if (state.linkMode && sessionToken) {
+      state.sessionHash = createHmac('sha256', this.config.session.secret).update(sessionToken).digest('hex');
+    }
+
+    const payload = Buffer.from(JSON.stringify(state), 'utf8').toString('base64url');
+    const signature = createHmac('sha256', this.config.session.secret).update(payload).digest('base64url');
+    return `${payload}.${signature}`;
   }
 
+  /**
+   * Decode and verify the HMAC-signed state parameter.
+   * Returns the parsed state only if the signature is valid.
+   */
   decodeState(raw?: string): OAuthState {
     if (!raw) return {};
+    try {
+      const dotIndex = raw.lastIndexOf('.');
+      if (dotIndex === -1) {
+        // Legacy unsigned state — treat as plain base64url JSON or returnUrl string.
+        return this.decodeLegacyState(raw);
+      }
+
+      const payload = raw.substring(0, dotIndex);
+      const signature = raw.substring(dotIndex + 1);
+      const expected = createHmac('sha256', this.config.session.secret).update(payload).digest('base64url');
+
+      if (signature !== expected) {
+        this.logger.warn('OAuth state signature mismatch — possible CSRF attempt');
+        throw new UnauthorizedException('Invalid OAuth state');
+      }
+
+      const decoded = Buffer.from(payload, 'base64url').toString('utf8');
+      const parsed = JSON.parse(decoded) as OAuthState;
+      return {
+        returnUrl: typeof parsed.returnUrl === 'string' ? parsed.returnUrl : undefined,
+        linkMode: Boolean(parsed.linkMode),
+        nonce: parsed.nonce,
+        sessionHash: parsed.sessionHash,
+      };
+    } catch (error) {
+      if (error instanceof UnauthorizedException) throw error;
+      // Legacy / plain-string state: treat as returnUrl
+      return { returnUrl: raw };
+    }
+  }
+
+  /**
+   * Verify that a link-mode state's sessionHash matches the current request's session token.
+   * Prevents CSRF account-linking hijack where an attacker tricks a victim into
+   * redeeming the attacker's OAuth callback.
+   */
+  verifyLinkModeSession(state: OAuthState, sessionToken: string | undefined): void {
+    if (!state.linkMode) return;
+    if (!state.sessionHash) {
+      this.logger.warn('Link-mode state is missing sessionHash — rejecting');
+      throw new UnauthorizedException('Invalid link state');
+    }
+    if (!sessionToken) {
+      throw new UnauthorizedException('Not authenticated');
+    }
+    const currentHash = createHmac('sha256', this.config.session.secret).update(sessionToken).digest('hex');
+    if (state.sessionHash !== currentHash) {
+      this.logger.warn('Link-mode sessionHash mismatch — possible CSRF account-linking attempt');
+      throw new UnauthorizedException('Session mismatch — please retry account linking');
+    }
+  }
+
+  private decodeLegacyState(raw: string): OAuthState {
     try {
       const decoded = Buffer.from(raw, 'base64url').toString('utf8');
       const parsed = JSON.parse(decoded) as OAuthState;
@@ -49,12 +128,11 @@ export class AuthService {
         linkMode: Boolean(parsed.linkMode),
       };
     } catch {
-      // Legacy / plain-string state: treat as returnUrl
       return { returnUrl: raw };
     }
   }
 
-  async buildGoogleLoginUrl(state: OAuthState = {}) {
+  async buildGoogleLoginUrl(state: OAuthState = {}, sessionToken?: string) {
     const params = new URLSearchParams({
       client_id: this.config.google.clientId,
       redirect_uri: this.config.google.redirectUri,
@@ -64,13 +142,13 @@ export class AuthService {
       prompt: 'consent',
     });
 
-    const encoded = this.encodeState(state);
+    const encoded = this.encodeState(state, sessionToken);
     if (encoded) params.set('state', encoded);
 
     return `${this.config.google.authUrl}?${params.toString()}`;
   }
 
-  async buildMicrosoftLoginUrl(state: OAuthState = {}) {
+  async buildMicrosoftLoginUrl(state: OAuthState = {}, sessionToken?: string) {
     const params = new URLSearchParams({
       client_id: this.config.microsoft.clientId,
       redirect_uri: this.config.microsoft.redirectUri,
@@ -80,7 +158,7 @@ export class AuthService {
       prompt: 'select_account',
     });
 
-    const encoded = this.encodeState(state);
+    const encoded = this.encodeState(state, sessionToken);
     if (encoded) params.set('state', encoded);
 
     return `${this.config.microsoft.authUrl}?${params.toString()}`;

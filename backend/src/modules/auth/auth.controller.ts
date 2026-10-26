@@ -62,8 +62,10 @@ export class AuthController {
   @Public()
   @Get('google/login')
   @ApiOperation({ summary: 'Redirect to Google login page' })
-  async googleLogin(@Query() query: GoogleLoginQueryDto & { linkMode?: string }, @Res() res: Response) {
-    const url = await this.authService.buildGoogleLoginUrl(this.toState(query));
+  async googleLogin(@Query() query: GoogleLoginQueryDto & { linkMode?: string }, @Req() req: Request, @Res() res: Response) {
+    const state = this.toState(query);
+    const sessionToken = state.linkMode ? this.extractToken(req) : undefined;
+    const url = await this.authService.buildGoogleLoginUrl(state, sessionToken);
     return res.redirect(url);
   }
 
@@ -74,7 +76,7 @@ export class AuthController {
     const state = this.authService.decodeState(query.state);
 
     if (state.linkMode) {
-      return this.handleLinkCallback('google', query.code, state.returnUrl, req, res);
+      return this.handleLinkCallback('google', query.code, state, req, res);
     }
 
     const callbackResult = await this.authService.handleGoogleCallback(query.code);
@@ -102,8 +104,10 @@ export class AuthController {
   @Public()
   @Get('microsoft/login')
   @ApiOperation({ summary: 'Redirect to Microsoft login page' })
-  async microsoftLogin(@Query() query: MicrosoftLoginQueryDto, @Res() res: Response) {
-    const url = await this.authService.buildMicrosoftLoginUrl(this.toState(query));
+  async microsoftLogin(@Query() query: MicrosoftLoginQueryDto & { linkMode?: string }, @Req() req: Request, @Res() res: Response) {
+    const state = this.toState(query);
+    const sessionToken = state.linkMode ? this.extractToken(req) : undefined;
+    const url = await this.authService.buildMicrosoftLoginUrl(state, sessionToken);
     return res.redirect(url);
   }
 
@@ -114,7 +118,7 @@ export class AuthController {
     const state = this.authService.decodeState(query.state);
 
     if (state.linkMode) {
-      return this.handleLinkCallback('microsoft', query.code, state.returnUrl, req, res);
+      return this.handleLinkCallback('microsoft', query.code, state, req, res);
     }
 
     const callbackResult = await this.authService.handleMicrosoftCallback(query.code);
@@ -243,11 +247,18 @@ export class AuthController {
     };
   }
 
-  private async handleLinkCallback(provider: SsoProvider, code: string, returnUrl: string | undefined, req: Request, res: Response) {
+  private async handleLinkCallback(provider: SsoProvider, code: string, state: import('./auth.service.js').OAuthState, req: Request, res: Response) {
     const token = this.extractToken(req);
     if (!token) {
       // User isn't logged in; can't link. Fall back to normal login flow.
       return res.redirect(`${this.config.frontend.url}/login?linkError=not-authenticated`);
+    }
+
+    // Verify the state was created by this session — prevents CSRF account-linking hijack.
+    try {
+      this.authService.verifyLinkModeSession(state, token);
+    } catch {
+      return res.redirect(`${this.config.frontend.url}${state.returnUrl || '/admin/settings'}?linkError=session-mismatch`);
     }
 
     let claims: JwtPayload;
@@ -266,10 +277,10 @@ export class AuthController {
     } catch (error) {
       const message = error instanceof Error ? error.message : 'link-failed';
       const safe = encodeURIComponent(message.slice(0, 200));
-      return res.redirect(`${this.config.frontend.url}${returnUrl || '/admin/settings'}?linkError=${safe}`);
+      return res.redirect(`${this.config.frontend.url}${state.returnUrl || '/admin/settings'}?linkError=${safe}`);
     }
 
-    return res.redirect(`${this.config.frontend.url}${returnUrl || '/admin/settings'}?linked=${provider}`);
+    return res.redirect(`${this.config.frontend.url}${state.returnUrl || '/admin/settings'}?linked=${provider}`);
   }
 
   private parseProvider(value: string): SsoProvider {
