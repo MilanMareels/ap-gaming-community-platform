@@ -135,14 +135,15 @@ export class AuthController {
 
   @Public()
   @Get('mobile/handoff')
-  @ApiOperation({ summary: 'Hand the web session over to the mobile app (sends the user through web login first if needed)' })
+  @ApiOperation({ summary: 'Hand the web session over to the mobile app (sends the user through Microsoft login first if needed)' })
   async mobileHandoff(@Query() query: MobileHandoffQueryDto, @Req() req: Request, @Res() res: Response) {
     const token = this.extractToken(req);
     const claims = token ? await this.authService.verifyToken(token).catch(() => undefined) : undefined;
 
-    if (!claims) {
+    // The app is Microsoft-only: a missing session or one without a Microsoft account goes through Microsoft login.
+    if (!claims || !(await this.authService.hasMicrosoftLink(claims.realUserId ?? claims.sub))) {
       const returnUrl = `/api/auth/mobile/handoff?challenge=${encodeURIComponent(query.challenge)}`;
-      return res.redirect(`${this.config.frontend.url}/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+      return res.redirect(`${this.config.frontend.url}/api/auth/microsoft/login?returnUrl=${encodeURIComponent(returnUrl)}`);
     }
 
     const code = await this.authService.createMobileHandoffCode(claims, query.challenge);

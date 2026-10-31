@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { MailService } from '../mail/mail.service.js';
 import { InventoryAdjustmentsService } from '../inventory-adjustments/inventory-adjustments.service.js';
@@ -162,6 +162,12 @@ export class ReservationsService {
 
     if (!user) {
       throw new BadRequestException('Authenticated user not found');
+    }
+
+    // Google sign-in is only for the admin UI; members reserve with their Microsoft account.
+    const microsoftLink = await this.prisma.microsoftSSOUser.findFirst({ where: { userId: user.id }, select: { id: true } });
+    if (!microsoftLink) {
+      throw new ForbiddenException(errorMessages.microsoftRequired);
     }
 
     const hardwareKey = dto.inventory.toLowerCase();

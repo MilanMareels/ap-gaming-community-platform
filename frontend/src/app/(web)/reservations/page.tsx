@@ -49,6 +49,7 @@ const containerVariants = {
 export default function ReservationsPage() {
   const [authLoading, setAuthLoading] = useState(true);
   const [profile, setProfile] = useState<AuthProfile | null>(null);
+  const [needsMicrosoft, setNeedsMicrosoft] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -94,6 +95,9 @@ export default function ReservationsPage() {
         const res = await apiClient.GET('/auth/profile', {});
         if (res.data) {
           setProfile(res.data);
+          // Google accounts are for the admin UI only. The backend refuses them too, so a failed check can pass here.
+          const links = await apiClient.GET('/auth/links', {});
+          setNeedsMicrosoft(links.data?.microsoft.length === 0);
         }
       } catch {
         // Treat as unauthenticated
@@ -327,8 +331,16 @@ export default function ReservationsPage() {
     );
   }
 
-  if (!profile) {
-    return <SignInGate />;
+  if (!profile || needsMicrosoft) {
+    return (
+      <SignInGate
+        message={
+          profile
+            ? 'Reserveren kan alleen met je AP Microsoft-account. Met een Google-account kan je enkel het beheer gebruiken.'
+            : 'Log in met je AP Microsoft-account om verder te gaan.'
+        }
+      />
+    );
   }
 
   if (success) {
@@ -501,7 +513,7 @@ export default function ReservationsPage() {
   );
 }
 
-function SignInGate() {
+function SignInGate({ message }: { message: string }) {
   const returnUrl = '/reservations';
   return (
     <div className='min-h-screen pt-28 pb-12 px-4 flex items-center justify-center'>
@@ -509,7 +521,7 @@ function SignInGate() {
         <h1 className='text-3xl font-bold text-white mb-2 tracking-tight'>
           Login om te <span className='text-[#d42422]'>reserveren</span>
         </h1>
-        <p className='text-gray-400 text-sm mb-8'>Log in met je AP Microsoft-account om verder te gaan.</p>
+        <p className='text-gray-400 text-sm mb-8'>{message}</p>
 
         <a
           href={`/api/auth/microsoft/login?returnUrl=${encodeURIComponent(returnUrl)}`}

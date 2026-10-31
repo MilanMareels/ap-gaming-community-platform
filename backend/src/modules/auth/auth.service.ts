@@ -229,6 +229,11 @@ export class AuthService {
     return { google, microsoft };
   }
 
+  async hasMicrosoftLink(userId: number) {
+    const link = await this.prisma.microsoftSSOUser.findFirst({ where: { userId }, select: { id: true } });
+    return link !== null;
+  }
+
   async verifyToken(token: string) {
     return this.jwtService.verifyAsync<JwtPayload>(token);
   }
