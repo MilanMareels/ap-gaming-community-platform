@@ -229,9 +229,16 @@ export class AuthService {
     return { google, microsoft };
   }
 
-  async hasMicrosoftLink(userId: number) {
-    const link = await this.prisma.microsoftSSOUser.findFirst({ where: { userId }, select: { id: true } });
-    return link !== null;
+  /** Members use the app with Microsoft; Gaming Hub managers may also use Google, for its management pages. */
+  async canUseMobileApp(userId: number) {
+    const [microsoftLink, managerRole] = await Promise.all([
+      this.prisma.microsoftSSOUser.findFirst({ where: { userId }, select: { id: true } }),
+      this.prisma.userRole.findFirst({
+        where: { userId, role: { permissions: { some: { permission: { key: 'reservations.manage' } } } } },
+        select: { userId: true },
+      }),
+    ]);
+    return microsoftLink !== null || managerRole !== null;
   }
 
   async verifyToken(token: string) {

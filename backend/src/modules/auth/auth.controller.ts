@@ -140,14 +140,22 @@ export class AuthController {
     const token = this.extractToken(req);
     const claims = token ? await this.authService.verifyToken(token).catch(() => undefined) : undefined;
 
-    // The app is Microsoft-only: a missing session or one without a Microsoft account goes through Microsoft login.
-    if (!claims || !(await this.authService.hasMicrosoftLink(claims.realUserId ?? claims.sub))) {
-      const returnUrl = `/api/auth/mobile/handoff?challenge=${encodeURIComponent(query.challenge)}`;
-      return res.redirect(`${this.config.frontend.url}/api/auth/microsoft/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+    if (claims && (await this.authService.canUseMobileApp(claims.realUserId ?? claims.sub))) {
+      const code = await this.authService.createMobileHandoffCode(claims, query.challenge);
+      return res.redirect(`${MOBILE_APP_CALLBACK_URL}?code=${encodeURIComponent(code)}`);
     }
 
-    const code = await this.authService.createMobileHandoffCode(claims, query.challenge);
-    return res.redirect(`${MOBILE_APP_CALLBACK_URL}?code=${encodeURIComponent(code)}`);
+    const provider = query.provider ?? 'microsoft';
+
+    // Signing in with Google again wouldn't help someone who isn't a manager, so tell the app. Dropping the
+    // session lets a manager try again with another Google account.
+    if (claims && provider === 'google') {
+      this.clearAuthCookies(res);
+      return res.redirect(`${MOBILE_APP_CALLBACK_URL}?error=not-manager`);
+    }
+
+    const returnUrl = `/api/auth/mobile/handoff?challenge=${encodeURIComponent(query.challenge)}&provider=${provider}`;
+    return res.redirect(`${this.config.frontend.url}/api/auth/${provider}/login?returnUrl=${encodeURIComponent(returnUrl)}`);
   }
 
   @Public()
