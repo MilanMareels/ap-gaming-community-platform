@@ -163,6 +163,31 @@ describe('AuthService', () => {
       expect(prisma.user.findUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 42 } }));
     });
 
+    describe('who may use the app', () => {
+      const allow = async (microsoftLink: unknown, managerRole: unknown) => {
+        prisma.microsoftSSOUser.findFirst = jest.fn<() => Promise<unknown>>().mockResolvedValue(microsoftLink);
+        prisma.userRole.findFirst = jest.fn<() => Promise<unknown>>().mockResolvedValue(managerRole);
+        return mobileService.canUseMobileApp(42);
+      };
+
+      it('should allow an account with Microsoft linked', async () => {
+        await expect(allow({ id: 1 }, null)).resolves.toBe(true);
+      });
+
+      it('should allow a Google-only manager', async () => {
+        await expect(allow(null, { userId: 42 })).resolves.toBe(true);
+        expect(prisma.userRole.findFirst).toHaveBeenCalledWith(
+          expect.objectContaining({
+            where: { userId: 42, role: { permissions: { some: { permission: { key: 'reservations.manage' } } } } },
+          }),
+        );
+      });
+
+      it('should refuse a Google-only member', async () => {
+        await expect(allow(null, null)).resolves.toBe(false);
+      });
+    });
+
     it('should reject a code with the wrong verifier', async () => {
       const code = await mobileService.createMobileHandoffCode(claims, challenge);
 

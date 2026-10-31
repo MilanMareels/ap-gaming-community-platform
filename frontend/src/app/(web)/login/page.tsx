@@ -64,9 +64,9 @@ function LoginContent() {
         aria-label='Beheerder'
         aria-expanded={showGoogle}
         onClick={() => setShowGoogle((shown) => !shown)}
-        className='fixed bottom-4 right-4 p-2 text-white/20 hover:text-white/50 transition-colors'
+        className='fixed bottom-4 right-4 p-3 text-white/45 hover:text-white/70 transition-colors'
       >
-        <Shield size={16} />
+        <Shield size={18} />
       </button>
     </div>
   );
