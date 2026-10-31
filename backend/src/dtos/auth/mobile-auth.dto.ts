@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, Matches } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsIn, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
 
 const BASE64URL = /^[A-Za-z0-9_-]{43,128}$/;
 
@@ -11,6 +11,11 @@ export class MobileHandoffQueryDto {
   @IsString()
   @Matches(BASE64URL)
   challenge!: string;
+
+  @ApiPropertyOptional({ enum: ['microsoft', 'google'], description: 'Where to sign in when needed. Google is only for Gaming Hub managers. Defaults to Microsoft.' })
+  @IsOptional()
+  @IsIn(['microsoft', 'google'])
+  provider?: 'microsoft' | 'google';
 }
 
 export class MobileTokenRequestDto {
