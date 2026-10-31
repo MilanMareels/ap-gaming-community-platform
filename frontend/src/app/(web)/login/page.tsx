@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Shield } from 'lucide-react';
 
 function buildLoginHref(provider: 'google' | 'microsoft', returnUrl: string) {
   const safe = returnUrl || '/admin';
@@ -12,6 +12,7 @@ function buildLoginHref(provider: 'google' | 'microsoft', returnUrl: string) {
 function LoginContent() {
   const searchParams = useSearchParams();
   const [returnUrl, setReturnUrl] = useState('/admin');
+  const [showGoogle, setShowGoogle] = useState(false);
   const authFailed = searchParams.get('authfailed') === '1';
 
   useEffect(() => {
@@ -28,7 +29,7 @@ function LoginContent() {
         <h1 className='text-3xl font-bold tracking-tight mb-2 text-center'>
           Login bij <span className='text-[#d42422]'>AP Gaming Hub</span>
         </h1>
-        <p className='text-gray-400 text-sm text-center mb-8'>Kies een provider om in te loggen.</p>
+        <p className='text-gray-400 text-sm text-center mb-8'>Log in met je AP Microsoft-account.</p>
 
         {authFailed && (
           <div className='mb-6 flex items-start gap-3 rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-3 text-sm text-yellow-200'>
@@ -45,17 +46,28 @@ function LoginContent() {
             <MicrosoftIcon />
             Login met Microsoft
           </a>
-          <a
-            href={googleHref}
-            className='flex items-center justify-center gap-3 w-full rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors py-3 font-medium'
-          >
-            <GoogleIcon />
-            Login met Google
-          </a>
+          {showGoogle && (
+            <a
+              href={googleHref}
+              className='flex items-center justify-center gap-3 w-full rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors py-3 font-medium'
+            >
+              <GoogleIcon />
+              Login met Google
+            </a>
+          )}
         </div>
-
-        <p className='text-xs text-gray-500 text-center mt-6'>Studenten kunnen het beste Microsoft gebruiken met hun AP-account.</p>
       </div>
+
+      {/* Google sign-in is only for the admin UI, so it stays out of sight for members. */}
+      <button
+        type='button'
+        aria-label='Beheerder'
+        aria-expanded={showGoogle}
+        onClick={() => setShowGoogle((shown) => !shown)}
+        className='fixed bottom-4 right-4 p-2 text-white/20 hover:text-white/50 transition-colors'
+      >
+        <Shield size={16} />
+      </button>
     </div>
   );
 }

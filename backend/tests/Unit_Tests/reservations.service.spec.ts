@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ReservationsService } from '../../src/modules/reservations/reservations.service.js';
 import { PrismaService } from '../../src/modules/prisma/prisma.service.js';
 import { CreateReservationDto, ReservationStatus } from '../../src/dtos/reservations/reservation.dto.js';
@@ -52,6 +52,7 @@ describe('ReservationsService', () => {
 
     const mockPrisma = {
       user: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn() },
+      microsoftSSOUser: { findFirst: jest.fn<() => Promise<{ id: number }>>().mockResolvedValue({ id: 1 }) },
       reservation: {
         findFirst: jest.fn(),
         findUnique: jest.fn(),
@@ -114,6 +115,30 @@ describe('ReservationsService', () => {
       const res = await service.createForUser(mockUser.id, baseDto);
 
       expect(res).toEqual(mockCreatedReservation);
+    });
+
+    it('should refuse a user without a linked Microsoft account', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.microsoftSSOUser.findFirst.mockResolvedValue(null);
+
+      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(ForbiddenException);
+
+      expect(prisma.microsoftSSOUser.findFirst).toHaveBeenCalledWith(expect.objectContaining({ where: { userId: mockUser.id } }));
+      expect(prisma.reservation.create).not.toHaveBeenCalled();
+    });
+
+    it('should still let staff create a reservation for someone without a Microsoft account', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.microsoftSSOUser.findFirst.mockResolvedValue(null);
+      prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+      prisma.reservation.count.mockResolvedValue(0);
+      prisma.reservation.findFirst.mockResolvedValue(null);
+      prisma.reservation.create.mockResolvedValue({ id: 1, cuid: 'cuid', user: mockUser });
+
+      await service.adminCreate(baseAdminDto);
+
+      expect(prisma.reservation.create).toHaveBeenCalled();
+      expect(prisma.microsoftSSOUser.findFirst).not.toHaveBeenCalled();
     });
 
     it('should throw BadRequestException when the authenticated user no longer exists', async () => {
