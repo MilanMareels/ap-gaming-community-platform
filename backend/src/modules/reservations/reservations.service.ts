@@ -11,6 +11,8 @@ import {
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
 import { errorMessages } from '../../errors/errorMessages.js';
+import { wallClockNow } from '../../common/wall-clock.js';
+import { bookableDays, hasAllowedDuration, wallClockDateKey } from './booking-window.js';
 
 /** Number of no-shows after which a user can no longer make reservations. */
 export const NO_SHOW_LIMIT = 3;
@@ -142,19 +144,16 @@ export class ReservationsService {
   }
 
   async createForUser(userId: number, dto: CreateReservationDto) {
-    const now = new Date();
-    const maxDate = new Date();
-    maxDate.setDate(maxDate.getDate() + 3);
-    maxDate.setHours(23, 59, 59, 999);
     const startTime = new Date(dto.startTime);
     const endTime = new Date(dto.endTime);
 
-    if (startTime < now) {
+    if (!hasAllowedDuration(startTime, endTime)) {
+      throw new BadRequestException(errorMessages.invalidDuration);
+    }
+    if (startTime < wallClockNow()) {
       throw new BadRequestException(errorMessages.pastDate);
     }
-    if (startTime > maxDate) {
-      throw new BadRequestException(errorMessages.maxAdvanceDays);
-    }
+    await this.assertBookableDay(startTime);
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -285,6 +284,19 @@ export class ReservationsService {
     await this.sendConfirmationEmail(user.email, user.sNumber, reservation.cuid, dto.inventory, dto.controllers, startTime, endTime);
 
     return reservation;
+  }
+
+  /** Members may only book today (if open) or the first open day after it, like the date pickers offer. */
+  private async assertBookableDay(startTime: Date) {
+    const openEntries = await this.prisma.timeTableEntry.findMany({
+      where: { type: 'OPEN' },
+      select: { dayOfWeek: true },
+    });
+    const openWeekdays = new Set(openEntries.map((e) => e.dayOfWeek));
+
+    if (!bookableDays(openWeekdays, wallClockNow()).includes(wallClockDateKey(startTime))) {
+      throw new BadRequestException(errorMessages.dayNotBookable);
+    }
   }
 
   async adminCreate(dto: AdminCreateReservationDto) {

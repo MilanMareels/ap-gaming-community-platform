@@ -7,12 +7,27 @@ import { CreateReservationDto, ReservationStatus } from '../../src/dtos/reservat
 import { errorMessages } from '../../src/errors/errorMessages.js';
 import { MailService } from '../../src/modules/mail/mail.service.js';
 import { InventoryAdjustmentsService } from '../../src/modules/inventory-adjustments/inventory-adjustments.service.js';
+import { wallClockNow } from '../../src/common/wall-clock.js';
 
 const getIsoDate = (offset = 0) => {
   const d = new Date();
   d.setDate(d.getDate() + offset);
   return d.toISOString();
 };
+
+/** A session in hub wall-clock time (stored as UTC), `dayOffset` days from today. */
+const wallClockSlot = (dayOffset: number, hour = 14, minutes = 60) => {
+  const now = wallClockNow();
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + dayOffset, hour));
+  return { startTime: start.toISOString(), endTime: new Date(start.getTime() + minutes * 60_000).toISOString() };
+};
+
+const weekdayIn = (dayOffset: number) => {
+  const now = wallClockNow();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + dayOffset)).getUTCDay();
+};
+
+const openOn = (...weekdays: number[]) => weekdays.map((dayOfWeek) => ({ dayOfWeek }));
 
 const mockUser = { id: 1, email: 'test@student.ap.be', sNumber: 's123456', name: null };
 
@@ -40,8 +55,7 @@ describe('ReservationsService', () => {
   beforeEach(async () => {
     baseDto.inventory = 'pc';
     baseDto.controllers = 1;
-    baseDto.startTime = getIsoDate(1);
-    baseDto.endTime = getIsoDate(1);
+    Object.assign(baseDto, wallClockSlot(1));
 
     baseAdminDto.email = mockUser.email;
     baseAdminDto.sNumber = mockUser.sNumber;
@@ -64,6 +78,9 @@ describe('ReservationsService', () => {
       },
       setting: {
         findFirst: jest.fn(),
+      },
+      timeTableEntry: {
+        findMany: jest.fn<() => Promise<{ dayOfWeek: number }[]>>().mockResolvedValue(openOn(0, 1, 2, 3, 4, 5, 6)),
       },
     };
 
@@ -146,24 +163,46 @@ describe('ReservationsService', () => {
       await expect(service.createForUser(999, baseDto)).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw an BadRequestException when trying to create an reservation when is in the past', async () => {
-      baseDto.startTime = getIsoDate(-1);
-      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw an BadRequestException when trying to create an reservation 3 days in the future', async () => {
-      baseDto.startTime = getIsoDate(5);
-      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(BadRequestException);
-    });
-
-    it('should return corrct error message when trying to create an reservation when is in the past', async () => {
-      baseDto.startTime = getIsoDate(-1);
+    it('should refuse a reservation in the past', async () => {
+      Object.assign(baseDto, wallClockSlot(-1));
       await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.pastDate);
     });
 
-    it('should return corrct error message when trying to create an reservation 3 days in the future', async () => {
-      baseDto.startTime = getIsoDate(5);
-      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.maxAdvanceDays);
+    it('should refuse a reservation 5 days ahead', async () => {
+      Object.assign(baseDto, wallClockSlot(5));
+      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.dayNotBookable);
+    });
+
+    it('should refuse a day after the first next open day', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      Object.assign(baseDto, wallClockSlot(2)); // every day is open, so only today and tomorrow are bookable
+      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.dayNotBookable);
+      expect(prisma.reservation.create).not.toHaveBeenCalled();
+    });
+
+    it('should accept the first open day when the days in between are closed', async () => {
+      prisma.timeTableEntry.findMany.mockResolvedValue(openOn(weekdayIn(2)));
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+      prisma.reservation.count.mockResolvedValue(0);
+      prisma.reservation.findFirst.mockResolvedValue(null);
+      prisma.reservation.create.mockResolvedValue({ id: 1, cuid: 'cuid', user: mockUser });
+
+      Object.assign(baseDto, wallClockSlot(2));
+      await service.createForUser(mockUser.id, baseDto);
+
+      expect(prisma.reservation.create).toHaveBeenCalled();
+    });
+
+    it('should refuse a closed day', async () => {
+      prisma.timeTableEntry.findMany.mockResolvedValue(openOn(weekdayIn(2)));
+      Object.assign(baseDto, wallClockSlot(1));
+      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.dayNotBookable);
+    });
+
+    it.each([0, 45, 150])('should refuse a session of %i minutes', async (minutes) => {
+      Object.assign(baseDto, wallClockSlot(1, 14, minutes));
+      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.invalidDuration);
     });
 
     describe('verifyByCuid', () => {
