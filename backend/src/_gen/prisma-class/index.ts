@@ -10,6 +10,7 @@ import { SettingRelations as _SettingRelations } from './setting_relations.js';
 import { FormRelations as _FormRelations } from './form_relations.js';
 import { NavLinkRelations as _NavLinkRelations } from './nav_link_relations.js';
 import { RosterGameRelations as _RosterGameRelations } from './roster_game_relations.js';
+import { EsportsMatchRelations as _EsportsMatchRelations } from './esports_match_relations.js';
 import { RosterEntryRelations as _RosterEntryRelations } from './roster_entry_relations.js';
 import { DynamicFormRelations as _DynamicFormRelations } from './dynamic_form_relations.js';
 import { DynamicFormFieldRelations as _DynamicFormFieldRelations } from './dynamic_form_field_relations.js';
@@ -45,6 +46,7 @@ import { Setting as _Setting } from './setting.js';
 import { Form as _Form } from './form.js';
 import { NavLink as _NavLink } from './nav_link.js';
 import { RosterGame as _RosterGame } from './roster_game.js';
+import { EsportsMatch as _EsportsMatch } from './esports_match.js';
 import { RosterEntry as _RosterEntry } from './roster_entry.js';
 import { DynamicForm as _DynamicForm } from './dynamic_form.js';
 import { DynamicFormField as _DynamicFormField } from './dynamic_form_field.js';
@@ -82,6 +84,7 @@ export namespace PrismaModel {
   export class FormRelations extends _FormRelations {}
   export class NavLinkRelations extends _NavLinkRelations {}
   export class RosterGameRelations extends _RosterGameRelations {}
+  export class EsportsMatchRelations extends _EsportsMatchRelations {}
   export class RosterEntryRelations extends _RosterEntryRelations {}
   export class DynamicFormRelations extends _DynamicFormRelations {}
   export class DynamicFormFieldRelations extends _DynamicFormFieldRelations {}
@@ -117,6 +120,7 @@ export namespace PrismaModel {
   export class Form extends _Form {}
   export class NavLink extends _NavLink {}
   export class RosterGame extends _RosterGame {}
+  export class EsportsMatch extends _EsportsMatch {}
   export class RosterEntry extends _RosterEntry {}
   export class DynamicForm extends _DynamicForm {}
   export class DynamicFormField extends _DynamicFormField {}
@@ -154,6 +158,7 @@ export namespace PrismaModel {
     FormRelations,
     NavLinkRelations,
     RosterGameRelations,
+    EsportsMatchRelations,
     RosterEntryRelations,
     DynamicFormRelations,
     DynamicFormFieldRelations,
@@ -189,6 +194,7 @@ export namespace PrismaModel {
     Form,
     NavLink,
     RosterGame,
+    EsportsMatch,
     RosterEntry,
     DynamicForm,
     DynamicFormField,

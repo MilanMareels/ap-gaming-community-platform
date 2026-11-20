@@ -102,6 +102,11 @@ export type NavLink = Prisma.NavLinkModel
  */
 export type RosterGame = Prisma.RosterGameModel
 /**
+ * Model EsportsMatch
+ * 
+ */
+export type EsportsMatch = Prisma.EsportsMatchModel
+/**
  * Model RosterEntry
  * 
  */

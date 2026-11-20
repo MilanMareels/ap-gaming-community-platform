@@ -63,6 +63,7 @@ export const ModelName = {
   Form: 'Form',
   NavLink: 'NavLink',
   RosterGame: 'RosterGame',
+  EsportsMatch: 'EsportsMatch',
   RosterEntry: 'RosterEntry',
   DynamicForm: 'DynamicForm',
   DynamicFormField: 'DynamicFormField',
@@ -226,6 +227,24 @@ export const RosterGameScalarFieldEnum = {
 } as const
 
 export type RosterGameScalarFieldEnum = (typeof RosterGameScalarFieldEnum)[keyof typeof RosterGameScalarFieldEnum]
+
+
+export const EsportsMatchScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  opponent: 'opponent',
+  competition: 'competition',
+  playedAt: 'playedAt',
+  result: 'result',
+  ourScore: 'ourScore',
+  opponentScore: 'opponentScore',
+  vodUrl: 'vodUrl',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EsportsMatchScalarFieldEnum = (typeof EsportsMatchScalarFieldEnum)[keyof typeof EsportsMatchScalarFieldEnum]
 
 
 export const RosterEntryScalarFieldEnum = {

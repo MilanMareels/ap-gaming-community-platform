@@ -8,6 +8,7 @@ const STATIC_ROUTES: { path: string; changeFrequency: MetadataRoute.Sitemap[numb
   { path: '/events', changeFrequency: 'daily', priority: 0.9 },
   { path: '/schedule', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/roster', changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/results', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/jobs', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/info', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/twitch', changeFrequency: 'monthly', priority: 0.4 },

@@ -18,6 +18,11 @@ export type CreateReservationDto = ApiSchemas['CreateReservationDto'];
 export type AdminCreateReservationDto = ApiSchemas['AdminCreateReservationDto'];
 export type UpdateReservationDto = ApiSchemas['UpdateReservationDto'];
 export type ReservationPerson = ApiSchemas['ReservationPersonDto'];
+export type EsportsMatch = ApiSchemas['EsportsMatch'];
+export type EsportsMatchResult = ApiSchemas['EsportsMatchResult'];
+export type CreateEsportsMatchDto = ApiSchemas['CreateEsportsMatchDto'];
+/** A match with the team that played it (as GET /esports-results includes it) */
+export type EsportsMatchWithTeam = EsportsMatch & { game: { id: number; name: string } };
 export type ReservationVerificationDto =
   ApiSchemas['ReservationVerificationDto'];
 export type MyReservation = ApiSchemas['MyReservationDto'];

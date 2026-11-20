@@ -409,6 +409,7 @@ export const ModelName = {
   Form: 'Form',
   NavLink: 'NavLink',
   RosterGame: 'RosterGame',
+  EsportsMatch: 'EsportsMatch',
   RosterEntry: 'RosterEntry',
   DynamicForm: 'DynamicForm',
   DynamicFormField: 'DynamicFormField',
@@ -447,7 +448,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "userNote" | "googleSSOUser" | "microsoftSSOUser" | "role" | "permission" | "rolePermission" | "userRole" | "setting" | "form" | "navLink" | "rosterGame" | "rosterEntry" | "dynamicForm" | "dynamicFormField" | "dynamicFormSubmission" | "dynamicFormSubmissionAnswer" | "dynamicFormSubmissionComment" | "job" | "dynamicFormAccess" | "reservation" | "timeTableEntry" | "event" | "bracket" | "bracketParticipant" | "bracketMatch" | "bracketMatchParticipant" | "eventRegistration" | "timeTrial" | "timeTrialParticipant" | "timeTrialRun" | "pointTrial" | "pointTrialParticipant" | "pointTrialEntry" | "inventoryAdjustment"
+    modelProps: "user" | "userNote" | "googleSSOUser" | "microsoftSSOUser" | "role" | "permission" | "rolePermission" | "userRole" | "setting" | "form" | "navLink" | "rosterGame" | "esportsMatch" | "rosterEntry" | "dynamicForm" | "dynamicFormField" | "dynamicFormSubmission" | "dynamicFormSubmissionAnswer" | "dynamicFormSubmissionComment" | "job" | "dynamicFormAccess" | "reservation" | "timeTableEntry" | "event" | "bracket" | "bracketParticipant" | "bracketMatch" | "bracketMatchParticipant" | "eventRegistration" | "timeTrial" | "timeTrialParticipant" | "timeTrialRun" | "pointTrial" | "pointTrialParticipant" | "pointTrialEntry" | "inventoryAdjustment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1336,6 +1337,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.RosterGameCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.RosterGameCountAggregateOutputType> | number
+        }
+      }
+    }
+    EsportsMatch: {
+      payload: Prisma.$EsportsMatchPayload<ExtArgs>
+      fields: Prisma.EsportsMatchFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EsportsMatchFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EsportsMatchPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EsportsMatchFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EsportsMatchPayload>
+        }
+        findFirst: {
+          args: Prisma.EsportsMatchFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EsportsMatchPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EsportsMatchFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EsportsMatchPayload>
+        }
+        findMany: {
+          args: Prisma.EsportsMatchFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EsportsMatchPayload>[]
+        }
+        create: {
+          args: Prisma.EsportsMatchCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EsportsMatchPayload>
+        }
+        createMany: {
+          args: Prisma.EsportsMatchCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EsportsMatchCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EsportsMatchPayload>[]
+        }
+        delete: {
+          args: Prisma.EsportsMatchDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EsportsMatchPayload>
+        }
+        update: {
+          args: Prisma.EsportsMatchUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EsportsMatchPayload>
+        }
+        deleteMany: {
+          args: Prisma.EsportsMatchDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EsportsMatchUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EsportsMatchUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EsportsMatchPayload>[]
+        }
+        upsert: {
+          args: Prisma.EsportsMatchUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EsportsMatchPayload>
+        }
+        aggregate: {
+          args: Prisma.EsportsMatchAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEsportsMatch>
+        }
+        groupBy: {
+          args: Prisma.EsportsMatchGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EsportsMatchGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EsportsMatchCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EsportsMatchCountAggregateOutputType> | number
         }
       }
     }
@@ -3204,6 +3279,24 @@ export const RosterGameScalarFieldEnum = {
 export type RosterGameScalarFieldEnum = (typeof RosterGameScalarFieldEnum)[keyof typeof RosterGameScalarFieldEnum]
 
 
+export const EsportsMatchScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  opponent: 'opponent',
+  competition: 'competition',
+  playedAt: 'playedAt',
+  result: 'result',
+  ourScore: 'ourScore',
+  opponentScore: 'opponentScore',
+  vodUrl: 'vodUrl',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EsportsMatchScalarFieldEnum = (typeof EsportsMatchScalarFieldEnum)[keyof typeof EsportsMatchScalarFieldEnum]
+
+
 export const RosterEntryScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -3595,6 +3688,20 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'EsportsMatchResult'
+ */
+export type EnumEsportsMatchResultFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EsportsMatchResult'>
+    
+
+
+/**
+ * Reference to a field of type 'EsportsMatchResult[]'
+ */
+export type ListEnumEsportsMatchResultFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EsportsMatchResult[]'>
+    
+
+
+/**
  * Reference to a field of type 'FormFieldType'
  */
 export type EnumFormFieldTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FormFieldType'>
@@ -3910,6 +4017,7 @@ export type GlobalOmitConfig = {
   form?: Prisma.FormOmit
   navLink?: Prisma.NavLinkOmit
   rosterGame?: Prisma.RosterGameOmit
+  esportsMatch?: Prisma.EsportsMatchOmit
   rosterEntry?: Prisma.RosterEntryOmit
   dynamicForm?: Prisma.DynamicFormOmit
   dynamicFormField?: Prisma.DynamicFormFieldOmit

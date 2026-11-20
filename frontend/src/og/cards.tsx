@@ -4,6 +4,7 @@ import { EVENT_CATEGORY_LABELS, formatEventDate, stripHtml } from '@/util/seo';
 import {
   getActiveJobs,
   getBracket,
+  getEsportsResults,
   getEvent,
   getInventory,
   getJob,
@@ -290,8 +291,39 @@ async function jobsCard(path: string[]): Promise<Card> {
   ));
 }
 
+async function resultsCard(path: string[]): Promise<Card> {
+  const played = ((await getEsportsResults()) ?? []).filter((match) => match.result !== 'UPCOMING');
+  const count = (result: string) => played.filter((match) => match.result === result).length;
+  const stats = (
+    [
+      [count('WIN'), 'Gewonnen'],
+      [count('LOSS'), 'Verloren'],
+      [count('DRAW'), 'Gelijk'],
+    ] as const
+  ).filter(([amount], index) => index < 2 || amount > 0);
+
+  if (!played.length)
+    return simpleCard(path, {
+      title: 'Esports resultaten',
+      eyebrow: 'AP Esports',
+      photo: 'setup',
+      text: 'De resultaten van de esports teams van AP Hogeschool.',
+    });
+
+  return card(path, stats, async (host) => (
+    <Frame host={host} title="Esports resultaten" eyebrow={`${played.length} ${played.length === 1 ? 'wedstrijd' : 'wedstrijden'}`} photo={await photo('setup')}>
+      <Row>
+        {stats.map(([amount, label]) => (
+          <Stat key={label} value={amount} label={label} />
+        ))}
+      </Row>
+    </Frame>
+  ));
+}
+
 const DATA_PAGES: Record<string, (path: string[]) => Promise<Card>> = {
   reservations: reservationsCard,
+  results: resultsCard,
   schedule: scheduleCard,
   events: eventsCard,
   roster: rosterCard,

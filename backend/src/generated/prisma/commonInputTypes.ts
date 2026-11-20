@@ -177,6 +177,23 @@ export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedIntNullableFilter<$PrismaModel>
 }
 
+export type EnumEsportsMatchResultFilter<$PrismaModel = never> = {
+  equals?: $Enums.EsportsMatchResult | Prisma.EnumEsportsMatchResultFieldRefInput<$PrismaModel>
+  in?: $Enums.EsportsMatchResult[] | Prisma.ListEnumEsportsMatchResultFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EsportsMatchResult[] | Prisma.ListEnumEsportsMatchResultFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEsportsMatchResultFilter<$PrismaModel> | $Enums.EsportsMatchResult
+}
+
+export type EnumEsportsMatchResultWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EsportsMatchResult | Prisma.EnumEsportsMatchResultFieldRefInput<$PrismaModel>
+  in?: $Enums.EsportsMatchResult[] | Prisma.ListEnumEsportsMatchResultFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EsportsMatchResult[] | Prisma.ListEnumEsportsMatchResultFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEsportsMatchResultWithAggregatesFilter<$PrismaModel> | $Enums.EsportsMatchResult
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEsportsMatchResultFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEsportsMatchResultFilter<$PrismaModel>
+}
+
 export type EnumFormFieldTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.FormFieldType | Prisma.EnumFormFieldTypeFieldRefInput<$PrismaModel>
   in?: $Enums.FormFieldType[] | Prisma.ListEnumFormFieldTypeFieldRefInput<$PrismaModel>
@@ -555,6 +572,23 @@ export type NestedFloatNullableFilter<$PrismaModel = never> = {
   gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   not?: Prisma.NestedFloatNullableFilter<$PrismaModel> | number | null
+}
+
+export type NestedEnumEsportsMatchResultFilter<$PrismaModel = never> = {
+  equals?: $Enums.EsportsMatchResult | Prisma.EnumEsportsMatchResultFieldRefInput<$PrismaModel>
+  in?: $Enums.EsportsMatchResult[] | Prisma.ListEnumEsportsMatchResultFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EsportsMatchResult[] | Prisma.ListEnumEsportsMatchResultFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEsportsMatchResultFilter<$PrismaModel> | $Enums.EsportsMatchResult
+}
+
+export type NestedEnumEsportsMatchResultWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EsportsMatchResult | Prisma.EnumEsportsMatchResultFieldRefInput<$PrismaModel>
+  in?: $Enums.EsportsMatchResult[] | Prisma.ListEnumEsportsMatchResultFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EsportsMatchResult[] | Prisma.ListEnumEsportsMatchResultFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEsportsMatchResultWithAggregatesFilter<$PrismaModel> | $Enums.EsportsMatchResult
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEsportsMatchResultFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEsportsMatchResultFilter<$PrismaModel>
 }
 
 export type NestedEnumFormFieldTypeFilter<$PrismaModel = never> = {
