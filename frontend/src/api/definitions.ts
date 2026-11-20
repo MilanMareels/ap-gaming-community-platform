@@ -2306,6 +2306,9 @@ export interface components {
             /** Format: date-time */
             endTime: string;
             status: components["schemas"]["ReservationStatus"];
+            /** Format: date-time */
+            createdAt?: string;
+            createdByStaff: boolean;
         };
         HttpExceptionDto: {
             /** @example 400 */
@@ -2397,6 +2400,48 @@ export interface components {
              */
             endTime: string;
         };
+        HourSlotDto: {
+            /** @example 14 */
+            hour: number;
+            /** @example Maandag */
+            day: string;
+            /** @example 8 */
+            count: number;
+        };
+        DurationBucketDto: {
+            /** @example 1h */
+            label: string;
+            /** @example 30 */
+            count: number;
+        };
+        BookingBehaviourDto: {
+            /**
+             * @description Reservations people made themselves with a known booking time
+             * @example 120
+             */
+            trackedReservations: number;
+            /**
+             * @description Reservations entered by staff, left out of the booking figures
+             * @example 8
+             */
+            staffReservations: number;
+            /**
+             * @description Average minutes between booking and the start of the reservation
+             * @example 640
+             */
+            avgLeadMinutes: number;
+            /** @example 300 */
+            medianLeadMinutes: number;
+            /**
+             * @description Share booked on the day of the reservation itself
+             * @example 62.5
+             */
+            sameDayPercent: number;
+            /** @description When reservations were made, per weekday and hour */
+            bookingHoursHeatmap: components["schemas"]["HourSlotDto"][];
+            /** @description How long before the start reservations were made */
+            leadTimeDistribution: components["schemas"]["DurationBucketDto"][];
+        };
         DailyCountDto: {
             /** @example 2026-10-01 */
             date: string;
@@ -2410,14 +2455,6 @@ export interface components {
             label: string;
             /** @example 18.5 */
             avg: number;
-        };
-        HourSlotDto: {
-            /** @example 14 */
-            hour: number;
-            /** @example Maandag */
-            day: string;
-            /** @example 8 */
-            count: number;
         };
         HardwareCountDto: {
             /** @example pc */
@@ -2460,12 +2497,6 @@ export interface components {
             noShowRate: number;
             /** @example 10 */
             cancelRate: number;
-        };
-        DurationBucketDto: {
-            /** @example 1h */
-            label: string;
-            /** @example 30 */
-            count: number;
         };
         RepeatUserDto: {
             /** @example 120 */
@@ -2510,6 +2541,7 @@ export interface components {
             noShowRate: number;
         };
         ReservationStatisticsDto: {
+            bookingBehaviour: components["schemas"]["BookingBehaviourDto"];
             dailyCounts: components["schemas"]["DailyCountDto"][];
             weekdayAverages: components["schemas"]["WeekdayCountDto"][];
             peakHoursHeatmap: components["schemas"]["HourSlotDto"][];
@@ -2560,6 +2592,11 @@ export interface components {
             avgDurationMinutes: number;
             /** @example 1.5 */
             avgControllers: number;
+            /**
+             * @description Average minutes between booking and start, over reservations they made themselves; null when unknown
+             * @example 240
+             */
+            avgLeadMinutes: number | null;
             hardwareBreakdown: components["schemas"]["HardwareCountDto"][];
             reservationsOverTime: components["schemas"]["MonthlyCountDto"][];
             preferredSlots: components["schemas"]["HourCountDto"][];

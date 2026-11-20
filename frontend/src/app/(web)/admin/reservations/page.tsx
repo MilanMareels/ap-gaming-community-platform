@@ -12,6 +12,7 @@ import { apiClient } from '@/api';
 import type { ReservationWithUser, ReservationStatus } from '@/api';
 import ReservationModal from './ReservationModal';
 import ReservationQrScannerModal from '@/components/reservations/ReservationQrScannerModal';
+import { formatBookedAt } from '@/util/booking-time';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -31,6 +32,17 @@ function todayLocal(): string {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
+}
+
+/** When the reservation was made and how long before its start; nothing for reservations from before this was tracked. */
+function BookedAt({ reservation, className = '' }: { reservation: ReservationWithUser; className?: string }) {
+  if (!reservation.createdAt) return null;
+  const { stamp, lead } = formatBookedAt(reservation.createdAt, reservation.startTime);
+  return (
+    <p className={`text-xs text-gray-500 ${className}`} title="Wanneer deze reservering gemaakt werd">
+      Geboekt {stamp} · {reservation.createdByStaff ? 'door het team' : lead}
+    </p>
+  );
 }
 
 function getInitials(name: string | undefined): string {
@@ -290,6 +302,7 @@ export default function AdminReservationsPage() {
                     <p className="font-medium text-white mt-0.5 flex items-center gap-1"><Gamepad2 size={12} /> {r.controllers}</p>
                   </div>
                 </div>
+                <BookedAt reservation={r} className="-mt-1" />
               </div>
               <div className="flex border-t border-slate-800/60">
                 <button
@@ -352,6 +365,7 @@ export default function AdminReservationsPage() {
                   <td className="px-4 py-3.5 text-gray-300">{dateFromISO(r.startTime)}</td>
                   <td className="px-4 py-3.5 text-gray-300">
                     {formatTime(r.startTime)} - {formatTime(r.endTime)}
+                    <BookedAt reservation={r} className="mt-0.5" />
                   </td>
                   <td className="px-4 py-3.5">
                     <Badge variant={r.inventory === 'pc' || r.inventory === 'switch' ? 'danger' : 'info'}>{r.inventory.toUpperCase()}</Badge>

@@ -366,7 +366,9 @@ export const ReservationScalarFieldEnum = {
   inventory: 'inventory',
   startTime: 'startTime',
   endTime: 'endTime',
-  status: 'status'
+  status: 'status',
+  createdAt: 'createdAt',
+  createdByStaff: 'createdByStaff'
 } as const
 
 export type ReservationScalarFieldEnum = (typeof ReservationScalarFieldEnum)[keyof typeof ReservationScalarFieldEnum]

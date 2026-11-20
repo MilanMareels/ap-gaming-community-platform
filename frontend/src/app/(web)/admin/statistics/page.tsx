@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { apiClient } from '@/api';
 import type { ReservationStatistics } from '@/api';
 import { PageHeader } from '@/components/admin/PageHeader';
+import { formatLeadTime } from '@/util/booking-time';
 import {
   BarChart,
   Bar,
@@ -87,6 +88,42 @@ function HeatmapCell({ count, max }: { count: number; max: number }) {
   return (
     <div className={`${bg} rounded text-center text-xs font-semibold text-white py-1.5 min-w-10`} title={`${count} reserveringen`}>
       {count || ''}
+    </div>
+  );
+}
+
+/** Weekday × hour grid of counts, showing only the hours that occur. */
+function WeekHourHeatmap({ cells }: { cells: { day: string; hour: number; count: number }[] }) {
+  const counts = new Map(cells.map((c) => [`${c.day}|${c.hour}`, c.count]));
+  const max = Math.max(0, ...cells.map((c) => c.count));
+  const hours = [...new Set(cells.map((c) => c.hour))].sort((a, b) => a - b);
+  if (hours.length === 0) return <p className="text-gray-500 text-sm">Geen data beschikbaar.</p>;
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-xs">
+        <thead>
+          <tr>
+            <th className="p-2 text-left text-gray-500 font-semibold" />
+            {hours.map((h) => (
+              <th key={h} className="p-1 text-center text-gray-400 font-semibold">
+                {String(h).padStart(2, '0')}:00
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {HEATMAP_DAYS.map((day) => (
+            <tr key={day}>
+              <td className="p-2 text-gray-400 font-semibold whitespace-nowrap">{day}</td>
+              {hours.map((h) => (
+                <td key={h} className="p-1">
+                  <HeatmapCell count={counts.get(`${day}|${h}`) ?? 0} max={max} />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -215,14 +252,7 @@ export default function AdminStatisticsPage() {
   const showRate = totalReservations > 0 ? Math.round((presentCount / totalReservations) * 1000) / 10 : 0;
   const noShowRate = totalReservations > 0 ? Math.round((noShowCount / totalReservations) * 1000) / 10 : 0;
 
-  const heatmapData = new Map<string, number>();
-  let heatmapMax = 0;
-  for (const h of stats.peakHoursHeatmap) {
-    const key = `${h.day}|${h.hour}`;
-    heatmapData.set(key, h.count);
-    if (h.count > heatmapMax) heatmapMax = h.count;
-  }
-  const heatmapHours = [...new Set(stats.peakHoursHeatmap.map((h) => h.hour))].sort((a, b) => a - b);
+  const booking = stats.bookingBehaviour;
 
   const pieData = stats.statusBreakdown.map((s) => ({
     name: STATUS_LABELS[s.status] ?? s.status,
@@ -337,37 +367,51 @@ export default function AdminStatisticsPage() {
 
         {/* Row 3: Peak hours heatmap */}
         <ChartCard title="Piekuren heatmap">
-          {heatmapHours.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr>
-                    <th className="p-2 text-left text-gray-500 font-semibold" />
-                    {heatmapHours.map((h) => (
-                      <th key={h} className="p-1 text-center text-gray-400 font-semibold">
-                        {String(h).padStart(2, '0')}:00
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {HEATMAP_DAYS.map((day) => (
-                    <tr key={day}>
-                      <td className="p-2 text-gray-400 font-semibold whitespace-nowrap">{day}</td>
-                      {heatmapHours.map((h) => (
-                        <td key={h} className="p-1">
-                          <HeatmapCell count={heatmapData.get(`${day}|${h}`) ?? 0} max={heatmapMax} />
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-gray-500 text-sm">Geen data beschikbaar.</p>
-          )}
+          <WeekHourHeatmap cells={stats.peakHoursHeatmap} />
         </ChartCard>
+
+        {/* Booking behaviour: when people book and how far ahead */}
+        <div>
+          <h2 className="text-lg font-bold text-white">Wanneer wordt er geboekt?</h2>
+          <p className="mt-1 text-sm text-gray-400">
+            Op basis van {booking.trackedReservations} reserveringen die mensen zelf maakten.
+            {booking.staffReservations > 0 && ` ${booking.staffReservations} door het team ingevoerde reserveringen tellen niet mee.`} Het tijdstip van
+            boeken wordt pas bijgehouden sinds november 2026.
+          </p>
+        </div>
+
+        {booking.trackedReservations === 0 ? (
+          <div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center text-sm text-gray-500">
+            Nog geen reserveringen met een gekend boekingstijdstip in deze periode.
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <StatCard title="Gemiddeld vooraf geboekt" value={formatLeadTime(booking.avgLeadMinutes)} subtitle="tussen boeken en de start" />
+              <StatCard title="Mediaan" value={formatLeadTime(booking.medianLeadMinutes)} subtitle="de helft boekt korter op voorhand" />
+              <StatCard title="Dezelfde dag geboekt" value={`${booking.sameDayPercent}%`} subtitle="op de dag van de reservering zelf" />
+            </div>
+
+            <ChartCard title="Hoe lang op voorhand">
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={booking.leadTimeDistribution} layout="vertical" margin={{ left: 8, right: 16 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
+                  <XAxis type="number" tick={{ fill: '#94a3b8', fontSize: 11 }} allowDecimals={false} />
+                  <YAxis type="category" dataKey="label" tick={{ fill: '#94a3b8', fontSize: 11 }} width={76} />
+                  <Tooltip
+                    cursor={{ fill: '#1e293b' }}
+                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: 8, color: '#fff' }}
+                  />
+                  <Bar dataKey="count" fill={COLORS.cyan} radius={[0, 4, 4, 0]} barSize={18} name="Reserveringen" />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard title="Tijdstip waarop gereserveerd wordt">
+              <WeekHourHeatmap cells={booking.bookingHoursHeatmap} />
+            </ChartCard>
+          </>
+        )}
 
         {/* Row 4: Hardware breakdown + Hardware over time */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
