@@ -17,6 +17,7 @@ export type User = ApiSchemas['User'];
 export type CreateReservationDto = ApiSchemas['CreateReservationDto'];
 export type AdminCreateReservationDto = ApiSchemas['AdminCreateReservationDto'];
 export type UpdateReservationDto = ApiSchemas['UpdateReservationDto'];
+export type ReservationPerson = ApiSchemas['ReservationPersonDto'];
 export type ReservationVerificationDto =
   ApiSchemas['ReservationVerificationDto'];
 export type MyReservation = ApiSchemas['MyReservationDto'];

@@ -528,8 +528,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a reservation as admin (no date restrictions) */
+        /** Create a reservation as admin for an existing user (userId) or by email (no date restrictions) */
         post: operations["ReservationsController_adminCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reservations/admin/people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search people to book a reservation for, by name, email or student number */
+        get: operations["ReservationsController_searchPeople"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2321,10 +2338,23 @@ export interface components {
             status: "RESERVED" | "CANCELLED" | "PRESENT" | "NO_SHOW";
         };
         AdminCreateReservationDto: {
+            /**
+             * @description An existing user, picked from the person search. Takes precedence over email.
+             * @example 12
+             */
+            userId?: number;
+            /**
+             * @description Required when no userId is given
+             * @example student@student.ap.be
+             */
+            email?: string;
+            /**
+             * @description Name for a new person, or for a known person without one
+             * @example Robin Claes
+             */
+            name?: string;
             /** @example s123456 */
             sNumber?: string;
-            /** @example student@student.ap.be */
-            email: string;
             /**
              * @example pc
              * @enum {string}
@@ -2337,11 +2367,33 @@ export interface components {
             /** @example 2026-02-28T12:00:00.000Z */
             endTime: string;
         };
+        ReservationPersonDto: {
+            /** @example 12 */
+            id: number;
+            /** @example Robin Claes */
+            name: string | null;
+            /** @example s123456@student.ap.be */
+            email: string;
+            /** @example s123456 */
+            sNumber: string;
+            /**
+             * @description Reservations this person has made so far
+             * @example 4
+             */
+            reservationCount: number;
+        };
         UpdateReservationStatusDto: {
             /** @enum {string} */
             status: "RESERVED" | "CANCELLED" | "PRESENT" | "NO_SHOW";
         };
         UpdateReservationDto: {
+            /**
+             * @description Move the reservation to this existing user
+             * @example 12
+             */
+            userId?: number;
+            /** @example Robin Claes */
+            name?: string;
             /** @example student@student.ap.be */
             email?: string;
             /** @example s123456 */
@@ -4202,6 +4254,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    ReservationsController_searchPeople: {
+        parameters: {
+            query: {
+                /** @description Part of a name, email address or student number (at least 2 characters) */
+                search: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationPersonDto"][];
                 };
             };
         };

@@ -66,7 +66,7 @@ describe('ReservationsService', () => {
     baseAdminDto.endTime = getIsoDate(1);
 
     const mockPrisma = {
-      user: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn() },
+      user: { findUnique: jest.fn(), findFirst: jest.fn(), findMany: jest.fn(), create: jest.fn(), update: jest.fn() },
       microsoftSSOUser: { findFirst: jest.fn<() => Promise<{ id: number }>>().mockResolvedValue({ id: 1 }) },
       reservation: {
         findFirst: jest.fn(),
@@ -148,7 +148,7 @@ describe('ReservationsService', () => {
     });
 
     it('should still let staff create a reservation for someone without a Microsoft account', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.user.findFirst.mockResolvedValue(mockUser);
       prisma.microsoftSSOUser.findFirst.mockResolvedValue(null);
       prisma.setting.findFirst.mockResolvedValue({ value: '5' });
       prisma.reservation.count.mockResolvedValue(0);
@@ -282,6 +282,135 @@ describe('ReservationsService', () => {
             endTime: { gt: new Date(start - gap) },
           }),
         });
+      });
+    });
+
+    describe('booking for a person as staff', () => {
+      const created = { id: 1, cuid: 'cuid', user: mockUser };
+
+      beforeEach(() => {
+        prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+        prisma.reservation.count.mockResolvedValue(0);
+        prisma.reservation.create.mockResolvedValue(created);
+      });
+
+      const bookedFor = () => prisma.reservation.create.mock.calls[0][0].data;
+
+      it('books for the user picked in the search', async () => {
+        prisma.user.findUnique.mockResolvedValue({ ...mockUser, id: 42, email: 'picked@student.ap.be' });
+
+        await service.adminCreate({ ...baseAdminDto, email: undefined, sNumber: undefined, userId: 42 });
+
+        expect(bookedFor()).toEqual(expect.objectContaining({ userId: 42, email: 'picked@student.ap.be' }));
+        expect(prisma.user.create).not.toHaveBeenCalled();
+      });
+
+      it('refuses a picked user that no longer exists', async () => {
+        prisma.user.findUnique.mockResolvedValue(null);
+        await expect(service.adminCreate({ ...baseAdminDto, userId: 404 })).rejects.toThrow(NotFoundException);
+      });
+
+      it('matches the email whatever its casing', async () => {
+        prisma.user.findFirst.mockResolvedValueOnce(mockUser);
+
+        await service.adminCreate({ ...baseAdminDto, email: '  Test@Student.AP.be ' });
+
+        expect(prisma.user.findFirst).toHaveBeenCalledWith({ where: { email: { equals: 'test@student.ap.be', mode: 'insensitive' } } });
+        expect(bookedFor()).toEqual(expect.objectContaining({ userId: mockUser.id, email: mockUser.email }));
+        expect(prisma.user.create).not.toHaveBeenCalled();
+      });
+
+      it('falls back to the student number, also when it is only in a short email', async () => {
+        const student = { id: 5, email: 's654321@student.ap.be', sNumber: 's654321', name: 'Robin' };
+        prisma.user.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(student);
+
+        await service.adminCreate({ ...baseAdminDto, email: 'S654321@ap.be', sNumber: undefined });
+
+        expect(prisma.user.findFirst).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            where: {
+              OR: [
+                { sNumber: { equals: 's654321', mode: 'insensitive' } },
+                { email: { equals: 's654321@student.ap.be', mode: 'insensitive' } },
+                { email: { equals: 's654321@ap.be', mode: 'insensitive' } },
+              ],
+            },
+          }),
+        );
+        expect(bookedFor()).toEqual(expect.objectContaining({ userId: 5, email: 's654321@student.ap.be' }));
+        expect(prisma.user.create).not.toHaveBeenCalled();
+      });
+
+      it('creates a named person when nobody matches', async () => {
+        prisma.user.findFirst.mockResolvedValue(null);
+        prisma.user.create.mockResolvedValue({ id: 9, email: 'new.person@example.com', sNumber: 's111111', name: 'New Person' });
+
+        await service.adminCreate({ ...baseAdminDto, email: 'New.Person@example.com', name: ' New Person ', sNumber: 'S111111' });
+
+        expect(prisma.user.create).toHaveBeenCalledWith({ data: { email: 'new.person@example.com', name: 'New Person', sNumber: 's111111' } });
+        expect(bookedFor()).toEqual(expect.objectContaining({ userId: 9 }));
+      });
+
+      it('asks for an email when a new person has none', async () => {
+        prisma.user.findFirst.mockResolvedValue(null);
+        await expect(service.adminCreate({ ...baseAdminDto, email: undefined, sNumber: undefined, name: 'Nobody' })).rejects.toThrow(
+          BadRequestException,
+        );
+      });
+
+      it('fills in a missing name and student number but keeps existing ones', async () => {
+        prisma.user.findFirst.mockResolvedValueOnce({ ...mockUser, name: null, sNumber: 'N/A' });
+        prisma.user.update.mockResolvedValue(mockUser);
+
+        await service.adminCreate({ ...baseAdminDto, name: 'Robin', sNumber: 's123456' });
+        expect(prisma.user.update).toHaveBeenCalledWith({ where: { id: mockUser.id }, data: { name: 'Robin', sNumber: 's123456' } });
+
+        prisma.user.update.mockClear();
+        prisma.user.findFirst.mockResolvedValueOnce({ ...mockUser, name: 'Robin Claes' });
+        await service.adminCreate({ ...baseAdminDto, name: 'Someone else' });
+        expect(prisma.user.update).not.toHaveBeenCalled();
+      });
+
+      it('moves a reservation to another picked person on edit', async () => {
+        prisma.reservation.findUnique.mockResolvedValue({ id: 3, userId: mockUser.id, email: mockUser.email, user: mockUser });
+        prisma.user.findUnique.mockResolvedValue({ ...mockUser, id: 42, email: 'other@student.ap.be' });
+        prisma.reservation.update.mockResolvedValue({});
+
+        await service.update(3, { userId: 42 });
+
+        expect(prisma.reservation.update).toHaveBeenCalledWith(
+          expect.objectContaining({ data: expect.objectContaining({ userId: 42, email: 'other@student.ap.be' }) }),
+        );
+      });
+
+      it('keeps the person when an edit only changes the email casing', async () => {
+        prisma.reservation.findUnique.mockResolvedValue({ id: 3, userId: mockUser.id, email: mockUser.email, user: mockUser });
+        prisma.reservation.update.mockResolvedValue({});
+
+        await service.update(3, { email: mockUser.email.toUpperCase(), inventory: 'ps5' });
+
+        expect(prisma.user.findFirst).not.toHaveBeenCalled();
+        expect(prisma.reservation.update).toHaveBeenCalledWith(expect.objectContaining({ data: { inventory: 'ps5' } }));
+      });
+
+      it('searches people by name, email or student number with their booking count', async () => {
+        prisma.user.findMany.mockResolvedValue([{ id: 1, name: 'Robin', email: 'r@x.be', sNumber: 's1', _count: { reservations: 4 } }]);
+
+        await expect(service.searchPeople(' rob ')).resolves.toEqual([
+          { id: 1, name: 'Robin', email: 'r@x.be', sNumber: 's1', reservationCount: 4 },
+        ]);
+        expect(prisma.user.findMany).toHaveBeenCalledWith(
+          expect.objectContaining({
+            where: {
+              OR: [
+                { name: { contains: 'rob', mode: 'insensitive' } },
+                { email: { contains: 'rob', mode: 'insensitive' } },
+                { sNumber: { contains: 'rob', mode: 'insensitive' } },
+              ],
+            },
+            take: 10,
+          }),
+        );
       });
     });
 
@@ -518,15 +647,18 @@ describe('ReservationsService', () => {
     });
 
     it('should send confirmation email for admin-created reservations', async () => {
+      prisma.user.findFirst.mockResolvedValue(mockUser);
       await service.adminCreate(baseAdminDto as any);
 
       expect(mailService.generateQRCode).toHaveBeenCalledWith(mockCuid);
       expect(mailService.sendMailWithAttachments).toHaveBeenCalled();
     });
 
-    it('should handle admin reservations without sNumber', async () => {
-      const dtoWithoutSNumber = { ...baseAdminDto };
+    it('should handle admin reservations for a new person without sNumber', async () => {
+      const dtoWithoutSNumber = { ...baseAdminDto, email: 'guest@example.com' };
       delete (dtoWithoutSNumber as any).sNumber;
+      prisma.user.findFirst.mockResolvedValue(null);
+      prisma.user.create.mockResolvedValue({ id: 7, email: 'guest@example.com', sNumber: 'N/A', name: null });
 
       await service.adminCreate(dtoWithoutSNumber as any);
 

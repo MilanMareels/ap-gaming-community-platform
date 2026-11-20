@@ -8,6 +8,8 @@ import {
   CreateReservationDto,
   AdminCreateReservationDto,
   MyReservationsResponseDto,
+  ReservationPersonDto,
+  ReservationPersonQueryDto,
   ReservationQueryDto,
   ReservationRulesDto,
   ReservationSlotDto,
@@ -149,12 +151,21 @@ export class ReservationsController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @RequirePermissions('reservations.manage')
   @ApiOperation({
-    summary: 'Create a reservation as admin (no date restrictions)',
+    summary: 'Create a reservation as admin for an existing user (userId) or by email (no date restrictions)',
   })
   @ApiCreatedResponse({ type: PrismaModel.Reservation })
   @ApiBadRequestResponse({ description: 'Time slot is already reserved', type: HttpExceptionDto })
   adminCreate(@Body() dto: AdminCreateReservationDto) {
     return this.reservationsService.adminCreate(dto);
+  }
+
+  @Get('admin/people')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('reservations.manage')
+  @ApiOperation({ summary: 'Search people to book a reservation for, by name, email or student number' })
+  @ApiOkResponse({ type: [ReservationPersonDto] })
+  searchPeople(@Query() query: ReservationPersonQueryDto) {
+    return this.reservationsService.searchPeople(query.search);
   }
 
   @Get('no-shows')
