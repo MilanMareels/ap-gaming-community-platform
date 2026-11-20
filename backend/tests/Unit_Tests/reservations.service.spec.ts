@@ -8,6 +8,7 @@ import { errorMessages } from '../../src/errors/errorMessages.js';
 import { MailService } from '../../src/modules/mail/mail.service.js';
 import { InventoryAdjustmentsService } from '../../src/modules/inventory-adjustments/inventory-adjustments.service.js';
 import { wallClockNow } from '../../src/common/wall-clock.js';
+import { ReservationRulesService } from '../../src/modules/reservations/reservation-rules.service.js';
 
 const getIsoDate = (offset = 0) => {
   const d = new Date();
@@ -78,6 +79,7 @@ describe('ReservationsService', () => {
       },
       setting: {
         findFirst: jest.fn(),
+        findMany: jest.fn<() => Promise<{ key: string; value: string }[]>>().mockResolvedValue([]),
       },
       timeTableEntry: {
         findMany: jest.fn<() => Promise<{ dayOfWeek: number }[]>>().mockResolvedValue(openOn(0, 1, 2, 3, 4, 5, 6)),
@@ -97,6 +99,7 @@ describe('ReservationsService', () => {
     const module = await Test.createTestingModule({
       providers: [
         ReservationsService,
+        ReservationRulesService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: MailService, useValue: mockMailService },
         { provide: InventoryAdjustmentsService, useValue: mockInventoryAdjustmentsService },
@@ -203,6 +206,83 @@ describe('ReservationsService', () => {
     it.each([0, 45, 150])('should refuse a session of %i minutes', async (minutes) => {
       Object.assign(baseDto, wallClockSlot(1, 14, minutes));
       await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.invalidDuration);
+    });
+
+    describe('per-member limits', () => {
+      const setRules = (rules: Record<string, string>) =>
+        prisma.setting.findMany.mockResolvedValue(Object.entries(rules).map(([key, value]) => ({ key, value })));
+
+      beforeEach(() => {
+        prisma.user.findUnique.mockResolvedValue(mockUser);
+        prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+        prisma.reservation.count.mockResolvedValue(0);
+        prisma.reservation.findFirst.mockResolvedValue(null);
+        prisma.reservation.create.mockResolvedValue({ id: 1, cuid: 'cuid', user: mockUser });
+      });
+
+      it('refuses a second reservation on the same day by default', async () => {
+        prisma.reservation.count
+          .mockResolvedValueOnce(0) // capacity
+          .mockResolvedValueOnce(0) // no-shows
+          .mockResolvedValueOnce(1); // already booked today
+
+        await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.maxPerDay(1));
+        expect(prisma.reservation.create).not.toHaveBeenCalled();
+      });
+
+      it('counts the reservations of the wall-clock day the session falls on', async () => {
+        await service.createForUser(mockUser.id, baseDto);
+
+        const day = baseDto.startTime.slice(0, 10);
+        expect(prisma.reservation.count).toHaveBeenLastCalledWith({
+          where: expect.objectContaining({
+            userId: mockUser.id,
+            startTime: { gte: new Date(`${day}T00:00:00.000Z`), lt: new Date(new Date(`${day}T00:00:00.000Z`).getTime() + 86_400_000) },
+          }),
+        });
+      });
+
+      it('allows several reservations a day when the limit is raised', async () => {
+        setRules({ 'reservations.maxPerDay': '3' });
+        prisma.reservation.count.mockResolvedValueOnce(0).mockResolvedValueOnce(0).mockResolvedValueOnce(2);
+
+        await service.createForUser(mockUser.id, baseDto);
+
+        expect(prisma.reservation.create).toHaveBeenCalled();
+      });
+
+      it('skips the daily limit when it is set to 0', async () => {
+        setRules({ 'reservations.maxPerDay': '0', 'reservations.minGapMinutes': '0' });
+
+        await service.createForUser(mockUser.id, baseDto);
+
+        expect(prisma.reservation.count).toHaveBeenCalledTimes(2); // capacity and no-shows only
+        expect(prisma.reservation.findFirst).toHaveBeenCalledTimes(1); // overlap only
+        expect(prisma.reservation.create).toHaveBeenCalled();
+      });
+
+      it('refuses a reservation too close to another one', async () => {
+        setRules({ 'reservations.minGapMinutes': '45' });
+        prisma.reservation.findFirst
+          .mockResolvedValueOnce(null) // no overlap
+          .mockResolvedValueOnce({ id: 9 }); // but within the gap
+
+        await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.minGap(45));
+      });
+
+      it('looks for any reservation within the gap, including short ones fully inside it', async () => {
+        await service.createForUser(mockUser.id, baseDto);
+
+        const start = new Date(baseDto.startTime).getTime();
+        const end = new Date(baseDto.endTime).getTime();
+        const gap = 90 * 60_000;
+        expect(prisma.reservation.findFirst).toHaveBeenNthCalledWith(2, {
+          where: expect.objectContaining({
+            startTime: { lt: new Date(end + gap) },
+            endTime: { gt: new Date(start - gap) },
+          }),
+        });
+      });
     });
 
     describe('verifyByCuid', () => {

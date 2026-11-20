@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
 
+export class ReservationRulesDto {
+  @ApiProperty({ example: 1, description: 'Active reservations a member may have on one day (0 = no limit)' })
+  maxPerDay!: number;
+
+  @ApiProperty({ example: 90, description: "Minutes required between a member's reservations (0 = none)" })
+  minGapMinutes!: number;
+}
+
 export class ReservationSlotDto {
   @ApiProperty({ example: 'pc' })
   inventory!: string;

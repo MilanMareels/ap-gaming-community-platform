@@ -2,12 +2,14 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Unauthor
 import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { ReservationsService } from './reservations.service.js';
+import { ReservationRulesService } from './reservation-rules.service.js';
 import { InventoryAdjustmentsService } from '../inventory-adjustments/inventory-adjustments.service.js';
 import {
   CreateReservationDto,
   AdminCreateReservationDto,
   MyReservationsResponseDto,
   ReservationQueryDto,
+  ReservationRulesDto,
   ReservationSlotDto,
   ReservationVerificationDto,
   UpdateReservationDto,
@@ -29,6 +31,7 @@ export class ReservationsController {
   constructor(
     private readonly reservationsService: ReservationsService,
     private readonly inventoryAdjustmentsService: InventoryAdjustmentsService,
+    private readonly reservationRules: ReservationRulesService,
   ) {}
 
   @Post()
@@ -81,6 +84,14 @@ export class ReservationsController {
   @ApiOkResponse({ type: [PrismaModel.Reservation] })
   findAll(@Query() query: ReservationQueryDto) {
     return this.reservationsService.findAll(query.date, query.search);
+  }
+
+  @Public()
+  @Get('rules')
+  @ApiOperation({ summary: 'Get the per-member reservation limits (public)' })
+  @ApiOkResponse({ type: ReservationRulesDto })
+  getRules() {
+    return this.reservationRules.get();
   }
 
   @Public()

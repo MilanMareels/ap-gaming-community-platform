@@ -12,7 +12,8 @@ import {
 } from '../../dtos/reservations/reservation.dto.js';
 import { errorMessages } from '../../errors/errorMessages.js';
 import { wallClockNow } from '../../common/wall-clock.js';
-import { bookableDays, hasAllowedDuration, wallClockDateKey } from './booking-window.js';
+import { bookableDays, hasAllowedDuration, wallClockDateKey, wallClockDay } from './booking-window.js';
+import { ReservationRulesService } from './reservation-rules.service.js';
 
 /** Number of no-shows after which a user can no longer make reservations. */
 export const NO_SHOW_LIMIT = 3;
@@ -23,6 +24,7 @@ export class ReservationsService {
     private readonly prisma: PrismaService,
     private readonly mailService: MailService,
     private readonly inventoryAdjustmentsService: InventoryAdjustmentsService,
+    private readonly reservationRules: ReservationRulesService,
   ) {}
 
   private formatDateTimeDutch(date: Date): string {
@@ -225,44 +227,37 @@ export class ReservationsService {
       throw new BadRequestException('You already have a reservation that overlaps with this time slot');
     }
 
-    const bufferTime = 30 * 60 * 1000; // 30 minutes
-    const bufferStart = new Date(startTime.getTime() - bufferTime);
-    const bufferEnd = new Date(endTime.getTime() + bufferTime);
+    const rules = await this.reservationRules.get();
 
-    const bufferConflict = await this.prisma.reservation.findFirst({
-      where: {
-        userId: user.id,
-        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
-        OR: [
-          {
-            AND: [{ startTime: { lte: bufferStart } }, { endTime: { gt: bufferStart } }],
-          },
-          {
-            AND: [{ startTime: { lt: bufferEnd } }, { endTime: { gte: bufferEnd } }],
-          },
-        ],
-      },
-    });
+    if (rules.minGapMinutes > 0) {
+      const gapMs = rules.minGapMinutes * 60_000;
+      const tooClose = await this.prisma.reservation.findFirst({
+        where: {
+          userId: user.id,
+          status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+          startTime: { lt: new Date(endTime.getTime() + gapMs) },
+          endTime: { gt: new Date(startTime.getTime() - gapMs) },
+        },
+      });
 
-    if (bufferConflict) {
-      throw new BadRequestException('You must have at least 30 minutes between reservations');
+      if (tooClose) {
+        throw new BadRequestException(errorMessages.minGap(rules.minGapMinutes));
+      }
     }
-    const maxReservationsPerDay = 2;
-    const startOfDay = new Date(startTime);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(startTime);
-    endOfDay.setHours(23, 59, 59, 999);
 
-    const dailyReservationsCount = await this.prisma.reservation.count({
-      where: {
-        userId: user.id,
-        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
-        startTime: { gte: startOfDay, lte: endOfDay },
-      },
-    });
+    if (rules.maxPerDay > 0) {
+      const day = wallClockDay(startTime);
+      const dailyReservationsCount = await this.prisma.reservation.count({
+        where: {
+          userId: user.id,
+          status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+          startTime: { gte: day.start, lt: day.end },
+        },
+      });
 
-    if (dailyReservationsCount >= maxReservationsPerDay) {
-      throw new BadRequestException('You can only make two reservations per day');
+      if (dailyReservationsCount >= rules.maxPerDay) {
+        throw new BadRequestException(errorMessages.maxPerDay(rules.maxPerDay));
+      }
     }
 
     const reservation = await this.prisma.reservation.create({

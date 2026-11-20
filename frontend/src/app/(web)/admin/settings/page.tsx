@@ -73,6 +73,7 @@ export default function AdminSettingsPage() {
   const [formTitle, setFormTitle] = useState('');
   const [formUrl, setFormUrl] = useState('');
   const [twitchChannel, setTwitchChannel] = useState('');
+  const [rules, setRules] = useState({ maxPerDay: '', minGapMinutes: '' });
 
   const [adjustments, setAdjustments] = useState<InventoryAdjustment[]>([]);
   const [adjustmentForm, setAdjustmentForm] = useState<AdjustmentFormState>(emptyAdjustmentForm);
@@ -111,10 +112,15 @@ export default function AdminSettingsPage() {
 
   async function fetchData() {
     try {
-      const [settingsRes, formRes] = await Promise.all([
+      const [settingsRes, formRes, rulesRes] = await Promise.all([
         apiClient.GET('/settings', {}),
         apiClient.GET('/settings/form', {}),
+        apiClient.GET('/reservations/rules', {}),
       ]);
+
+      if (rulesRes.data) {
+        setRules({ maxPerDay: String(rulesRes.data.maxPerDay), minGapMinutes: String(rulesRes.data.minGapMinutes) });
+      }
 
       if (settingsRes.data) setSettings(settingsRes.data as Setting[]);
       if (settingsRes.data) {
@@ -388,6 +394,44 @@ export default function AdminSettingsPage() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        </div>
+
+        {/* Reservation rules */}
+        <div className="bg-linear-to-br from-slate-900 via-slate-900 to-slate-900/90 rounded-xl border border-slate-800 overflow-hidden">
+          <div className="px-6 py-5 border-b border-slate-800/60">
+            <h3 className="text-sm font-bold text-white">Reservatieregels</h3>
+            <p className="text-xs text-gray-500 mt-0.5">Limieten per persoon voor reservaties via de website en de app. Zet een waarde op 0 om de regel uit te schakelen. Reservaties die je als beheerder aanmaakt, volgen deze regels niet.</p>
+          </div>
+          <div className="px-6 py-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(
+                [
+                  { key: 'maxPerDay', setting: 'reservations.maxPerDay', label: 'Max. reservaties per dag' },
+                  { key: 'minGapMinutes', setting: 'reservations.minGapMinutes', label: 'Min. minuten tussen reservaties' },
+                ] as const
+              ).map(({ key, setting, label }) => (
+                <div key={key} className="flex items-center gap-4">
+                  <label htmlFor={`rule-${key}`} className="text-sm font-semibold text-gray-400 flex-1">
+                    {label}
+                  </label>
+                  <input
+                    id={`rule-${key}`}
+                    type="number"
+                    min="0"
+                    step="1"
+                    className="bg-slate-950 border border-slate-700 rounded-lg py-2.5 px-3 text-sm text-white w-24 outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/20 transition-colors"
+                    value={rules[key]}
+                    onChange={(e) => setRules((current) => ({ ...current, [key]: e.target.value }))}
+                    onBlur={() => {
+                      const value = rules[key].trim();
+                      if (/^\d+$/.test(value)) handleUpdateSetting(setting, value);
+                      else fetchData();
+                    }}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>

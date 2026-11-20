@@ -106,6 +106,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/mobile/handoff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Hand the web session over to the mobile app (sends the user through Microsoft login first if needed) */
+        get: operations["AuthController_mobileHandoff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/mobile/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Exchange a mobile handoff code and PKCE verifier for a bearer token */
+        post: operations["AuthController_mobileToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/links": {
         parameters: {
             query?: never;
@@ -383,6 +417,23 @@ export interface paths {
         patch: operations["ReservationsController_cancelByCuid"];
         trace?: never;
     };
+    "/reservations/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the per-member reservation limits (public) */
+        get: operations["ReservationsController_getRules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reservations/slots": {
         parameters: {
             query?: never;
@@ -615,7 +666,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get all roster games with entries */
+        /** Get all roster games with entries (player email/student number only for roster managers) */
         get: operations["RosterController_findAllGames"];
         put?: never;
         /** Create a new roster game (Admin only) */
@@ -650,7 +701,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get all roster entries */
+        /** Get all roster entries (player email/student number only for roster managers) */
         get: operations["RosterController_findAllEntries"];
         put?: never;
         /** Add a roster entry (Admin only) */
@@ -1107,7 +1158,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get bracket for an event (public) */
+        /** Get bracket for an event (public; participant emails only for bracket managers) */
         get: operations["BracketsController_findByEvent"];
         put?: never;
         /** Create a bracket for an event (Admin only) */
@@ -1246,7 +1297,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get time trial for an event (public) */
+        /** Get time trial for an event (public; participant emails only for time trial managers) */
         get: operations["TimeTrialsController_findByEvent"];
         put?: never;
         /** Create a time trial for an event (Admin only) */
@@ -1335,7 +1386,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get point trial for an event (public) */
+        /** Get point trial for an event (public; participant emails only for point trial managers) */
         get: operations["PointTrialsController_findByEvent"];
         put?: never;
         /** Create a point trial for an event (Admin only) */
@@ -1851,6 +1902,16 @@ export interface components {
              */
             url: string;
         };
+        MobileTokenRequestDto: {
+            /** @description Handoff code received on the app callback URL */
+            code: string;
+            /** @description PKCE verifier matching the challenge sent to /auth/mobile/handoff */
+            verifier: string;
+        };
+        MobileTokenResponseDto: {
+            /** @description Bearer token for the Authorization header */
+            token: string;
+        };
         LinkedProviderDto: {
             id: number;
             ssoId: string;
@@ -2020,6 +2081,18 @@ export interface components {
             noShowLimit: number;
             /** @description Whether the user is blocked from making new reservations */
             isBlocked: boolean;
+        };
+        ReservationRulesDto: {
+            /**
+             * @description Active reservations a member may have on one day (0 = no limit)
+             * @example 1
+             */
+            maxPerDay: number;
+            /**
+             * @description Minutes required between a member's reservations (0 = none)
+             * @example 90
+             */
+            minGapMinutes: number;
         };
         ReservationSlotDto: {
             /** @example pc */
@@ -3383,12 +3456,7 @@ export interface operations {
     };
     AuthController_microsoftLogin: {
         parameters: {
-            query?: {
-                /** @description Frontend return URL path to preserve after login */
-                returnUrl?: string;
-                /** @description If true, treat callback as a link-account flow for the currently authenticated user */
-                linkMode?: string;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -3420,6 +3488,58 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_mobileHandoff: {
+        parameters: {
+            query: {
+                /** @description PKCE S256 challenge: base64url(sha256(verifier)), generated by the mobile app */
+                challenge: string;
+                /** @description Where to sign in when needed. Google is only for Gaming Hub managers. Defaults to Microsoft. */
+                provider?: "microsoft" | "google";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_mobileToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MobileTokenRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MobileTokenResponseDto"];
+                };
+            };
+            /** @description Invalid or expired login code */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3907,6 +4027,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    ReservationsController_getRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationRulesDto"];
                 };
             };
         };
