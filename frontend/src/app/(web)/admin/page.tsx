@@ -9,6 +9,8 @@ const NAV_ITEMS_ORDERED = [
   { href: '/admin/events', permissions: ['events.manage'] },
   { href: '/admin/noshows', permissions: ['reservations.noshows.manage', 'reservations.manage'] },
   { href: '/admin/roster', permissions: ['roster.manage'] },
+  { href: '/admin/esports-results', permissions: ['esports.results.manage'] },
+  { href: '/admin/team-planning', permissions: ['esports.schedule.manage'] },
   { href: '/admin/navigation', permissions: ['navigation.manage'] },
   { href: '/admin/forms', permissions: ['forms.manage'] },
   { href: '/admin/submissions', permissions: ['forms.manage', 'forms.submissions.view'] },
@@ -22,14 +24,16 @@ const NAV_ITEMS_ORDERED = [
 
 export default function AdminPage() {
   const router = useRouter();
-  const { hasAnyPermission } = useAdmin();
+  const { user, hasAnyPermission } = useAdmin();
 
   useEffect(() => {
     const first = NAV_ITEMS_ORDERED.find((item) =>
       hasAnyPermission(...item.permissions),
     );
-    router.replace(first?.href ?? '/admin/reservations');
-  }, [hasAnyPermission, router]);
+    // Team managers may have no permissions at all; their place is their team's planning
+    const fallback = user.planning?.isManager ? '/admin/team-planning' : '/admin/reservations';
+    router.replace(first?.href ?? fallback);
+  }, [hasAnyPermission, router, user]);
 
   return null;
 }
