@@ -80,7 +80,7 @@ enum AvailabilityStatus {
   UNAVAILABLE
 }
 
-// A scrim, training or match the whole team has planned during a day.
+// A scrim, VOD review or match the whole team has planned during a day.
 model PlanningBlock {
   id Int @id @default(autoincrement())
 
@@ -96,6 +96,6 @@ model PlanningBlock {
 
 enum PlanningBlockType {
   SCRIM
-  PRACTICE
+  VOD // watching back and reviewing recorded games together
   MATCH
 }

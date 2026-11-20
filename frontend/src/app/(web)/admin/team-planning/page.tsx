@@ -26,7 +26,7 @@ const TABS = [
 
 type Tab = (typeof TABS)[number]['id'];
 
-/** Team managers plan their team here: who plays, which days to fill in, and scrims or trainings. */
+/** Team managers plan their team here: who plays, which days to fill in, and scrims or VOD reviews. */
 export default function AdminTeamPlanningPage() {
   const { hasPermission } = useAdmin();
   const isPlanningAdmin = hasPermission('esports.schedule.manage');
@@ -86,7 +86,7 @@ export default function AdminTeamPlanningPage() {
     <div>
       <PageHeader
         title="Teamplanning"
-        description="Voeg spelers toe, plan de dagen die ze moeten invullen en plan scrims of trainingen."
+        description="Voeg spelers toe, plan de dagen die ze moeten invullen en plan scrims of VOD-reviews."
         actions={
           isPlanningAdmin && (
             <Button onClick={() => setTeamDialog('new')}>

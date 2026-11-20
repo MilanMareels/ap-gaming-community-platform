@@ -40,6 +40,6 @@ export const STATUS_STYLE: Record<AvailabilityStatus, { label: string; cell: str
 
 export const BLOCK_STYLE: Record<PlanningBlockType, { label: string; cell: string; swatch: string }> = {
   SCRIM: { label: 'Scrim', cell: 'bg-sky-500/85 text-sky-950', swatch: 'bg-sky-500' },
-  PRACTICE: { label: 'Training', cell: 'bg-violet-500/85 text-violet-50', swatch: 'bg-violet-500' },
+  VOD: { label: 'VODs', cell: 'bg-violet-500/85 text-violet-50', swatch: 'bg-violet-500' },
   MATCH: { label: 'Wedstrijd', cell: 'bg-amber-400/90 text-amber-950', swatch: 'bg-amber-400' },
 };

@@ -2121,7 +2121,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Plan a scrim, training or match during a day */
+        /** Plan a scrim, VOD review or match during a day */
         post: operations["TeamPlanningController_addBlock"];
         delete?: never;
         options?: never;
@@ -3359,7 +3359,7 @@ export interface components {
             isMe: boolean;
         };
         /** @enum {string} */
-        PlanningBlockType: "SCRIM" | "PRACTICE" | "MATCH";
+        PlanningBlockType: "SCRIM" | "VOD" | "MATCH";
         PlanningBlockDto: {
             /** @example 2 */
             id: number;
