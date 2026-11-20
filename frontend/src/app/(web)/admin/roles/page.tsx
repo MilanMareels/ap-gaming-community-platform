@@ -30,6 +30,7 @@ const PERMISSION_CATEGORIES: Record<string, string[]> = {
   Reservaties: ['reservations.manage', 'reservations.noshows.manage'],
   Content: ['roster.manage', 'timetable.manage', 'navigation.manage', 'forms.manage', 'forms.submissions.view', 'jobs.manage'],
   Toernooien: ['brackets.manage', 'time-trials.manage', 'point-trials.manage'],
+  Esports: ['esports.results.manage', 'esports.schedule.manage'],
   Beheer: ['users.view', 'users.manage', 'users.notes.delete_others', 'users.roles.manage', 'roles.manage', 'settings.manage', 'statistics.view', 'inventory-adjustments.manage'],
 };
 
@@ -208,6 +209,14 @@ export default function AdminRolesPage() {
     }
   };
 
+  // Permissions that exist but aren't in a category yet still show up, so new ones can always be granted
+  const categorized = new Set(Object.values(PERMISSION_CATEGORIES).flat());
+  const uncategorized = allPermissions.map((p) => p.key).filter((key) => !categorized.has(key));
+  const permissionCategories = Object.entries(PERMISSION_CATEGORIES)
+    .map(([category, keys]) => [category, keys.filter((key) => allPermissions.some((p) => p.key === key))] as const)
+    .concat(uncategorized.length > 0 ? [['Overig', uncategorized] as const] : [])
+    .filter(([, keys]) => keys.length > 0);
+
   const getPermissionLabel = (key: string) => {
     const perm = allPermissions.find((p) => p.key === key);
     return perm?.description ?? key;
@@ -280,7 +289,7 @@ export default function AdminRolesPage() {
             <div>
               <label className={labelClass}>Permissies</label>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
-                {Object.entries(PERMISSION_CATEGORIES).map(([category, keys]) => (
+                {permissionCategories.map(([category, keys]) => (
                   <div key={category} className="bg-slate-950/60 border border-slate-800/60 rounded-lg p-3 space-y-2">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-300 cursor-pointer">
                       <input
