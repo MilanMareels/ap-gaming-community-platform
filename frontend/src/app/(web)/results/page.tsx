@@ -116,9 +116,14 @@ export default function ResultsPage() {
       <div className="container relative z-10 mx-auto w-full max-w-4xl">
         <ScrollReveal direction="up">
           <div className="mb-12 text-center">
-            <h1 className="bg-gradient-to-r from-white via-gray-400 to-gray-500 bg-clip-text text-6xl font-black uppercase italic tracking-tighter text-transparent md:text-8xl">
-              <span className="bg-gradient-to-r from-[#ff4444] via-[#d42422] via-80% to-[#990000] bg-clip-text pr-4 text-transparent">Esports</span>
-              resultaten
+            {/* Each word carries its own gradient with some right padding, so the italic overhang isn't clipped */}
+            <h1 className="flex flex-wrap justify-center gap-x-4 text-5xl font-black uppercase italic tracking-tighter sm:text-6xl lg:text-7xl">
+              <span className="inline-block bg-gradient-to-r from-[#ff4444] via-[#d42422] via-80% to-[#990000] bg-clip-text pr-[0.12em] text-transparent">
+                Esports
+              </span>
+              <span className="inline-block bg-gradient-to-r from-white via-gray-400 to-gray-500 bg-clip-text pr-[0.12em] text-transparent">
+                resultaten
+              </span>
             </h1>
             <p className="mt-4 text-lg font-semibold uppercase tracking-widest text-gray-400">Hoe onze teams het doen</p>
           </div>
