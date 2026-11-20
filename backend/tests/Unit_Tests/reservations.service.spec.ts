@@ -906,4 +906,96 @@ describe('ReservationsService', () => {
       expect(prisma.reservation.update).not.toHaveBeenCalled();
     });
   });
+  describe('Booking time', () => {
+    beforeEach(() => {
+      prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+      prisma.reservation.count.mockResolvedValue(0);
+      prisma.reservation.findFirst.mockResolvedValue(null);
+      prisma.reservation.create.mockResolvedValue({ id: 1, cuid: 'cuid', user: mockUser });
+    });
+
+    const createdWith = () => prisma.reservation.create.mock.calls[0][0].data;
+
+    it('records when a member made their reservation, in wall-clock time', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      const before = wallClockNow().getTime();
+
+      await service.createForUser(mockUser.id, baseDto);
+
+      const { createdAt, createdByStaff } = createdWith();
+      expect(createdAt.getTime()).toBeGreaterThanOrEqual(before - 1000);
+      expect(createdAt.getTime()).toBeLessThanOrEqual(wallClockNow().getTime() + 1000);
+      expect(createdByStaff).toBeUndefined();
+    });
+
+    it('marks reservations staff enter for someone', async () => {
+      prisma.user.findFirst.mockResolvedValue(mockUser);
+
+      await service.adminCreate(baseAdminDto);
+
+      expect(createdWith()).toEqual(expect.objectContaining({ createdAt: expect.any(Date), createdByStaff: true }));
+    });
+  });
+
+  describe('Booking statistics', () => {
+    const at = (iso: string) => new Date(`${iso}Z`);
+    const row = (start: string, createdAt: string | null, createdByStaff = false) => ({
+      userId: 1,
+      email: mockUser.email,
+      inventory: 'pc',
+      controllers: 1,
+      startTime: at(start),
+      endTime: new Date(at(start).getTime() + 3_600_000),
+      status: ReservationStatus.PRESENT,
+      createdAt: createdAt ? at(createdAt) : null,
+      createdByStaff,
+      user: { name: null, sNumber: mockUser.sNumber },
+    });
+
+    it('works out when people book and how far ahead, leaving out staff entries and untracked ones', async () => {
+      prisma.reservation.findMany.mockResolvedValue([
+        // Monday 2026-11-16: booked 30 minutes ahead, same day
+        row('2026-11-16T14:00:00', '2026-11-16T13:30:00'),
+        // Tuesday: booked the evening before at 21:00, 17 hours ahead
+        row('2026-11-17T14:00:00', '2026-11-16T21:00:00'),
+        // Tuesday: booked the morning of, 4 hours ahead
+        row('2026-11-17T15:00:00', '2026-11-17T11:00:00'),
+        row('2026-11-18T14:00:00', '2026-11-18T14:00:00', true),
+        row('2026-11-18T15:00:00', null),
+      ]);
+
+      const { bookingBehaviour } = await service.getStatistics();
+
+      expect(bookingBehaviour.trackedReservations).toBe(3);
+      expect(bookingBehaviour.staffReservations).toBe(1);
+      expect(bookingBehaviour.avgLeadMinutes).toBe(Math.round((30 + 1020 + 240) / 3));
+      expect(bookingBehaviour.medianLeadMinutes).toBe(240);
+      expect(bookingBehaviour.sameDayPercent).toBe(66.7);
+      expect(bookingBehaviour.bookingHoursHeatmap).toEqual(
+        expect.arrayContaining([
+          { day: 'Maandag', hour: 13, count: 1 },
+          { day: 'Maandag', hour: 21, count: 1 },
+          { day: 'Dinsdag', hour: 11, count: 1 },
+        ]),
+      );
+      expect(bookingBehaviour.leadTimeDistribution).toEqual([
+        { label: '< 1u', count: 1 },
+        { label: '1-3u', count: 0 },
+        { label: '3-6u', count: 1 },
+        { label: '6-12u', count: 0 },
+        { label: '12-24u', count: 1 },
+        { label: '1-2 dagen', count: 0 },
+        { label: '2+ dagen', count: 0 },
+      ]);
+    });
+
+    it('gives a per-person average lead time, or none when it is unknown', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.reservation.findMany.mockResolvedValueOnce([row('2026-11-16T14:00:00', '2026-11-16T12:00:00'), row('2026-11-17T14:00:00', '2026-11-17T13:00:00')]);
+      expect((await service.getUserStatistics(1)).avgLeadMinutes).toBe(90);
+
+      prisma.reservation.findMany.mockResolvedValueOnce([row('2026-11-16T14:00:00', null)]);
+      expect((await service.getUserStatistics(1)).avgLeadMinutes).toBeNull();
+    });
+  });
 });

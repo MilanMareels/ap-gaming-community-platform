@@ -1,5 +1,5 @@
 import { ReservationStatus } from '../../generated/prisma/enums.js';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class Reservation {
 
@@ -29,4 +29,10 @@ export class Reservation {
 
   @ApiProperty({ enum: ReservationStatus, enumName: 'ReservationStatus' })
   status: ReservationStatus;
+
+  @ApiPropertyOptional({ type: Date })
+  createdAt: Date | null;
+
+  @ApiProperty({ type: Boolean })
+  createdByStaff: boolean = false;
 }

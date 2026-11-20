@@ -13,6 +13,11 @@ model Reservation {
   endTime   DateTime
 
   status ReservationStatus
+
+  /// When the reservation was made, in the same wall-clock convention as startTime. Null for reservations from before this was tracked.
+  createdAt      DateTime?
+  /// Entered by staff on someone's behalf (e.g. a walk-in), so it says nothing about when people book themselves.
+  createdByStaff Boolean   @default(false)
 }
 
 model TimeTableEntry {

@@ -272,6 +272,7 @@ export class ReservationsService {
         startTime: startTime,
         endTime: endTime,
         status: ReservationStatus.RESERVED,
+        createdAt: wallClockNow(),
       },
       include: {
         user: true,
@@ -339,6 +340,8 @@ export class ReservationsService {
         startTime: startTime,
         endTime: endTime,
         status: ReservationStatus.RESERVED,
+        createdAt: wallClockNow(),
+        createdByStaff: true,
       },
       include: {
         user: true,
@@ -664,6 +667,8 @@ export class ReservationsService {
         startTime: true,
         endTime: true,
         status: true,
+        createdAt: true,
+        createdByStaff: true,
         user: { select: { name: true, sNumber: true } },
       },
       orderBy: { startTime: 'asc' },
@@ -926,7 +931,53 @@ export class ReservationsService {
       .sort((a, b) => b.totalReservations - a.totalReservations)
       .slice(0, 20);
 
+    // ─── Booking behaviour: when people book and how far ahead ───
+    // Only reservations people made themselves; staff entries (walk-ins) would skew it towards "right before".
+    const selfBooked = reservations.filter(
+      (r): r is typeof r & { createdAt: Date } => r.createdAt !== null && !r.createdByStaff,
+    );
+    const leadMinutes = selfBooked.map((r) => Math.max(0, (r.startTime.getTime() - r.createdAt.getTime()) / 60_000)).sort((a, b) => a - b);
+    const median = (sorted: number[]) => {
+      if (sorted.length === 0) return 0;
+      const mid = Math.floor(sorted.length / 2);
+      return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    };
+    const bookingHeatmap = new Map<string, number>();
+    for (const r of selfBooked) {
+      const key = `${WEEKDAY_LABELS[r.createdAt.getUTCDay()]}|${r.createdAt.getUTCHours()}`;
+      bookingHeatmap.set(key, (bookingHeatmap.get(key) ?? 0) + 1);
+    }
+    const LEAD_BUCKETS: { label: string; maxMinutes: number }[] = [
+      { label: '< 1u', maxMinutes: 60 },
+      { label: '1-3u', maxMinutes: 180 },
+      { label: '3-6u', maxMinutes: 360 },
+      { label: '6-12u', maxMinutes: 720 },
+      { label: '12-24u', maxMinutes: 1440 },
+      { label: '1-2 dagen', maxMinutes: 2880 },
+      { label: '2+ dagen', maxMinutes: Infinity },
+    ];
+    const leadTimeDistribution = LEAD_BUCKETS.map((bucket, i) => ({
+      label: bucket.label,
+      count: leadMinutes.filter((m) => m >= (LEAD_BUCKETS[i - 1]?.maxMinutes ?? 0) && m < bucket.maxMinutes).length,
+    }));
+    const bookingBehaviour = {
+      trackedReservations: selfBooked.length,
+      staffReservations: reservations.filter((r) => r.createdByStaff).length,
+      avgLeadMinutes: leadMinutes.length > 0 ? Math.round(leadMinutes.reduce((a, b) => a + b, 0) / leadMinutes.length) : 0,
+      medianLeadMinutes: Math.round(median(leadMinutes)),
+      sameDayPercent:
+        selfBooked.length > 0
+          ? Math.round((selfBooked.filter((r) => toDateStr(r.createdAt) === toDateStr(r.startTime)).length / selfBooked.length) * 1000) / 10
+          : 0,
+      bookingHoursHeatmap: [...bookingHeatmap.entries()].map(([key, count]) => {
+        const [day, hour] = key.split('|');
+        return { day, hour: Number(hour), count };
+      }),
+      leadTimeDistribution,
+    };
+
     return {
+      bookingBehaviour,
       dailyCounts,
       weekdayAverages,
       peakHoursHeatmap,
@@ -953,6 +1004,8 @@ export class ReservationsService {
         startTime: true,
         endTime: true,
         status: true,
+        createdAt: true,
+        createdByStaff: true,
       },
       orderBy: { startTime: 'asc' },
     });
@@ -1002,8 +1055,15 @@ export class ReservationsService {
     }
     const preferredSlots = [...slotMap.entries()].map(([hour, count]) => ({ hour, count })).sort((a, b) => a.hour - b.hour);
 
+    // How far ahead they book, over the reservations they made themselves
+    const leadTimes = reservations
+      .filter((r) => r.createdAt && !r.createdByStaff)
+      .map((r) => Math.max(0, (r.startTime.getTime() - r.createdAt!.getTime()) / 60_000));
+    const avgLeadMinutes = leadTimes.length > 0 ? Math.round(leadTimes.reduce((a, b) => a + b, 0) / leadTimes.length) : null;
+
     return {
       user: { name: user.name ?? 'Unknown', email: user.email, sNumber: user.sNumber },
+      avgLeadMinutes,
       totalReservations: total,
       showRate: total > 0 ? Math.round((present / total) * 1000) / 10 : 0,
       noShowRate: total > 0 ? Math.round((noShow / total) * 1000) / 10 : 0,
