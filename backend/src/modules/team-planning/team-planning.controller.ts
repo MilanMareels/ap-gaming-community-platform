@@ -160,7 +160,7 @@ export class TeamPlanningController {
   }
 
   @Post('admin/days/:dayId/blocks')
-  @ApiOperation({ summary: 'Plan a scrim, training or match during a day' })
+  @ApiOperation({ summary: 'Plan a scrim, VOD review or match during a day' })
   @ApiCreatedResponse({ type: PlanningBlockDto })
   async addBlock(@Param('dayId', ParseIntPipe) dayId: number, @Body() dto: CreatePlanningBlockDto, @Req() req: Request) {
     return this.planning.addBlock(dayId, await this.viewer(req), dto);

@@ -88,7 +88,7 @@ export function PlanningTab({ teamId, onError }: { teamId: number; onError: (mes
             <button
               onClick={() => setEditing({ day, block: null })}
               className="flex items-center gap-1 text-xs font-semibold text-gray-400 hover:text-white"
-              title="Scrim, training of wedstrijd plannen"
+              title="Scrim, VODs of wedstrijd plannen"
             >
               <Plus size={14} /> Blok
             </button>
