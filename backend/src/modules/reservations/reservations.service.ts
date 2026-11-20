@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { Prisma } from '../../generated/prisma/client.js';
 import { MailService } from '../mail/mail.service.js';
 import { InventoryAdjustmentsService } from '../inventory-adjustments/inventory-adjustments.service.js';
 import {
@@ -11,6 +12,10 @@ import {
   UpdateReservationStatusDto,
 } from '../../dtos/reservations/reservation.dto.js';
 import { errorMessages } from '../../errors/errorMessages.js';
+import { wallClockNow } from '../../common/wall-clock.js';
+import { bookableDays, hasAllowedDuration, wallClockDateKey, wallClockDay } from './booking-window.js';
+import { ReservationRulesService } from './reservation-rules.service.js';
+import { PeopleService, normalizeSNumber } from '../people/people.service.js';
 
 /** Number of no-shows after which a user can no longer make reservations. */
 export const NO_SHOW_LIMIT = 3;
@@ -21,6 +26,8 @@ export class ReservationsService {
     private readonly prisma: PrismaService,
     private readonly mailService: MailService,
     private readonly inventoryAdjustmentsService: InventoryAdjustmentsService,
+    private readonly reservationRules: ReservationRulesService,
+    private readonly people: PeopleService,
   ) {}
 
   private formatDateTimeDutch(date: Date): string {
@@ -142,19 +149,16 @@ export class ReservationsService {
   }
 
   async createForUser(userId: number, dto: CreateReservationDto) {
-    const now = new Date();
-    const maxDate = new Date();
-    maxDate.setDate(maxDate.getDate() + 3);
-    maxDate.setHours(23, 59, 59, 999);
     const startTime = new Date(dto.startTime);
     const endTime = new Date(dto.endTime);
 
-    if (startTime < now) {
+    if (!hasAllowedDuration(startTime, endTime)) {
+      throw new BadRequestException(errorMessages.invalidDuration);
+    }
+    if (startTime < wallClockNow()) {
       throw new BadRequestException(errorMessages.pastDate);
     }
-    if (startTime > maxDate) {
-      throw new BadRequestException(errorMessages.maxAdvanceDays);
-    }
+    await this.assertBookableDay(startTime);
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -226,44 +230,37 @@ export class ReservationsService {
       throw new BadRequestException('You already have a reservation that overlaps with this time slot');
     }
 
-    const bufferTime = 30 * 60 * 1000; // 30 minutes
-    const bufferStart = new Date(startTime.getTime() - bufferTime);
-    const bufferEnd = new Date(endTime.getTime() + bufferTime);
+    const rules = await this.reservationRules.get();
 
-    const bufferConflict = await this.prisma.reservation.findFirst({
-      where: {
-        userId: user.id,
-        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
-        OR: [
-          {
-            AND: [{ startTime: { lte: bufferStart } }, { endTime: { gt: bufferStart } }],
-          },
-          {
-            AND: [{ startTime: { lt: bufferEnd } }, { endTime: { gte: bufferEnd } }],
-          },
-        ],
-      },
-    });
+    if (rules.minGapMinutes > 0) {
+      const gapMs = rules.minGapMinutes * 60_000;
+      const tooClose = await this.prisma.reservation.findFirst({
+        where: {
+          userId: user.id,
+          status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+          startTime: { lt: new Date(endTime.getTime() + gapMs) },
+          endTime: { gt: new Date(startTime.getTime() - gapMs) },
+        },
+      });
 
-    if (bufferConflict) {
-      throw new BadRequestException('You must have at least 30 minutes between reservations');
+      if (tooClose) {
+        throw new BadRequestException(errorMessages.minGap(rules.minGapMinutes));
+      }
     }
-    const maxReservationsPerDay = 2;
-    const startOfDay = new Date(startTime);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(startTime);
-    endOfDay.setHours(23, 59, 59, 999);
 
-    const dailyReservationsCount = await this.prisma.reservation.count({
-      where: {
-        userId: user.id,
-        status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
-        startTime: { gte: startOfDay, lte: endOfDay },
-      },
-    });
+    if (rules.maxPerDay > 0) {
+      const day = wallClockDay(startTime);
+      const dailyReservationsCount = await this.prisma.reservation.count({
+        where: {
+          userId: user.id,
+          status: { in: [ReservationStatus.RESERVED, ReservationStatus.PRESENT] },
+          startTime: { gte: day.start, lt: day.end },
+        },
+      });
 
-    if (dailyReservationsCount >= maxReservationsPerDay) {
-      throw new BadRequestException('You can only make two reservations per day');
+      if (dailyReservationsCount >= rules.maxPerDay) {
+        throw new BadRequestException(errorMessages.maxPerDay(rules.maxPerDay));
+      }
     }
 
     const reservation = await this.prisma.reservation.create({
@@ -287,20 +284,21 @@ export class ReservationsService {
     return reservation;
   }
 
-  async adminCreate(dto: AdminCreateReservationDto) {
-    // Find or create user (sNumber defaults to 'N/A' for anonymous)
-    let user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+  /** Members may only book today (if open) or the first open day after it, like the date pickers offer. */
+  private async assertBookableDay(startTime: Date) {
+    const openEntries = await this.prisma.timeTableEntry.findMany({
+      where: { type: 'OPEN' },
+      select: { dayOfWeek: true },
     });
+    const openWeekdays = new Set(openEntries.map((e) => e.dayOfWeek));
 
-    if (!user) {
-      user = await this.prisma.user.create({
-        data: {
-          email: dto.email,
-          sNumber: dto.sNumber || 'N/A',
-        },
-      });
+    if (!bookableDays(openWeekdays, wallClockNow()).includes(wallClockDateKey(startTime))) {
+      throw new BadRequestException(errorMessages.dayNotBookable);
     }
+  }
+
+  async adminCreate(dto: AdminCreateReservationDto) {
+    const user = await this.people.findOrCreate(dto);
 
     const startTime = new Date(dto.startTime);
     const endTime = new Date(dto.endTime);
@@ -337,7 +335,7 @@ export class ReservationsService {
         userId: user.id,
         inventory: dto.inventory,
         controllers: dto.controllers,
-        email: dto.email,
+        email: user.email,
         startTime: startTime,
         endTime: endTime,
         status: ReservationStatus.RESERVED,
@@ -348,7 +346,7 @@ export class ReservationsService {
     });
 
     // Send confirmation email
-    await this.sendConfirmationEmail(dto.email, dto.sNumber || 'N/A', reservation.cuid, dto.inventory, dto.controllers, startTime, endTime);
+    await this.sendConfirmationEmail(user.email, user.sNumber, reservation.cuid, dto.inventory, dto.controllers, startTime, endTime);
 
     return reservation;
   }
@@ -363,38 +361,27 @@ export class ReservationsService {
       throw new NotFoundException('Reservation not found');
     }
 
-    // If email or sNumber changed, update or create the user
-    if (dto.email || dto.sNumber) {
-      const newEmail = dto.email || reservation.email;
-      const newSNumber = dto.sNumber || reservation.user.sNumber;
+    const updateData: Prisma.ReservationUncheckedUpdateInput = {};
 
-      if (newEmail !== reservation.email) {
-        // Find or create user with new email
-        let user = await this.prisma.user.findUnique({
-          where: { email: newEmail },
-        });
+    const changesPerson =
+      (dto.userId !== undefined && dto.userId !== reservation.userId) ||
+      (dto.email !== undefined && dto.email.trim().toLowerCase() !== reservation.email.toLowerCase());
 
-        if (!user) {
-          user = await this.prisma.user.create({
-            data: { email: newEmail, sNumber: newSNumber },
-          });
-        }
-
-        await this.prisma.reservation.update({
-          where: { id },
-          data: { userId: user.id, email: newEmail },
-        });
-      } else if (dto.sNumber) {
-        await this.prisma.user.update({
-          where: { id: reservation.userId },
-          data: { sNumber: newSNumber },
-        });
-      }
+    if (changesPerson) {
+      const user = await this.people.findOrCreate(dto);
+      updateData.userId = user.id;
+      updateData.email = user.email;
+    } else if (dto.name?.trim() || dto.sNumber?.trim()) {
+      // Corrections to the person already on the reservation
+      await this.prisma.user.update({
+        where: { id: reservation.userId },
+        data: {
+          ...(dto.name?.trim() ? { name: dto.name.trim() } : {}),
+          ...(dto.sNumber?.trim() ? { sNumber: normalizeSNumber(dto.sNumber) ?? dto.sNumber.trim() } : {}),
+        },
+      });
     }
 
-    // Build update data for reservation fields
-    const updateData: any = {};
-    if (dto.email) updateData.email = dto.email;
     if (dto.inventory) updateData.inventory = dto.inventory;
     if (dto.controllers !== undefined) updateData.controllers = dto.controllers;
     if (dto.startTime) updateData.startTime = new Date(dto.startTime);

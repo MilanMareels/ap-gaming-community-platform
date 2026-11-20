@@ -102,6 +102,11 @@ export type NavLink = Prisma.NavLinkModel
  */
 export type RosterGame = Prisma.RosterGameModel
 /**
+ * Model EsportsMatch
+ * 
+ */
+export type EsportsMatch = Prisma.EsportsMatchModel
+/**
  * Model RosterEntry
  * 
  */
@@ -216,3 +221,28 @@ export type PointTrialEntry = Prisma.PointTrialEntryModel
  * 
  */
 export type InventoryAdjustment = Prisma.InventoryAdjustmentModel
+/**
+ * Model PlanningTeam
+ * 
+ */
+export type PlanningTeam = Prisma.PlanningTeamModel
+/**
+ * Model PlanningTeamMember
+ * 
+ */
+export type PlanningTeamMember = Prisma.PlanningTeamMemberModel
+/**
+ * Model PlanningDay
+ * 
+ */
+export type PlanningDay = Prisma.PlanningDayModel
+/**
+ * Model PlanningAvailability
+ * 
+ */
+export type PlanningAvailability = Prisma.PlanningAvailabilityModel
+/**
+ * Model PlanningBlock
+ * 
+ */
+export type PlanningBlock = Prisma.PlanningBlockModel

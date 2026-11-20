@@ -11,6 +11,7 @@ import { UserRole } from './user_role.js';
 import { DynamicFormSubmission } from './dynamic_form_submission.js';
 import { DynamicFormSubmissionComment } from './dynamic_form_submission_comment.js';
 import { UserNote } from './user_note.js';
+import { PlanningTeamMember } from './planning_team_member.js';
 
 export class UserRelations {
 
@@ -52,4 +53,7 @@ export class UserRelations {
 
   @ApiProperty({ isArray: true, type: () => UserNote })
   notesAuthored: UserNote[];
+
+  @ApiProperty({ isArray: true, type: () => PlanningTeamMember })
+  planningMemberships: PlanningTeamMember[];
 }

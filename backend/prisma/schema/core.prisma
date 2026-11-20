@@ -33,9 +33,41 @@ model NavLink {
 }
 
 model RosterGame {
-  id            Int           @id @default(autoincrement())
+  id            Int            @id @default(autoincrement())
   name          String
   rosterEntries RosterEntry[]
+  matches       EsportsMatch[]
+}
+
+// A match played (or planned) by one of the esports teams, shown on the public results page
+model EsportsMatch {
+  id Int @id @default(autoincrement())
+
+  gameId Int
+  game   RosterGame @relation(fields: [gameId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  opponent    String
+  competition String?
+  playedAt    DateTime
+
+  result        EsportsMatchResult
+  ourScore      Int?
+  opponentScore Int?
+
+  vodUrl String?
+  notes  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([gameId, playedAt])
+}
+
+enum EsportsMatchResult {
+  UPCOMING
+  WIN
+  LOSS
+  DRAW
 }
 
 model RosterEntry {

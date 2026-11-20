@@ -32,6 +32,8 @@ const PERMISSIONS = [
   { key: 'jobs.manage', description: 'Manage job postings (vacatures)' },
   { key: 'users.notes.delete_others', description: 'Delete notes written by other admins' },
   { key: 'forms.submissions.view', description: 'View form submissions (for assigned forms)' },
+  { key: 'esports.results.manage', description: 'Manage esports match results' },
+  { key: 'esports.schedule.manage', description: 'Manage all esports team planning' },
 ];
 
 async function seedPermissionsAndRoles() {

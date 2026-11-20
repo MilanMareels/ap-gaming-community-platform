@@ -106,6 +106,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/mobile/handoff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Hand the web session over to the mobile app (sends the user through Microsoft login first if needed) */
+        get: operations["AuthController_mobileHandoff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/mobile/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Exchange a mobile handoff code and PKCE verifier for a bearer token */
+        post: operations["AuthController_mobileToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/links": {
         parameters: {
             query?: never;
@@ -383,6 +417,23 @@ export interface paths {
         patch: operations["ReservationsController_cancelByCuid"];
         trace?: never;
     };
+    "/reservations/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the per-member reservation limits (public) */
+        get: operations["ReservationsController_getRules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reservations/slots": {
         parameters: {
             query?: never;
@@ -477,8 +528,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a reservation as admin (no date restrictions) */
+        /** Create a reservation as admin for an existing user (userId) or by email (no date restrictions) */
         post: operations["ReservationsController_adminCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reservations/admin/people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search people to book a reservation for, by name, email or student number */
+        get: operations["ReservationsController_searchPeople"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -615,7 +683,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get all roster games with entries */
+        /** Get all roster games with entries (player email/student number only for roster managers) */
         get: operations["RosterController_findAllGames"];
         put?: never;
         /** Create a new roster game (Admin only) */
@@ -650,7 +718,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get all roster entries */
+        /** Get all roster entries (player email/student number only for roster managers) */
         get: operations["RosterController_findAllEntries"];
         put?: never;
         /** Add a roster entry (Admin only) */
@@ -1107,7 +1175,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get bracket for an event (public) */
+        /** Get bracket for an event (public; participant emails only for bracket managers) */
         get: operations["BracketsController_findByEvent"];
         put?: never;
         /** Create a bracket for an event (Admin only) */
@@ -1246,7 +1314,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get time trial for an event (public) */
+        /** Get time trial for an event (public; participant emails only for time trial managers) */
         get: operations["TimeTrialsController_findByEvent"];
         put?: never;
         /** Create a time trial for an event (Admin only) */
@@ -1335,7 +1403,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get point trial for an event (public) */
+        /** Get point trial for an event (public; participant emails only for point trial managers) */
         get: operations["PointTrialsController_findByEvent"];
         put?: never;
         /** Create a point trial for an event (Admin only) */
@@ -1833,6 +1901,252 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/esports-results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Match results and upcoming matches of the esports teams, newest first (public) */
+        get: operations["EsportsResultsController_findAll"];
+        put?: never;
+        /** Add a match */
+        post: operations["EsportsResultsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/esports-results/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a match */
+        delete: operations["EsportsResultsController_remove"];
+        options?: never;
+        head?: never;
+        /** Edit a match */
+        patch: operations["EsportsResultsController_update"];
+        trace?: never;
+    };
+    "/team-planning/my-teams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Teams the signed-in user plays in */
+        get: operations["TeamPlanningController_myTeams"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/team-planning/teams/{teamId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A team's planned days with everyone's availability (players, its managers and planning admins) */
+        get: operations["TeamPlanningController_teamView"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/team-planning/teams/{teamId}/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Save availability cells: your own, or anyone's on a team you manage. A null status clears a cell. */
+        put: operations["TeamPlanningController_saveAvailability"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/team-planning/admin/teams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Teams the signed-in user manages (all teams for planning admins) */
+        get: operations["TeamPlanningController_adminTeams"];
+        put?: never;
+        /** Create a team (planning admins) */
+        post: operations["TeamPlanningController_createTeam"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/team-planning/admin/teams/{teamId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Members and planned days of a team you manage */
+        get: operations["TeamPlanningController_teamDetail"];
+        put?: never;
+        post?: never;
+        /** Delete a team (planning admins) */
+        delete: operations["TeamPlanningController_deleteTeam"];
+        options?: never;
+        head?: never;
+        /** Rename a team you manage */
+        patch: operations["TeamPlanningController_updateTeam"];
+        trace?: never;
+    };
+    "/team-planning/admin/people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search people to add to a team, by name, email or student number */
+        get: operations["TeamPlanningController_searchPeople"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/team-planning/admin/teams/{teamId}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a player or manager to a team */
+        post: operations["TeamPlanningController_addMember"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/team-planning/admin/members/{memberId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove someone from a team */
+        delete: operations["TeamPlanningController_removeMember"];
+        options?: never;
+        head?: never;
+        /** Change a member's handle or role */
+        patch: operations["TeamPlanningController_updateMember"];
+        trace?: never;
+    };
+    "/team-planning/admin/teams/{teamId}/days": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Plan one or more dates for a team */
+        post: operations["TeamPlanningController_addDays"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/team-planning/admin/days/{dayId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a planned day */
+        delete: operations["TeamPlanningController_removeDay"];
+        options?: never;
+        head?: never;
+        /** Change a planned day's hours or note */
+        patch: operations["TeamPlanningController_updateDay"];
+        trace?: never;
+    };
+    "/team-planning/admin/days/{dayId}/blocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Plan a scrim, training or match during a day */
+        post: operations["TeamPlanningController_addBlock"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/team-planning/admin/blocks/{blockId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a planned block */
+        delete: operations["TeamPlanningController_removeBlock"];
+        options?: never;
+        head?: never;
+        /** Change a planned block */
+        patch: operations["TeamPlanningController_updateBlock"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1851,6 +2165,16 @@ export interface components {
              */
             url: string;
         };
+        MobileTokenRequestDto: {
+            /** @description Handoff code received on the app callback URL */
+            code: string;
+            /** @description PKCE verifier matching the challenge sent to /auth/mobile/handoff */
+            verifier: string;
+        };
+        MobileTokenResponseDto: {
+            /** @description Bearer token for the Authorization header */
+            token: string;
+        };
         LinkedProviderDto: {
             id: number;
             ssoId: string;
@@ -1862,6 +2186,12 @@ export interface components {
         LogoutResponseDto: {
             /** @example true */
             success: boolean;
+        };
+        PlanningRolesDto: {
+            /** @description Plays in at least one planning team, so fills in availability */
+            isPlayer: boolean;
+            /** @description Manages at least one planning team (in the admin UI) */
+            isManager: boolean;
         };
         ImpersonationInfoDto: {
             /** @description The real admin user ID behind the impersonation */
@@ -1888,6 +2218,8 @@ export interface components {
             roles: string[];
             /** @description Permission keys the user has */
             permissions: string[];
+            /** @description What the user does in team planning */
+            planning: components["schemas"]["PlanningRolesDto"];
             /** @description Present when impersonating a user or role */
             impersonation?: components["schemas"]["ImpersonationInfoDto"];
         };
@@ -2020,6 +2352,18 @@ export interface components {
             noShowLimit: number;
             /** @description Whether the user is blocked from making new reservations */
             isBlocked: boolean;
+        };
+        ReservationRulesDto: {
+            /**
+             * @description Active reservations a member may have on one day (0 = no limit)
+             * @example 1
+             */
+            maxPerDay: number;
+            /**
+             * @description Minutes required between a member's reservations (0 = none)
+             * @example 90
+             */
+            minGapMinutes: number;
         };
         ReservationSlotDto: {
             /** @example pc */
@@ -2248,10 +2592,23 @@ export interface components {
             status: "RESERVED" | "CANCELLED" | "PRESENT" | "NO_SHOW";
         };
         AdminCreateReservationDto: {
+            /**
+             * @description An existing user, picked from the person search. Takes precedence over email.
+             * @example 12
+             */
+            userId?: number;
+            /**
+             * @description Required when no userId is given
+             * @example student@student.ap.be
+             */
+            email?: string;
+            /**
+             * @description Name for a new person, or for a known person without one
+             * @example Robin Claes
+             */
+            name?: string;
             /** @example s123456 */
             sNumber?: string;
-            /** @example student@student.ap.be */
-            email: string;
             /**
              * @example pc
              * @enum {string}
@@ -2264,11 +2621,33 @@ export interface components {
             /** @example 2026-02-28T12:00:00.000Z */
             endTime: string;
         };
+        PersonDto: {
+            /** @example 12 */
+            id: number;
+            /** @example Robin Claes */
+            name: string | null;
+            /** @example s123456@student.ap.be */
+            email: string;
+            /** @example s123456 */
+            sNumber: string;
+            /**
+             * @description Reservations this person has made so far
+             * @example 4
+             */
+            reservationCount: number;
+        };
         UpdateReservationStatusDto: {
             /** @enum {string} */
             status: "RESERVED" | "CANCELLED" | "PRESENT" | "NO_SHOW";
         };
         UpdateReservationDto: {
+            /**
+             * @description Move the reservation to this existing user
+             * @example 12
+             */
+            userId?: number;
+            /** @example Robin Claes */
+            name?: string;
             /** @example student@student.ap.be */
             email?: string;
             /** @example s123456 */
@@ -2603,7 +2982,7 @@ export interface components {
             /** @example 0 */
             position: number;
             /**
-             * @description Visibility: public, authenticated, admin, or role:<RoleName>
+             * @description Visibility: public, authenticated, players (planning team members), admin, or role:<RoleName>
              * @example public
              */
             visibility?: string;
@@ -2635,7 +3014,7 @@ export interface components {
             /** @example 0 */
             position?: number;
             /**
-             * @description Visibility: public, authenticated, admin, or role:<RoleName>
+             * @description Visibility: public, authenticated, players (planning team members), admin, or role:<RoleName>
              * @example public
              */
             visibility?: string;
@@ -2879,6 +3258,332 @@ export interface components {
             /** @example image/jpeg */
             contentType: string;
         };
+        /** @enum {string} */
+        EsportsMatchResult: "UPCOMING" | "WIN" | "LOSS" | "DRAW";
+        EsportsMatch: {
+            id: number;
+            gameId: number;
+            opponent: string;
+            competition?: string;
+            /** Format: date-time */
+            playedAt: string;
+            result: components["schemas"]["EsportsMatchResult"];
+            ourScore?: number;
+            opponentScore?: number;
+            vodUrl?: string;
+            notes?: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CreateEsportsMatchDto: {
+            /**
+             * @description The team (roster game) that played
+             * @example 1
+             */
+            gameId: number;
+            /** @example KdG Esports */
+            opponent: string;
+            /** @example Belgian University League */
+            competition?: string | null;
+            /** @example 2026-11-20T19:00:00.000Z */
+            playedAt: string;
+            /** @example WIN */
+            result: components["schemas"]["EsportsMatchResult"];
+            /** @example 2 */
+            ourScore?: number | null;
+            /** @example 1 */
+            opponentScore?: number | null;
+            /** @example https://www.twitch.tv/videos/123 */
+            vodUrl?: string | null;
+            /** @example Close game on Ascent */
+            notes?: string | null;
+        };
+        UpdateEsportsMatchDto: {
+            /**
+             * @description The team (roster game) that played
+             * @example 1
+             */
+            gameId?: number;
+            /** @example KdG Esports */
+            opponent?: string;
+            /** @example Belgian University League */
+            competition?: string | null;
+            /** @example 2026-11-20T19:00:00.000Z */
+            playedAt?: string;
+            /** @example WIN */
+            result?: components["schemas"]["EsportsMatchResult"];
+            /** @example 2 */
+            ourScore?: number | null;
+            /** @example 1 */
+            opponentScore?: number | null;
+            /** @example https://www.twitch.tv/videos/123 */
+            vodUrl?: string | null;
+            /** @example Close game on Ascent */
+            notes?: string | null;
+        };
+        PlanningTeamSummaryDto: {
+            /** @example 1 */
+            id: number;
+            /** @example AP Valorant */
+            name: string;
+            /** @example Valorant */
+            game: string | null;
+            /**
+             * @description Players on the team
+             * @example 6
+             */
+            playerCount: number;
+            /**
+             * @description Planned days from today on
+             * @example 4
+             */
+            upcomingDays: number;
+            /**
+             * @description Upcoming days the signed-in player hasn't filled in at all (0 for non-players)
+             * @example 2
+             */
+            daysToFill: number;
+        };
+        PlanningPlayerDto: {
+            /** @example 4 */
+            memberId: number;
+            /**
+             * @description Handle, else name, else email
+             * @example Rocky
+             */
+            label: string;
+            /** @example Robin Claes */
+            name: string | null;
+            isMe: boolean;
+        };
+        /** @enum {string} */
+        PlanningBlockType: "SCRIM" | "PRACTICE" | "MATCH";
+        PlanningBlockDto: {
+            /** @example 2 */
+            id: number;
+            type: components["schemas"]["PlanningBlockType"];
+            title: string | null;
+            /** @example 19 */
+            startHour: number;
+            /**
+             * @description Exclusive
+             * @example 21
+             */
+            endHour: number;
+            notes: string | null;
+        };
+        PlanningDayDto: {
+            /** @example 7 */
+            id: number;
+            /** @example 2026-11-23 */
+            date: string;
+            /** @example 13 */
+            startHour: number;
+            /**
+             * @description Exclusive
+             * @example 23
+             */
+            endHour: number;
+            note: string | null;
+            blocks: components["schemas"]["PlanningBlockDto"][];
+        };
+        /** @enum {string} */
+        AvailabilityStatus: "AVAILABLE" | "UNAVAILABLE";
+        PlanningCellDto: {
+            /** @example 7 */
+            dayId: number;
+            /** @example 4 */
+            memberId: number;
+            /** @example 19 */
+            hour: number;
+            status: components["schemas"]["AvailabilityStatus"];
+            note: string | null;
+        };
+        PlanningTeamViewDto: {
+            team: components["schemas"]["PlanningTeamSummaryDto"];
+            /** @description The signed-in user's member id when they play on this team */
+            myMemberId: number | null;
+            /** @description The signed-in user may edit everyone and plan blocks */
+            canManage: boolean;
+            players: components["schemas"]["PlanningPlayerDto"][];
+            days: components["schemas"]["PlanningDayDto"][];
+            availability: components["schemas"]["PlanningCellDto"][];
+        };
+        SaveCellDto: {
+            /** @example 7 */
+            dayId: number;
+            /** @example 19 */
+            hour: number;
+            /** @description null clears the cell */
+            status: components["schemas"]["AvailabilityStatus"] | null;
+            /**
+             * @description Left out keeps the current note
+             * @example vanaf 20:30
+             */
+            note?: string | null;
+        };
+        SaveAvailabilityDto: {
+            /**
+             * @description Whose availability; defaults to the signed-in player's own
+             * @example 4
+             */
+            memberId?: number;
+            cells: components["schemas"]["SaveCellDto"][];
+        };
+        CreatePlanningTeamDto: {
+            /** @example AP Valorant */
+            name: string;
+            /** @example Valorant */
+            game?: string | null;
+        };
+        PlanningMemberDto: {
+            /** @example 4 */
+            id: number;
+            /** @example 12 */
+            userId: number;
+            /** @example Robin Claes */
+            name: string | null;
+            /** @example s123456@student.ap.be */
+            email: string;
+            /** @example s123456 */
+            sNumber: string;
+            /** @example Rocky */
+            handle: string | null;
+            isPlayer: boolean;
+            isManager: boolean;
+            /** @description Has signed in with Microsoft, so they can fill in their availability */
+            canSignIn: boolean;
+        };
+        PlanningAdminDayDto: {
+            /** @example 7 */
+            id: number;
+            /** @example 2026-11-23 */
+            date: string;
+            /** @example 13 */
+            startHour: number;
+            /**
+             * @description Exclusive
+             * @example 23
+             */
+            endHour: number;
+            note: string | null;
+            blocks: components["schemas"]["PlanningBlockDto"][];
+            /**
+             * @description Players who filled in at least one hour
+             * @example 4
+             */
+            filledBy: number;
+        };
+        PlanningTeamDetailDto: {
+            team: components["schemas"]["PlanningTeamSummaryDto"];
+            /** @description The signed-in user may create and delete teams and assign managers */
+            isPlanningAdmin: boolean;
+            members: components["schemas"]["PlanningMemberDto"][];
+            /** @description All planned days, newest last */
+            days: components["schemas"]["PlanningAdminDayDto"][];
+        };
+        UpdatePlanningTeamDto: {
+            /** @example AP Valorant */
+            name?: string;
+            /** @example Valorant */
+            game?: string | null;
+        };
+        AddPlanningMemberDto: {
+            /**
+             * @description Someone picked from the person search; takes precedence over email
+             * @example 12
+             */
+            userId?: number;
+            /**
+             * @description Required when no userId is given
+             * @example s123456@student.ap.be
+             */
+            email?: string;
+            /** @example Robin Claes */
+            name?: string;
+            /** @example s123456 */
+            sNumber?: string;
+            /** @example Rocky */
+            handle?: string | null;
+            /** @default true */
+            isPlayer: boolean;
+            /**
+             * @description Only planning admins can make someone a manager
+             * @default false
+             */
+            isManager: boolean;
+        };
+        UpdatePlanningMemberDto: {
+            /** @example Rocky */
+            handle?: string | null;
+            isPlayer?: boolean;
+            /** @description Only planning admins can change this */
+            isManager?: boolean;
+        };
+        AddPlanningDaysDto: {
+            /**
+             * @example [
+             *       "2026-11-23",
+             *       "2026-11-24"
+             *     ]
+             */
+            dates: string[];
+            /** @example 13 */
+            startHour: number;
+            /**
+             * @description Exclusive
+             * @example 23
+             */
+            endHour: number;
+            /** @example Voorbereiding finale */
+            note?: string | null;
+        };
+        PlanningAddDaysResultDto: {
+            /** @example 3 */
+            added: number;
+            /**
+             * @description Dates that were already planned
+             * @example 1
+             */
+            skipped: number;
+        };
+        UpdatePlanningDayDto: {
+            /** @example 13 */
+            startHour?: number;
+            /** @example 23 */
+            endHour?: number;
+            note?: string | null;
+        };
+        CreatePlanningBlockDto: {
+            /** @example SCRIM */
+            type: components["schemas"]["PlanningBlockType"];
+            /** @example Scrim vs KdG */
+            title?: string | null;
+            /** @example 19 */
+            startHour: number;
+            /**
+             * @description Exclusive
+             * @example 21
+             */
+            endHour: number;
+            notes?: string | null;
+        };
+        UpdatePlanningBlockDto: {
+            /** @example SCRIM */
+            type?: components["schemas"]["PlanningBlockType"];
+            /** @example Scrim vs KdG */
+            title?: string | null;
+            /** @example 19 */
+            startHour?: number;
+            /**
+             * @description Exclusive
+             * @example 21
+             */
+            endHour?: number;
+            notes?: string | null;
+        };
         GoogleSSOUser: {
             id: number;
             ssoId: string;
@@ -2961,6 +3666,17 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
         };
+        PlanningTeamMember: {
+            id: number;
+            teamId: number;
+            userId: number;
+            handle?: string;
+            isPlayer: boolean;
+            isManager: boolean;
+            order: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
         UserRelations: {
             reservations: components["schemas"]["Reservation"][];
             googleSSOUsers: components["schemas"]["GoogleSSOUser"][];
@@ -2975,6 +3691,7 @@ export interface components {
             dynamicFormSubmissionComments: components["schemas"]["DynamicFormSubmissionComment"][];
             notesAbout: components["schemas"]["UserNote"][];
             notesAuthored: components["schemas"]["UserNote"][];
+            planningMemberships: components["schemas"]["PlanningTeamMember"][];
         };
         User: {
             id: number;
@@ -3041,6 +3758,10 @@ export interface components {
         };
         RosterGameRelations: {
             rosterEntries: components["schemas"]["RosterEntry"][];
+            matches: components["schemas"]["EsportsMatch"][];
+        };
+        EsportsMatchRelations: {
+            game: components["schemas"]["RosterGame"];
         };
         RosterEntryRelations: {
             user: components["schemas"]["User"];
@@ -3274,6 +3995,64 @@ export interface components {
             participant: components["schemas"]["PointTrialParticipant"];
         };
         InventoryAdjustmentRelations: Record<string, never>;
+        PlanningDay: {
+            id: number;
+            teamId: number;
+            /** Format: date-time */
+            date: string;
+            startHour: number;
+            endHour: number;
+            note?: string;
+        };
+        PlanningTeamRelations: {
+            members: components["schemas"]["PlanningTeamMember"][];
+            days: components["schemas"]["PlanningDay"][];
+        };
+        PlanningTeam: {
+            id: number;
+            name: string;
+            game?: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        PlanningAvailability: {
+            id: number;
+            dayId: number;
+            memberId: number;
+            hour: number;
+            status: components["schemas"]["AvailabilityStatus"];
+            note?: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        PlanningTeamMemberRelations: {
+            team: components["schemas"]["PlanningTeam"];
+            user: components["schemas"]["User"];
+            availability: components["schemas"]["PlanningAvailability"][];
+        };
+        PlanningBlock: {
+            id: number;
+            dayId: number;
+            type: components["schemas"]["PlanningBlockType"];
+            title?: string;
+            startHour: number;
+            endHour: number;
+            notes?: string;
+        };
+        PlanningDayRelations: {
+            team: components["schemas"]["PlanningTeam"];
+            availability: components["schemas"]["PlanningAvailability"][];
+            blocks: components["schemas"]["PlanningBlock"][];
+        };
+        PlanningAvailabilityRelations: {
+            day: components["schemas"]["PlanningDay"];
+            member: components["schemas"]["PlanningTeamMember"];
+        };
+        PlanningBlockRelations: {
+            day: components["schemas"]["PlanningDay"];
+        };
         Form: {
             id: number;
             title: string;
@@ -3383,12 +4162,7 @@ export interface operations {
     };
     AuthController_microsoftLogin: {
         parameters: {
-            query?: {
-                /** @description Frontend return URL path to preserve after login */
-                returnUrl?: string;
-                /** @description If true, treat callback as a link-account flow for the currently authenticated user */
-                linkMode?: string;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -3420,6 +4194,58 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_mobileHandoff: {
+        parameters: {
+            query: {
+                /** @description PKCE S256 challenge: base64url(sha256(verifier)), generated by the mobile app */
+                challenge: string;
+                /** @description Where to sign in when needed. Google is only for Gaming Hub managers. Defaults to Microsoft. */
+                provider?: "microsoft" | "google";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_mobileToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MobileTokenRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MobileTokenResponseDto"];
+                };
+            };
+            /** @description Invalid or expired login code */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3911,6 +4737,25 @@ export interface operations {
             };
         };
     };
+    ReservationsController_getRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationRulesDto"];
+                };
+            };
+        };
+    };
     ReservationsController_getSlots: {
         parameters: {
             query: {
@@ -4063,6 +4908,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HttpExceptionDto"];
+                };
+            };
+        };
+    };
+    ReservationsController_searchPeople: {
+        parameters: {
+            query: {
+                /** @description Part of a name, email address or student number (at least 2 characters) */
+                search: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonDto"][];
                 };
             };
         };
@@ -6838,6 +7705,491 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    EsportsResultsController_findAll: {
+        parameters: {
+            query?: {
+                /** @description Only matches of this team */
+                gameId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EsportsMatch"][];
+                };
+            };
+        };
+    };
+    EsportsResultsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateEsportsMatchDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EsportsMatch"];
+                };
+            };
+        };
+    };
+    EsportsResultsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EsportsResultsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateEsportsMatchDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EsportsMatch"];
+                };
+            };
+        };
+    };
+    TeamPlanningController_myTeams: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanningTeamSummaryDto"][];
+                };
+            };
+        };
+    };
+    TeamPlanningController_teamView: {
+        parameters: {
+            query?: {
+                /** @description Show recent past days instead of upcoming ones */
+                past?: boolean;
+            };
+            header?: never;
+            path: {
+                teamId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanningTeamViewDto"];
+                };
+            };
+        };
+    };
+    TeamPlanningController_saveAvailability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveAvailabilityDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TeamPlanningController_adminTeams: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanningTeamSummaryDto"][];
+                };
+            };
+        };
+    };
+    TeamPlanningController_createTeam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePlanningTeamDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanningTeamSummaryDto"];
+                };
+            };
+        };
+    };
+    TeamPlanningController_teamDetail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanningTeamDetailDto"];
+                };
+            };
+        };
+    };
+    TeamPlanningController_deleteTeam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TeamPlanningController_updateTeam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePlanningTeamDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanningTeamSummaryDto"];
+                };
+            };
+        };
+    };
+    TeamPlanningController_searchPeople: {
+        parameters: {
+            query: {
+                /** @description Part of a name, email address or student number (at least 2 characters) */
+                search: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonDto"][];
+                };
+            };
+        };
+    };
+    TeamPlanningController_addMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddPlanningMemberDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TeamPlanningController_removeMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                memberId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TeamPlanningController_updateMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                memberId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePlanningMemberDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TeamPlanningController_addDays: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddPlanningDaysDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanningAddDaysResultDto"];
+                };
+            };
+        };
+    };
+    TeamPlanningController_removeDay: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dayId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TeamPlanningController_updateDay: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dayId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePlanningDayDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TeamPlanningController_addBlock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dayId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePlanningBlockDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanningBlockDto"];
+                };
+            };
+        };
+    };
+    TeamPlanningController_removeBlock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                blockId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TeamPlanningController_updateBlock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                blockId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePlanningBlockDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanningBlockDto"];
+                };
             };
         };
     };

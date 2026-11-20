@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsDateString, IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Max, MaxLength, Min, MinLength, ValidateIf } from 'class-validator';
+
+export class ReservationRulesDto {
+  @ApiProperty({ example: 1, description: 'Active reservations a member may have on one day (0 = no limit)' })
+  maxPerDay!: number;
+
+  @ApiProperty({ example: 90, description: "Minutes required between a member's reservations (0 = none)" })
+  minGapMinutes!: number;
+}
 
 export class ReservationSlotDto {
   @ApiProperty({ example: 'pc' })
@@ -50,15 +58,26 @@ export class UpdateReservationStatusDto {
 }
 
 export class AdminCreateReservationDto {
+  @ApiProperty({ example: 12, required: false, description: 'An existing user, picked from the person search. Takes precedence over email.' })
+  @IsInt()
+  @IsOptional()
+  userId?: number;
+
+  @ApiProperty({ example: 'student@student.ap.be', required: false, description: 'Required when no userId is given' })
+  @ValidateIf((dto: AdminCreateReservationDto) => dto.userId === undefined)
+  @IsEmail()
+  email?: string;
+
+  @ApiProperty({ example: 'Robin Claes', required: false, description: 'Name for a new person, or for a known person without one' })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  name?: string;
+
   @ApiProperty({ example: 's123456', required: false })
   @IsString()
   @IsOptional()
   sNumber?: string;
-
-  @ApiProperty({ example: 'student@student.ap.be' })
-  @IsEmail()
-  @IsNotEmpty()
-  email!: string;
 
   @ApiProperty({ example: 'pc', enum: ['pc', 'ps5', 'switch'] })
   @IsEnum(['pc', 'ps5', 'switch'])
@@ -81,6 +100,17 @@ export class AdminCreateReservationDto {
 }
 
 export class UpdateReservationDto {
+  @ApiProperty({ example: 12, required: false, description: 'Move the reservation to this existing user' })
+  @IsInt()
+  @IsOptional()
+  userId?: number;
+
+  @ApiProperty({ example: 'Robin Claes', required: false })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  name?: string;
+
   @ApiProperty({ example: 'student@student.ap.be', required: false })
   @IsEmail()
   @IsOptional()

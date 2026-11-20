@@ -23,6 +23,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Eye,
+  Medal,
+  CalendarRange,
 } from 'lucide-react';
 import { apiClient } from '@/api';
 import type { components } from '@/api';
@@ -50,6 +52,8 @@ interface NavItem {
   href: string;
   icon: LucideIcon;
   permissions: string[];
+  /** Also shown to team managers, who may have no permissions at all */
+  forPlanningManagers?: boolean;
 }
 
 interface NavGroup {
@@ -70,6 +74,8 @@ const NAV_GROUPS: NavGroup[] = [
     title: 'Content',
     items: [
       { id: 'roster', label: 'Teams', href: '/admin/roster', icon: UsersIcon, permissions: ['roster.manage'] },
+      { id: 'esports-results', label: 'Resultaten', href: '/admin/esports-results', icon: Medal, permissions: ['esports.results.manage'] },
+      { id: 'team-planning', label: 'Teamplanning', href: '/admin/team-planning', icon: CalendarRange, permissions: ['esports.schedule.manage'], forPlanningManagers: true },
       { id: 'navigation', label: 'Navigatie', href: '/admin/navigation', icon: Navigation, permissions: ['navigation.manage'] },
       { id: 'forms', label: 'Formulieren', href: '/admin/forms', icon: FileText, permissions: ['forms.manage'] },
       { id: 'submissions', label: 'Inzendingen', href: '/admin/submissions', icon: ClipboardList, permissions: ['forms.manage', 'forms.submissions.view'] },
@@ -137,7 +143,8 @@ export default function AdminShell({
         window.location.href = `/login?returnUrl=${encodeURIComponent(pathname)}`;
         return;
       }
-      if (!res.data.roles?.includes('Admin') && (!res.data.permissions || res.data.permissions.length === 0)) {
+      // Team managers get in for their team's planning, even without any permission
+      if (!res.data.roles?.includes('Admin') && (!res.data.permissions || res.data.permissions.length === 0) && !res.data.planning?.isManager) {
         window.location.href = `/login?returnUrl=${encodeURIComponent(pathname)}`;
         return;
       }
@@ -198,7 +205,8 @@ export default function AdminShell({
   const visibleGroups = NAV_GROUPS.map((group) => ({
     ...group,
     items: group.items.filter(
-      (item) => isAdminRole || item.permissions.some((p) => userPermissions.has(p)),
+      (item) =>
+        isAdminRole || item.permissions.some((p) => userPermissions.has(p)) || (item.forPlanningManagers && user.planning?.isManager),
     ),
   })).filter((group) => group.items.length > 0);
 
