@@ -2,12 +2,16 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Unauthor
 import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { ReservationsService } from './reservations.service.js';
+import { ReservationRulesService } from './reservation-rules.service.js';
+import { PeopleService } from '../people/people.service.js';
+import { PersonDto, PersonSearchQueryDto } from '../../dtos/people/person.dto.js';
 import { InventoryAdjustmentsService } from '../inventory-adjustments/inventory-adjustments.service.js';
 import {
   CreateReservationDto,
   AdminCreateReservationDto,
   MyReservationsResponseDto,
   ReservationQueryDto,
+  ReservationRulesDto,
   ReservationSlotDto,
   ReservationVerificationDto,
   UpdateReservationDto,
@@ -29,6 +33,8 @@ export class ReservationsController {
   constructor(
     private readonly reservationsService: ReservationsService,
     private readonly inventoryAdjustmentsService: InventoryAdjustmentsService,
+    private readonly reservationRules: ReservationRulesService,
+    private readonly people: PeopleService,
   ) {}
 
   @Post()
@@ -81,6 +87,14 @@ export class ReservationsController {
   @ApiOkResponse({ type: [PrismaModel.Reservation] })
   findAll(@Query() query: ReservationQueryDto) {
     return this.reservationsService.findAll(query.date, query.search);
+  }
+
+  @Public()
+  @Get('rules')
+  @ApiOperation({ summary: 'Get the per-member reservation limits (public)' })
+  @ApiOkResponse({ type: ReservationRulesDto })
+  getRules() {
+    return this.reservationRules.get();
   }
 
   @Public()
@@ -138,12 +152,21 @@ export class ReservationsController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @RequirePermissions('reservations.manage')
   @ApiOperation({
-    summary: 'Create a reservation as admin (no date restrictions)',
+    summary: 'Create a reservation as admin for an existing user (userId) or by email (no date restrictions)',
   })
   @ApiCreatedResponse({ type: PrismaModel.Reservation })
   @ApiBadRequestResponse({ description: 'Time slot is already reserved', type: HttpExceptionDto })
   adminCreate(@Body() dto: AdminCreateReservationDto) {
     return this.reservationsService.adminCreate(dto);
+  }
+
+  @Get('admin/people')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @RequirePermissions('reservations.manage')
+  @ApiOperation({ summary: 'Search people to book a reservation for, by name, email or student number' })
+  @ApiOkResponse({ type: [PersonDto] })
+  searchPeople(@Query() query: PersonSearchQueryDto) {
+    return this.people.search(query.search);
   }
 
   @Get('no-shows')

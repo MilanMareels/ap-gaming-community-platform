@@ -7,7 +7,18 @@ import Link from 'next/link';
 import { apiClient } from '@/api';
 import DiscordIcon from '@/components/ui/DiscordIcon';
 
-const FAQS: { question: string; answer: string; link?: { href: string; label: string } }[] = [
+type ReservationRules = { maxPerDay: number; minGapMinutes: number };
+
+/** Describes the configured per-member limits; a session lasts at most 2 hours. */
+function describeSessionRules({ maxPerDay, minGapMinutes }: ReservationRules): string {
+  const parts = ['Een sessie duurt 1, 1,5 of 2 uur.'];
+  if (maxPerDay > 0) parts.push(`Je kan maximaal ${maxPerDay} ${maxPerDay === 1 ? 'reservatie' : 'reservaties'} per dag maken.`);
+  if (minGapMinutes > 0) parts.push(`Tussen twee van je reservaties moet minstens ${minGapMinutes} minuten zitten.`);
+  parts.push('Zo kunnen zo veel mogelijk studenten gebruikmaken van de faciliteiten.');
+  return parts.join(' ');
+}
+
+const FAQS: { question: string; answer: string | ((rules: ReservationRules) => string); link?: { href: string; label: string } }[] = [
   {
     question: 'Hoe reserveer ik een plaats?',
     answer:
@@ -37,8 +48,7 @@ const FAQS: { question: string; answer: string; link?: { href: string; label: st
   },
   {
     question: 'Hoelang mag ik huren en blijven gamen?',
-    answer:
-      'Je kan maximaal 4 uur per dag reserveren. Deze limiet zorgt ervoor dat zo veel mogelijk studenten gebruik kunnen maken van de faciliteiten.',
+    answer: describeSessionRules,
   },
   {
     question: 'Kan ik ook op de PS5 of Nintendo Switch spelen?',
@@ -57,6 +67,7 @@ export default function InfoPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [formUrl, setFormUrl] = useState('');
   const [formTitle, setFormTitle] = useState('Formulier');
+  const [rules, setRules] = useState<ReservationRules>({ maxPerDay: 1, minGapMinutes: 90 });
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -74,7 +85,13 @@ export default function InfoPage() {
       }
     };
     fetchSettings();
+    apiClient
+      .GET('/reservations/rules')
+      .then((res) => res.data && setRules(res.data))
+      .catch(() => {});
   }, []);
+
+  const sessionRules = describeSessionRules(rules);
 
   const tabs = [
     { id: 'conduct', label: 'Gedragscode', icon: Users },
@@ -226,8 +243,8 @@ export default function InfoPage() {
                     <div className="flex items-start gap-4 bg-black/30 p-4 rounded-lg border border-white/5 hover:border-[#d42422]/50 transition-colors">
                       <Zap className="text-[#d42422] mt-1 flex-shrink-0" size={20} />
                       <div>
-                        <p className="font-bold text-white mb-1">Maximale sessieduur</p>
-                        <p>Maximaal 4 uur per dag. Dit zorgt ervoor dat meer studenten van de faciliteiten kunnen genieten.</p>
+                        <p className="font-bold text-white mb-1">Sessieduur en limieten</p>
+                        <p>{sessionRules}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-4 bg-black/30 p-4 rounded-lg border border-white/5 hover:border-[#d42422]/50 transition-colors">
@@ -311,7 +328,7 @@ export default function InfoPage() {
                       openIndex === index ? 'max-h-96 py-4 opacity-100' : 'max-h-0 opacity-0'
                     }`}
                   >
-                    <p className="text-gray-400 text-lg leading-relaxed border-t border-white/10 pt-4">{faq.answer}</p>
+                    <p className="text-gray-400 text-lg leading-relaxed border-t border-white/10 pt-4">{typeof faq.answer === 'function' ? faq.answer(rules) : faq.answer}</p>
                     {faq.link && (
                       <Link href={faq.link.href} className="inline-block mt-3 text-[#d42422] hover:text-red-400 font-semibold transition-colors">
                         {faq.link.label} &rarr;

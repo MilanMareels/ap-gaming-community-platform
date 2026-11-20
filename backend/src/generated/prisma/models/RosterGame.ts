@@ -193,12 +193,14 @@ export type RosterGameWhereInput = {
   id?: Prisma.IntFilter<"RosterGame"> | number
   name?: Prisma.StringFilter<"RosterGame"> | string
   rosterEntries?: Prisma.RosterEntryListRelationFilter
+  matches?: Prisma.EsportsMatchListRelationFilter
 }
 
 export type RosterGameOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   rosterEntries?: Prisma.RosterEntryOrderByRelationAggregateInput
+  matches?: Prisma.EsportsMatchOrderByRelationAggregateInput
 }
 
 export type RosterGameWhereUniqueInput = Prisma.AtLeast<{
@@ -208,6 +210,7 @@ export type RosterGameWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.RosterGameWhereInput | Prisma.RosterGameWhereInput[]
   name?: Prisma.StringFilter<"RosterGame"> | string
   rosterEntries?: Prisma.RosterEntryListRelationFilter
+  matches?: Prisma.EsportsMatchListRelationFilter
 }, "id">
 
 export type RosterGameOrderByWithAggregationInput = {
@@ -231,23 +234,27 @@ export type RosterGameScalarWhereWithAggregatesInput = {
 export type RosterGameCreateInput = {
   name: string
   rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutGameInput
+  matches?: Prisma.EsportsMatchCreateNestedManyWithoutGameInput
 }
 
 export type RosterGameUncheckedCreateInput = {
   id?: number
   name: string
   rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutGameInput
+  matches?: Prisma.EsportsMatchUncheckedCreateNestedManyWithoutGameInput
 }
 
 export type RosterGameUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   rosterEntries?: Prisma.RosterEntryUpdateManyWithoutGameNestedInput
+  matches?: Prisma.EsportsMatchUpdateManyWithoutGameNestedInput
 }
 
 export type RosterGameUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutGameNestedInput
+  matches?: Prisma.EsportsMatchUncheckedUpdateManyWithoutGameNestedInput
 }
 
 export type RosterGameCreateManyInput = {
@@ -292,6 +299,20 @@ export type RosterGameScalarRelationFilter = {
   isNot?: Prisma.RosterGameWhereInput
 }
 
+export type RosterGameCreateNestedOneWithoutMatchesInput = {
+  create?: Prisma.XOR<Prisma.RosterGameCreateWithoutMatchesInput, Prisma.RosterGameUncheckedCreateWithoutMatchesInput>
+  connectOrCreate?: Prisma.RosterGameCreateOrConnectWithoutMatchesInput
+  connect?: Prisma.RosterGameWhereUniqueInput
+}
+
+export type RosterGameUpdateOneRequiredWithoutMatchesNestedInput = {
+  create?: Prisma.XOR<Prisma.RosterGameCreateWithoutMatchesInput, Prisma.RosterGameUncheckedCreateWithoutMatchesInput>
+  connectOrCreate?: Prisma.RosterGameCreateOrConnectWithoutMatchesInput
+  upsert?: Prisma.RosterGameUpsertWithoutMatchesInput
+  connect?: Prisma.RosterGameWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RosterGameUpdateToOneWithWhereWithoutMatchesInput, Prisma.RosterGameUpdateWithoutMatchesInput>, Prisma.RosterGameUncheckedUpdateWithoutMatchesInput>
+}
+
 export type RosterGameCreateNestedOneWithoutRosterEntriesInput = {
   create?: Prisma.XOR<Prisma.RosterGameCreateWithoutRosterEntriesInput, Prisma.RosterGameUncheckedCreateWithoutRosterEntriesInput>
   connectOrCreate?: Prisma.RosterGameCreateOrConnectWithoutRosterEntriesInput
@@ -306,13 +327,53 @@ export type RosterGameUpdateOneRequiredWithoutRosterEntriesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.RosterGameUpdateToOneWithWhereWithoutRosterEntriesInput, Prisma.RosterGameUpdateWithoutRosterEntriesInput>, Prisma.RosterGameUncheckedUpdateWithoutRosterEntriesInput>
 }
 
+export type RosterGameCreateWithoutMatchesInput = {
+  name: string
+  rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutGameInput
+}
+
+export type RosterGameUncheckedCreateWithoutMatchesInput = {
+  id?: number
+  name: string
+  rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutGameInput
+}
+
+export type RosterGameCreateOrConnectWithoutMatchesInput = {
+  where: Prisma.RosterGameWhereUniqueInput
+  create: Prisma.XOR<Prisma.RosterGameCreateWithoutMatchesInput, Prisma.RosterGameUncheckedCreateWithoutMatchesInput>
+}
+
+export type RosterGameUpsertWithoutMatchesInput = {
+  update: Prisma.XOR<Prisma.RosterGameUpdateWithoutMatchesInput, Prisma.RosterGameUncheckedUpdateWithoutMatchesInput>
+  create: Prisma.XOR<Prisma.RosterGameCreateWithoutMatchesInput, Prisma.RosterGameUncheckedCreateWithoutMatchesInput>
+  where?: Prisma.RosterGameWhereInput
+}
+
+export type RosterGameUpdateToOneWithWhereWithoutMatchesInput = {
+  where?: Prisma.RosterGameWhereInput
+  data: Prisma.XOR<Prisma.RosterGameUpdateWithoutMatchesInput, Prisma.RosterGameUncheckedUpdateWithoutMatchesInput>
+}
+
+export type RosterGameUpdateWithoutMatchesInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  rosterEntries?: Prisma.RosterEntryUpdateManyWithoutGameNestedInput
+}
+
+export type RosterGameUncheckedUpdateWithoutMatchesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutGameNestedInput
+}
+
 export type RosterGameCreateWithoutRosterEntriesInput = {
   name: string
+  matches?: Prisma.EsportsMatchCreateNestedManyWithoutGameInput
 }
 
 export type RosterGameUncheckedCreateWithoutRosterEntriesInput = {
   id?: number
   name: string
+  matches?: Prisma.EsportsMatchUncheckedCreateNestedManyWithoutGameInput
 }
 
 export type RosterGameCreateOrConnectWithoutRosterEntriesInput = {
@@ -333,11 +394,13 @@ export type RosterGameUpdateToOneWithWhereWithoutRosterEntriesInput = {
 
 export type RosterGameUpdateWithoutRosterEntriesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  matches?: Prisma.EsportsMatchUpdateManyWithoutGameNestedInput
 }
 
 export type RosterGameUncheckedUpdateWithoutRosterEntriesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  matches?: Prisma.EsportsMatchUncheckedUpdateManyWithoutGameNestedInput
 }
 
 
@@ -347,10 +410,12 @@ export type RosterGameUncheckedUpdateWithoutRosterEntriesInput = {
 
 export type RosterGameCountOutputType = {
   rosterEntries: number
+  matches: number
 }
 
 export type RosterGameCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   rosterEntries?: boolean | RosterGameCountOutputTypeCountRosterEntriesArgs
+  matches?: boolean | RosterGameCountOutputTypeCountMatchesArgs
 }
 
 /**
@@ -370,11 +435,19 @@ export type RosterGameCountOutputTypeCountRosterEntriesArgs<ExtArgs extends runt
   where?: Prisma.RosterEntryWhereInput
 }
 
+/**
+ * RosterGameCountOutputType without action
+ */
+export type RosterGameCountOutputTypeCountMatchesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EsportsMatchWhereInput
+}
+
 
 export type RosterGameSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   rosterEntries?: boolean | Prisma.RosterGame$rosterEntriesArgs<ExtArgs>
+  matches?: boolean | Prisma.RosterGame$matchesArgs<ExtArgs>
   _count?: boolean | Prisma.RosterGameCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["rosterGame"]>
 
@@ -396,6 +469,7 @@ export type RosterGameSelectScalar = {
 export type RosterGameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name", ExtArgs["result"]["rosterGame"]>
 export type RosterGameInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   rosterEntries?: boolean | Prisma.RosterGame$rosterEntriesArgs<ExtArgs>
+  matches?: boolean | Prisma.RosterGame$matchesArgs<ExtArgs>
   _count?: boolean | Prisma.RosterGameCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RosterGameIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -405,6 +479,7 @@ export type $RosterGamePayload<ExtArgs extends runtime.Types.Extensions.Internal
   name: "RosterGame"
   objects: {
     rosterEntries: Prisma.$RosterEntryPayload<ExtArgs>[]
+    matches: Prisma.$EsportsMatchPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -804,6 +879,7 @@ readonly fields: RosterGameFieldRefs;
 export interface Prisma__RosterGameClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   rosterEntries<T extends Prisma.RosterGame$rosterEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RosterGame$rosterEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RosterEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  matches<T extends Prisma.RosterGame$matchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RosterGame$matchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EsportsMatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1249,6 +1325,30 @@ export type RosterGame$rosterEntriesArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.RosterEntryScalarFieldEnum | Prisma.RosterEntryScalarFieldEnum[]
+}
+
+/**
+ * RosterGame.matches
+ */
+export type RosterGame$matchesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EsportsMatch
+   */
+  select?: Prisma.EsportsMatchSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EsportsMatch
+   */
+  omit?: Prisma.EsportsMatchOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EsportsMatchInclude<ExtArgs> | null
+  where?: Prisma.EsportsMatchWhereInput
+  orderBy?: Prisma.EsportsMatchOrderByWithRelationInput | Prisma.EsportsMatchOrderByWithRelationInput[]
+  cursor?: Prisma.EsportsMatchWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EsportsMatchScalarFieldEnum | Prisma.EsportsMatchScalarFieldEnum[]
 }
 
 /**

@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/Button';
 import { Input, Select } from '@/components/ui/Input';
 import { apiClient } from '@/api';
 import type { ReservationWithUser, ReservationStatus } from '@/api';
+import { getApiErrorMessage } from '@/util/api-error';
+import { PersonPicker, type PersonChoice } from '@/components/admin/PersonPicker';
 
 interface ReservationModalProps {
   open: boolean;
@@ -37,6 +39,9 @@ const STATUS_OPTIONS = [
 ];
 
 /** Parse an ISO date-time to a date string (YYYY-MM-DD) */
+const searchPeople = async (search: string) =>
+  (await apiClient.GET('/reservations/admin/people', { params: { query: { search } } })).data ?? [];
+
 function toDateInput(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
@@ -65,8 +70,7 @@ export default function ReservationModal({
 }: ReservationModalProps) {
   const isEdit = !!reservation;
 
-  const [email, setEmail] = useState('');
-  const [sNumber, setSNumber] = useState('');
+  const [person, setPerson] = useState<PersonChoice | null>(null);
   const [inventory, setInventory] = useState('pc');
   const [controllers, setControllers] = useState('0');
   const [status, setStatus] = useState<ReservationStatus>('RESERVED');
@@ -79,8 +83,15 @@ export default function ReservationModal({
   // Populate form when opening in edit mode
   useEffect(() => {
     if (reservation) {
-      setEmail(reservation.email);
-      setSNumber(reservation.user?.sNumber || '');
+      setPerson({
+        kind: 'existing',
+        person: {
+          id: reservation.userId,
+          name: reservation.user?.name ?? null,
+          email: reservation.user?.email ?? reservation.email,
+          sNumber: reservation.user?.sNumber ?? '',
+        },
+      });
       setInventory(reservation.inventory);
       setControllers(String(reservation.controllers));
       setStatus(reservation.status);
@@ -89,8 +100,7 @@ export default function ReservationModal({
       setEndTime(toTimeInput(reservation.endTime));
     } else {
       // Reset for create mode
-      setEmail('');
-      setSNumber('');
+      setPerson(null);
       setInventory('pc');
       setControllers('0');
       setStatus('RESERVED');
@@ -107,10 +117,19 @@ export default function ReservationModal({
     e.preventDefault();
     setError('');
 
-    if (!email || !date || !startTime || !endTime) {
+    if (!person || !date || !startTime || !endTime) {
       setError('Vul alle verplichte velden in.');
       return;
     }
+    if (person.kind === 'new' && (!person.name.trim() || !person.email.trim())) {
+      setError('Vul de naam en het e-mailadres van de nieuwe persoon in.');
+      return;
+    }
+
+    const personFields =
+      person.kind === 'existing'
+        ? { userId: person.person.id }
+        : { name: person.name.trim(), email: person.email.trim(), sNumber: person.sNumber.trim() || undefined };
 
     const startISO = `${date}T${startTime}:00.000Z`;
     const endISO = `${date}T${endTime}:00.000Z`;
@@ -123,51 +142,38 @@ export default function ReservationModal({
     setSaving(true);
 
     try {
+      const details = {
+        inventory: inventory as 'pc' | 'ps5' | 'switch',
+        controllers: Number(controllers),
+        startTime: startISO,
+        endTime: endISO,
+      };
+
       if (isEdit && reservation) {
-        // Update existing reservation details
-        await apiClient.PATCH('/reservations/{id}', {
+        const personChanged = person.kind === 'new' || person.person.id !== reservation.userId;
+        const { error: updateError } = await apiClient.PATCH('/reservations/{id}', {
           params: { path: { id: reservation.id.toString() } },
-          body: {
-            email,
-            sNumber: sNumber || undefined,
-            inventory: inventory as 'pc' | 'ps5' | 'switch',
-            controllers: Number(controllers),
-            startTime: startISO,
-            endTime: endISO,
-          },
+          body: { ...(personChanged ? personFields : {}), ...details },
         });
-        // Update status if it changed
+        if (updateError) throw updateError;
+
         if (status !== reservation.status) {
-          await apiClient.PATCH('/reservations/{id}/status', {
+          const { error: statusError } = await apiClient.PATCH('/reservations/{id}/status', {
             params: { path: { id: reservation.id.toString() } },
             body: { status },
           });
+          if (statusError) throw statusError;
         }
       } else {
-        // Create new admin reservation
-        await apiClient.POST('/reservations/admin', {
-          body: {
-            email,
-            sNumber: sNumber || undefined,
-            inventory: inventory as 'pc' | 'ps5' | 'switch',
-            controllers: Number(controllers),
-            startTime: startISO,
-            endTime: endISO,
-          },
+        const { error: createError } = await apiClient.POST('/reservations/admin', {
+          body: { ...personFields, ...details },
         });
+        if (createError) throw createError;
       }
       onSaved();
       onClose();
     } catch (err: unknown) {
-      const error = err as {
-        response?: { data?: { message?: string | string[] } };
-        message?: string;
-      };
-      const msg =
-        error?.response?.data?.message ||
-        error?.message ||
-        'Er is een fout opgetreden.';
-      setError(Array.isArray(msg) ? msg.join(', ') : msg);
+      setError(getApiErrorMessage(err as { message?: string | string[] }, 'Er is een fout opgetreden.'));
     } finally {
       setSaving(false);
     }
@@ -198,20 +204,11 @@ export default function ReservationModal({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className='p-6 space-y-4'>
-          <Input
-            label='E-mailadres *'
-            type='email'
-            placeholder='student@student.ap.be'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-
-          <Input
-            label='S-nummer (optioneel)'
-            type='text'
-            placeholder='s123456'
-            value={sNumber}
-            onChange={(e) => setSNumber(e.target.value)}
+          <PersonPicker
+            value={person}
+            onChange={setPerson}
+            search={searchPeople}
+            newPersonHint="Bestaat er al iemand met dit e-mailadres of s-nummer, dan komt de reservatie op die persoon."
           />
 
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>

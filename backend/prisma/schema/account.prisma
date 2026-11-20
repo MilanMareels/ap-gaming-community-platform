@@ -20,6 +20,8 @@ model User {
 
   notesAbout   UserNote[] @relation("UserNoteSubject")
   notesAuthored UserNote[] @relation("UserNoteAuthor")
+
+  planningMemberships PlanningTeamMember[]
 }
 
 model UserNote {

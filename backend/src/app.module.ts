@@ -16,6 +16,8 @@ import { InventoryAdjustmentsModule } from './modules/inventory-adjustments/inve
 import { FormsModule } from './modules/forms/forms.module.js';
 import { JobsModule } from './modules/jobs/jobs.module.js';
 import { StorageModule } from './modules/storage/storage.module.js';
+import { EsportsResultsModule } from './modules/esports-results/esports-results.module.js';
+import { TeamPlanningModule } from './modules/team-planning/team-planning.module.js';
 import { SchedulerModule } from './modules/scheduler/scheduler.module.js';
 
 @Module({
@@ -38,6 +40,8 @@ import { SchedulerModule } from './modules/scheduler/scheduler.module.js';
     JobsModule,
     StorageModule,
     SchedulerModule,
+    EsportsResultsModule,
+    TeamPlanningModule,
   ],
   controllers: [],
   providers: [],

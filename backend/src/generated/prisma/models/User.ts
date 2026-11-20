@@ -221,6 +221,7 @@ export type UserWhereInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentListRelationFilter
   notesAbout?: Prisma.UserNoteListRelationFilter
   notesAuthored?: Prisma.UserNoteListRelationFilter
+  planningMemberships?: Prisma.PlanningTeamMemberListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -241,6 +242,7 @@ export type UserOrderByWithRelationInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentOrderByRelationAggregateInput
   notesAbout?: Prisma.UserNoteOrderByRelationAggregateInput
   notesAuthored?: Prisma.UserNoteOrderByRelationAggregateInput
+  planningMemberships?: Prisma.PlanningTeamMemberOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -264,6 +266,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentListRelationFilter
   notesAbout?: Prisma.UserNoteListRelationFilter
   notesAuthored?: Prisma.UserNoteListRelationFilter
+  planningMemberships?: Prisma.PlanningTeamMemberListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -305,6 +308,7 @@ export type UserCreateInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -325,6 +329,7 @@ export type UserUncheckedCreateInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -344,6 +349,7 @@ export type UserUpdateInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -364,6 +370,7 @@ export type UserUncheckedUpdateInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUncheckedUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -633,6 +640,20 @@ export type UserUpdateOneWithoutPointTrialParticipantsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPointTrialParticipantsInput, Prisma.UserUpdateWithoutPointTrialParticipantsInput>, Prisma.UserUncheckedUpdateWithoutPointTrialParticipantsInput>
 }
 
+export type UserCreateNestedOneWithoutPlanningMembershipsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPlanningMembershipsInput, Prisma.UserUncheckedCreateWithoutPlanningMembershipsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPlanningMembershipsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPlanningMembershipsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPlanningMembershipsInput, Prisma.UserUncheckedCreateWithoutPlanningMembershipsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPlanningMembershipsInput
+  upsert?: Prisma.UserUpsertWithoutPlanningMembershipsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPlanningMembershipsInput, Prisma.UserUpdateWithoutPlanningMembershipsInput>, Prisma.UserUncheckedUpdateWithoutPlanningMembershipsInput>
+}
+
 export type UserCreateWithoutNotesAboutInput = {
   name?: string | null
   email: string
@@ -649,6 +670,7 @@ export type UserCreateWithoutNotesAboutInput = {
   dynamicFormSubmissions?: Prisma.DynamicFormSubmissionCreateNestedManyWithoutUserInput
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotesAboutInput = {
@@ -668,6 +690,7 @@ export type UserUncheckedCreateWithoutNotesAboutInput = {
   dynamicFormSubmissions?: Prisma.DynamicFormSubmissionUncheckedCreateNestedManyWithoutUserInput
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotesAboutInput = {
@@ -691,6 +714,7 @@ export type UserCreateWithoutNotesAuthoredInput = {
   dynamicFormSubmissions?: Prisma.DynamicFormSubmissionCreateNestedManyWithoutUserInput
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotesAuthoredInput = {
@@ -710,6 +734,7 @@ export type UserUncheckedCreateWithoutNotesAuthoredInput = {
   dynamicFormSubmissions?: Prisma.DynamicFormSubmissionUncheckedCreateNestedManyWithoutUserInput
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotesAuthoredInput = {
@@ -744,6 +769,7 @@ export type UserUpdateWithoutNotesAboutInput = {
   dynamicFormSubmissions?: Prisma.DynamicFormSubmissionUpdateManyWithoutUserNestedInput
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotesAboutInput = {
@@ -763,6 +789,7 @@ export type UserUncheckedUpdateWithoutNotesAboutInput = {
   dynamicFormSubmissions?: Prisma.DynamicFormSubmissionUncheckedUpdateManyWithoutUserNestedInput
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutNotesAuthoredInput = {
@@ -792,6 +819,7 @@ export type UserUpdateWithoutNotesAuthoredInput = {
   dynamicFormSubmissions?: Prisma.DynamicFormSubmissionUpdateManyWithoutUserNestedInput
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotesAuthoredInput = {
@@ -811,6 +839,7 @@ export type UserUncheckedUpdateWithoutNotesAuthoredInput = {
   dynamicFormSubmissions?: Prisma.DynamicFormSubmissionUncheckedUpdateManyWithoutUserNestedInput
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUncheckedUpdateManyWithoutUserNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutGoogleSSOUsersInput = {
@@ -829,6 +858,7 @@ export type UserCreateWithoutGoogleSSOUsersInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutGoogleSSOUsersInput = {
@@ -848,6 +878,7 @@ export type UserUncheckedCreateWithoutGoogleSSOUsersInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutGoogleSSOUsersInput = {
@@ -882,6 +913,7 @@ export type UserUpdateWithoutGoogleSSOUsersInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGoogleSSOUsersInput = {
@@ -901,6 +933,7 @@ export type UserUncheckedUpdateWithoutGoogleSSOUsersInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUncheckedUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMicrosoftSSOUsersInput = {
@@ -919,6 +952,7 @@ export type UserCreateWithoutMicrosoftSSOUsersInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMicrosoftSSOUsersInput = {
@@ -938,6 +972,7 @@ export type UserUncheckedCreateWithoutMicrosoftSSOUsersInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMicrosoftSSOUsersInput = {
@@ -972,6 +1007,7 @@ export type UserUpdateWithoutMicrosoftSSOUsersInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMicrosoftSSOUsersInput = {
@@ -991,6 +1027,7 @@ export type UserUncheckedUpdateWithoutMicrosoftSSOUsersInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUncheckedUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUserRolesInput = {
@@ -1009,6 +1046,7 @@ export type UserCreateWithoutUserRolesInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUserRolesInput = {
@@ -1028,6 +1066,7 @@ export type UserUncheckedCreateWithoutUserRolesInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUserRolesInput = {
@@ -1062,6 +1101,7 @@ export type UserUpdateWithoutUserRolesInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserRolesInput = {
@@ -1081,6 +1121,7 @@ export type UserUncheckedUpdateWithoutUserRolesInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUncheckedUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRosterEntriesInput = {
@@ -1099,6 +1140,7 @@ export type UserCreateWithoutRosterEntriesInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRosterEntriesInput = {
@@ -1118,6 +1160,7 @@ export type UserUncheckedCreateWithoutRosterEntriesInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRosterEntriesInput = {
@@ -1152,6 +1195,7 @@ export type UserUpdateWithoutRosterEntriesInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRosterEntriesInput = {
@@ -1171,6 +1215,7 @@ export type UserUncheckedUpdateWithoutRosterEntriesInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUncheckedUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDynamicFormSubmissionsInput = {
@@ -1189,6 +1234,7 @@ export type UserCreateWithoutDynamicFormSubmissionsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDynamicFormSubmissionsInput = {
@@ -1208,6 +1254,7 @@ export type UserUncheckedCreateWithoutDynamicFormSubmissionsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDynamicFormSubmissionsInput = {
@@ -1242,6 +1289,7 @@ export type UserUpdateWithoutDynamicFormSubmissionsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDynamicFormSubmissionsInput = {
@@ -1261,6 +1309,7 @@ export type UserUncheckedUpdateWithoutDynamicFormSubmissionsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUncheckedUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDynamicFormSubmissionCommentsInput = {
@@ -1279,6 +1328,7 @@ export type UserCreateWithoutDynamicFormSubmissionCommentsInput = {
   dynamicFormSubmissions?: Prisma.DynamicFormSubmissionCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDynamicFormSubmissionCommentsInput = {
@@ -1298,6 +1348,7 @@ export type UserUncheckedCreateWithoutDynamicFormSubmissionCommentsInput = {
   dynamicFormSubmissions?: Prisma.DynamicFormSubmissionUncheckedCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDynamicFormSubmissionCommentsInput = {
@@ -1332,6 +1383,7 @@ export type UserUpdateWithoutDynamicFormSubmissionCommentsInput = {
   dynamicFormSubmissions?: Prisma.DynamicFormSubmissionUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDynamicFormSubmissionCommentsInput = {
@@ -1351,6 +1403,7 @@ export type UserUncheckedUpdateWithoutDynamicFormSubmissionCommentsInput = {
   dynamicFormSubmissions?: Prisma.DynamicFormSubmissionUncheckedUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUncheckedUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReservationsInput = {
@@ -1369,6 +1422,7 @@ export type UserCreateWithoutReservationsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReservationsInput = {
@@ -1388,6 +1442,7 @@ export type UserUncheckedCreateWithoutReservationsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReservationsInput = {
@@ -1422,6 +1477,7 @@ export type UserUpdateWithoutReservationsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReservationsInput = {
@@ -1441,6 +1497,7 @@ export type UserUncheckedUpdateWithoutReservationsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUncheckedUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBracketParticipantsInput = {
@@ -1459,6 +1516,7 @@ export type UserCreateWithoutBracketParticipantsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBracketParticipantsInput = {
@@ -1478,6 +1536,7 @@ export type UserUncheckedCreateWithoutBracketParticipantsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBracketParticipantsInput = {
@@ -1512,6 +1571,7 @@ export type UserUpdateWithoutBracketParticipantsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBracketParticipantsInput = {
@@ -1531,6 +1591,7 @@ export type UserUncheckedUpdateWithoutBracketParticipantsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUncheckedUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEventRegistrationsInput = {
@@ -1549,6 +1610,7 @@ export type UserCreateWithoutEventRegistrationsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEventRegistrationsInput = {
@@ -1568,6 +1630,7 @@ export type UserUncheckedCreateWithoutEventRegistrationsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEventRegistrationsInput = {
@@ -1602,6 +1665,7 @@ export type UserUpdateWithoutEventRegistrationsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEventRegistrationsInput = {
@@ -1621,6 +1685,7 @@ export type UserUncheckedUpdateWithoutEventRegistrationsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUncheckedUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTimeTrialParticipantsInput = {
@@ -1639,6 +1704,7 @@ export type UserCreateWithoutTimeTrialParticipantsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTimeTrialParticipantsInput = {
@@ -1658,6 +1724,7 @@ export type UserUncheckedCreateWithoutTimeTrialParticipantsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTimeTrialParticipantsInput = {
@@ -1692,6 +1759,7 @@ export type UserUpdateWithoutTimeTrialParticipantsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTimeTrialParticipantsInput = {
@@ -1711,6 +1779,7 @@ export type UserUncheckedUpdateWithoutTimeTrialParticipantsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUncheckedUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPointTrialParticipantsInput = {
@@ -1729,6 +1798,7 @@ export type UserCreateWithoutPointTrialParticipantsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPointTrialParticipantsInput = {
@@ -1748,6 +1818,7 @@ export type UserUncheckedCreateWithoutPointTrialParticipantsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
   notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
   notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPointTrialParticipantsInput = {
@@ -1782,6 +1853,7 @@ export type UserUpdateWithoutPointTrialParticipantsInput = {
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
   notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
   notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPointTrialParticipantsInput = {
@@ -1796,6 +1868,101 @@ export type UserUncheckedUpdateWithoutPointTrialParticipantsInput = {
   eventRegistrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
   bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
   timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  dynamicFormSubmissions?: Prisma.DynamicFormSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
+  notesAbout?: Prisma.UserNoteUncheckedUpdateManyWithoutUserNestedInput
+  notesAuthored?: Prisma.UserNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  planningMemberships?: Prisma.PlanningTeamMemberUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutPlanningMembershipsInput = {
+  name?: string | null
+  email: string
+  sNumber: string
+  reservations?: Prisma.ReservationCreateNestedManyWithoutUserInput
+  googleSSOUsers?: Prisma.GoogleSSOUserCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserCreateNestedManyWithoutUserInput
+  rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutUserInput
+  eventRegistrations?: Prisma.EventRegistrationCreateNestedManyWithoutUserInput
+  bracketParticipants?: Prisma.BracketParticipantCreateNestedManyWithoutUserInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantCreateNestedManyWithoutUserInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  dynamicFormSubmissions?: Prisma.DynamicFormSubmissionCreateNestedManyWithoutUserInput
+  dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentCreateNestedManyWithoutUserInput
+  notesAbout?: Prisma.UserNoteCreateNestedManyWithoutUserInput
+  notesAuthored?: Prisma.UserNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutPlanningMembershipsInput = {
+  id?: number
+  name?: string | null
+  email: string
+  sNumber: string
+  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutUserInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUncheckedCreateNestedManyWithoutUserInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedCreateNestedManyWithoutUserInput
+  rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutUserInput
+  eventRegistrations?: Prisma.EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+  bracketParticipants?: Prisma.BracketParticipantUncheckedCreateNestedManyWithoutUserInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  dynamicFormSubmissions?: Prisma.DynamicFormSubmissionUncheckedCreateNestedManyWithoutUserInput
+  dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedCreateNestedManyWithoutUserInput
+  notesAbout?: Prisma.UserNoteUncheckedCreateNestedManyWithoutUserInput
+  notesAuthored?: Prisma.UserNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutPlanningMembershipsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPlanningMembershipsInput, Prisma.UserUncheckedCreateWithoutPlanningMembershipsInput>
+}
+
+export type UserUpsertWithoutPlanningMembershipsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPlanningMembershipsInput, Prisma.UserUncheckedUpdateWithoutPlanningMembershipsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPlanningMembershipsInput, Prisma.UserUncheckedCreateWithoutPlanningMembershipsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPlanningMembershipsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPlanningMembershipsInput, Prisma.UserUncheckedUpdateWithoutPlanningMembershipsInput>
+}
+
+export type UserUpdateWithoutPlanningMembershipsInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  sNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  reservations?: Prisma.ReservationUpdateManyWithoutUserNestedInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUpdateManyWithoutUserNestedInput
+  rosterEntries?: Prisma.RosterEntryUpdateManyWithoutUserNestedInput
+  eventRegistrations?: Prisma.EventRegistrationUpdateManyWithoutUserNestedInput
+  bracketParticipants?: Prisma.BracketParticipantUpdateManyWithoutUserNestedInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUpdateManyWithoutUserNestedInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  dynamicFormSubmissions?: Prisma.DynamicFormSubmissionUpdateManyWithoutUserNestedInput
+  dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUpdateManyWithoutUserNestedInput
+  notesAbout?: Prisma.UserNoteUpdateManyWithoutUserNestedInput
+  notesAuthored?: Prisma.UserNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPlanningMembershipsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  sNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutUserNestedInput
+  googleSSOUsers?: Prisma.GoogleSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  microsoftSSOUsers?: Prisma.MicrosoftSSOUserUncheckedUpdateManyWithoutUserNestedInput
+  rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutUserNestedInput
+  eventRegistrations?: Prisma.EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+  bracketParticipants?: Prisma.BracketParticipantUncheckedUpdateManyWithoutUserNestedInput
+  timeTrialParticipants?: Prisma.TimeTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
+  pointTrialParticipants?: Prisma.PointTrialParticipantUncheckedUpdateManyWithoutUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   dynamicFormSubmissions?: Prisma.DynamicFormSubmissionUncheckedUpdateManyWithoutUserNestedInput
   dynamicFormSubmissionComments?: Prisma.DynamicFormSubmissionCommentUncheckedUpdateManyWithoutUserNestedInput
@@ -1822,6 +1989,7 @@ export type UserCountOutputType = {
   dynamicFormSubmissionComments: number
   notesAbout: number
   notesAuthored: number
+  planningMemberships: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1838,6 +2006,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   dynamicFormSubmissionComments?: boolean | UserCountOutputTypeCountDynamicFormSubmissionCommentsArgs
   notesAbout?: boolean | UserCountOutputTypeCountNotesAboutArgs
   notesAuthored?: boolean | UserCountOutputTypeCountNotesAuthoredArgs
+  planningMemberships?: boolean | UserCountOutputTypeCountPlanningMembershipsArgs
 }
 
 /**
@@ -1941,6 +2110,13 @@ export type UserCountOutputTypeCountNotesAuthoredArgs<ExtArgs extends runtime.Ty
   where?: Prisma.UserNoteWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPlanningMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlanningTeamMemberWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1960,6 +2136,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   dynamicFormSubmissionComments?: boolean | Prisma.User$dynamicFormSubmissionCommentsArgs<ExtArgs>
   notesAbout?: boolean | Prisma.User$notesAboutArgs<ExtArgs>
   notesAuthored?: boolean | Prisma.User$notesAuthoredArgs<ExtArgs>
+  planningMemberships?: boolean | Prisma.User$planningMembershipsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1999,6 +2176,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   dynamicFormSubmissionComments?: boolean | Prisma.User$dynamicFormSubmissionCommentsArgs<ExtArgs>
   notesAbout?: boolean | Prisma.User$notesAboutArgs<ExtArgs>
   notesAuthored?: boolean | Prisma.User$notesAuthoredArgs<ExtArgs>
+  planningMemberships?: boolean | Prisma.User$planningMembershipsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2020,6 +2198,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     dynamicFormSubmissionComments: Prisma.$DynamicFormSubmissionCommentPayload<ExtArgs>[]
     notesAbout: Prisma.$UserNotePayload<ExtArgs>[]
     notesAuthored: Prisma.$UserNotePayload<ExtArgs>[]
+    planningMemberships: Prisma.$PlanningTeamMemberPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2433,6 +2612,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   dynamicFormSubmissionComments<T extends Prisma.User$dynamicFormSubmissionCommentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$dynamicFormSubmissionCommentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DynamicFormSubmissionCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notesAbout<T extends Prisma.User$notesAboutArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notesAboutArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notesAuthored<T extends Prisma.User$notesAuthoredArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notesAuthoredArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  planningMemberships<T extends Prisma.User$planningMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$planningMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlanningTeamMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3168,6 +3348,30 @@ export type User$notesAuthoredArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.UserNoteScalarFieldEnum | Prisma.UserNoteScalarFieldEnum[]
+}
+
+/**
+ * User.planningMemberships
+ */
+export type User$planningMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlanningTeamMember
+   */
+  select?: Prisma.PlanningTeamMemberSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlanningTeamMember
+   */
+  omit?: Prisma.PlanningTeamMemberOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlanningTeamMemberInclude<ExtArgs> | null
+  where?: Prisma.PlanningTeamMemberWhereInput
+  orderBy?: Prisma.PlanningTeamMemberOrderByWithRelationInput | Prisma.PlanningTeamMemberOrderByWithRelationInput[]
+  cursor?: Prisma.PlanningTeamMemberWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlanningTeamMemberScalarFieldEnum | Prisma.PlanningTeamMemberScalarFieldEnum[]
 }
 
 /**

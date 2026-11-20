@@ -23,6 +23,7 @@ import type { AuthProfile, MyReservation, MyReservationsResponse } from '@/api';
 import { getApiErrorMessage } from '@/util/api-error';
 import { Pagination } from '@/components/ui/Pagination';
 import { NoShowTracker } from '@/components/reservations/NoShowTracker';
+import { MyTeams } from '@/components/planning/MyTeams';
 
 /** "Now" in the fake-UTC convention used by stored reservation timestamps (local wall-clock stored as UTC). */
 function nowAsFakeUTC(): Date {
@@ -150,6 +151,8 @@ export default function ProfilePage() {
             <LogOut size={16} /> Uitloggen
           </button>
         </motion.div>
+
+        {(profile.planning?.isPlayer || profile.planning?.isManager) && <MyTeams isManager={profile.planning.isManager} />}
 
         {data && <NoShowStatus data={data} />}
 

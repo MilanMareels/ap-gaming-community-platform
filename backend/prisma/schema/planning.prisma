@@ -1,0 +1,101 @@
+// Team planning: esports teams plan the days they want to practise or play, and each player
+// says per hour whether they can make it. Separate from the public roster.
+
+model PlanningTeam {
+  id Int @id @default(autoincrement())
+
+  name String
+  game String?
+
+  members PlanningTeamMember[]
+  days    PlanningDay[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Someone on a planning team: a player who fills in availability, a manager who plans
+// the team in the admin UI, or both.
+model PlanningTeamMember {
+  id Int @id @default(autoincrement())
+
+  teamId Int
+  team   PlanningTeam @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  handle    String? // shown above their column instead of their name
+  isPlayer  Boolean @default(true)
+  isManager Boolean @default(false)
+  order     Int     @default(0)
+
+  availability PlanningAvailability[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([teamId, userId])
+  @@index([userId])
+}
+
+// A date the team plans, with the hours players are asked to fill in.
+model PlanningDay {
+  id Int @id @default(autoincrement())
+
+  teamId Int
+  team   PlanningTeam @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  date      DateTime @db.Date
+  startHour Int      @default(13)
+  endHour   Int      @default(23) // exclusive
+  note      String?
+
+  availability PlanningAvailability[]
+  blocks       PlanningBlock[]
+
+  @@unique([teamId, date])
+}
+
+// Whether a player can play during one hour of a planned day. No row means they haven't said.
+model PlanningAvailability {
+  id Int @id @default(autoincrement())
+
+  dayId Int
+  day   PlanningDay @relation(fields: [dayId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  memberId Int
+  member   PlanningTeamMember @relation(fields: [memberId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  hour   Int // the hour starting at hour:00
+  status AvailabilityStatus
+  note   String? // e.g. "vanaf 20:30"
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([dayId, memberId, hour])
+}
+
+enum AvailabilityStatus {
+  AVAILABLE
+  UNAVAILABLE
+}
+
+// A scrim, training or match the whole team has planned during a day.
+model PlanningBlock {
+  id Int @id @default(autoincrement())
+
+  dayId Int
+  day   PlanningDay @relation(fields: [dayId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  type      PlanningBlockType
+  title     String?
+  startHour Int
+  endHour   Int // exclusive
+  notes     String?
+}
+
+enum PlanningBlockType {
+  SCRIM
+  PRACTICE
+  MATCH
+}

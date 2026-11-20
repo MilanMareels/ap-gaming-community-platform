@@ -7,12 +7,29 @@ import { CreateReservationDto, ReservationStatus } from '../../src/dtos/reservat
 import { errorMessages } from '../../src/errors/errorMessages.js';
 import { MailService } from '../../src/modules/mail/mail.service.js';
 import { InventoryAdjustmentsService } from '../../src/modules/inventory-adjustments/inventory-adjustments.service.js';
+import { wallClockNow } from '../../src/common/wall-clock.js';
+import { ReservationRulesService } from '../../src/modules/reservations/reservation-rules.service.js';
+import { PeopleService } from '../../src/modules/people/people.service.js';
 
 const getIsoDate = (offset = 0) => {
   const d = new Date();
   d.setDate(d.getDate() + offset);
   return d.toISOString();
 };
+
+/** A session in hub wall-clock time (stored as UTC), `dayOffset` days from today. */
+const wallClockSlot = (dayOffset: number, hour = 14, minutes = 60) => {
+  const now = wallClockNow();
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + dayOffset, hour));
+  return { startTime: start.toISOString(), endTime: new Date(start.getTime() + minutes * 60_000).toISOString() };
+};
+
+const weekdayIn = (dayOffset: number) => {
+  const now = wallClockNow();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + dayOffset)).getUTCDay();
+};
+
+const openOn = (...weekdays: number[]) => weekdays.map((dayOfWeek) => ({ dayOfWeek }));
 
 const mockUser = { id: 1, email: 'test@student.ap.be', sNumber: 's123456', name: null };
 
@@ -40,8 +57,7 @@ describe('ReservationsService', () => {
   beforeEach(async () => {
     baseDto.inventory = 'pc';
     baseDto.controllers = 1;
-    baseDto.startTime = getIsoDate(1);
-    baseDto.endTime = getIsoDate(1);
+    Object.assign(baseDto, wallClockSlot(1));
 
     baseAdminDto.email = mockUser.email;
     baseAdminDto.sNumber = mockUser.sNumber;
@@ -51,7 +67,7 @@ describe('ReservationsService', () => {
     baseAdminDto.endTime = getIsoDate(1);
 
     const mockPrisma = {
-      user: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn() },
+      user: { findUnique: jest.fn(), findFirst: jest.fn(), findMany: jest.fn(), create: jest.fn(), update: jest.fn() },
       microsoftSSOUser: { findFirst: jest.fn<() => Promise<{ id: number }>>().mockResolvedValue({ id: 1 }) },
       reservation: {
         findFirst: jest.fn(),
@@ -64,6 +80,10 @@ describe('ReservationsService', () => {
       },
       setting: {
         findFirst: jest.fn(),
+        findMany: jest.fn<() => Promise<{ key: string; value: string }[]>>().mockResolvedValue([]),
+      },
+      timeTableEntry: {
+        findMany: jest.fn<() => Promise<{ dayOfWeek: number }[]>>().mockResolvedValue(openOn(0, 1, 2, 3, 4, 5, 6)),
       },
     };
 
@@ -80,6 +100,8 @@ describe('ReservationsService', () => {
     const module = await Test.createTestingModule({
       providers: [
         ReservationsService,
+        ReservationRulesService,
+        PeopleService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: MailService, useValue: mockMailService },
         { provide: InventoryAdjustmentsService, useValue: mockInventoryAdjustmentsService },
@@ -128,7 +150,7 @@ describe('ReservationsService', () => {
     });
 
     it('should still let staff create a reservation for someone without a Microsoft account', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.user.findFirst.mockResolvedValue(mockUser);
       prisma.microsoftSSOUser.findFirst.mockResolvedValue(null);
       prisma.setting.findFirst.mockResolvedValue({ value: '5' });
       prisma.reservation.count.mockResolvedValue(0);
@@ -146,24 +168,232 @@ describe('ReservationsService', () => {
       await expect(service.createForUser(999, baseDto)).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw an BadRequestException when trying to create an reservation when is in the past', async () => {
-      baseDto.startTime = getIsoDate(-1);
-      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw an BadRequestException when trying to create an reservation 3 days in the future', async () => {
-      baseDto.startTime = getIsoDate(5);
-      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(BadRequestException);
-    });
-
-    it('should return corrct error message when trying to create an reservation when is in the past', async () => {
-      baseDto.startTime = getIsoDate(-1);
+    it('should refuse a reservation in the past', async () => {
+      Object.assign(baseDto, wallClockSlot(-1));
       await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.pastDate);
     });
 
-    it('should return corrct error message when trying to create an reservation 3 days in the future', async () => {
-      baseDto.startTime = getIsoDate(5);
-      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.maxAdvanceDays);
+    it('should refuse a reservation 5 days ahead', async () => {
+      Object.assign(baseDto, wallClockSlot(5));
+      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.dayNotBookable);
+    });
+
+    it('should refuse a day after the first next open day', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      Object.assign(baseDto, wallClockSlot(2)); // every day is open, so only today and tomorrow are bookable
+      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.dayNotBookable);
+      expect(prisma.reservation.create).not.toHaveBeenCalled();
+    });
+
+    it('should accept the first open day when the days in between are closed', async () => {
+      prisma.timeTableEntry.findMany.mockResolvedValue(openOn(weekdayIn(2)));
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+      prisma.reservation.count.mockResolvedValue(0);
+      prisma.reservation.findFirst.mockResolvedValue(null);
+      prisma.reservation.create.mockResolvedValue({ id: 1, cuid: 'cuid', user: mockUser });
+
+      Object.assign(baseDto, wallClockSlot(2));
+      await service.createForUser(mockUser.id, baseDto);
+
+      expect(prisma.reservation.create).toHaveBeenCalled();
+    });
+
+    it('should refuse a closed day', async () => {
+      prisma.timeTableEntry.findMany.mockResolvedValue(openOn(weekdayIn(2)));
+      Object.assign(baseDto, wallClockSlot(1));
+      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.dayNotBookable);
+    });
+
+    it.each([0, 45, 150])('should refuse a session of %i minutes', async (minutes) => {
+      Object.assign(baseDto, wallClockSlot(1, 14, minutes));
+      await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.invalidDuration);
+    });
+
+    describe('per-member limits', () => {
+      const setRules = (rules: Record<string, string>) =>
+        prisma.setting.findMany.mockResolvedValue(Object.entries(rules).map(([key, value]) => ({ key, value })));
+
+      beforeEach(() => {
+        prisma.user.findUnique.mockResolvedValue(mockUser);
+        prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+        prisma.reservation.count.mockResolvedValue(0);
+        prisma.reservation.findFirst.mockResolvedValue(null);
+        prisma.reservation.create.mockResolvedValue({ id: 1, cuid: 'cuid', user: mockUser });
+      });
+
+      it('refuses a second reservation on the same day by default', async () => {
+        prisma.reservation.count
+          .mockResolvedValueOnce(0) // capacity
+          .mockResolvedValueOnce(0) // no-shows
+          .mockResolvedValueOnce(1); // already booked today
+
+        await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.maxPerDay(1));
+        expect(prisma.reservation.create).not.toHaveBeenCalled();
+      });
+
+      it('counts the reservations of the wall-clock day the session falls on', async () => {
+        await service.createForUser(mockUser.id, baseDto);
+
+        const day = baseDto.startTime.slice(0, 10);
+        expect(prisma.reservation.count).toHaveBeenLastCalledWith({
+          where: expect.objectContaining({
+            userId: mockUser.id,
+            startTime: { gte: new Date(`${day}T00:00:00.000Z`), lt: new Date(new Date(`${day}T00:00:00.000Z`).getTime() + 86_400_000) },
+          }),
+        });
+      });
+
+      it('allows several reservations a day when the limit is raised', async () => {
+        setRules({ 'reservations.maxPerDay': '3' });
+        prisma.reservation.count.mockResolvedValueOnce(0).mockResolvedValueOnce(0).mockResolvedValueOnce(2);
+
+        await service.createForUser(mockUser.id, baseDto);
+
+        expect(prisma.reservation.create).toHaveBeenCalled();
+      });
+
+      it('skips the daily limit when it is set to 0', async () => {
+        setRules({ 'reservations.maxPerDay': '0', 'reservations.minGapMinutes': '0' });
+
+        await service.createForUser(mockUser.id, baseDto);
+
+        expect(prisma.reservation.count).toHaveBeenCalledTimes(2); // capacity and no-shows only
+        expect(prisma.reservation.findFirst).toHaveBeenCalledTimes(1); // overlap only
+        expect(prisma.reservation.create).toHaveBeenCalled();
+      });
+
+      it('refuses a reservation too close to another one', async () => {
+        setRules({ 'reservations.minGapMinutes': '45' });
+        prisma.reservation.findFirst
+          .mockResolvedValueOnce(null) // no overlap
+          .mockResolvedValueOnce({ id: 9 }); // but within the gap
+
+        await expect(service.createForUser(mockUser.id, baseDto)).rejects.toThrow(errorMessages.minGap(45));
+      });
+
+      it('looks for any reservation within the gap, including short ones fully inside it', async () => {
+        await service.createForUser(mockUser.id, baseDto);
+
+        const start = new Date(baseDto.startTime).getTime();
+        const end = new Date(baseDto.endTime).getTime();
+        const gap = 90 * 60_000;
+        expect(prisma.reservation.findFirst).toHaveBeenNthCalledWith(2, {
+          where: expect.objectContaining({
+            startTime: { lt: new Date(end + gap) },
+            endTime: { gt: new Date(start - gap) },
+          }),
+        });
+      });
+    });
+
+    describe('booking for a person as staff', () => {
+      const created = { id: 1, cuid: 'cuid', user: mockUser };
+
+      beforeEach(() => {
+        prisma.setting.findFirst.mockResolvedValue({ value: '5' });
+        prisma.reservation.count.mockResolvedValue(0);
+        prisma.reservation.create.mockResolvedValue(created);
+      });
+
+      const bookedFor = () => prisma.reservation.create.mock.calls[0][0].data;
+
+      it('books for the user picked in the search', async () => {
+        prisma.user.findUnique.mockResolvedValue({ ...mockUser, id: 42, email: 'picked@student.ap.be' });
+
+        await service.adminCreate({ ...baseAdminDto, email: undefined, sNumber: undefined, userId: 42 });
+
+        expect(bookedFor()).toEqual(expect.objectContaining({ userId: 42, email: 'picked@student.ap.be' }));
+        expect(prisma.user.create).not.toHaveBeenCalled();
+      });
+
+      it('refuses a picked user that no longer exists', async () => {
+        prisma.user.findUnique.mockResolvedValue(null);
+        await expect(service.adminCreate({ ...baseAdminDto, userId: 404 })).rejects.toThrow(NotFoundException);
+      });
+
+      it('matches the email whatever its casing', async () => {
+        prisma.user.findFirst.mockResolvedValueOnce(mockUser);
+
+        await service.adminCreate({ ...baseAdminDto, email: '  Test@Student.AP.be ' });
+
+        expect(prisma.user.findFirst).toHaveBeenCalledWith({ where: { email: { equals: 'test@student.ap.be', mode: 'insensitive' } } });
+        expect(bookedFor()).toEqual(expect.objectContaining({ userId: mockUser.id, email: mockUser.email }));
+        expect(prisma.user.create).not.toHaveBeenCalled();
+      });
+
+      it('falls back to the student number, also when it is only in a short email', async () => {
+        const student = { id: 5, email: 's654321@student.ap.be', sNumber: 's654321', name: 'Robin' };
+        prisma.user.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(student);
+
+        await service.adminCreate({ ...baseAdminDto, email: 'S654321@ap.be', sNumber: undefined });
+
+        expect(prisma.user.findFirst).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            where: {
+              OR: [
+                { sNumber: { equals: 's654321', mode: 'insensitive' } },
+                { email: { equals: 's654321@student.ap.be', mode: 'insensitive' } },
+                { email: { equals: 's654321@ap.be', mode: 'insensitive' } },
+              ],
+            },
+          }),
+        );
+        expect(bookedFor()).toEqual(expect.objectContaining({ userId: 5, email: 's654321@student.ap.be' }));
+        expect(prisma.user.create).not.toHaveBeenCalled();
+      });
+
+      it('creates a named person when nobody matches', async () => {
+        prisma.user.findFirst.mockResolvedValue(null);
+        prisma.user.create.mockResolvedValue({ id: 9, email: 'new.person@example.com', sNumber: 's111111', name: 'New Person' });
+
+        await service.adminCreate({ ...baseAdminDto, email: 'New.Person@example.com', name: ' New Person ', sNumber: 'S111111' });
+
+        expect(prisma.user.create).toHaveBeenCalledWith({ data: { email: 'new.person@example.com', name: 'New Person', sNumber: 's111111' } });
+        expect(bookedFor()).toEqual(expect.objectContaining({ userId: 9 }));
+      });
+
+      it('asks for an email when a new person has none', async () => {
+        prisma.user.findFirst.mockResolvedValue(null);
+        await expect(service.adminCreate({ ...baseAdminDto, email: undefined, sNumber: undefined, name: 'Nobody' })).rejects.toThrow(
+          BadRequestException,
+        );
+      });
+
+      it('fills in a missing name and student number but keeps existing ones', async () => {
+        prisma.user.findFirst.mockResolvedValueOnce({ ...mockUser, name: null, sNumber: 'N/A' });
+        prisma.user.update.mockResolvedValue(mockUser);
+
+        await service.adminCreate({ ...baseAdminDto, name: 'Robin', sNumber: 's123456' });
+        expect(prisma.user.update).toHaveBeenCalledWith({ where: { id: mockUser.id }, data: { name: 'Robin', sNumber: 's123456' } });
+
+        prisma.user.update.mockClear();
+        prisma.user.findFirst.mockResolvedValueOnce({ ...mockUser, name: 'Robin Claes' });
+        await service.adminCreate({ ...baseAdminDto, name: 'Someone else' });
+        expect(prisma.user.update).not.toHaveBeenCalled();
+      });
+
+      it('moves a reservation to another picked person on edit', async () => {
+        prisma.reservation.findUnique.mockResolvedValue({ id: 3, userId: mockUser.id, email: mockUser.email, user: mockUser });
+        prisma.user.findUnique.mockResolvedValue({ ...mockUser, id: 42, email: 'other@student.ap.be' });
+        prisma.reservation.update.mockResolvedValue({});
+
+        await service.update(3, { userId: 42 });
+
+        expect(prisma.reservation.update).toHaveBeenCalledWith(
+          expect.objectContaining({ data: expect.objectContaining({ userId: 42, email: 'other@student.ap.be' }) }),
+        );
+      });
+
+      it('keeps the person when an edit only changes the email casing', async () => {
+        prisma.reservation.findUnique.mockResolvedValue({ id: 3, userId: mockUser.id, email: mockUser.email, user: mockUser });
+        prisma.reservation.update.mockResolvedValue({});
+
+        await service.update(3, { email: mockUser.email.toUpperCase(), inventory: 'ps5' });
+
+        expect(prisma.user.findFirst).not.toHaveBeenCalled();
+        expect(prisma.reservation.update).toHaveBeenCalledWith(expect.objectContaining({ data: { inventory: 'ps5' } }));
+      });
     });
 
     describe('verifyByCuid', () => {
@@ -399,15 +629,18 @@ describe('ReservationsService', () => {
     });
 
     it('should send confirmation email for admin-created reservations', async () => {
+      prisma.user.findFirst.mockResolvedValue(mockUser);
       await service.adminCreate(baseAdminDto as any);
 
       expect(mailService.generateQRCode).toHaveBeenCalledWith(mockCuid);
       expect(mailService.sendMailWithAttachments).toHaveBeenCalled();
     });
 
-    it('should handle admin reservations without sNumber', async () => {
-      const dtoWithoutSNumber = { ...baseAdminDto };
+    it('should handle admin reservations for a new person without sNumber', async () => {
+      const dtoWithoutSNumber = { ...baseAdminDto, email: 'guest@example.com' };
       delete (dtoWithoutSNumber as any).sNumber;
+      prisma.user.findFirst.mockResolvedValue(null);
+      prisma.user.create.mockResolvedValue({ id: 7, email: 'guest@example.com', sNumber: 'N/A', name: null });
 
       await service.adminCreate(dtoWithoutSNumber as any);
 

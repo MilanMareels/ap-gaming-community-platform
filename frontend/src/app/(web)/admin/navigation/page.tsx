@@ -32,12 +32,14 @@ type NavLinkTree = NavLink & { children: NavLink[] };
 const BASE_VISIBILITY_OPTIONS = [
   { value: 'public', label: 'Publiek' },
   { value: 'authenticated', label: 'Ingelogd' },
+  { value: 'players', label: 'Spelers (teamplanning)' },
   { value: 'admin', label: 'Admin' },
 ];
 
 const VISIBILITY_VARIANT: Record<string, 'default' | 'info' | 'warning'> = {
   public: 'default',
   authenticated: 'info',
+  players: 'info',
   admin: 'warning',
 };
 

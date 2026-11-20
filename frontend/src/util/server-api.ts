@@ -64,6 +64,15 @@ export interface PublicRosterGame {
   rosterEntries: { handle: string; rank: string; role: string | null }[];
 }
 
+export interface PublicEsportsMatch {
+  opponent: string;
+  playedAt: string;
+  result: 'UPCOMING' | 'WIN' | 'LOSS' | 'DRAW';
+  ourScore: number | null;
+  opponentScore: number | null;
+  game: { name: string };
+}
+
 const isId = (id: string) => /^\d+$/.test(id);
 
 export const getEvent = (id: string) => (isId(id) ? fetchPublic<EventWithCount>(`/events/${id}`) : Promise.resolve(null));
@@ -78,4 +87,5 @@ export const getTimeTrial = (eventId: string) =>
 export const getPointTrial = (eventId: string) =>
   isId(eventId) ? fetchPublic<PublicPointTrial>(`/events/${eventId}/point-trial`) : Promise.resolve(null);
 export const getRosterGames = () => fetchPublic<PublicRosterGame[]>('/roster/games');
+export const getEsportsResults = () => fetchPublic<PublicEsportsMatch[]>('/esports-results');
 export const getInventory = () => fetchPublic<{ key: string; value: string }[]>('/settings/inventory');
