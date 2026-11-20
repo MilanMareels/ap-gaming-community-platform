@@ -12,6 +12,8 @@ import { NavLinkRelations as _NavLinkRelations } from './nav_link_relations.js';
 import { RosterGameRelations as _RosterGameRelations } from './roster_game_relations.js';
 import { EsportsMatchRelations as _EsportsMatchRelations } from './esports_match_relations.js';
 import { RosterEntryRelations as _RosterEntryRelations } from './roster_entry_relations.js';
+import { PlayerAvailabilityRelations as _PlayerAvailabilityRelations } from './player_availability_relations.js';
+import { TeamScheduleBlockRelations as _TeamScheduleBlockRelations } from './team_schedule_block_relations.js';
 import { DynamicFormRelations as _DynamicFormRelations } from './dynamic_form_relations.js';
 import { DynamicFormFieldRelations as _DynamicFormFieldRelations } from './dynamic_form_field_relations.js';
 import { DynamicFormSubmissionRelations as _DynamicFormSubmissionRelations } from './dynamic_form_submission_relations.js';
@@ -48,6 +50,8 @@ import { NavLink as _NavLink } from './nav_link.js';
 import { RosterGame as _RosterGame } from './roster_game.js';
 import { EsportsMatch as _EsportsMatch } from './esports_match.js';
 import { RosterEntry as _RosterEntry } from './roster_entry.js';
+import { PlayerAvailability as _PlayerAvailability } from './player_availability.js';
+import { TeamScheduleBlock as _TeamScheduleBlock } from './team_schedule_block.js';
 import { DynamicForm as _DynamicForm } from './dynamic_form.js';
 import { DynamicFormField as _DynamicFormField } from './dynamic_form_field.js';
 import { DynamicFormSubmission as _DynamicFormSubmission } from './dynamic_form_submission.js';
@@ -86,6 +90,8 @@ export namespace PrismaModel {
   export class RosterGameRelations extends _RosterGameRelations {}
   export class EsportsMatchRelations extends _EsportsMatchRelations {}
   export class RosterEntryRelations extends _RosterEntryRelations {}
+  export class PlayerAvailabilityRelations extends _PlayerAvailabilityRelations {}
+  export class TeamScheduleBlockRelations extends _TeamScheduleBlockRelations {}
   export class DynamicFormRelations extends _DynamicFormRelations {}
   export class DynamicFormFieldRelations extends _DynamicFormFieldRelations {}
   export class DynamicFormSubmissionRelations extends _DynamicFormSubmissionRelations {}
@@ -122,6 +128,8 @@ export namespace PrismaModel {
   export class RosterGame extends _RosterGame {}
   export class EsportsMatch extends _EsportsMatch {}
   export class RosterEntry extends _RosterEntry {}
+  export class PlayerAvailability extends _PlayerAvailability {}
+  export class TeamScheduleBlock extends _TeamScheduleBlock {}
   export class DynamicForm extends _DynamicForm {}
   export class DynamicFormField extends _DynamicFormField {}
   export class DynamicFormSubmission extends _DynamicFormSubmission {}
@@ -160,6 +168,8 @@ export namespace PrismaModel {
     RosterGameRelations,
     EsportsMatchRelations,
     RosterEntryRelations,
+    PlayerAvailabilityRelations,
+    TeamScheduleBlockRelations,
     DynamicFormRelations,
     DynamicFormFieldRelations,
     DynamicFormSubmissionRelations,
@@ -196,6 +206,8 @@ export namespace PrismaModel {
     RosterGame,
     EsportsMatch,
     RosterEntry,
+    PlayerAvailability,
+    TeamScheduleBlock,
     DynamicForm,
     DynamicFormField,
     DynamicFormSubmission,

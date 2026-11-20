@@ -24,6 +24,7 @@ import {
   PanelLeftOpen,
   Eye,
   Medal,
+  CalendarRange,
 } from 'lucide-react';
 import { apiClient } from '@/api';
 import type { components } from '@/api';
@@ -72,6 +73,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { id: 'roster', label: 'Teams', href: '/admin/roster', icon: UsersIcon, permissions: ['roster.manage'] },
       { id: 'esports-results', label: 'Resultaten', href: '/admin/esports-results', icon: Medal, permissions: ['esports.results.manage'] },
+      { id: 'team-schedule', label: 'Teamplanning', href: '/teams/schedule', icon: CalendarRange, permissions: ['esports.schedule.manage'] },
       { id: 'navigation', label: 'Navigatie', href: '/admin/navigation', icon: Navigation, permissions: ['navigation.manage'] },
       { id: 'forms', label: 'Formulieren', href: '/admin/forms', icon: FileText, permissions: ['forms.manage'] },
       { id: 'submissions', label: 'Inzendingen', href: '/admin/submissions', icon: ClipboardList, permissions: ['forms.manage', 'forms.submissions.view'] },

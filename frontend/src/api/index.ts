@@ -21,6 +21,11 @@ export type ReservationPerson = ApiSchemas['ReservationPersonDto'];
 export type EsportsMatch = ApiSchemas['EsportsMatch'];
 export type EsportsMatchResult = ApiSchemas['EsportsMatchResult'];
 export type CreateEsportsMatchDto = ApiSchemas['CreateEsportsMatchDto'];
+export type TeamScheduleWeek = ApiSchemas['TeamScheduleWeekDto'];
+export type TeamSchedulePlayer = ApiSchemas['TeamSchedulePlayerDto'];
+export type TeamScheduleBlock = ApiSchemas['TeamScheduleBlockDto'];
+export type TeamScheduleBlockType = ApiSchemas['TeamScheduleBlockType'];
+export type AvailabilityStatus = ApiSchemas['AvailabilityStatus'];
 /** A match with the team that played it (as GET /esports-results includes it) */
 export type EsportsMatchWithTeam = EsportsMatch & { game: { id: number; name: string } };
 export type ReservationVerificationDto =

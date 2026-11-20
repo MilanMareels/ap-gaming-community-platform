@@ -1937,6 +1937,109 @@ export interface paths {
         patch: operations["EsportsResultsController_update"];
         trace?: never;
     };
+    "/team-schedule/games": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Teams whose schedule the signed-in user can see (their own, or all for schedule managers) */
+        get: operations["TeamScheduleController_listTeams"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/team-schedule/games/{gameId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One week of a team's availability grid and planned blocks */
+        get: operations["TeamScheduleController_getWeek"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/team-schedule/games/{gameId}/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Save availability cells (your own; anyone's for schedule managers). A null status clears a cell. */
+        put: operations["TeamScheduleController_updateAvailability"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/team-schedule/games/{gameId}/hours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Set the hours shown in a team's grid */
+        patch: operations["TeamScheduleController_updateHours"];
+        trace?: never;
+    };
+    "/team-schedule/games/{gameId}/blocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Plan a scrim, practice or match for the whole team */
+        post: operations["TeamScheduleController_createBlock"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/team-schedule/blocks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a planned block */
+        delete: operations["TeamScheduleController_removeBlock"];
+        options?: never;
+        head?: never;
+        /** Change a planned block */
+        patch: operations["TeamScheduleController_updateBlock"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2496,6 +2599,8 @@ export interface components {
         RosterGame: {
             id: number;
             name: string;
+            scheduleStartHour: number;
+            scheduleEndHour: number;
         };
         CreateRosterGameDto: {
             /** @example League of Legends */
@@ -3105,6 +3210,138 @@ export interface components {
             /** @example Close game on Ascent */
             notes?: string | null;
         };
+        TeamScheduleTeamDto: {
+            /** @example 1 */
+            id: number;
+            /** @example Valorant */
+            name: string;
+        };
+        TeamScheduleGameDto: {
+            /** @example 1 */
+            id: number;
+            /** @example Valorant */
+            name: string;
+            /**
+             * @description First hour shown in the grid
+             * @example 13
+             */
+            scheduleStartHour: number;
+            /**
+             * @description The grid runs until this hour
+             * @example 23
+             */
+            scheduleEndHour: number;
+        };
+        TeamSchedulePlayerDto: {
+            /** @example 4 */
+            rosterEntryId: number;
+            /** @example Rocky */
+            handle: string;
+            /** @example Robin Claes */
+            name: string | null;
+            /** @description This is the signed-in user */
+            isMe: boolean;
+        };
+        /** @enum {string} */
+        AvailabilityStatus: "AVAILABLE" | "UNAVAILABLE";
+        PlayerAvailabilityDto: {
+            /** @example 4 */
+            rosterEntryId: number;
+            /** @example 2026-11-16 */
+            date: string;
+            /** @example 19 */
+            hour: number;
+            status: components["schemas"]["AvailabilityStatus"];
+            /** @example vanaf 20:30 */
+            note: string | null;
+        };
+        /** @enum {string} */
+        TeamScheduleBlockType: "SCRIM" | "PRACTICE" | "MATCH";
+        TeamScheduleBlockDto: {
+            /** @example 2 */
+            id: number;
+            type: components["schemas"]["TeamScheduleBlockType"];
+            title: string | null;
+            /** @example 2026-11-16 */
+            date: string;
+            /** @example 19 */
+            startHour: number;
+            /** @example 21 */
+            endHour: number;
+            notes: string | null;
+        };
+        TeamScheduleWeekDto: {
+            game: components["schemas"]["TeamScheduleGameDto"];
+            /**
+             * @description The Monday the week starts on
+             * @example 2026-11-16
+             */
+            weekStart: string;
+            /** @description The signed-in user may plan blocks and edit everyone */
+            canManage: boolean;
+            players: components["schemas"]["TeamSchedulePlayerDto"][];
+            availability: components["schemas"]["PlayerAvailabilityDto"][];
+            blocks: components["schemas"]["TeamScheduleBlockDto"][];
+        };
+        AvailabilityCellDto: {
+            /** @example 2026-11-16 */
+            date: string;
+            /**
+             * @description The hour starting at hour:00
+             * @example 19
+             */
+            hour: number;
+            /** @description null clears the cell */
+            status: components["schemas"]["AvailabilityStatus"] | null;
+            /** @example vanaf 20:30 */
+            note?: string | null;
+        };
+        UpdateAvailabilityDto: {
+            /**
+             * @description Whose availability; defaults to the signed-in player's own
+             * @example 4
+             */
+            rosterEntryId?: number;
+            cells: components["schemas"]["AvailabilityCellDto"][];
+        };
+        UpdateScheduleHoursDto: {
+            /** @example 13 */
+            scheduleStartHour: number;
+            /** @example 23 */
+            scheduleEndHour: number;
+        };
+        CreateScheduleBlockDto: {
+            /** @example SCRIM */
+            type: components["schemas"]["TeamScheduleBlockType"];
+            /** @example Scrim vs KdG */
+            title?: string | null;
+            /** @example 2026-11-16 */
+            date: string;
+            /** @example 19 */
+            startHour: number;
+            /**
+             * @description Exclusive
+             * @example 21
+             */
+            endHour: number;
+            notes?: string | null;
+        };
+        UpdateScheduleBlockDto: {
+            /** @example SCRIM */
+            type?: components["schemas"]["TeamScheduleBlockType"];
+            /** @example Scrim vs KdG */
+            title?: string | null;
+            /** @example 2026-11-16 */
+            date?: string;
+            /** @example 19 */
+            startHour?: number;
+            /**
+             * @description Exclusive
+             * @example 21
+             */
+            endHour?: number;
+            notes?: string | null;
+        };
         GoogleSSOUser: {
             id: number;
             ssoId: string;
@@ -3265,15 +3502,49 @@ export interface components {
             parent?: components["schemas"]["NavLink"];
             children: components["schemas"]["NavLink"][];
         };
+        TeamScheduleBlock: {
+            id: number;
+            gameId: number;
+            type: components["schemas"]["TeamScheduleBlockType"];
+            title?: string;
+            /** Format: date-time */
+            date: string;
+            startHour: number;
+            endHour: number;
+            notes?: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
         RosterGameRelations: {
             rosterEntries: components["schemas"]["RosterEntry"][];
             matches: components["schemas"]["EsportsMatch"][];
+            scheduleBlocks: components["schemas"]["TeamScheduleBlock"][];
         };
         EsportsMatchRelations: {
             game: components["schemas"]["RosterGame"];
         };
+        PlayerAvailability: {
+            id: number;
+            rosterEntryId: number;
+            /** Format: date-time */
+            date: string;
+            hour: number;
+            status: components["schemas"]["AvailabilityStatus"];
+            note?: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
         RosterEntryRelations: {
             user: components["schemas"]["User"];
+            game: components["schemas"]["RosterGame"];
+            availability: components["schemas"]["PlayerAvailability"][];
+        };
+        PlayerAvailabilityRelations: {
+            rosterEntry: components["schemas"]["RosterEntry"];
+        };
+        TeamScheduleBlockRelations: {
             game: components["schemas"]["RosterGame"];
         };
         /** @enum {string} */
@@ -7244,6 +7515,166 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EsportsMatch"];
+                };
+            };
+        };
+    };
+    TeamScheduleController_listTeams: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamScheduleTeamDto"][];
+                };
+            };
+        };
+    };
+    TeamScheduleController_getWeek: {
+        parameters: {
+            query?: {
+                /** @description Any day of the week to show (defaults to this week) */
+                week?: string;
+            };
+            header?: never;
+            path: {
+                gameId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamScheduleWeekDto"];
+                };
+            };
+        };
+    };
+    TeamScheduleController_updateAvailability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAvailabilityDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TeamScheduleController_updateHours: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateScheduleHoursDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamScheduleGameDto"];
+                };
+            };
+        };
+    };
+    TeamScheduleController_createBlock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateScheduleBlockDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamScheduleBlockDto"];
+                };
+            };
+        };
+    };
+    TeamScheduleController_removeBlock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TeamScheduleController_updateBlock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateScheduleBlockDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamScheduleBlockDto"];
                 };
             };
         };

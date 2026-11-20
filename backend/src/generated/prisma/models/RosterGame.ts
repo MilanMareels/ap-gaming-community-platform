@@ -28,50 +28,70 @@ export type AggregateRosterGame = {
 
 export type RosterGameAvgAggregateOutputType = {
   id: number | null
+  scheduleStartHour: number | null
+  scheduleEndHour: number | null
 }
 
 export type RosterGameSumAggregateOutputType = {
   id: number | null
+  scheduleStartHour: number | null
+  scheduleEndHour: number | null
 }
 
 export type RosterGameMinAggregateOutputType = {
   id: number | null
   name: string | null
+  scheduleStartHour: number | null
+  scheduleEndHour: number | null
 }
 
 export type RosterGameMaxAggregateOutputType = {
   id: number | null
   name: string | null
+  scheduleStartHour: number | null
+  scheduleEndHour: number | null
 }
 
 export type RosterGameCountAggregateOutputType = {
   id: number
   name: number
+  scheduleStartHour: number
+  scheduleEndHour: number
   _all: number
 }
 
 
 export type RosterGameAvgAggregateInputType = {
   id?: true
+  scheduleStartHour?: true
+  scheduleEndHour?: true
 }
 
 export type RosterGameSumAggregateInputType = {
   id?: true
+  scheduleStartHour?: true
+  scheduleEndHour?: true
 }
 
 export type RosterGameMinAggregateInputType = {
   id?: true
   name?: true
+  scheduleStartHour?: true
+  scheduleEndHour?: true
 }
 
 export type RosterGameMaxAggregateInputType = {
   id?: true
   name?: true
+  scheduleStartHour?: true
+  scheduleEndHour?: true
 }
 
 export type RosterGameCountAggregateInputType = {
   id?: true
   name?: true
+  scheduleStartHour?: true
+  scheduleEndHour?: true
   _all?: true
 }
 
@@ -164,6 +184,8 @@ export type RosterGameGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inter
 export type RosterGameGroupByOutputType = {
   id: number
   name: string
+  scheduleStartHour: number
+  scheduleEndHour: number
   _count: RosterGameCountAggregateOutputType | null
   _avg: RosterGameAvgAggregateOutputType | null
   _sum: RosterGameSumAggregateOutputType | null
@@ -192,15 +214,21 @@ export type RosterGameWhereInput = {
   NOT?: Prisma.RosterGameWhereInput | Prisma.RosterGameWhereInput[]
   id?: Prisma.IntFilter<"RosterGame"> | number
   name?: Prisma.StringFilter<"RosterGame"> | string
+  scheduleStartHour?: Prisma.IntFilter<"RosterGame"> | number
+  scheduleEndHour?: Prisma.IntFilter<"RosterGame"> | number
   rosterEntries?: Prisma.RosterEntryListRelationFilter
   matches?: Prisma.EsportsMatchListRelationFilter
+  scheduleBlocks?: Prisma.TeamScheduleBlockListRelationFilter
 }
 
 export type RosterGameOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  scheduleStartHour?: Prisma.SortOrder
+  scheduleEndHour?: Prisma.SortOrder
   rosterEntries?: Prisma.RosterEntryOrderByRelationAggregateInput
   matches?: Prisma.EsportsMatchOrderByRelationAggregateInput
+  scheduleBlocks?: Prisma.TeamScheduleBlockOrderByRelationAggregateInput
 }
 
 export type RosterGameWhereUniqueInput = Prisma.AtLeast<{
@@ -209,13 +237,18 @@ export type RosterGameWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.RosterGameWhereInput[]
   NOT?: Prisma.RosterGameWhereInput | Prisma.RosterGameWhereInput[]
   name?: Prisma.StringFilter<"RosterGame"> | string
+  scheduleStartHour?: Prisma.IntFilter<"RosterGame"> | number
+  scheduleEndHour?: Prisma.IntFilter<"RosterGame"> | number
   rosterEntries?: Prisma.RosterEntryListRelationFilter
   matches?: Prisma.EsportsMatchListRelationFilter
+  scheduleBlocks?: Prisma.TeamScheduleBlockListRelationFilter
 }, "id">
 
 export type RosterGameOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  scheduleStartHour?: Prisma.SortOrder
+  scheduleEndHour?: Prisma.SortOrder
   _count?: Prisma.RosterGameCountOrderByAggregateInput
   _avg?: Prisma.RosterGameAvgOrderByAggregateInput
   _max?: Prisma.RosterGameMaxOrderByAggregateInput
@@ -229,69 +262,99 @@ export type RosterGameScalarWhereWithAggregatesInput = {
   NOT?: Prisma.RosterGameScalarWhereWithAggregatesInput | Prisma.RosterGameScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"RosterGame"> | number
   name?: Prisma.StringWithAggregatesFilter<"RosterGame"> | string
+  scheduleStartHour?: Prisma.IntWithAggregatesFilter<"RosterGame"> | number
+  scheduleEndHour?: Prisma.IntWithAggregatesFilter<"RosterGame"> | number
 }
 
 export type RosterGameCreateInput = {
   name: string
+  scheduleStartHour?: number
+  scheduleEndHour?: number
   rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutGameInput
   matches?: Prisma.EsportsMatchCreateNestedManyWithoutGameInput
+  scheduleBlocks?: Prisma.TeamScheduleBlockCreateNestedManyWithoutGameInput
 }
 
 export type RosterGameUncheckedCreateInput = {
   id?: number
   name: string
+  scheduleStartHour?: number
+  scheduleEndHour?: number
   rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutGameInput
   matches?: Prisma.EsportsMatchUncheckedCreateNestedManyWithoutGameInput
+  scheduleBlocks?: Prisma.TeamScheduleBlockUncheckedCreateNestedManyWithoutGameInput
 }
 
 export type RosterGameUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  scheduleStartHour?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduleEndHour?: Prisma.IntFieldUpdateOperationsInput | number
   rosterEntries?: Prisma.RosterEntryUpdateManyWithoutGameNestedInput
   matches?: Prisma.EsportsMatchUpdateManyWithoutGameNestedInput
+  scheduleBlocks?: Prisma.TeamScheduleBlockUpdateManyWithoutGameNestedInput
 }
 
 export type RosterGameUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  scheduleStartHour?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduleEndHour?: Prisma.IntFieldUpdateOperationsInput | number
   rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutGameNestedInput
   matches?: Prisma.EsportsMatchUncheckedUpdateManyWithoutGameNestedInput
+  scheduleBlocks?: Prisma.TeamScheduleBlockUncheckedUpdateManyWithoutGameNestedInput
 }
 
 export type RosterGameCreateManyInput = {
   id?: number
   name: string
+  scheduleStartHour?: number
+  scheduleEndHour?: number
 }
 
 export type RosterGameUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  scheduleStartHour?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduleEndHour?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type RosterGameUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  scheduleStartHour?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduleEndHour?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type RosterGameCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  scheduleStartHour?: Prisma.SortOrder
+  scheduleEndHour?: Prisma.SortOrder
 }
 
 export type RosterGameAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  scheduleStartHour?: Prisma.SortOrder
+  scheduleEndHour?: Prisma.SortOrder
 }
 
 export type RosterGameMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  scheduleStartHour?: Prisma.SortOrder
+  scheduleEndHour?: Prisma.SortOrder
 }
 
 export type RosterGameMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  scheduleStartHour?: Prisma.SortOrder
+  scheduleEndHour?: Prisma.SortOrder
 }
 
 export type RosterGameSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  scheduleStartHour?: Prisma.SortOrder
+  scheduleEndHour?: Prisma.SortOrder
 }
 
 export type RosterGameScalarRelationFilter = {
@@ -327,15 +390,35 @@ export type RosterGameUpdateOneRequiredWithoutRosterEntriesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.RosterGameUpdateToOneWithWhereWithoutRosterEntriesInput, Prisma.RosterGameUpdateWithoutRosterEntriesInput>, Prisma.RosterGameUncheckedUpdateWithoutRosterEntriesInput>
 }
 
+export type RosterGameCreateNestedOneWithoutScheduleBlocksInput = {
+  create?: Prisma.XOR<Prisma.RosterGameCreateWithoutScheduleBlocksInput, Prisma.RosterGameUncheckedCreateWithoutScheduleBlocksInput>
+  connectOrCreate?: Prisma.RosterGameCreateOrConnectWithoutScheduleBlocksInput
+  connect?: Prisma.RosterGameWhereUniqueInput
+}
+
+export type RosterGameUpdateOneRequiredWithoutScheduleBlocksNestedInput = {
+  create?: Prisma.XOR<Prisma.RosterGameCreateWithoutScheduleBlocksInput, Prisma.RosterGameUncheckedCreateWithoutScheduleBlocksInput>
+  connectOrCreate?: Prisma.RosterGameCreateOrConnectWithoutScheduleBlocksInput
+  upsert?: Prisma.RosterGameUpsertWithoutScheduleBlocksInput
+  connect?: Prisma.RosterGameWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RosterGameUpdateToOneWithWhereWithoutScheduleBlocksInput, Prisma.RosterGameUpdateWithoutScheduleBlocksInput>, Prisma.RosterGameUncheckedUpdateWithoutScheduleBlocksInput>
+}
+
 export type RosterGameCreateWithoutMatchesInput = {
   name: string
+  scheduleStartHour?: number
+  scheduleEndHour?: number
   rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutGameInput
+  scheduleBlocks?: Prisma.TeamScheduleBlockCreateNestedManyWithoutGameInput
 }
 
 export type RosterGameUncheckedCreateWithoutMatchesInput = {
   id?: number
   name: string
+  scheduleStartHour?: number
+  scheduleEndHour?: number
   rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutGameInput
+  scheduleBlocks?: Prisma.TeamScheduleBlockUncheckedCreateNestedManyWithoutGameInput
 }
 
 export type RosterGameCreateOrConnectWithoutMatchesInput = {
@@ -356,24 +439,36 @@ export type RosterGameUpdateToOneWithWhereWithoutMatchesInput = {
 
 export type RosterGameUpdateWithoutMatchesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  scheduleStartHour?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduleEndHour?: Prisma.IntFieldUpdateOperationsInput | number
   rosterEntries?: Prisma.RosterEntryUpdateManyWithoutGameNestedInput
+  scheduleBlocks?: Prisma.TeamScheduleBlockUpdateManyWithoutGameNestedInput
 }
 
 export type RosterGameUncheckedUpdateWithoutMatchesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  scheduleStartHour?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduleEndHour?: Prisma.IntFieldUpdateOperationsInput | number
   rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutGameNestedInput
+  scheduleBlocks?: Prisma.TeamScheduleBlockUncheckedUpdateManyWithoutGameNestedInput
 }
 
 export type RosterGameCreateWithoutRosterEntriesInput = {
   name: string
+  scheduleStartHour?: number
+  scheduleEndHour?: number
   matches?: Prisma.EsportsMatchCreateNestedManyWithoutGameInput
+  scheduleBlocks?: Prisma.TeamScheduleBlockCreateNestedManyWithoutGameInput
 }
 
 export type RosterGameUncheckedCreateWithoutRosterEntriesInput = {
   id?: number
   name: string
+  scheduleStartHour?: number
+  scheduleEndHour?: number
   matches?: Prisma.EsportsMatchUncheckedCreateNestedManyWithoutGameInput
+  scheduleBlocks?: Prisma.TeamScheduleBlockUncheckedCreateNestedManyWithoutGameInput
 }
 
 export type RosterGameCreateOrConnectWithoutRosterEntriesInput = {
@@ -394,12 +489,68 @@ export type RosterGameUpdateToOneWithWhereWithoutRosterEntriesInput = {
 
 export type RosterGameUpdateWithoutRosterEntriesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  scheduleStartHour?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduleEndHour?: Prisma.IntFieldUpdateOperationsInput | number
   matches?: Prisma.EsportsMatchUpdateManyWithoutGameNestedInput
+  scheduleBlocks?: Prisma.TeamScheduleBlockUpdateManyWithoutGameNestedInput
 }
 
 export type RosterGameUncheckedUpdateWithoutRosterEntriesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  scheduleStartHour?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduleEndHour?: Prisma.IntFieldUpdateOperationsInput | number
+  matches?: Prisma.EsportsMatchUncheckedUpdateManyWithoutGameNestedInput
+  scheduleBlocks?: Prisma.TeamScheduleBlockUncheckedUpdateManyWithoutGameNestedInput
+}
+
+export type RosterGameCreateWithoutScheduleBlocksInput = {
+  name: string
+  scheduleStartHour?: number
+  scheduleEndHour?: number
+  rosterEntries?: Prisma.RosterEntryCreateNestedManyWithoutGameInput
+  matches?: Prisma.EsportsMatchCreateNestedManyWithoutGameInput
+}
+
+export type RosterGameUncheckedCreateWithoutScheduleBlocksInput = {
+  id?: number
+  name: string
+  scheduleStartHour?: number
+  scheduleEndHour?: number
+  rosterEntries?: Prisma.RosterEntryUncheckedCreateNestedManyWithoutGameInput
+  matches?: Prisma.EsportsMatchUncheckedCreateNestedManyWithoutGameInput
+}
+
+export type RosterGameCreateOrConnectWithoutScheduleBlocksInput = {
+  where: Prisma.RosterGameWhereUniqueInput
+  create: Prisma.XOR<Prisma.RosterGameCreateWithoutScheduleBlocksInput, Prisma.RosterGameUncheckedCreateWithoutScheduleBlocksInput>
+}
+
+export type RosterGameUpsertWithoutScheduleBlocksInput = {
+  update: Prisma.XOR<Prisma.RosterGameUpdateWithoutScheduleBlocksInput, Prisma.RosterGameUncheckedUpdateWithoutScheduleBlocksInput>
+  create: Prisma.XOR<Prisma.RosterGameCreateWithoutScheduleBlocksInput, Prisma.RosterGameUncheckedCreateWithoutScheduleBlocksInput>
+  where?: Prisma.RosterGameWhereInput
+}
+
+export type RosterGameUpdateToOneWithWhereWithoutScheduleBlocksInput = {
+  where?: Prisma.RosterGameWhereInput
+  data: Prisma.XOR<Prisma.RosterGameUpdateWithoutScheduleBlocksInput, Prisma.RosterGameUncheckedUpdateWithoutScheduleBlocksInput>
+}
+
+export type RosterGameUpdateWithoutScheduleBlocksInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  scheduleStartHour?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduleEndHour?: Prisma.IntFieldUpdateOperationsInput | number
+  rosterEntries?: Prisma.RosterEntryUpdateManyWithoutGameNestedInput
+  matches?: Prisma.EsportsMatchUpdateManyWithoutGameNestedInput
+}
+
+export type RosterGameUncheckedUpdateWithoutScheduleBlocksInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  scheduleStartHour?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduleEndHour?: Prisma.IntFieldUpdateOperationsInput | number
+  rosterEntries?: Prisma.RosterEntryUncheckedUpdateManyWithoutGameNestedInput
   matches?: Prisma.EsportsMatchUncheckedUpdateManyWithoutGameNestedInput
 }
 
@@ -411,11 +562,13 @@ export type RosterGameUncheckedUpdateWithoutRosterEntriesInput = {
 export type RosterGameCountOutputType = {
   rosterEntries: number
   matches: number
+  scheduleBlocks: number
 }
 
 export type RosterGameCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   rosterEntries?: boolean | RosterGameCountOutputTypeCountRosterEntriesArgs
   matches?: boolean | RosterGameCountOutputTypeCountMatchesArgs
+  scheduleBlocks?: boolean | RosterGameCountOutputTypeCountScheduleBlocksArgs
 }
 
 /**
@@ -442,34 +595,51 @@ export type RosterGameCountOutputTypeCountMatchesArgs<ExtArgs extends runtime.Ty
   where?: Prisma.EsportsMatchWhereInput
 }
 
+/**
+ * RosterGameCountOutputType without action
+ */
+export type RosterGameCountOutputTypeCountScheduleBlocksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TeamScheduleBlockWhereInput
+}
+
 
 export type RosterGameSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  scheduleStartHour?: boolean
+  scheduleEndHour?: boolean
   rosterEntries?: boolean | Prisma.RosterGame$rosterEntriesArgs<ExtArgs>
   matches?: boolean | Prisma.RosterGame$matchesArgs<ExtArgs>
+  scheduleBlocks?: boolean | Prisma.RosterGame$scheduleBlocksArgs<ExtArgs>
   _count?: boolean | Prisma.RosterGameCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["rosterGame"]>
 
 export type RosterGameSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  scheduleStartHour?: boolean
+  scheduleEndHour?: boolean
 }, ExtArgs["result"]["rosterGame"]>
 
 export type RosterGameSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  scheduleStartHour?: boolean
+  scheduleEndHour?: boolean
 }, ExtArgs["result"]["rosterGame"]>
 
 export type RosterGameSelectScalar = {
   id?: boolean
   name?: boolean
+  scheduleStartHour?: boolean
+  scheduleEndHour?: boolean
 }
 
-export type RosterGameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name", ExtArgs["result"]["rosterGame"]>
+export type RosterGameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "scheduleStartHour" | "scheduleEndHour", ExtArgs["result"]["rosterGame"]>
 export type RosterGameInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   rosterEntries?: boolean | Prisma.RosterGame$rosterEntriesArgs<ExtArgs>
   matches?: boolean | Prisma.RosterGame$matchesArgs<ExtArgs>
+  scheduleBlocks?: boolean | Prisma.RosterGame$scheduleBlocksArgs<ExtArgs>
   _count?: boolean | Prisma.RosterGameCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RosterGameIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -480,10 +650,13 @@ export type $RosterGamePayload<ExtArgs extends runtime.Types.Extensions.Internal
   objects: {
     rosterEntries: Prisma.$RosterEntryPayload<ExtArgs>[]
     matches: Prisma.$EsportsMatchPayload<ExtArgs>[]
+    scheduleBlocks: Prisma.$TeamScheduleBlockPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     name: string
+    scheduleStartHour: number
+    scheduleEndHour: number
   }, ExtArgs["result"]["rosterGame"]>
   composites: {}
 }
@@ -880,6 +1053,7 @@ export interface Prisma__RosterGameClient<T, Null = never, ExtArgs extends runti
   readonly [Symbol.toStringTag]: "PrismaPromise"
   rosterEntries<T extends Prisma.RosterGame$rosterEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RosterGame$rosterEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RosterEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   matches<T extends Prisma.RosterGame$matchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RosterGame$matchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EsportsMatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  scheduleBlocks<T extends Prisma.RosterGame$scheduleBlocksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RosterGame$scheduleBlocksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TeamScheduleBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -911,6 +1085,8 @@ export interface Prisma__RosterGameClient<T, Null = never, ExtArgs extends runti
 export interface RosterGameFieldRefs {
   readonly id: Prisma.FieldRef<"RosterGame", 'Int'>
   readonly name: Prisma.FieldRef<"RosterGame", 'String'>
+  readonly scheduleStartHour: Prisma.FieldRef<"RosterGame", 'Int'>
+  readonly scheduleEndHour: Prisma.FieldRef<"RosterGame", 'Int'>
 }
     
 
@@ -1349,6 +1525,30 @@ export type RosterGame$matchesArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.EsportsMatchScalarFieldEnum | Prisma.EsportsMatchScalarFieldEnum[]
+}
+
+/**
+ * RosterGame.scheduleBlocks
+ */
+export type RosterGame$scheduleBlocksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TeamScheduleBlock
+   */
+  select?: Prisma.TeamScheduleBlockSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TeamScheduleBlock
+   */
+  omit?: Prisma.TeamScheduleBlockOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TeamScheduleBlockInclude<ExtArgs> | null
+  where?: Prisma.TeamScheduleBlockWhereInput
+  orderBy?: Prisma.TeamScheduleBlockOrderByWithRelationInput | Prisma.TeamScheduleBlockOrderByWithRelationInput[]
+  cursor?: Prisma.TeamScheduleBlockWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TeamScheduleBlockScalarFieldEnum | Prisma.TeamScheduleBlockScalarFieldEnum[]
 }
 
 /**

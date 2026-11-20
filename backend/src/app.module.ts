@@ -17,6 +17,7 @@ import { FormsModule } from './modules/forms/forms.module.js';
 import { JobsModule } from './modules/jobs/jobs.module.js';
 import { StorageModule } from './modules/storage/storage.module.js';
 import { EsportsResultsModule } from './modules/esports-results/esports-results.module.js';
+import { TeamScheduleModule } from './modules/team-schedule/team-schedule.module.js';
 import { SchedulerModule } from './modules/scheduler/scheduler.module.js';
 
 @Module({
@@ -40,6 +41,7 @@ import { SchedulerModule } from './modules/scheduler/scheduler.module.js';
     StorageModule,
     SchedulerModule,
     EsportsResultsModule,
+    TeamScheduleModule,
   ],
   controllers: [],
   providers: [],

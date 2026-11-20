@@ -88,6 +88,16 @@ export type EsportsMatch = Prisma.EsportsMatchModel
  */
 export type RosterEntry = Prisma.RosterEntryModel
 /**
+ * Model PlayerAvailability
+ * 
+ */
+export type PlayerAvailability = Prisma.PlayerAvailabilityModel
+/**
+ * Model TeamScheduleBlock
+ * 
+ */
+export type TeamScheduleBlock = Prisma.TeamScheduleBlockModel
+/**
  * Model DynamicForm
  * 
  */

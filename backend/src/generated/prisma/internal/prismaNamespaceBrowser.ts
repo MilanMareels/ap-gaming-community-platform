@@ -65,6 +65,8 @@ export const ModelName = {
   RosterGame: 'RosterGame',
   EsportsMatch: 'EsportsMatch',
   RosterEntry: 'RosterEntry',
+  PlayerAvailability: 'PlayerAvailability',
+  TeamScheduleBlock: 'TeamScheduleBlock',
   DynamicForm: 'DynamicForm',
   DynamicFormField: 'DynamicFormField',
   DynamicFormSubmission: 'DynamicFormSubmission',
@@ -223,7 +225,9 @@ export type NavLinkScalarFieldEnum = (typeof NavLinkScalarFieldEnum)[keyof typeo
 
 export const RosterGameScalarFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  scheduleStartHour: 'scheduleStartHour',
+  scheduleEndHour: 'scheduleEndHour'
 } as const
 
 export type RosterGameScalarFieldEnum = (typeof RosterGameScalarFieldEnum)[keyof typeof RosterGameScalarFieldEnum]
@@ -259,6 +263,35 @@ export const RosterEntryScalarFieldEnum = {
 } as const
 
 export type RosterEntryScalarFieldEnum = (typeof RosterEntryScalarFieldEnum)[keyof typeof RosterEntryScalarFieldEnum]
+
+
+export const PlayerAvailabilityScalarFieldEnum = {
+  id: 'id',
+  rosterEntryId: 'rosterEntryId',
+  date: 'date',
+  hour: 'hour',
+  status: 'status',
+  note: 'note',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlayerAvailabilityScalarFieldEnum = (typeof PlayerAvailabilityScalarFieldEnum)[keyof typeof PlayerAvailabilityScalarFieldEnum]
+
+
+export const TeamScheduleBlockScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  type: 'type',
+  title: 'title',
+  date: 'date',
+  startHour: 'startHour',
+  endHour: 'endHour',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TeamScheduleBlockScalarFieldEnum = (typeof TeamScheduleBlockScalarFieldEnum)[keyof typeof TeamScheduleBlockScalarFieldEnum]
 
 
 export const DynamicFormScalarFieldEnum = {

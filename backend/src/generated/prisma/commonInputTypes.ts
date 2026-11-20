@@ -194,6 +194,40 @@ export type EnumEsportsMatchResultWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumEsportsMatchResultFilter<$PrismaModel>
 }
 
+export type EnumAvailabilityStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.AvailabilityStatus | Prisma.EnumAvailabilityStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.AvailabilityStatus[] | Prisma.ListEnumAvailabilityStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AvailabilityStatus[] | Prisma.ListEnumAvailabilityStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAvailabilityStatusFilter<$PrismaModel> | $Enums.AvailabilityStatus
+}
+
+export type EnumAvailabilityStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AvailabilityStatus | Prisma.EnumAvailabilityStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.AvailabilityStatus[] | Prisma.ListEnumAvailabilityStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AvailabilityStatus[] | Prisma.ListEnumAvailabilityStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAvailabilityStatusWithAggregatesFilter<$PrismaModel> | $Enums.AvailabilityStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAvailabilityStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAvailabilityStatusFilter<$PrismaModel>
+}
+
+export type EnumTeamScheduleBlockTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.TeamScheduleBlockType | Prisma.EnumTeamScheduleBlockTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.TeamScheduleBlockType[] | Prisma.ListEnumTeamScheduleBlockTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TeamScheduleBlockType[] | Prisma.ListEnumTeamScheduleBlockTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTeamScheduleBlockTypeFilter<$PrismaModel> | $Enums.TeamScheduleBlockType
+}
+
+export type EnumTeamScheduleBlockTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TeamScheduleBlockType | Prisma.EnumTeamScheduleBlockTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.TeamScheduleBlockType[] | Prisma.ListEnumTeamScheduleBlockTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TeamScheduleBlockType[] | Prisma.ListEnumTeamScheduleBlockTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTeamScheduleBlockTypeWithAggregatesFilter<$PrismaModel> | $Enums.TeamScheduleBlockType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTeamScheduleBlockTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTeamScheduleBlockTypeFilter<$PrismaModel>
+}
+
 export type EnumFormFieldTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.FormFieldType | Prisma.EnumFormFieldTypeFieldRefInput<$PrismaModel>
   in?: $Enums.FormFieldType[] | Prisma.ListEnumFormFieldTypeFieldRefInput<$PrismaModel>
@@ -589,6 +623,40 @@ export type NestedEnumEsportsMatchResultWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumEsportsMatchResultFilter<$PrismaModel>
   _max?: Prisma.NestedEnumEsportsMatchResultFilter<$PrismaModel>
+}
+
+export type NestedEnumAvailabilityStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.AvailabilityStatus | Prisma.EnumAvailabilityStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.AvailabilityStatus[] | Prisma.ListEnumAvailabilityStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AvailabilityStatus[] | Prisma.ListEnumAvailabilityStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAvailabilityStatusFilter<$PrismaModel> | $Enums.AvailabilityStatus
+}
+
+export type NestedEnumAvailabilityStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AvailabilityStatus | Prisma.EnumAvailabilityStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.AvailabilityStatus[] | Prisma.ListEnumAvailabilityStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AvailabilityStatus[] | Prisma.ListEnumAvailabilityStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAvailabilityStatusWithAggregatesFilter<$PrismaModel> | $Enums.AvailabilityStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAvailabilityStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAvailabilityStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumTeamScheduleBlockTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.TeamScheduleBlockType | Prisma.EnumTeamScheduleBlockTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.TeamScheduleBlockType[] | Prisma.ListEnumTeamScheduleBlockTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TeamScheduleBlockType[] | Prisma.ListEnumTeamScheduleBlockTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTeamScheduleBlockTypeFilter<$PrismaModel> | $Enums.TeamScheduleBlockType
+}
+
+export type NestedEnumTeamScheduleBlockTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TeamScheduleBlockType | Prisma.EnumTeamScheduleBlockTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.TeamScheduleBlockType[] | Prisma.ListEnumTeamScheduleBlockTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TeamScheduleBlockType[] | Prisma.ListEnumTeamScheduleBlockTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTeamScheduleBlockTypeWithAggregatesFilter<$PrismaModel> | $Enums.TeamScheduleBlockType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTeamScheduleBlockTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTeamScheduleBlockTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumFormFieldTypeFilter<$PrismaModel = never> = {

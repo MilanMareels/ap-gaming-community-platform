@@ -33,6 +33,7 @@ const PERMISSIONS = [
   { key: 'users.notes.delete_others', description: 'Delete notes written by other admins' },
   { key: 'forms.submissions.view', description: 'View form submissions (for assigned forms)' },
   { key: 'esports.results.manage', description: 'Manage esports match results' },
+  { key: 'esports.schedule.manage', description: 'Manage esports team schedules' },
 ];
 
 async function seedPermissionsAndRoles() {

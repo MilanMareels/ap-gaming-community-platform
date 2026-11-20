@@ -19,6 +19,23 @@ export const EsportsMatchResult = {
 export type EsportsMatchResult = (typeof EsportsMatchResult)[keyof typeof EsportsMatchResult]
 
 
+export const AvailabilityStatus = {
+  AVAILABLE: 'AVAILABLE',
+  UNAVAILABLE: 'UNAVAILABLE'
+} as const
+
+export type AvailabilityStatus = (typeof AvailabilityStatus)[keyof typeof AvailabilityStatus]
+
+
+export const TeamScheduleBlockType = {
+  SCRIM: 'SCRIM',
+  PRACTICE: 'PRACTICE',
+  MATCH: 'MATCH'
+} as const
+
+export type TeamScheduleBlockType = (typeof TeamScheduleBlockType)[keyof typeof TeamScheduleBlockType]
+
+
 export const FormFieldType = {
   SHORT_TEXT: 'SHORT_TEXT',
   LONG_TEXT: 'LONG_TEXT',

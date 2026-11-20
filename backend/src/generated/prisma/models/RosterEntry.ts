@@ -254,6 +254,7 @@ export type RosterEntryWhereInput = {
   order?: Prisma.IntFilter<"RosterEntry"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   game?: Prisma.XOR<Prisma.RosterGameScalarRelationFilter, Prisma.RosterGameWhereInput>
+  availability?: Prisma.PlayerAvailabilityListRelationFilter
 }
 
 export type RosterEntryOrderByWithRelationInput = {
@@ -267,6 +268,7 @@ export type RosterEntryOrderByWithRelationInput = {
   order?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   game?: Prisma.RosterGameOrderByWithRelationInput
+  availability?: Prisma.PlayerAvailabilityOrderByRelationAggregateInput
 }
 
 export type RosterEntryWhereUniqueInput = Prisma.AtLeast<{
@@ -283,6 +285,7 @@ export type RosterEntryWhereUniqueInput = Prisma.AtLeast<{
   order?: Prisma.IntFilter<"RosterEntry"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   game?: Prisma.XOR<Prisma.RosterGameScalarRelationFilter, Prisma.RosterGameWhereInput>
+  availability?: Prisma.PlayerAvailabilityListRelationFilter
 }, "id">
 
 export type RosterEntryOrderByWithAggregationInput = {
@@ -323,6 +326,7 @@ export type RosterEntryCreateInput = {
   order?: number
   user: Prisma.UserCreateNestedOneWithoutRosterEntriesInput
   game: Prisma.RosterGameCreateNestedOneWithoutRosterEntriesInput
+  availability?: Prisma.PlayerAvailabilityCreateNestedManyWithoutRosterEntryInput
 }
 
 export type RosterEntryUncheckedCreateInput = {
@@ -334,6 +338,7 @@ export type RosterEntryUncheckedCreateInput = {
   role?: string | null
   imageUrl?: string | null
   order?: number
+  availability?: Prisma.PlayerAvailabilityUncheckedCreateNestedManyWithoutRosterEntryInput
 }
 
 export type RosterEntryUpdateInput = {
@@ -344,6 +349,7 @@ export type RosterEntryUpdateInput = {
   order?: Prisma.IntFieldUpdateOperationsInput | number
   user?: Prisma.UserUpdateOneRequiredWithoutRosterEntriesNestedInput
   game?: Prisma.RosterGameUpdateOneRequiredWithoutRosterEntriesNestedInput
+  availability?: Prisma.PlayerAvailabilityUpdateManyWithoutRosterEntryNestedInput
 }
 
 export type RosterEntryUncheckedUpdateInput = {
@@ -355,6 +361,7 @@ export type RosterEntryUncheckedUpdateInput = {
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  availability?: Prisma.PlayerAvailabilityUncheckedUpdateManyWithoutRosterEntryNestedInput
 }
 
 export type RosterEntryCreateManyInput = {
@@ -444,6 +451,11 @@ export type RosterEntrySumOrderByAggregateInput = {
   order?: Prisma.SortOrder
 }
 
+export type RosterEntryScalarRelationFilter = {
+  is?: Prisma.RosterEntryWhereInput
+  isNot?: Prisma.RosterEntryWhereInput
+}
+
 export type RosterEntryCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.RosterEntryCreateWithoutUserInput, Prisma.RosterEntryUncheckedCreateWithoutUserInput> | Prisma.RosterEntryCreateWithoutUserInput[] | Prisma.RosterEntryUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.RosterEntryCreateOrConnectWithoutUserInput | Prisma.RosterEntryCreateOrConnectWithoutUserInput[]
@@ -528,6 +540,20 @@ export type RosterEntryUncheckedUpdateManyWithoutGameNestedInput = {
   deleteMany?: Prisma.RosterEntryScalarWhereInput | Prisma.RosterEntryScalarWhereInput[]
 }
 
+export type RosterEntryCreateNestedOneWithoutAvailabilityInput = {
+  create?: Prisma.XOR<Prisma.RosterEntryCreateWithoutAvailabilityInput, Prisma.RosterEntryUncheckedCreateWithoutAvailabilityInput>
+  connectOrCreate?: Prisma.RosterEntryCreateOrConnectWithoutAvailabilityInput
+  connect?: Prisma.RosterEntryWhereUniqueInput
+}
+
+export type RosterEntryUpdateOneRequiredWithoutAvailabilityNestedInput = {
+  create?: Prisma.XOR<Prisma.RosterEntryCreateWithoutAvailabilityInput, Prisma.RosterEntryUncheckedCreateWithoutAvailabilityInput>
+  connectOrCreate?: Prisma.RosterEntryCreateOrConnectWithoutAvailabilityInput
+  upsert?: Prisma.RosterEntryUpsertWithoutAvailabilityInput
+  connect?: Prisma.RosterEntryWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RosterEntryUpdateToOneWithWhereWithoutAvailabilityInput, Prisma.RosterEntryUpdateWithoutAvailabilityInput>, Prisma.RosterEntryUncheckedUpdateWithoutAvailabilityInput>
+}
+
 export type RosterEntryCreateWithoutUserInput = {
   handle: string
   rank: string
@@ -535,6 +561,7 @@ export type RosterEntryCreateWithoutUserInput = {
   imageUrl?: string | null
   order?: number
   game: Prisma.RosterGameCreateNestedOneWithoutRosterEntriesInput
+  availability?: Prisma.PlayerAvailabilityCreateNestedManyWithoutRosterEntryInput
 }
 
 export type RosterEntryUncheckedCreateWithoutUserInput = {
@@ -545,6 +572,7 @@ export type RosterEntryUncheckedCreateWithoutUserInput = {
   role?: string | null
   imageUrl?: string | null
   order?: number
+  availability?: Prisma.PlayerAvailabilityUncheckedCreateNestedManyWithoutRosterEntryInput
 }
 
 export type RosterEntryCreateOrConnectWithoutUserInput = {
@@ -594,6 +622,7 @@ export type RosterEntryCreateWithoutGameInput = {
   imageUrl?: string | null
   order?: number
   user: Prisma.UserCreateNestedOneWithoutRosterEntriesInput
+  availability?: Prisma.PlayerAvailabilityCreateNestedManyWithoutRosterEntryInput
 }
 
 export type RosterEntryUncheckedCreateWithoutGameInput = {
@@ -604,6 +633,7 @@ export type RosterEntryUncheckedCreateWithoutGameInput = {
   role?: string | null
   imageUrl?: string | null
   order?: number
+  availability?: Prisma.PlayerAvailabilityUncheckedCreateNestedManyWithoutRosterEntryInput
 }
 
 export type RosterEntryCreateOrConnectWithoutGameInput = {
@@ -632,6 +662,64 @@ export type RosterEntryUpdateManyWithWhereWithoutGameInput = {
   data: Prisma.XOR<Prisma.RosterEntryUpdateManyMutationInput, Prisma.RosterEntryUncheckedUpdateManyWithoutGameInput>
 }
 
+export type RosterEntryCreateWithoutAvailabilityInput = {
+  handle: string
+  rank: string
+  role?: string | null
+  imageUrl?: string | null
+  order?: number
+  user: Prisma.UserCreateNestedOneWithoutRosterEntriesInput
+  game: Prisma.RosterGameCreateNestedOneWithoutRosterEntriesInput
+}
+
+export type RosterEntryUncheckedCreateWithoutAvailabilityInput = {
+  id?: number
+  userId: number
+  gameId: number
+  handle: string
+  rank: string
+  role?: string | null
+  imageUrl?: string | null
+  order?: number
+}
+
+export type RosterEntryCreateOrConnectWithoutAvailabilityInput = {
+  where: Prisma.RosterEntryWhereUniqueInput
+  create: Prisma.XOR<Prisma.RosterEntryCreateWithoutAvailabilityInput, Prisma.RosterEntryUncheckedCreateWithoutAvailabilityInput>
+}
+
+export type RosterEntryUpsertWithoutAvailabilityInput = {
+  update: Prisma.XOR<Prisma.RosterEntryUpdateWithoutAvailabilityInput, Prisma.RosterEntryUncheckedUpdateWithoutAvailabilityInput>
+  create: Prisma.XOR<Prisma.RosterEntryCreateWithoutAvailabilityInput, Prisma.RosterEntryUncheckedCreateWithoutAvailabilityInput>
+  where?: Prisma.RosterEntryWhereInput
+}
+
+export type RosterEntryUpdateToOneWithWhereWithoutAvailabilityInput = {
+  where?: Prisma.RosterEntryWhereInput
+  data: Prisma.XOR<Prisma.RosterEntryUpdateWithoutAvailabilityInput, Prisma.RosterEntryUncheckedUpdateWithoutAvailabilityInput>
+}
+
+export type RosterEntryUpdateWithoutAvailabilityInput = {
+  handle?: Prisma.StringFieldUpdateOperationsInput | string
+  rank?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  user?: Prisma.UserUpdateOneRequiredWithoutRosterEntriesNestedInput
+  game?: Prisma.RosterGameUpdateOneRequiredWithoutRosterEntriesNestedInput
+}
+
+export type RosterEntryUncheckedUpdateWithoutAvailabilityInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  gameId?: Prisma.IntFieldUpdateOperationsInput | number
+  handle?: Prisma.StringFieldUpdateOperationsInput | string
+  rank?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
 export type RosterEntryCreateManyUserInput = {
   id?: number
   gameId: number
@@ -649,6 +737,7 @@ export type RosterEntryUpdateWithoutUserInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
   game?: Prisma.RosterGameUpdateOneRequiredWithoutRosterEntriesNestedInput
+  availability?: Prisma.PlayerAvailabilityUpdateManyWithoutRosterEntryNestedInput
 }
 
 export type RosterEntryUncheckedUpdateWithoutUserInput = {
@@ -659,6 +748,7 @@ export type RosterEntryUncheckedUpdateWithoutUserInput = {
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  availability?: Prisma.PlayerAvailabilityUncheckedUpdateManyWithoutRosterEntryNestedInput
 }
 
 export type RosterEntryUncheckedUpdateManyWithoutUserInput = {
@@ -688,6 +778,7 @@ export type RosterEntryUpdateWithoutGameInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
   user?: Prisma.UserUpdateOneRequiredWithoutRosterEntriesNestedInput
+  availability?: Prisma.PlayerAvailabilityUpdateManyWithoutRosterEntryNestedInput
 }
 
 export type RosterEntryUncheckedUpdateWithoutGameInput = {
@@ -698,6 +789,7 @@ export type RosterEntryUncheckedUpdateWithoutGameInput = {
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  availability?: Prisma.PlayerAvailabilityUncheckedUpdateManyWithoutRosterEntryNestedInput
 }
 
 export type RosterEntryUncheckedUpdateManyWithoutGameInput = {
@@ -711,6 +803,35 @@ export type RosterEntryUncheckedUpdateManyWithoutGameInput = {
 }
 
 
+/**
+ * Count Type RosterEntryCountOutputType
+ */
+
+export type RosterEntryCountOutputType = {
+  availability: number
+}
+
+export type RosterEntryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  availability?: boolean | RosterEntryCountOutputTypeCountAvailabilityArgs
+}
+
+/**
+ * RosterEntryCountOutputType without action
+ */
+export type RosterEntryCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RosterEntryCountOutputType
+   */
+  select?: Prisma.RosterEntryCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * RosterEntryCountOutputType without action
+ */
+export type RosterEntryCountOutputTypeCountAvailabilityArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlayerAvailabilityWhereInput
+}
+
 
 export type RosterEntrySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -723,6 +844,8 @@ export type RosterEntrySelect<ExtArgs extends runtime.Types.Extensions.InternalA
   order?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   game?: boolean | Prisma.RosterGameDefaultArgs<ExtArgs>
+  availability?: boolean | Prisma.RosterEntry$availabilityArgs<ExtArgs>
+  _count?: boolean | Prisma.RosterEntryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["rosterEntry"]>
 
 export type RosterEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -766,6 +889,8 @@ export type RosterEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type RosterEntryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   game?: boolean | Prisma.RosterGameDefaultArgs<ExtArgs>
+  availability?: boolean | Prisma.RosterEntry$availabilityArgs<ExtArgs>
+  _count?: boolean | Prisma.RosterEntryCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RosterEntryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -781,6 +906,7 @@ export type $RosterEntryPayload<ExtArgs extends runtime.Types.Extensions.Interna
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     game: Prisma.$RosterGamePayload<ExtArgs>
+    availability: Prisma.$PlayerAvailabilityPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1187,6 +1313,7 @@ export interface Prisma__RosterEntryClient<T, Null = never, ExtArgs extends runt
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   game<T extends Prisma.RosterGameDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RosterGameDefaultArgs<ExtArgs>>): Prisma.Prisma__RosterGameClient<runtime.Types.Result.GetResult<Prisma.$RosterGamePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  availability<T extends Prisma.RosterEntry$availabilityArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RosterEntry$availabilityArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlayerAvailabilityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1622,6 +1749,30 @@ export type RosterEntryDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many RosterEntries to delete.
    */
   limit?: number
+}
+
+/**
+ * RosterEntry.availability
+ */
+export type RosterEntry$availabilityArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlayerAvailability
+   */
+  select?: Prisma.PlayerAvailabilitySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlayerAvailability
+   */
+  omit?: Prisma.PlayerAvailabilityOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlayerAvailabilityInclude<ExtArgs> | null
+  where?: Prisma.PlayerAvailabilityWhereInput
+  orderBy?: Prisma.PlayerAvailabilityOrderByWithRelationInput | Prisma.PlayerAvailabilityOrderByWithRelationInput[]
+  cursor?: Prisma.PlayerAvailabilityWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlayerAvailabilityScalarFieldEnum | Prisma.PlayerAvailabilityScalarFieldEnum[]
 }
 
 /**
