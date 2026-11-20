@@ -113,7 +113,7 @@ export type AvailabilityStatus = (typeof AvailabilityStatus)[keyof typeof Availa
 
 export const PlanningBlockType = {
   SCRIM: 'SCRIM',
-  PRACTICE: 'PRACTICE',
+  VOD: 'VOD',
   MATCH: 'MATCH'
 } as const
 
