@@ -57,10 +57,16 @@ function MatchRow({ match, showTeam }: { match: EsportsMatchWithTeam; showTeam: 
       </div>
 
       <div className="flex items-center gap-4 sm:justify-end">
-        {hasScore && (
+        {hasScore ? (
           <span className="font-mono text-2xl font-black tracking-tight text-white">
             {match.ourScore} <span className="text-gray-600">–</span> {match.opponentScore}
           </span>
+        ) : (
+          !upcoming && (
+            <span className="text-sm font-bold uppercase tracking-wider text-gray-300">
+              {RESULT_TITLE[match.result as Exclude<EsportsMatchResult, 'UPCOMING'>]}
+            </span>
+          )
         )}
         {match.vodUrl && (
           <a
@@ -90,10 +96,12 @@ export default function ResultsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Only teams with at least one result get a tab; teams with just upcoming matches appear under "Alle teams"
   const teams = useMemo(() => {
-    const byId = new Map(matches.map((match) => [match.game.id, match.game]));
+    const byId = new Map(matches.filter((match) => match.result !== 'UPCOMING').map((match) => [match.game.id, match.game]));
     return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
   }, [matches]);
+  const showTeamNames = teamId === null && new Set(matches.map((match) => match.gameId)).size > 1;
 
   const shown = teamId === null ? matches : matches.filter((match) => match.gameId === teamId);
   // Soonest first for upcoming matches; results stay newest first, as the API sends them
@@ -170,7 +178,7 @@ export default function ResultsPage() {
                 </h2>
                 <div className="space-y-3">
                   {upcoming.map((match) => (
-                    <MatchRow key={match.id} match={match} showTeam={teamId === null && teams.length > 1} />
+                    <MatchRow key={match.id} match={match} showTeam={showTeamNames} />
                   ))}
                 </div>
               </section>
@@ -185,7 +193,7 @@ export default function ResultsPage() {
               ) : (
                 <div className="space-y-3">
                   {results.map((match) => (
-                    <MatchRow key={match.id} match={match} showTeam={teamId === null && teams.length > 1} />
+                    <MatchRow key={match.id} match={match} showTeam={showTeamNames} />
                   ))}
                 </div>
               )}

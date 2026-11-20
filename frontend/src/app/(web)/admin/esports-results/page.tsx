@@ -121,6 +121,10 @@ export default function AdminEsportsResultsPage() {
     }
 
     const upcoming = form.result === 'UPCOMING';
+    if (!upcoming && (form.ourScore.trim() === '') !== (form.opponentScore.trim() === '')) {
+      setError('Vul beide scores in, of laat ze allebei leeg als er geen score is.');
+      return;
+    }
     const score = (value: string) => (upcoming || value.trim() === '' ? null : Number(value));
     const body: CreateEsportsMatchDto = {
       gameId: Number(form.gameId),
@@ -252,14 +256,15 @@ export default function AdminEsportsResultsPage() {
               </div>
               {form.result !== 'UPCOMING' && (
                 <div className="grid grid-cols-2 gap-4">
-                  <Input label="Score AP" type="number" min="0" value={form.ourScore} onChange={(e) => update({ ourScore: e.target.value })} />
+                  <Input label="Score AP (optioneel)" type="number" min="0" value={form.ourScore} onChange={(e) => update({ ourScore: e.target.value })} />
                   <Input
-                    label="Score tegenstander"
+                    label="Score tegenstander (optioneel)"
                     type="number"
                     min="0"
                     value={form.opponentScore}
                     onChange={(e) => update({ opponentScore: e.target.value })}
                   />
+                  <p className="col-span-2 -mt-2 text-xs text-gray-500">Laat beide leeg als er enkel een winnaar is, zonder score.</p>
                 </div>
               )}
               <Input

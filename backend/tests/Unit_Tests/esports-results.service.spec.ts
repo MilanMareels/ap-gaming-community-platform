@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { EsportsResultsService } from '../../src/modules/esports-results/esports-results.service.js';
 import { PrismaService } from '../../src/modules/prisma/prisma.service.js';
 import { EsportsMatchResult } from '../../src/generated/prisma/enums.js';
@@ -72,6 +72,22 @@ describe('EsportsResultsService', () => {
   it('keeps no score for an upcoming match', async () => {
     await service.create({ ...match, result: EsportsMatchResult.UPCOMING });
     expect(prisma.esportsMatch.create.mock.calls[0][0].data).toEqual(expect.objectContaining({ ourScore: null, opponentScore: null }));
+  });
+
+  it('stores a result without a score', async () => {
+    await service.create({ ...match, result: EsportsMatchResult.LOSS, ourScore: null, opponentScore: undefined });
+    expect(prisma.esportsMatch.create.mock.calls[0][0].data).toEqual(
+      expect.objectContaining({ result: EsportsMatchResult.LOSS, ourScore: null, opponentScore: undefined }),
+    );
+  });
+
+  it('refuses only one side of a score', async () => {
+    await expect(service.create({ ...match, opponentScore: null })).rejects.toThrow(BadRequestException);
+
+    prisma.esportsMatch.findUnique.mockResolvedValue({ id: 4, result: EsportsMatchResult.WIN, ourScore: null, opponentScore: null });
+    await expect(service.update(4, { ourScore: 3 })).rejects.toThrow(BadRequestException);
+    await service.update(4, { ourScore: 3, opponentScore: 1 });
+    expect(prisma.esportsMatch.update).toHaveBeenCalled();
   });
 
   it('refuses a team that does not exist', async () => {

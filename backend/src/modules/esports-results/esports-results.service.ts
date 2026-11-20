@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateEsportsMatchDto, UpdateEsportsMatchDto } from '../../dtos/esports-results/esports-match.dto.js';
 import { EsportsMatchResult } from '../../generated/prisma/enums.js';
@@ -23,6 +23,7 @@ export class EsportsResultsService {
 
   async create(dto: CreateEsportsMatchDto) {
     await this.assertTeamExists(dto.gameId);
+    this.assertScore(dto.result, dto.ourScore, dto.opponentScore);
     return this.prisma.esportsMatch.create({
       data: { ...this.toData(dto), gameId: dto.gameId, opponent: dto.opponent.trim(), playedAt: new Date(dto.playedAt), result: dto.result },
       include: withTeam,
@@ -33,6 +34,11 @@ export class EsportsResultsService {
     const existing = await this.prisma.esportsMatch.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Match not found');
     if (dto.gameId !== undefined) await this.assertTeamExists(dto.gameId);
+    this.assertScore(
+      dto.result ?? existing.result,
+      dto.ourScore !== undefined ? dto.ourScore : existing.ourScore,
+      dto.opponentScore !== undefined ? dto.opponentScore : existing.opponentScore,
+    );
 
     const data = this.toData(dto);
     // A match that is (still) upcoming has no score yet
@@ -47,6 +53,14 @@ export class EsportsResultsService {
     const existing = await this.prisma.esportsMatch.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Match not found');
     await this.prisma.esportsMatch.delete({ where: { id } });
+  }
+
+  /** A result may have no score (just who won), but not only one side of a score. */
+  private assertScore(result: EsportsMatchResult, ourScore?: number | null, opponentScore?: number | null) {
+    if (result === EsportsMatchResult.UPCOMING) return;
+    if ((ourScore == null) !== (opponentScore == null)) {
+      throw new BadRequestException('Fill in both scores, or neither when there is no score');
+    }
   }
 
   private async assertTeamExists(gameId: number) {
