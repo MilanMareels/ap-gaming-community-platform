@@ -7,7 +7,7 @@ import { Input, Select } from '@/components/ui/Input';
 import { apiClient } from '@/api';
 import type { ReservationWithUser, ReservationStatus } from '@/api';
 import { getApiErrorMessage } from '@/util/api-error';
-import { PersonPicker, type PersonChoice } from './PersonPicker';
+import { PersonPicker, type PersonChoice } from '@/components/admin/PersonPicker';
 
 interface ReservationModalProps {
   open: boolean;
@@ -39,6 +39,9 @@ const STATUS_OPTIONS = [
 ];
 
 /** Parse an ISO date-time to a date string (YYYY-MM-DD) */
+const searchPeople = async (search: string) =>
+  (await apiClient.GET('/reservations/admin/people', { params: { query: { search } } })).data ?? [];
+
 function toDateInput(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
@@ -201,7 +204,12 @@ export default function ReservationModal({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className='p-6 space-y-4'>
-          <PersonPicker value={person} onChange={setPerson} />
+          <PersonPicker
+            value={person}
+            onChange={setPerson}
+            search={searchPeople}
+            newPersonHint="Bestaat er al iemand met dit e-mailadres of s-nummer, dan komt de reservatie op die persoon."
+          />
 
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
             <Select

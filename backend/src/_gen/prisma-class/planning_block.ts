@@ -1,22 +1,19 @@
-import { TeamScheduleBlockType } from '../../generated/prisma/enums.js';
+import { PlanningBlockType } from '../../generated/prisma/enums.js';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class TeamScheduleBlock {
+export class PlanningBlock {
 
   @ApiProperty({ type: Number })
   id: number;
 
   @ApiProperty({ type: Number })
-  gameId: number;
+  dayId: number;
 
-  @ApiProperty({ enum: TeamScheduleBlockType, enumName: 'TeamScheduleBlockType' })
-  type: TeamScheduleBlockType;
+  @ApiProperty({ enum: PlanningBlockType, enumName: 'PlanningBlockType' })
+  type: PlanningBlockType;
 
   @ApiPropertyOptional({ type: String })
   title: string | null;
-
-  @ApiProperty({ type: Date })
-  date: Date;
 
   @ApiProperty({ type: Number })
   startHour: number;
@@ -26,10 +23,4 @@ export class TeamScheduleBlock {
 
   @ApiPropertyOptional({ type: String })
   notes: string | null;
-
-  @ApiProperty({ type: Date })
-  createdAt: Date;
-
-  @ApiProperty({ type: Date })
-  updatedAt: Date;
 }

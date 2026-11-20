@@ -276,6 +276,11 @@ export class AuthService {
       ? (claims.permissions ?? [])
       : [...new Set(user.userRoles.flatMap((ur) => ur.role.permissions.map((rp) => rp.permission.key)))];
 
+    const memberships = await this.prisma.planningTeamMember.findMany({
+      where: { userId: user.id },
+      select: { isPlayer: true, isManager: true },
+    });
+
     const profile: AuthProfileResponseDto = {
       id: user.id,
       name: user.name,
@@ -284,6 +289,10 @@ export class AuthService {
       isAdmin: roles.includes('Admin'),
       roles,
       permissions,
+      planning: {
+        isPlayer: memberships.some((membership) => membership.isPlayer),
+        isManager: memberships.some((membership) => membership.isManager),
+      },
     };
 
     // Attach impersonation info if present

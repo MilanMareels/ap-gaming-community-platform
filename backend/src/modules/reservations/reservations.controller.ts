@@ -3,13 +3,13 @@ import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiBadRequest
 import type { Request } from 'express';
 import { ReservationsService } from './reservations.service.js';
 import { ReservationRulesService } from './reservation-rules.service.js';
+import { PeopleService } from '../people/people.service.js';
+import { PersonDto, PersonSearchQueryDto } from '../../dtos/people/person.dto.js';
 import { InventoryAdjustmentsService } from '../inventory-adjustments/inventory-adjustments.service.js';
 import {
   CreateReservationDto,
   AdminCreateReservationDto,
   MyReservationsResponseDto,
-  ReservationPersonDto,
-  ReservationPersonQueryDto,
   ReservationQueryDto,
   ReservationRulesDto,
   ReservationSlotDto,
@@ -34,6 +34,7 @@ export class ReservationsController {
     private readonly reservationsService: ReservationsService,
     private readonly inventoryAdjustmentsService: InventoryAdjustmentsService,
     private readonly reservationRules: ReservationRulesService,
+    private readonly people: PeopleService,
   ) {}
 
   @Post()
@@ -163,9 +164,9 @@ export class ReservationsController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @RequirePermissions('reservations.manage')
   @ApiOperation({ summary: 'Search people to book a reservation for, by name, email or student number' })
-  @ApiOkResponse({ type: [ReservationPersonDto] })
-  searchPeople(@Query() query: ReservationPersonQueryDto) {
-    return this.reservationsService.searchPeople(query.search);
+  @ApiOkResponse({ type: [PersonDto] })
+  searchPeople(@Query() query: PersonSearchQueryDto) {
+    return this.people.search(query.search);
   }
 
   @Get('no-shows')

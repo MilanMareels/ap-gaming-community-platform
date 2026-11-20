@@ -1,16 +1,16 @@
 import { AvailabilityStatus } from '../../generated/prisma/enums.js';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class PlayerAvailability {
+export class PlanningAvailability {
 
   @ApiProperty({ type: Number })
   id: number;
 
   @ApiProperty({ type: Number })
-  rosterEntryId: number;
+  dayId: number;
 
-  @ApiProperty({ type: Date })
-  date: Date;
+  @ApiProperty({ type: Number })
+  memberId: number;
 
   @ApiProperty({ type: Number })
   hour: number;

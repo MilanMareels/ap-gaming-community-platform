@@ -65,8 +65,6 @@ export const ModelName = {
   RosterGame: 'RosterGame',
   EsportsMatch: 'EsportsMatch',
   RosterEntry: 'RosterEntry',
-  PlayerAvailability: 'PlayerAvailability',
-  TeamScheduleBlock: 'TeamScheduleBlock',
   DynamicForm: 'DynamicForm',
   DynamicFormField: 'DynamicFormField',
   DynamicFormSubmission: 'DynamicFormSubmission',
@@ -88,7 +86,12 @@ export const ModelName = {
   PointTrial: 'PointTrial',
   PointTrialParticipant: 'PointTrialParticipant',
   PointTrialEntry: 'PointTrialEntry',
-  InventoryAdjustment: 'InventoryAdjustment'
+  InventoryAdjustment: 'InventoryAdjustment',
+  PlanningTeam: 'PlanningTeam',
+  PlanningTeamMember: 'PlanningTeamMember',
+  PlanningDay: 'PlanningDay',
+  PlanningAvailability: 'PlanningAvailability',
+  PlanningBlock: 'PlanningBlock'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -225,9 +228,7 @@ export type NavLinkScalarFieldEnum = (typeof NavLinkScalarFieldEnum)[keyof typeo
 
 export const RosterGameScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  scheduleStartHour: 'scheduleStartHour',
-  scheduleEndHour: 'scheduleEndHour'
+  name: 'name'
 } as const
 
 export type RosterGameScalarFieldEnum = (typeof RosterGameScalarFieldEnum)[keyof typeof RosterGameScalarFieldEnum]
@@ -263,35 +264,6 @@ export const RosterEntryScalarFieldEnum = {
 } as const
 
 export type RosterEntryScalarFieldEnum = (typeof RosterEntryScalarFieldEnum)[keyof typeof RosterEntryScalarFieldEnum]
-
-
-export const PlayerAvailabilityScalarFieldEnum = {
-  id: 'id',
-  rosterEntryId: 'rosterEntryId',
-  date: 'date',
-  hour: 'hour',
-  status: 'status',
-  note: 'note',
-  updatedAt: 'updatedAt'
-} as const
-
-export type PlayerAvailabilityScalarFieldEnum = (typeof PlayerAvailabilityScalarFieldEnum)[keyof typeof PlayerAvailabilityScalarFieldEnum]
-
-
-export const TeamScheduleBlockScalarFieldEnum = {
-  id: 'id',
-  gameId: 'gameId',
-  type: 'type',
-  title: 'title',
-  date: 'date',
-  startHour: 'startHour',
-  endHour: 'endHour',
-  notes: 'notes',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type TeamScheduleBlockScalarFieldEnum = (typeof TeamScheduleBlockScalarFieldEnum)[keyof typeof TeamScheduleBlockScalarFieldEnum]
 
 
 export const DynamicFormScalarFieldEnum = {
@@ -572,6 +544,69 @@ export const InventoryAdjustmentScalarFieldEnum = {
 } as const
 
 export type InventoryAdjustmentScalarFieldEnum = (typeof InventoryAdjustmentScalarFieldEnum)[keyof typeof InventoryAdjustmentScalarFieldEnum]
+
+
+export const PlanningTeamScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  game: 'game',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlanningTeamScalarFieldEnum = (typeof PlanningTeamScalarFieldEnum)[keyof typeof PlanningTeamScalarFieldEnum]
+
+
+export const PlanningTeamMemberScalarFieldEnum = {
+  id: 'id',
+  teamId: 'teamId',
+  userId: 'userId',
+  handle: 'handle',
+  isPlayer: 'isPlayer',
+  isManager: 'isManager',
+  order: 'order',
+  createdAt: 'createdAt'
+} as const
+
+export type PlanningTeamMemberScalarFieldEnum = (typeof PlanningTeamMemberScalarFieldEnum)[keyof typeof PlanningTeamMemberScalarFieldEnum]
+
+
+export const PlanningDayScalarFieldEnum = {
+  id: 'id',
+  teamId: 'teamId',
+  date: 'date',
+  startHour: 'startHour',
+  endHour: 'endHour',
+  note: 'note'
+} as const
+
+export type PlanningDayScalarFieldEnum = (typeof PlanningDayScalarFieldEnum)[keyof typeof PlanningDayScalarFieldEnum]
+
+
+export const PlanningAvailabilityScalarFieldEnum = {
+  id: 'id',
+  dayId: 'dayId',
+  memberId: 'memberId',
+  hour: 'hour',
+  status: 'status',
+  note: 'note',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlanningAvailabilityScalarFieldEnum = (typeof PlanningAvailabilityScalarFieldEnum)[keyof typeof PlanningAvailabilityScalarFieldEnum]
+
+
+export const PlanningBlockScalarFieldEnum = {
+  id: 'id',
+  dayId: 'dayId',
+  type: 'type',
+  title: 'title',
+  startHour: 'startHour',
+  endHour: 'endHour',
+  notes: 'notes'
+} as const
+
+export type PlanningBlockScalarFieldEnum = (typeof PlanningBlockScalarFieldEnum)[keyof typeof PlanningBlockScalarFieldEnum]
 
 
 export const SortOrder = {

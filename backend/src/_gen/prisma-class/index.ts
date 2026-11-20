@@ -12,8 +12,6 @@ import { NavLinkRelations as _NavLinkRelations } from './nav_link_relations.js';
 import { RosterGameRelations as _RosterGameRelations } from './roster_game_relations.js';
 import { EsportsMatchRelations as _EsportsMatchRelations } from './esports_match_relations.js';
 import { RosterEntryRelations as _RosterEntryRelations } from './roster_entry_relations.js';
-import { PlayerAvailabilityRelations as _PlayerAvailabilityRelations } from './player_availability_relations.js';
-import { TeamScheduleBlockRelations as _TeamScheduleBlockRelations } from './team_schedule_block_relations.js';
 import { DynamicFormRelations as _DynamicFormRelations } from './dynamic_form_relations.js';
 import { DynamicFormFieldRelations as _DynamicFormFieldRelations } from './dynamic_form_field_relations.js';
 import { DynamicFormSubmissionRelations as _DynamicFormSubmissionRelations } from './dynamic_form_submission_relations.js';
@@ -36,6 +34,11 @@ import { PointTrialRelations as _PointTrialRelations } from './point_trial_relat
 import { PointTrialParticipantRelations as _PointTrialParticipantRelations } from './point_trial_participant_relations.js';
 import { PointTrialEntryRelations as _PointTrialEntryRelations } from './point_trial_entry_relations.js';
 import { InventoryAdjustmentRelations as _InventoryAdjustmentRelations } from './inventory_adjustment_relations.js';
+import { PlanningTeamRelations as _PlanningTeamRelations } from './planning_team_relations.js';
+import { PlanningTeamMemberRelations as _PlanningTeamMemberRelations } from './planning_team_member_relations.js';
+import { PlanningDayRelations as _PlanningDayRelations } from './planning_day_relations.js';
+import { PlanningAvailabilityRelations as _PlanningAvailabilityRelations } from './planning_availability_relations.js';
+import { PlanningBlockRelations as _PlanningBlockRelations } from './planning_block_relations.js';
 import { User as _User } from './user.js';
 import { UserNote as _UserNote } from './user_note.js';
 import { GoogleSSOUser as _GoogleSSOUser } from './google_s_s_o_user.js';
@@ -50,8 +53,6 @@ import { NavLink as _NavLink } from './nav_link.js';
 import { RosterGame as _RosterGame } from './roster_game.js';
 import { EsportsMatch as _EsportsMatch } from './esports_match.js';
 import { RosterEntry as _RosterEntry } from './roster_entry.js';
-import { PlayerAvailability as _PlayerAvailability } from './player_availability.js';
-import { TeamScheduleBlock as _TeamScheduleBlock } from './team_schedule_block.js';
 import { DynamicForm as _DynamicForm } from './dynamic_form.js';
 import { DynamicFormField as _DynamicFormField } from './dynamic_form_field.js';
 import { DynamicFormSubmission as _DynamicFormSubmission } from './dynamic_form_submission.js';
@@ -74,6 +75,11 @@ import { PointTrial as _PointTrial } from './point_trial.js';
 import { PointTrialParticipant as _PointTrialParticipant } from './point_trial_participant.js';
 import { PointTrialEntry as _PointTrialEntry } from './point_trial_entry.js';
 import { InventoryAdjustment as _InventoryAdjustment } from './inventory_adjustment.js';
+import { PlanningTeam as _PlanningTeam } from './planning_team.js';
+import { PlanningTeamMember as _PlanningTeamMember } from './planning_team_member.js';
+import { PlanningDay as _PlanningDay } from './planning_day.js';
+import { PlanningAvailability as _PlanningAvailability } from './planning_availability.js';
+import { PlanningBlock as _PlanningBlock } from './planning_block.js';
 
 export namespace PrismaModel {
   export class UserRelations extends _UserRelations {}
@@ -90,8 +96,6 @@ export namespace PrismaModel {
   export class RosterGameRelations extends _RosterGameRelations {}
   export class EsportsMatchRelations extends _EsportsMatchRelations {}
   export class RosterEntryRelations extends _RosterEntryRelations {}
-  export class PlayerAvailabilityRelations extends _PlayerAvailabilityRelations {}
-  export class TeamScheduleBlockRelations extends _TeamScheduleBlockRelations {}
   export class DynamicFormRelations extends _DynamicFormRelations {}
   export class DynamicFormFieldRelations extends _DynamicFormFieldRelations {}
   export class DynamicFormSubmissionRelations extends _DynamicFormSubmissionRelations {}
@@ -114,6 +118,11 @@ export namespace PrismaModel {
   export class PointTrialParticipantRelations extends _PointTrialParticipantRelations {}
   export class PointTrialEntryRelations extends _PointTrialEntryRelations {}
   export class InventoryAdjustmentRelations extends _InventoryAdjustmentRelations {}
+  export class PlanningTeamRelations extends _PlanningTeamRelations {}
+  export class PlanningTeamMemberRelations extends _PlanningTeamMemberRelations {}
+  export class PlanningDayRelations extends _PlanningDayRelations {}
+  export class PlanningAvailabilityRelations extends _PlanningAvailabilityRelations {}
+  export class PlanningBlockRelations extends _PlanningBlockRelations {}
   export class User extends _User {}
   export class UserNote extends _UserNote {}
   export class GoogleSSOUser extends _GoogleSSOUser {}
@@ -128,8 +137,6 @@ export namespace PrismaModel {
   export class RosterGame extends _RosterGame {}
   export class EsportsMatch extends _EsportsMatch {}
   export class RosterEntry extends _RosterEntry {}
-  export class PlayerAvailability extends _PlayerAvailability {}
-  export class TeamScheduleBlock extends _TeamScheduleBlock {}
   export class DynamicForm extends _DynamicForm {}
   export class DynamicFormField extends _DynamicFormField {}
   export class DynamicFormSubmission extends _DynamicFormSubmission {}
@@ -152,6 +159,11 @@ export namespace PrismaModel {
   export class PointTrialParticipant extends _PointTrialParticipant {}
   export class PointTrialEntry extends _PointTrialEntry {}
   export class InventoryAdjustment extends _InventoryAdjustment {}
+  export class PlanningTeam extends _PlanningTeam {}
+  export class PlanningTeamMember extends _PlanningTeamMember {}
+  export class PlanningDay extends _PlanningDay {}
+  export class PlanningAvailability extends _PlanningAvailability {}
+  export class PlanningBlock extends _PlanningBlock {}
 
   export const extraModels = [
     UserRelations,
@@ -168,8 +180,6 @@ export namespace PrismaModel {
     RosterGameRelations,
     EsportsMatchRelations,
     RosterEntryRelations,
-    PlayerAvailabilityRelations,
-    TeamScheduleBlockRelations,
     DynamicFormRelations,
     DynamicFormFieldRelations,
     DynamicFormSubmissionRelations,
@@ -192,6 +202,11 @@ export namespace PrismaModel {
     PointTrialParticipantRelations,
     PointTrialEntryRelations,
     InventoryAdjustmentRelations,
+    PlanningTeamRelations,
+    PlanningTeamMemberRelations,
+    PlanningDayRelations,
+    PlanningAvailabilityRelations,
+    PlanningBlockRelations,
     User,
     UserNote,
     GoogleSSOUser,
@@ -206,8 +221,6 @@ export namespace PrismaModel {
     RosterGame,
     EsportsMatch,
     RosterEntry,
-    PlayerAvailability,
-    TeamScheduleBlock,
     DynamicForm,
     DynamicFormField,
     DynamicFormSubmission,
@@ -230,5 +243,10 @@ export namespace PrismaModel {
     PointTrialParticipant,
     PointTrialEntry,
     InventoryAdjustment,
+    PlanningTeam,
+    PlanningTeamMember,
+    PlanningDay,
+    PlanningAvailability,
+    PlanningBlock,
   ];
 }

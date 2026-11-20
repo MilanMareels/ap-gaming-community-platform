@@ -27,7 +27,7 @@ export class CreateNavLinkDto {
   @IsInt()
   position!: number;
 
-  @ApiPropertyOptional({ example: 'public', description: 'Visibility: public, authenticated, admin, or role:<RoleName>' })
+  @ApiPropertyOptional({ example: 'public', description: 'Visibility: public, authenticated, players (planning team members), admin, or role:<RoleName>' })
   @IsString()
   @IsOptional()
   visibility?: string;
@@ -74,7 +74,7 @@ export class UpdateNavLinkDto {
   @IsOptional()
   position?: number;
 
-  @ApiPropertyOptional({ example: 'public', description: 'Visibility: public, authenticated, admin, or role:<RoleName>' })
+  @ApiPropertyOptional({ example: 'public', description: 'Visibility: public, authenticated, players (planning team members), admin, or role:<RoleName>' })
   @IsString()
   @IsOptional()
   visibility?: string;

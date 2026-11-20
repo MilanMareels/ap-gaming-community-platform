@@ -20,6 +20,14 @@ export class ImpersonationInfoDto {
   roleName?: string;
 }
 
+export class PlanningRolesDto {
+  @ApiProperty({ description: 'Plays in at least one planning team, so fills in availability' })
+  isPlayer!: boolean;
+
+  @ApiProperty({ description: 'Manages at least one planning team (in the admin UI)' })
+  isManager!: boolean;
+}
+
 export class AuthProfileResponseDto {
   @ApiProperty()
   id!: number;
@@ -43,6 +51,9 @@ export class AuthProfileResponseDto {
 
   @ApiProperty({ type: [String], description: 'Permission keys the user has' })
   permissions!: string[];
+
+  @ApiProperty({ type: PlanningRolesDto, description: 'What the user does in team planning' })
+  planning!: PlanningRolesDto;
 
   @ApiPropertyOptional({ type: ImpersonationInfoDto, description: 'Present when impersonating a user or role' })
   impersonation?: ImpersonationInfoDto;

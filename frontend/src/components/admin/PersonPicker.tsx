@@ -3,12 +3,11 @@
 import { useEffect, useState } from 'react';
 import { Search, UserPlus, X } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
-import { apiClient } from '@/api';
-import type { ReservationPerson } from '@/api';
+import type { Person } from '@/api';
 
-/** Who a staff reservation is for: someone who already has an account, or a new person to add. */
+/** Who staff picked: someone who already has an account, or a new person to add. */
 export type PersonChoice =
-  | { kind: 'existing'; person: Pick<ReservationPerson, 'id' | 'name' | 'email' | 'sNumber'> }
+  | { kind: 'existing'; person: Pick<Person, 'id' | 'name' | 'email' | 'sNumber'> }
   | { kind: 'new'; name: string; email: string; sNumber: string };
 
 const labelClass = 'block text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-1.5';
@@ -16,11 +15,15 @@ const labelClass = 'block text-[11px] font-semibold uppercase tracking-wide text
 interface PersonPickerProps {
   value: PersonChoice | null;
   onChange: (value: PersonChoice | null) => void;
+  /** Looks people up by name, email or student number (called with at least 2 characters). */
+  search: (term: string) => Promise<Person[]>;
+  /** Shown under the new-person fields. */
+  newPersonHint?: string;
 }
 
-export function PersonPicker({ value, onChange }: PersonPickerProps) {
+export function PersonPicker({ value, onChange, search, newPersonHint }: PersonPickerProps) {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<ReservationPerson[]>([]);
+  const [results, setResults] = useState<Person[]>([]);
   const [searching, setSearching] = useState(false);
 
   const term = query.trim();
@@ -31,9 +34,9 @@ export function PersonPicker({ value, onChange }: PersonPickerProps) {
     let cancelled = false;
     const handle = setTimeout(async () => {
       setSearching(true);
-      const { data } = await apiClient.GET('/reservations/admin/people', { params: { query: { search: term } } });
+      const found = await search(term).catch(() => []);
       if (!cancelled) {
-        setResults(data ?? []);
+        setResults(found);
         setSearching(false);
       }
     }, 200);
@@ -42,7 +45,7 @@ export function PersonPicker({ value, onChange }: PersonPickerProps) {
       cancelled = true;
       clearTimeout(handle);
     };
-  }, [term, value]);
+  }, [term, value, search]);
 
   const startNewPerson = () => {
     const looksLikeEmail = term.includes('@');
@@ -94,7 +97,7 @@ export function PersonPicker({ value, onChange }: PersonPickerProps) {
           onChange={(e) => update({ email: e.target.value })}
         />
         <Input label="S-nummer (optioneel)" placeholder="s123456" value={value.sNumber} onChange={(e) => update({ sNumber: e.target.value })} />
-        <p className="text-xs text-gray-500">Bestaat er al iemand met dit e-mailadres of s-nummer, dan komt de reservatie op die persoon.</p>
+        {newPersonHint && <p className="text-xs text-gray-500">{newPersonHint}</p>}
       </div>
     );
   }

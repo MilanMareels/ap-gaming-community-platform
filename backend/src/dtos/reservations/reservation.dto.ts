@@ -1,30 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Max, MaxLength, Min, MinLength, ValidateIf } from 'class-validator';
 
-export class ReservationPersonDto {
-  @ApiProperty({ example: 12 })
-  id!: number;
-
-  @ApiProperty({ example: 'Robin Claes', nullable: true, type: String })
-  name!: string | null;
-
-  @ApiProperty({ example: 's123456@student.ap.be' })
-  email!: string;
-
-  @ApiProperty({ example: 's123456' })
-  sNumber!: string;
-
-  @ApiProperty({ example: 4, description: 'Reservations this person has made so far' })
-  reservationCount!: number;
-}
-
-export class ReservationPersonQueryDto {
-  @ApiProperty({ example: 'robin', description: 'Part of a name, email address or student number (at least 2 characters)' })
-  @IsString()
-  @MinLength(2)
-  search!: string;
-}
-
 export class ReservationRulesDto {
   @ApiProperty({ example: 1, description: 'Active reservations a member may have on one day (0 = no limit)' })
   maxPerDay!: number;

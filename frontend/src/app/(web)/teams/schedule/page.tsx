@@ -1,44 +1,30 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
-import { CalendarPlus, ChevronLeft, ChevronRight, StickyNote } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Settings2 } from 'lucide-react';
 import { apiClient } from '@/api';
-import type { AvailabilityStatus, TeamScheduleBlock, TeamSchedulePlayer, TeamScheduleWeek } from '@/api';
+import type { PlanningTeamSummary, PlanningTeamView } from '@/api';
 import { getApiErrorMessage } from '@/util/api-error';
-import { DayGrid } from './DayGrid';
-import { BlockDialog, CellDialog, type BlockDraft } from './Dialogs';
-import { BLOCK_STYLE, STATUS_STYLE, addDays, cellKey, dayLabel, hourLabel, nextStatus, todayKey, type Cell } from './schedule';
+import { PlanningGrid } from '@/components/planning/PlanningGrid';
 
-type Team = { id: number; name: string };
-
-/** A drag in progress: every cell it passes in one player's column gets the same status. */
-interface Paint {
-  rosterEntryId: number;
-  status: AvailabilityStatus | null;
-  changed: Map<string, { date: string; hour: number }>;
-}
-
-const errorText = (error: unknown) => getApiErrorMessage(error as { message?: string | string[] }, 'Opslaan is mislukt.');
-
-export default function TeamSchedulePage() {
-  const [teams, setTeams] = useState<Team[] | null>(null);
+/** Where players fill in when they can play on the days their team planned. */
+export default function TeamPlanningPage() {
+  const [teams, setTeams] = useState<PlanningTeamSummary[] | null>(null);
   const [teamId, setTeamId] = useState<number | null>(null);
-  const [week, setWeek] = useState<string | undefined>(undefined);
-  const [data, setData] = useState<TeamScheduleWeek | null>(null);
-  const [cells, setCells] = useState<Record<string, Cell>>({});
+  const [past, setPast] = useState(false);
+  const [view, setView] = useState<PlanningTeamView | null>(null);
+  const [version, setVersion] = useState(0);
   const [error, setError] = useState('');
-  const [noteMode, setNoteMode] = useState(false);
-  const [editingCell, setEditingCell] = useState<{ player: TeamSchedulePlayer; date: string; hour: number } | null>(null);
-  const [editingBlock, setEditingBlock] = useState<TeamScheduleBlock | 'new' | null>(null);
-  const paint = useRef<Paint | null>(null);
 
   useEffect(() => {
     apiClient
-      .GET('/team-schedule/games', {})
-      .then(({ data: list }) => {
-        setTeams(list ?? []);
-        if (list?.length) setTeamId(list[0].id);
+      .GET('/team-planning/my-teams', {})
+      .then(({ data }) => {
+        const list = data ?? [];
+        setTeams(list);
+        const requested = Number(new URLSearchParams(window.location.search).get('team'));
+        setTeamId(list.find((team) => team.id === requested)?.id ?? list[0]?.id ?? null);
       })
       .catch(() => setTeams([]));
   }, []);
@@ -48,127 +34,29 @@ export default function TeamSchedulePage() {
       teamId === null
         ? Promise.resolve()
         : apiClient
-            .GET('/team-schedule/games/{gameId}', { params: { path: { gameId: teamId }, query: { week } } })
-            .then(({ data: weekData, error: apiError }) => {
-              if (apiError || !weekData) {
-                setError(errorText(apiError));
+            .GET('/team-planning/teams/{teamId}', { params: { path: { teamId }, query: { past } } })
+            .then(({ data, error: apiError }) => {
+              if (apiError || !data) {
+                setError(getApiErrorMessage(apiError as { message?: string | string[] }, 'De planning kon niet geladen worden.'));
                 return;
               }
-              setData(weekData);
-              setCells(
-                Object.fromEntries(
-                  weekData.availability.map((cell) => [cellKey(cell.rosterEntryId, cell.date, cell.hour), { status: cell.status, note: cell.note ?? null }]),
-                ),
-              );
+              setView(data);
+              setVersion((v) => v + 1);
             }),
-    [teamId, week],
+    [teamId, past],
   );
 
   useEffect(() => {
     load();
   }, [load]);
 
-  const hours = useMemo(
-    () => (data ? Array.from({ length: data.game.scheduleEndHour - data.game.scheduleStartHour }, (_, i) => data.game.scheduleStartHour + i) : []),
-    [data],
-  );
-  const days = useMemo(() => (data ? Array.from({ length: 7 }, (_, i) => addDays(data.weekStart, i)) : []), [data]);
-  const canEdit = useCallback((player: TeamSchedulePlayer) => player.isMe || !!data?.canManage, [data]);
-
-  const save = useCallback(
-    async (rosterEntryId: number, changes: { date: string; hour: number; status: AvailabilityStatus | null; note?: string | null }[]) => {
-      if (!data || changes.length === 0) return;
-      const { error: apiError } = await apiClient.PUT('/team-schedule/games/{gameId}/availability', {
-        params: { path: { gameId: data.game.id } },
-        body: { rosterEntryId, cells: changes },
-      });
-      if (apiError) {
-        setError(errorText(apiError));
-        load();
-      }
+  const onError = useCallback(
+    (message: string) => {
+      setError(message);
+      load();
     },
-    [data, load],
+    [load],
   );
-
-  const setCell = (rosterEntryId: number, date: string, hour: number, status: AvailabilityStatus | null, note?: string | null) =>
-    setCells((current) => {
-      const key = cellKey(rosterEntryId, date, hour);
-      const next = { ...current };
-      if (status === null) delete next[key];
-      else next[key] = { status, note: note === undefined ? (current[key]?.note ?? null) : note };
-      return next;
-    });
-
-  // While painting, follow the pointer to whatever cell is under it (touch keeps the first target, so look it up).
-  useEffect(() => {
-    const move = (event: PointerEvent) => {
-      const current = paint.current;
-      if (!current) return;
-      const target = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>('[data-entry]');
-      if (!target || Number(target.dataset.entry) !== current.rosterEntryId) return;
-      const date = target.dataset.date!;
-      const hour = Number(target.dataset.hour);
-      const key = cellKey(current.rosterEntryId, date, hour);
-      if (current.changed.has(key)) return;
-      current.changed.set(key, { date, hour });
-      setCell(current.rosterEntryId, date, hour, current.status);
-    };
-    const end = () => {
-      const current = paint.current;
-      paint.current = null;
-      if (current) save(current.rosterEntryId, [...current.changed.values()].map((cell) => ({ ...cell, status: current.status })));
-    };
-
-    window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', end);
-    window.addEventListener('pointercancel', end);
-    return () => {
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', end);
-      window.removeEventListener('pointercancel', end);
-    };
-  }, [save]);
-
-  const onCellPointerDown = (event: ReactPointerEvent, player: TeamSchedulePlayer, date: string, hour: number) => {
-    if (noteMode) {
-      setEditingCell({ player, date, hour });
-      return;
-    }
-    event.preventDefault();
-    (event.target as Element).releasePointerCapture?.(event.pointerId);
-    const status = nextStatus(cells[cellKey(player.rosterEntryId, date, hour)]?.status);
-    paint.current = { rosterEntryId: player.rosterEntryId, status, changed: new Map([[cellKey(player.rosterEntryId, date, hour), { date, hour }]]) };
-    setCell(player.rosterEntryId, date, hour, status);
-  };
-
-  const saveBlock = async (draft: BlockDraft) => {
-    if (!data) return;
-    const body = { ...draft, title: draft.title.trim() || null, notes: draft.notes.trim() || null };
-    const { error: apiError } =
-      editingBlock === 'new'
-        ? await apiClient.POST('/team-schedule/games/{gameId}/blocks', { params: { path: { gameId: data.game.id } }, body })
-        : await apiClient.PATCH('/team-schedule/blocks/{id}', { params: { path: { id: (editingBlock as TeamScheduleBlock).id } }, body });
-    if (apiError) setError(errorText(apiError));
-    setEditingBlock(null);
-    load();
-  };
-
-  const deleteBlock = async (block: TeamScheduleBlock) => {
-    const { error: apiError } = await apiClient.DELETE('/team-schedule/blocks/{id}', { params: { path: { id: block.id } } });
-    if (apiError) setError(errorText(apiError));
-    setEditingBlock(null);
-    load();
-  };
-
-  const updateHours = async (scheduleStartHour: number, scheduleEndHour: number) => {
-    if (!data || scheduleEndHour <= scheduleStartHour) return;
-    const { error: apiError } = await apiClient.PATCH('/team-schedule/games/{gameId}/hours', {
-      params: { path: { gameId: data.game.id } },
-      body: { scheduleStartHour, scheduleEndHour },
-    });
-    if (apiError) setError(errorText(apiError));
-    load();
-  };
 
   if (teams === null) {
     return (
@@ -177,9 +65,6 @@ export default function TeamSchedulePage() {
       </div>
     );
   }
-
-  const today = todayKey();
-  const me = data?.players.find((player) => player.isMe);
 
   return (
     <div className="min-h-screen px-4 py-24 font-sans sm:px-6">
@@ -194,7 +79,7 @@ export default function TeamSchedulePage() {
 
         {teams.length === 0 ? (
           <p className="mt-10 rounded-2xl border border-white/10 bg-[#0a0f25] p-8 text-center text-gray-400">
-            Je staat nog in geen enkel team. Vraag een beheerder om je toe te voegen aan de roster.
+            Je zit nog in geen enkel team. Je teammanager kan je toevoegen.
           </p>
         ) : (
           <>
@@ -213,65 +98,33 @@ export default function TeamSchedulePage() {
                   ))}
                 </select>
               )}
-              {data && (
-                <div className="flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-950">
-                  <button className="p-2 text-gray-300 hover:text-white" aria-label="Vorige week" onClick={() => setWeek(addDays(data.weekStart, -7))}>
-                    <ChevronLeft size={18} />
+              <div className="flex rounded-lg border border-slate-700 bg-slate-950 p-0.5 text-sm">
+                {[
+                  { value: false, label: 'Komende dagen' },
+                  { value: true, label: 'Voorbije dagen' },
+                ].map((option) => (
+                  <button
+                    key={option.label}
+                    onClick={() => setPast(option.value)}
+                    className={`rounded-md px-3 py-1.5 font-semibold ${past === option.value ? 'bg-[#d42422] text-white' : 'text-gray-400 hover:text-white'}`}
+                  >
+                    {option.label}
                   </button>
-                  <button className="px-2 text-sm font-semibold capitalize text-white" onClick={() => setWeek(undefined)} title="Naar deze week">
-                    {dayLabel(data.weekStart)} – {dayLabel(addDays(data.weekStart, 6))}
-                  </button>
-                  <button className="p-2 text-gray-300 hover:text-white" aria-label="Volgende week" onClick={() => setWeek(addDays(data.weekStart, 7))}>
-                    <ChevronRight size={18} />
-                  </button>
-                </div>
-              )}
-              <Button variant={noteMode ? 'primary' : 'secondary'} size="sm" onClick={() => setNoteMode((on) => !on)} aria-pressed={noteMode}>
-                <StickyNote size={14} className="mr-1.5 inline" /> {noteMode ? 'Notities: tik op een vakje' : 'Notitie toevoegen'}
-              </Button>
-              {data?.canManage && (
-                <>
-                  <Button variant="secondary" size="sm" onClick={() => setEditingBlock('new')}>
-                    <CalendarPlus size={14} className="mr-1.5 inline" /> Blok toevoegen
-                  </Button>
-                  <label className="flex items-center gap-2 text-xs text-gray-400">
-                    Uren
-                    <select
-                      aria-label="Eerste uur"
-                      value={data.game.scheduleStartHour}
-                      onChange={(e) => updateHours(Number(e.target.value), data.game.scheduleEndHour)}
-                      className="rounded border border-slate-700 bg-slate-950 px-1.5 py-1 text-white"
-                    >
-                      {Array.from({ length: data.game.scheduleEndHour }, (_, hour) => (
-                        <option key={hour} value={hour}>
-                          {hour}:00
-                        </option>
-                      ))}
-                    </select>
-                    tot
-                    <select
-                      aria-label="Laatste uur"
-                      value={data.game.scheduleEndHour}
-                      onChange={(e) => updateHours(data.game.scheduleStartHour, Number(e.target.value))}
-                      className="rounded border border-slate-700 bg-slate-950 px-1.5 py-1 text-white"
-                    >
-                      {Array.from({ length: 24 - data.game.scheduleStartHour }, (_, i) => data.game.scheduleStartHour + i + 1).map((hour) => (
-                        <option key={hour} value={hour}>
-                          {hour}:00
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </>
-              )}
-            </div>
-
-            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-300">
-              {[...Object.values(STATUS_STYLE), ...Object.values(BLOCK_STYLE)].map((style) => (
-                <span key={style.label} className="flex items-center gap-1.5">
-                  <span className={`h-3 w-6 rounded-sm ${style.swatch}`} /> {style.label}
+                ))}
+              </div>
+              {view && !past && view.team.daysToFill > 0 && (
+                <span className="rounded-full bg-amber-500/15 px-3 py-1 text-sm font-semibold text-amber-300">
+                  Nog {view.team.daysToFill} {view.team.daysToFill === 1 ? 'dag' : 'dagen'} in te vullen
                 </span>
-              ))}
+              )}
+              {view?.canManage && (
+                <Link
+                  href={`/admin/team-planning?team=${view.team.id}`}
+                  className="ml-auto flex items-center gap-1.5 text-sm font-semibold text-gray-400 hover:text-white"
+                >
+                  <Settings2 size={16} /> Team beheren
+                </Link>
+              )}
             </div>
 
             {error && (
@@ -283,56 +136,19 @@ export default function TeamSchedulePage() {
               </div>
             )}
 
-            {data && data.players.length === 0 && <p className="mt-8 text-gray-400">Dit team heeft nog geen spelers.</p>}
-
-            {data && data.players.length > 0 && (
-              <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
-                {days.map((date) => (
-                  <DayGrid
-                    key={date}
-                    date={date}
-                    hours={hours}
-                    players={data.players}
-                    cells={cells}
-                    blocks={data.blocks}
-                    isToday={date === today}
-                    canEdit={canEdit}
-                    onCellPointerDown={onCellPointerDown}
-                    onBlockClick={data.canManage ? (block) => setEditingBlock(block) : undefined}
-                  />
-                ))}
+            {view && (
+              <div className="mt-6">
+                <PlanningGrid
+                  key={version}
+                  view={view}
+                  onError={onError}
+                  emptyText={past ? 'Er zijn nog geen voorbije dagen.' : 'Je team heeft nog geen dagen gepland.'}
+                />
               </div>
             )}
-
-            {data && !me && !data.canManage && <p className="mt-6 text-sm text-gray-500">Je kan dit team bekijken maar niet invullen.</p>}
           </>
         )}
       </div>
-
-      {editingCell && (
-        <CellDialog
-          title={`${editingCell.player.handle} · ${dayLabel(editingCell.date)} ${hourLabel(editingCell.hour)}u`}
-          cell={cells[cellKey(editingCell.player.rosterEntryId, editingCell.date, editingCell.hour)]}
-          onClose={() => setEditingCell(null)}
-          onSave={(status, note) => {
-            const { player, date, hour } = editingCell;
-            setCell(player.rosterEntryId, date, hour, status, note.trim() || null);
-            save(player.rosterEntryId, [{ date, hour, status, note: note.trim() || null }]);
-            setEditingCell(null);
-          }}
-        />
-      )}
-
-      {editingBlock && data && (
-        <BlockDialog
-          block={editingBlock === 'new' ? null : editingBlock}
-          weekStart={data.weekStart}
-          hours={hours}
-          onClose={() => setEditingBlock(null)}
-          onSave={saveBlock}
-          onDelete={editingBlock === 'new' ? undefined : () => deleteBlock(editingBlock)}
-        />
-      )}
     </div>
   );
 }

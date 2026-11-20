@@ -9,6 +9,7 @@ import { MailService } from '../../src/modules/mail/mail.service.js';
 import { InventoryAdjustmentsService } from '../../src/modules/inventory-adjustments/inventory-adjustments.service.js';
 import { wallClockNow } from '../../src/common/wall-clock.js';
 import { ReservationRulesService } from '../../src/modules/reservations/reservation-rules.service.js';
+import { PeopleService } from '../../src/modules/people/people.service.js';
 
 const getIsoDate = (offset = 0) => {
   const d = new Date();
@@ -100,6 +101,7 @@ describe('ReservationsService', () => {
       providers: [
         ReservationsService,
         ReservationRulesService,
+        PeopleService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: MailService, useValue: mockMailService },
         { provide: InventoryAdjustmentsService, useValue: mockInventoryAdjustmentsService },
@@ -391,26 +393,6 @@ describe('ReservationsService', () => {
 
         expect(prisma.user.findFirst).not.toHaveBeenCalled();
         expect(prisma.reservation.update).toHaveBeenCalledWith(expect.objectContaining({ data: { inventory: 'ps5' } }));
-      });
-
-      it('searches people by name, email or student number with their booking count', async () => {
-        prisma.user.findMany.mockResolvedValue([{ id: 1, name: 'Robin', email: 'r@x.be', sNumber: 's1', _count: { reservations: 4 } }]);
-
-        await expect(service.searchPeople(' rob ')).resolves.toEqual([
-          { id: 1, name: 'Robin', email: 'r@x.be', sNumber: 's1', reservationCount: 4 },
-        ]);
-        expect(prisma.user.findMany).toHaveBeenCalledWith(
-          expect.objectContaining({
-            where: {
-              OR: [
-                { name: { contains: 'rob', mode: 'insensitive' } },
-                { email: { contains: 'rob', mode: 'insensitive' } },
-                { sNumber: { contains: 'rob', mode: 'insensitive' } },
-              ],
-            },
-            take: 10,
-          }),
-        );
       });
     });
 

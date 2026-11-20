@@ -33,15 +33,10 @@ model NavLink {
 }
 
 model RosterGame {
-  id             Int                 @id @default(autoincrement())
-  name           String
-  rosterEntries  RosterEntry[]
-  matches        EsportsMatch[]
-  scheduleBlocks TeamScheduleBlock[]
-
-  // Hours shown in the team's availability grid: from scheduleStartHour until scheduleEndHour
-  scheduleStartHour Int @default(13)
-  scheduleEndHour   Int @default(23)
+  id            Int            @id @default(autoincrement())
+  name          String
+  rosterEntries RosterEntry[]
+  matches       EsportsMatch[]
 }
 
 // A match played (or planned) by one of the esports teams, shown on the public results page
@@ -90,56 +85,4 @@ model RosterEntry {
 
   imageUrl String?
   order    Int     @default(0)
-
-  availability PlayerAvailability[]
-}
-
-// Whether a player can play during one hour of one day, as they filled it in themselves.
-// No row means they haven't said.
-model PlayerAvailability {
-  id Int @id @default(autoincrement())
-
-  rosterEntryId Int
-  rosterEntry   RosterEntry @relation(fields: [rosterEntryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  date   DateTime           @db.Date
-  hour   Int // the hour starting at hour:00
-  status AvailabilityStatus
-  note   String? // e.g. "from 20:30"
-
-  updatedAt DateTime @updatedAt
-
-  @@unique([rosterEntryId, date, hour])
-  @@index([date])
-}
-
-enum AvailabilityStatus {
-  AVAILABLE
-  UNAVAILABLE
-}
-
-// A team-wide plan in the availability grid, such as a scrim
-model TeamScheduleBlock {
-  id Int @id @default(autoincrement())
-
-  gameId Int
-  game   RosterGame @relation(fields: [gameId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  type      TeamScheduleBlockType
-  title     String?
-  date      DateTime              @db.Date
-  startHour Int
-  endHour   Int // exclusive
-  notes     String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([gameId, date])
-}
-
-enum TeamScheduleBlockType {
-  SCRIM
-  PRACTICE
-  MATCH
 }

@@ -22,6 +22,7 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
   const [userRole, setUserRole] = useState<UserRole>('public');
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [hasAnyPermission, setHasAnyPermission] = useState(false);
+  const [isPlanningMember, setIsPlanningMember] = useState(false);
   const [impersonation, setImpersonation] = useState<{ realUserId: number; userName?: string | null; roleName?: string; userId?: number } | null>(null);
   const [navHeight, setNavHeight] = useState(0);
   const dropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -63,7 +64,8 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
         if (data.roles?.includes('Admin')) setUserRole('admin');
         else setUserRole('authenticated');
         if (data.roles) setUserRoles(data.roles);
-        if (data.permissions?.length > 0 || data.roles?.length > 0) setHasAnyPermission(true);
+        if (data.permissions?.length > 0 || data.roles?.length > 0 || data.planning?.isManager) setHasAnyPermission(true);
+        if (data.planning?.isPlayer || data.planning?.isManager) setIsPlanningMember(true);
         if (data.impersonation) setImpersonation(data.impersonation);
       })
       .catch(() => {});
@@ -74,23 +76,19 @@ export function NavbarClient({ navItems }: NavbarClientProps) {
       if (visibility === 'public') return true;
       if (visibility === 'authenticated') return userRole !== 'public';
       if (visibility === 'admin') return userRole === 'admin';
+      if (visibility === 'players') return isPlanningMember || userRole === 'admin';
       if (visibility.startsWith('role:')) {
         const roleName = visibility.slice(5);
         return userRoles.includes(roleName);
       }
       return true;
     },
-    [userRole, userRoles],
+    [userRole, userRoles, isPlanningMember],
   );
 
-  const visibleItems = navItems.filter(
-    (item) =>
-      isVisible(item.visibility) &&
-      // Filter children too
-      (item.children
-        ? { ...item, children: item.children.filter((c) => isVisible(c.visibility)) }
-        : true),
-  );
+  const visibleItems = navItems
+    .filter((item) => isVisible(item.visibility))
+    .map((item) => (item.children ? { ...item, children: item.children.filter((child) => isVisible(child.visibility)) } : item));
 
   // Separate regular items and CTA items
   const regularItems = visibleItems.filter((item) => !item.isCta);
