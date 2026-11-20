@@ -217,6 +217,14 @@ export class UserStatisticsDto {
   @ApiProperty({ example: 1.5 })
   avgControllers!: number;
 
+  @ApiProperty({
+    type: Number,
+    nullable: true,
+    example: 240,
+    description: 'Average minutes between booking and start, over reservations they made themselves; null when unknown',
+  })
+  avgLeadMinutes!: number | null;
+
   @ApiProperty({ type: [HardwareCountDto] })
   hardwareBreakdown!: HardwareCountDto[];
 
@@ -227,7 +235,33 @@ export class UserStatisticsDto {
   preferredSlots!: HourCountDto[];
 }
 
+export class BookingBehaviourDto {
+  @ApiProperty({ example: 120, description: 'Reservations people made themselves with a known booking time' })
+  trackedReservations!: number;
+
+  @ApiProperty({ example: 8, description: 'Reservations entered by staff, left out of the booking figures' })
+  staffReservations!: number;
+
+  @ApiProperty({ example: 640, description: 'Average minutes between booking and the start of the reservation' })
+  avgLeadMinutes!: number;
+
+  @ApiProperty({ example: 300 })
+  medianLeadMinutes!: number;
+
+  @ApiProperty({ example: 62.5, description: 'Share booked on the day of the reservation itself' })
+  sameDayPercent!: number;
+
+  @ApiProperty({ type: [HourSlotDto], description: 'When reservations were made, per weekday and hour' })
+  bookingHoursHeatmap!: HourSlotDto[];
+
+  @ApiProperty({ type: [DurationBucketDto], description: 'How long before the start reservations were made' })
+  leadTimeDistribution!: DurationBucketDto[];
+}
+
 export class ReservationStatisticsDto {
+  @ApiProperty({ type: BookingBehaviourDto })
+  bookingBehaviour!: BookingBehaviourDto;
+
   @ApiProperty({ type: [DailyCountDto] })
   dailyCounts!: DailyCountDto[];
 

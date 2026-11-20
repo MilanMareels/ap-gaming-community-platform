@@ -6,6 +6,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { apiClient } from '@/api';
 import type { UserStatistics } from '@/api';
+import { formatLeadTime } from '@/util/booking-time';
 import { Button } from '@/components/ui/Button';
 import {
   BarChart,
@@ -120,13 +121,18 @@ export default function UserStatisticsPage() {
       </div>
 
       {/* KPI cards */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
         <StatCard title="Totaal reserveringen" value={stats.totalReservations} />
         <StatCard title="Opkomst" value={`${stats.showRate}%`} color="text-green-400" />
         <StatCard title="No-show" value={`${stats.noShowRate}%`} color="text-red-400" />
         <StatCard title="Geannuleerd" value={`${stats.cancelRate}%`} color="text-amber-400" />
         <StatCard title="Gem. duur" value={durationLabel} />
         <StatCard title="Favoriete hardware" value={favoriteHw} />
+        <StatCard
+          title="Gem. vooraf geboekt"
+          value={stats.avgLeadMinutes === null ? '–' : formatLeadTime(stats.avgLeadMinutes)}
+          subtitle={stats.avgLeadMinutes === null ? 'nog niet gekend' : undefined}
+        />
       </div>
 
       {/* Charts row 1 */}
