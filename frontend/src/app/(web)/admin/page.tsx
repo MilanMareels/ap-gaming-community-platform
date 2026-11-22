@@ -18,6 +18,7 @@ const NAV_ITEMS_ORDERED = [
   { href: '/admin/users', permissions: ['users.view', 'users.manage'] },
   { href: '/admin/roles', permissions: ['roles.manage'] },
   { href: '/admin/timetable', permissions: ['timetable.manage'] },
+  { href: '/admin/audit', permissions: ['audit.view'] },
   { href: '/admin/statistics', permissions: ['statistics.view'] },
   { href: '/admin/settings', permissions: ['settings.manage'] },
 ];
