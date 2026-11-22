@@ -31,7 +31,7 @@ const PERMISSION_CATEGORIES: Record<string, string[]> = {
   Content: ['roster.manage', 'timetable.manage', 'navigation.manage', 'forms.manage', 'forms.submissions.view', 'jobs.manage'],
   Toernooien: ['brackets.manage', 'time-trials.manage', 'point-trials.manage'],
   Esports: ['esports.results.manage', 'esports.schedule.manage'],
-  Beheer: ['users.view', 'users.manage', 'users.notes.delete_others', 'users.roles.manage', 'roles.manage', 'settings.manage', 'statistics.view', 'inventory-adjustments.manage'],
+  Beheer: ['users.view', 'users.manage', 'users.notes.delete_others', 'users.roles.manage', 'roles.manage', 'settings.manage', 'statistics.view', 'inventory-adjustments.manage', 'audit.view'],
 };
 
 const inputClass = 'w-full bg-slate-950 border border-slate-700 rounded-lg py-2.5 px-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/20 transition-colors';
