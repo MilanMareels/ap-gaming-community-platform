@@ -86,3 +86,6 @@ export type UserStatistics = ApiSchemas['UserStatisticsDto'];
 export type InventoryAdjustmentSlot = ApiSchemas['InventoryAdjustmentSlotDto'];
 export type CreateInventoryAdjustmentDto = ApiSchemas['CreateInventoryAdjustmentDto'];
 export type UpdateInventoryAdjustmentDto = ApiSchemas['UpdateInventoryAdjustmentDto'];
+export type AuditEvent = ApiSchemas['AuditEventDto'];
+export type AuditChange = ApiSchemas['AuditChangeDto'];
+export type AuditFilterOptions = ApiSchemas['AuditFilterOptionsDto'];

@@ -59,6 +59,8 @@ export const ModelName = {
   Permission: 'Permission',
   RolePermission: 'RolePermission',
   UserRole: 'UserRole',
+  AuditEvent: 'AuditEvent',
+  AuditChange: 'AuditChange',
   Setting: 'Setting',
   Form: 'Form',
   NavLink: 'NavLink',
@@ -187,6 +189,48 @@ export const UserRoleScalarFieldEnum = {
 } as const
 
 export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
+
+
+export const AuditEventScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  actorType: 'actorType',
+  actorId: 'actorId',
+  actorEmail: 'actorEmail',
+  actorName: 'actorName',
+  realActorId: 'realActorId',
+  realActorEmail: 'realActorEmail',
+  realActorName: 'realActorName',
+  impersonatedRole: 'impersonatedRole',
+  action: 'action',
+  description: 'description',
+  method: 'method',
+  path: 'path',
+  statusCode: 'statusCode',
+  success: 'success',
+  error: 'error',
+  durationMs: 'durationMs',
+  ip: 'ip',
+  userAgent: 'userAgent',
+  request: 'request',
+  details: 'details'
+} as const
+
+export type AuditEventScalarFieldEnum = (typeof AuditEventScalarFieldEnum)[keyof typeof AuditEventScalarFieldEnum]
+
+
+export const AuditChangeScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  model: 'model',
+  entityId: 'entityId',
+  operation: 'operation',
+  before: 'before',
+  after: 'after',
+  changedFields: 'changedFields'
+} as const
+
+export type AuditChangeScalarFieldEnum = (typeof AuditChangeScalarFieldEnum)[keyof typeof AuditChangeScalarFieldEnum]
 
 
 export const SettingScalarFieldEnum = {

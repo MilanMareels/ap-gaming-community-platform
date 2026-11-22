@@ -37,6 +37,7 @@ import {
 } from './constants/auth.constants.js';
 import { Public } from './public.decorator.js';
 import type { JwtPayload } from './types/jwt-payload.type.js';
+import { describeAudit, setAuditActor } from '../audit/audit-context.js';
 
 type LoginQuery = { returnUrl?: string; linkMode?: string };
 
@@ -79,11 +80,15 @@ export class AuthController {
       return this.handleLinkCallback('google', query.code, state, req, res);
     }
 
+    describeAudit({ event: 'login', provider: 'google' });
     const callbackResult = await this.authService.handleGoogleCallback(query.code);
 
     if (!callbackResult.token) {
+      describeAudit({ event: 'login.refused', reason: 'Geen account voor dit e-mailadres' });
       return res.redirect(`${this.config.frontend.url}${AUTH_UNKNOWN_USER_PATH}`);
     }
+
+    setAuditActor({ sub: callbackResult.user.id, email: callbackResult.user.email });
 
     this.setAuthCookie(res, callbackResult.token);
     return res.redirect(`${this.config.frontend.url}${state.returnUrl || AUTH_DEFAULT_RETURN_URL}`);
@@ -121,11 +126,15 @@ export class AuthController {
       return this.handleLinkCallback('microsoft', query.code, state, req, res);
     }
 
+    describeAudit({ event: 'login', provider: 'microsoft' });
     const callbackResult = await this.authService.handleMicrosoftCallback(query.code);
 
     if (!callbackResult.token) {
+      describeAudit({ event: 'login.refused', reason: 'Geen account voor dit e-mailadres' });
       return res.redirect(`${this.config.frontend.url}${AUTH_UNKNOWN_USER_PATH}`);
     }
+
+    setAuditActor({ sub: callbackResult.user.id, email: callbackResult.user.email });
 
     this.setAuthCookie(res, callbackResult.token);
     return res.redirect(`${this.config.frontend.url}${state.returnUrl || AUTH_DEFAULT_RETURN_URL}`);
@@ -277,6 +286,9 @@ export class AuthController {
       return res.redirect(`${this.config.frontend.url}/login?linkError=session-expired`);
     }
 
+    setAuditActor(claims);
+    describeAudit({ event: 'sso.link', provider });
+
     try {
       if (provider === 'google') {
         await this.authService.linkGoogleAccount(claims.sub, code);
@@ -285,6 +297,7 @@ export class AuthController {
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'link-failed';
+      describeAudit({ event: 'sso.link.failed', reason: message });
       const safe = encodeURIComponent(message.slice(0, 200));
       return res.redirect(`${this.config.frontend.url}${state.returnUrl || '/admin/settings'}?linkError=${safe}`);
     }

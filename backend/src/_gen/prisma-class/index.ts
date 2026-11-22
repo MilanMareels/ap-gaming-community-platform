@@ -6,6 +6,8 @@ import { RoleRelations as _RoleRelations } from './role_relations.js';
 import { PermissionRelations as _PermissionRelations } from './permission_relations.js';
 import { RolePermissionRelations as _RolePermissionRelations } from './role_permission_relations.js';
 import { UserRoleRelations as _UserRoleRelations } from './user_role_relations.js';
+import { AuditEventRelations as _AuditEventRelations } from './audit_event_relations.js';
+import { AuditChangeRelations as _AuditChangeRelations } from './audit_change_relations.js';
 import { SettingRelations as _SettingRelations } from './setting_relations.js';
 import { FormRelations as _FormRelations } from './form_relations.js';
 import { NavLinkRelations as _NavLinkRelations } from './nav_link_relations.js';
@@ -47,6 +49,8 @@ import { Role as _Role } from './role.js';
 import { Permission as _Permission } from './permission.js';
 import { RolePermission as _RolePermission } from './role_permission.js';
 import { UserRole as _UserRole } from './user_role.js';
+import { AuditEvent as _AuditEvent } from './audit_event.js';
+import { AuditChange as _AuditChange } from './audit_change.js';
 import { Setting as _Setting } from './setting.js';
 import { Form as _Form } from './form.js';
 import { NavLink as _NavLink } from './nav_link.js';
@@ -90,6 +94,8 @@ export namespace PrismaModel {
   export class PermissionRelations extends _PermissionRelations {}
   export class RolePermissionRelations extends _RolePermissionRelations {}
   export class UserRoleRelations extends _UserRoleRelations {}
+  export class AuditEventRelations extends _AuditEventRelations {}
+  export class AuditChangeRelations extends _AuditChangeRelations {}
   export class SettingRelations extends _SettingRelations {}
   export class FormRelations extends _FormRelations {}
   export class NavLinkRelations extends _NavLinkRelations {}
@@ -131,6 +137,8 @@ export namespace PrismaModel {
   export class Permission extends _Permission {}
   export class RolePermission extends _RolePermission {}
   export class UserRole extends _UserRole {}
+  export class AuditEvent extends _AuditEvent {}
+  export class AuditChange extends _AuditChange {}
   export class Setting extends _Setting {}
   export class Form extends _Form {}
   export class NavLink extends _NavLink {}
@@ -174,6 +182,8 @@ export namespace PrismaModel {
     PermissionRelations,
     RolePermissionRelations,
     UserRoleRelations,
+    AuditEventRelations,
+    AuditChangeRelations,
     SettingRelations,
     FormRelations,
     NavLinkRelations,
@@ -215,6 +225,8 @@ export namespace PrismaModel {
     Permission,
     RolePermission,
     UserRole,
+    AuditEvent,
+    AuditChange,
     Setting,
     Form,
     NavLink,

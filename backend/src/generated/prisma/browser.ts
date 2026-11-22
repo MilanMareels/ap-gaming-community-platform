@@ -58,6 +58,17 @@ export type RolePermission = Prisma.RolePermissionModel
  */
 export type UserRole = Prisma.UserRoleModel
 /**
+ * Model AuditEvent
+ * One action someone (or the system) took: an API call that changes something, a login, or a scheduled job.
+ * Append-only: nothing in the application updates or deletes these rows.
+ */
+export type AuditEvent = Prisma.AuditEventModel
+/**
+ * Model AuditChange
+ * One database row created, changed or deleted as part of an AuditEvent
+ */
+export type AuditChange = Prisma.AuditChangeModel
+/**
  * Model Setting
  * 
  */
