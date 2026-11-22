@@ -1,0 +1,71 @@
+enum AuditActorType {
+  USER
+  ANONYMOUS
+  SYSTEM
+}
+
+/// One action someone (or the system) took: an API call that changes something, a login, or a scheduled job.
+/// Append-only: nothing in the application updates or deletes these rows.
+model AuditEvent {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  /// Who did it. Not a relation on purpose: the entry must outlive the user, so name and email are copied too.
+  actorType  AuditActorType
+  actorId    Int?
+  actorEmail String?
+  actorName  String?
+
+  /// Set while impersonating: the admin who is really behind the action
+  realActorId    Int?
+  realActorEmail String?
+  realActorName  String?
+  /// Set while impersonating a role instead of a user
+  impersonatedRole String?
+
+  /// Stable key such as "reservations.updateStatus" or "scheduler.markOverdueNoShows"
+  action      String
+  /// Human readable description of the action
+  description String?
+
+  method     String?
+  path       String?
+  statusCode Int?
+  success    Boolean @default(true)
+  error      String?
+  durationMs Int?
+
+  ip        String?
+  userAgent String?
+
+  /// Route params, query and body of the request, with secrets redacted
+  request Json?
+  /// Extra context the action added itself, such as which permissions were added to a role
+  details Json?
+
+  changes AuditChange[]
+
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+  @@index([realActorId, createdAt])
+  @@index([action, createdAt])
+}
+
+/// One database row created, changed or deleted as part of an AuditEvent
+model AuditChange {
+  id      Int        @id @default(autoincrement())
+  eventId Int
+  event   AuditEvent @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  model     String
+  entityId  String?
+  /// create, update, delete, upsert, createMany, updateMany or deleteMany
+  operation String
+
+  before        Json?
+  after         Json?
+  changedFields String[]
+
+  @@index([eventId])
+  @@index([model, entityId])
+}

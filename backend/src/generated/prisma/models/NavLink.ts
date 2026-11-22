@@ -602,14 +602,6 @@ export type NavLinkUpdateManyWithoutParentNestedInput = {
   deleteMany?: Prisma.NavLinkScalarWhereInput | Prisma.NavLinkScalarWhereInput[]
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type NavLinkUncheckedUpdateManyWithoutParentNestedInput = {
   create?: Prisma.XOR<Prisma.NavLinkCreateWithoutParentInput, Prisma.NavLinkUncheckedCreateWithoutParentInput> | Prisma.NavLinkCreateWithoutParentInput[] | Prisma.NavLinkUncheckedCreateWithoutParentInput[]
   connectOrCreate?: Prisma.NavLinkCreateOrConnectWithoutParentInput | Prisma.NavLinkCreateOrConnectWithoutParentInput[]

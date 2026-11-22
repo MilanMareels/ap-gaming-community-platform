@@ -9,6 +9,15 @@
 * 🟢 You can import this file directly.
 */
 
+export const AuditActorType = {
+  USER: 'USER',
+  ANONYMOUS: 'ANONYMOUS',
+  SYSTEM: 'SYSTEM'
+} as const
+
+export type AuditActorType = (typeof AuditActorType)[keyof typeof AuditActorType]
+
+
 export const EsportsMatchResult = {
   UPCOMING: 'UPCOMING',
   WIN: 'WIN',

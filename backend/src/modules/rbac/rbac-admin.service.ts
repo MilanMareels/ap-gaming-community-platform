@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RbacService } from './rbac.service.js';
+import { describeAudit } from '../audit/audit-context.js';
 
 @Injectable()
 export class RbacAdminService {
@@ -56,6 +57,8 @@ export class RbacAdminService {
       throw new BadRequestException(`Unknown permissions: ${missing.join(', ')}`);
     }
 
+    describeAudit({ role: name, permissions: permissionKeys.slice().sort() });
+
     return this.prisma.role.create({
       data: {
         name,
@@ -96,6 +99,16 @@ export class RbacAdminService {
         const missing = permissionKeys.filter((k) => !found.has(k));
         throw new BadRequestException(`Unknown permissions: ${missing.join(', ')}`);
       }
+
+      // The replacement below runs as one batch, so the audit log can't see the old set: say what changed
+      const current = await this.prisma.rolePermission.findMany({ where: { roleId: id }, include: { permission: { select: { key: true } } } });
+      const currentKeys = new Set(current.map((rp) => rp.permission.key));
+      const nextKeys = new Set(permissionKeys);
+      describeAudit({
+        role: role.name,
+        permissionsAdded: [...nextKeys].filter((k) => !currentKeys.has(k)).sort(),
+        permissionsRemoved: [...currentKeys].filter((k) => !nextKeys.has(k)).sort(),
+      });
 
       // Replace all permissions
       await this.prisma.$transaction([
@@ -139,7 +152,15 @@ export class RbacAdminService {
     // Invalidate cache for all users with this role
     const userRoles = await this.prisma.userRole.findMany({
       where: { roleId: id },
-      select: { userId: true },
+      select: { userId: true, user: { select: { email: true } } },
+    });
+
+    // The database removes the role's permissions and assignments along with it, out of sight of the audit log
+    const permissions = await this.prisma.rolePermission.findMany({ where: { roleId: id }, select: { permission: { select: { key: true } } } });
+    describeAudit({
+      role: role.name,
+      permissions: permissions.map((rp) => rp.permission.key).sort(),
+      removedFromUsers: userRoles.map((ur) => ur.user.email).sort(),
     });
     for (const ur of userRoles) {
       this.rbacService.clearCacheForUser(ur.userId);
@@ -166,6 +187,8 @@ export class RbacAdminService {
     });
     if (existing) throw new ConflictException('User already has this role');
 
+    describeAudit({ user: user.email, role: role.name });
+
     await this.prisma.userRole.create({
       data: { userId, roleId },
     });
@@ -176,9 +199,11 @@ export class RbacAdminService {
   async removeRoleFromUser(userId: number, roleId: number) {
     const userRole = await this.prisma.userRole.findUnique({
       where: { userId_roleId: { userId, roleId } },
-      include: { role: true },
+      include: { role: true, user: { select: { email: true } } },
     });
     if (!userRole) throw new NotFoundException('User does not have this role');
+
+    describeAudit({ user: userRole.user.email, role: userRole.role.name });
 
     await this.prisma.userRole.delete({
       where: { id: userRole.id },

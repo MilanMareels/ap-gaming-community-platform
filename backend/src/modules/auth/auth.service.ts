@@ -10,6 +10,7 @@ import type { GoogleTokenResponse } from './types/google-token-response.type.js'
 import type { GoogleUserInfo } from './types/google-userinfo.type.js';
 import type { MicrosoftTokenResponse } from './types/microsoft-token-response.type.js';
 import type { MicrosoftUserInfo } from './types/microsoft-userinfo.type.js';
+import { describeAudit } from '../audit/audit-context.js';
 
 export type SsoProvider = 'google' | 'microsoft';
 
@@ -337,6 +338,7 @@ export class AuthService {
       select: { id: true, email: true },
     });
     if (!targetUser) throw new NotFoundException('Target user not found');
+    describeAudit({ impersonatedUser: targetUser.email });
 
     return this.generateImpersonationToken(targetUserId, targetUser.email, {
       realUserId,
@@ -354,6 +356,7 @@ export class AuthService {
       },
     });
     if (!role) throw new NotFoundException('Role not found');
+    describeAudit({ impersonatedRole: role.name });
 
     // Build a token for the real user but with only this role's permissions
     const realUser = await this.prisma.user.findUnique({

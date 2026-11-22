@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateFormDto, UpdateFormDto } from '../../dtos/forms/form.dto.js';
 import { CreateFormFieldDto, UpdateFormFieldDto, ReorderFormFieldsDto } from '../../dtos/forms/form-field.dto.js';
+import { describeAudit } from '../audit/audit-context.js';
 
 @Injectable()
 export class FormsService {
@@ -141,6 +142,22 @@ export class FormsService {
 
   async setFormAccess(formId: number, roleIds: number[]) {
     await this.ensureFormExists(formId);
+
+    // The replacement below runs as one batch, so the audit log can't see the old set: say what changed
+    const [form, current, roles] = await Promise.all([
+      this.prisma.dynamicForm.findUnique({ where: { id: formId }, select: { title: true } }),
+      this.prisma.dynamicFormAccess.findMany({ where: { formId }, select: { roleId: true } }),
+      this.prisma.role.findMany({ select: { id: true, name: true } }),
+    ]);
+    const roleName = new Map(roles.map((r) => [r.id, r.name]));
+    const currentIds = new Set(current.map((a) => a.roleId));
+    const nextIds = new Set(roleIds);
+    describeAudit({
+      form: form?.title,
+      rolesAdded: [...nextIds].filter((id) => !currentIds.has(id)).map((id) => roleName.get(id) ?? `#${id}`),
+      rolesRemoved: [...currentIds].filter((id) => !nextIds.has(id)).map((id) => roleName.get(id) ?? `#${id}`),
+    });
+
     await this.prisma.$transaction([
       this.prisma.dynamicFormAccess.deleteMany({ where: { formId } }),
       ...roleIds.map((roleId) =>

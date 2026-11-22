@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Trash2, Gamepad2, Plus, Pencil, QrCode, CalendarDays, Search, UserPlus, UserCheck } from 'lucide-react';
+import { Trash2, Gamepad2, Plus, Pencil, QrCode, CalendarDays, Search, UserPlus, UserCheck, History } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Pagination } from '@/components/ui/Pagination';
@@ -13,6 +13,7 @@ import type { ReservationWithUser, ReservationStatus } from '@/api';
 import ReservationModal from './ReservationModal';
 import ReservationQrScannerModal from '@/components/reservations/ReservationQrScannerModal';
 import { formatBookedAt } from '@/util/booking-time';
+import { useAdmin } from '../AdminShell';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -67,6 +68,8 @@ function ReservationTypeBadge({ reservationCount }: { reservationCount?: number 
 }
 
 export default function AdminReservationsPage() {
+  const { hasPermission } = useAdmin();
+  const canViewAudit = hasPermission('audit.view');
   const [reservations, setReservations] = useState<ReservationWithUser[]>([]);
   const [filterDate, setFilterDate] = useState(todayLocal);
   const [searchQuery, setSearchQuery] = useState('');
@@ -317,6 +320,14 @@ export default function AdminReservationsPage() {
                 >
                   <Trash2 size={14} /> Verwijder
                 </button>
+                {canViewAudit && (
+                  <Link
+                    href={`/admin/audit?model=Reservation&entityId=${r.id}`}
+                    className="flex-1 py-2.5 text-xs font-medium text-gray-400 hover:text-white hover:bg-slate-800/40 transition-colors flex items-center justify-center gap-1.5 border-l border-slate-800/60"
+                  >
+                    <History size={14} /> Geschiedenis
+                  </Link>
+                )}
               </div>
             </div>
           ))}
@@ -392,6 +403,15 @@ export default function AdminReservationsPage() {
                       >
                         <Trash2 size={16} />
                       </button>
+                      {canViewAudit && (
+                        <Link
+                          href={`/admin/audit?model=Reservation&entityId=${r.id}`}
+                          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-700 transition-colors"
+                          title="Geschiedenis"
+                        >
+                          <History size={16} />
+                        </Link>
+                      )}
                     </div>
                   </td>
                 </tr>

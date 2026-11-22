@@ -19,10 +19,12 @@ import { StorageModule } from './modules/storage/storage.module.js';
 import { EsportsResultsModule } from './modules/esports-results/esports-results.module.js';
 import { TeamPlanningModule } from './modules/team-planning/team-planning.module.js';
 import { SchedulerModule } from './modules/scheduler/scheduler.module.js';
+import { AuditModule } from './modules/audit/audit.module.js';
 
 @Module({
   imports: [
     PrismaModule,
+    AuditModule,
     AuthModule,
     RbacModule,
     ReservationsModule,

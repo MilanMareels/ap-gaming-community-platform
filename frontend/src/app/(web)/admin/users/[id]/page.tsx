@@ -14,6 +14,7 @@ import {
   Send,
   X,
   Eye,
+  ScrollText,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
@@ -106,6 +107,7 @@ export default function UserDetailPage() {
   const canManageRoles = hasPermission('users.roles.manage');
   const canDeleteOtherNotes = hasPermission('users.notes.delete_others');
   const canViewStats = hasPermission('statistics.view');
+  const canViewAudit = hasPermission('audit.view');
   const isRealAdmin = (currentUser.roles ?? []).includes('Admin') && !currentUser.impersonation;
   const isSelf = detail?.id === currentUser.id;
 
@@ -262,6 +264,13 @@ export default function UserDetailPage() {
               <Button variant="secondary" size="sm" onClick={handleImpersonateUser}>
                 <Eye size={14} /> Impersoneer
               </Button>
+            )}
+            {canViewAudit && (
+              <Link href={`/admin/audit?actorId=${userId}`}>
+                <Button variant="secondary" size="sm">
+                  <ScrollText size={14} /> Auditlog
+                </Button>
+              </Link>
             )}
             {canViewStats && (
               <Link href={`/admin/statistics/user/${userId}`}>

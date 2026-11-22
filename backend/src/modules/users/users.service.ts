@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../prisma/prisma.service.js';
 import { ReservationStatus } from '../../dtos/reservations/reservation.dto.js';
 import type { CreateWhitelistDto, CreateUserNoteDto, UpdateUserDto, UserDetailDto, UserListResponseDto, UserNoteDto } from '../../dtos/users/user.dto.js';
+import { describeAudit } from '../audit/audit-context.js';
 
 const WHITELIST_PREFIX = 'admin_whitelist.';
 
@@ -167,6 +168,16 @@ export class UsersService {
       throw new BadRequestException('Cannot delete your own account');
     }
     await this.assertExists(id);
+
+    // The database deletes the user's reservations, roles, notes and registrations along with them,
+    // out of sight of the audit log: keep a summary of what went
+    const [user, reservations, roles] = await Promise.all([
+      this.prisma.user.findUnique({ where: { id }, select: { email: true, name: true, sNumber: true } }),
+      this.prisma.reservation.count({ where: { userId: id } }),
+      this.prisma.userRole.findMany({ where: { userId: id }, select: { role: { select: { name: true } } } }),
+    ]);
+    describeAudit({ deletedUser: user, reservationsDeleted: reservations, roles: roles.map((r) => r.role.name) });
+
     await this.prisma.user.delete({ where: { id } });
     return { success: true };
   }
