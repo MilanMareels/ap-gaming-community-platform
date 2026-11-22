@@ -34,6 +34,7 @@ const PERMISSIONS = [
   { key: 'forms.submissions.view', description: 'View form submissions (for assigned forms)' },
   { key: 'esports.results.manage', description: 'Manage esports match results' },
   { key: 'esports.schedule.manage', description: 'Manage all esports team planning' },
+  { key: 'audit.view', description: 'View the audit log of everything that happened on the site' },
 ];
 
 async function seedPermissionsAndRoles() {

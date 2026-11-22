@@ -25,6 +25,7 @@ import {
   Eye,
   Medal,
   CalendarRange,
+  ScrollText,
 } from 'lucide-react';
 import { apiClient } from '@/api';
 import type { components } from '@/api';
@@ -88,6 +89,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'users', label: 'Gebruikers', href: '/admin/users', icon: UserCog, permissions: ['users.view', 'users.manage'] },
       { id: 'roles', label: 'Rollen', href: '/admin/roles', icon: Shield, permissions: ['roles.manage'] },
       { id: 'timetable', label: 'Openingsuren', href: '/admin/timetable', icon: Clock, permissions: ['timetable.manage'] },
+      { id: 'audit', label: 'Auditlog', href: '/admin/audit', icon: ScrollText, permissions: ['audit.view'] },
     ],
   },
   {

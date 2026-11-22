@@ -4,6 +4,40 @@
  */
 
 export interface paths {
+    "/audit-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List audit log entries, newest first */
+        get: operations["AuditController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/audit-logs/filters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Actions and data types that occur in the audit log, for filtering */
+        get: operations["AuditController_filters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/google/url": {
         parameters: {
             query?: never;
@@ -2151,6 +2185,76 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AuditChangeDto: {
+            id: number;
+            /** @example Reservation */
+            model: string;
+            /** @example 42 */
+            entityId: string | null;
+            /** @example update */
+            operation: string;
+            before: {
+                [key: string]: unknown;
+            } | null;
+            after: {
+                [key: string]: unknown;
+            } | null;
+            changedFields: string[];
+        };
+        AuditEventDto: {
+            id: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** @enum {string} */
+            actorType: "USER" | "ANONYMOUS" | "SYSTEM";
+            actorId: number | null;
+            actorEmail: string | null;
+            actorName: string | null;
+            realActorId: number | null;
+            realActorEmail: string | null;
+            realActorName: string | null;
+            impersonatedRole: string | null;
+            /** @example reservations.updateStatus */
+            action: string;
+            description: string | null;
+            method: string | null;
+            path: string | null;
+            statusCode: number | null;
+            success: boolean;
+            error: string | null;
+            durationMs: number | null;
+            ip: string | null;
+            userAgent: string | null;
+            request: {
+                [key: string]: unknown;
+            } | null;
+            details: {
+                [key: string]: unknown;
+            } | null;
+            changes: components["schemas"]["AuditChangeDto"][];
+        };
+        AuditLogPageDto: {
+            items: components["schemas"]["AuditEventDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        AuditActionOptionDto: {
+            /** @example reservations.updateStatus */
+            action: string;
+            description: string | null;
+            count: number;
+        };
+        AuditFilterOptionsDto: {
+            actions: components["schemas"]["AuditActionOptionDto"][];
+            /**
+             * @example [
+             *       "Reservation",
+             *       "Role"
+             *     ]
+             */
+            models: string[];
+        };
         GoogleAuthUrlResponseDto: {
             /**
              * @description Google OAuth login URL
@@ -3787,6 +3891,49 @@ export interface components {
             user: components["schemas"]["User"];
             role: components["schemas"]["Role"];
         };
+        AuditChange: {
+            id: number;
+            eventId: number;
+            model: string;
+            entityId?: string;
+            operation: string;
+            before?: Record<string, never>;
+            after?: Record<string, never>;
+            changedFields: string[];
+        };
+        AuditEventRelations: {
+            changes: components["schemas"]["AuditChange"][];
+        };
+        /** @enum {string} */
+        AuditActorType: "USER" | "ANONYMOUS" | "SYSTEM";
+        AuditEvent: {
+            id: number;
+            /** Format: date-time */
+            createdAt: string;
+            actorType: components["schemas"]["AuditActorType"];
+            actorId?: number;
+            actorEmail?: string;
+            actorName?: string;
+            realActorId?: number;
+            realActorEmail?: string;
+            realActorName?: string;
+            impersonatedRole?: string;
+            action: string;
+            description?: string;
+            method?: string;
+            path?: string;
+            statusCode?: number;
+            success: boolean;
+            error?: string;
+            durationMs?: number;
+            ip?: string;
+            userAgent?: string;
+            request?: Record<string, never>;
+            details?: Record<string, never>;
+        };
+        AuditChangeRelations: {
+            event: components["schemas"]["AuditEvent"];
+        };
         SettingRelations: Record<string, never>;
         FormRelations: Record<string, never>;
         NavLinkRelations: {
@@ -4104,6 +4251,62 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    AuditController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                /** @description Searches who did it, the action, its description and the URL */
+                search?: string;
+                /** @description Actions by this user, also while they impersonated someone else */
+                actorId?: number;
+                actorType?: "USER" | "ANONYMOUS" | "SYSTEM";
+                action?: string;
+                /** @description Only actions that changed a row of this model */
+                model?: string;
+                /** @description With model: the history of one row */
+                entityId?: string;
+                success?: "true" | "false";
+                /** @description From this moment (inclusive) */
+                from?: string;
+                /** @description Until this moment (exclusive) */
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditLogPageDto"];
+                };
+            };
+        };
+    };
+    AuditController_filters: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditFilterOptionsDto"];
+                };
+            };
+        };
+    };
     AuthController_googleAuthUrl: {
         parameters: {
             query?: {
