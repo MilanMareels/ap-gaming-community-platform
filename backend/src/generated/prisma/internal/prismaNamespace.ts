@@ -3694,7 +3694,10 @@ export const UserNoteScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   authorId: 'authorId',
+  type: 'type',
   content: 'content',
+  expiresAt: 'expiresAt',
+  emailedAt: 'emailedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -4295,6 +4298,20 @@ export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
  * Reference to a field of type 'String[]'
  */
 export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
+    
+
+
+/**
+ * Reference to a field of type 'UserNoteType'
+ */
+export type EnumUserNoteTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserNoteType'>
+    
+
+
+/**
+ * Reference to a field of type 'UserNoteType[]'
+ */
+export type ListEnumUserNoteTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserNoteType[]'>
     
 
 

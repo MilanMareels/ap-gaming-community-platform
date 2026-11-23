@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ActiveUserNoteDto } from '../users/user.dto.js';
 import { IsDateString, IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Max, MaxLength, Min, MinLength, ValidateIf } from 'class-validator';
 
 export class ReservationRulesDto {
@@ -163,6 +164,12 @@ export class ReservationQueryDto {
 export class ReservationVerificationDto {
   @ApiProperty({ example: 'cm9x8k2df0000a1b2c3d4e5f6' })
   cuid!: string;
+
+  @ApiProperty()
+  userId!: number;
+
+  @ApiProperty({ type: [ActiveUserNoteDto], description: 'Notes about this person that still count, most serious first' })
+  activeNotes!: ActiveUserNoteDto[];
 
   @ApiProperty({ example: 'student@student.ap.be' })
   email!: string;

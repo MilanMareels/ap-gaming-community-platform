@@ -37,6 +37,9 @@ export type AvailabilityStatus = ApiSchemas['AvailabilityStatus'];
 export type EsportsMatchWithTeam = EsportsMatch & { game: { id: number; name: string } };
 export type ReservationVerificationDto =
   ApiSchemas['ReservationVerificationDto'];
+export type UserNoteType = ApiSchemas['UserNoteType'];
+export type UserNote = ApiSchemas['UserNoteDto'];
+export type ActiveUserNote = ApiSchemas['ActiveUserNoteDto'];
 export type MyReservation = ApiSchemas['MyReservationDto'];
 export type MyReservationsResponse = ApiSchemas['MyReservationsResponseDto'];
 export type AuthProfile = ApiSchemas['AuthProfileResponseDto'];
@@ -47,7 +50,7 @@ export type UpdateTimeTableEntryDto = ApiSchemas['UpdateTimeTableEntryDto'];
 export type UpdateSettingDto = ApiSchemas['UpdateSettingDto'];
 
 /** Augmented types that include relation fields (matching Prisma include) */
-export type ReservationWithUser = Reservation & { user: User & { reservationCount?: number } };
+export type ReservationWithUser = Reservation & { user: User & { reservationCount?: number; activeNotes?: ActiveUserNote[] } };
 export type RosterEntryWithRelations = RosterEntry & {
   user: User;
   game: RosterGame;

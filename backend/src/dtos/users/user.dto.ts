@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsBooleanString, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsBoolean, IsBooleanString, IsDateString, IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
+import { UserNoteType } from '../../generated/prisma/enums.js';
 
 export class UserListQueryDto {
   @ApiProperty({ required: false, description: 'Search by name, email or sNumber' })
@@ -64,6 +65,9 @@ export class UserListItemDto {
 
   @ApiProperty({ type: [String] })
   roles!: string[];
+
+  @ApiProperty({ description: 'Whether an active block keeps this user off the site' })
+  isBlocked!: boolean;
 }
 
 export class UserListResponseDto {
@@ -111,12 +115,28 @@ export class UserRecentReservationDto {
   status!: string;
 }
 
+export { UserNoteType };
+
 export class UserNoteDto {
   @ApiProperty()
   id!: number;
 
+  @ApiProperty({ enum: UserNoteType, enumName: 'UserNoteType' })
+  type!: UserNoteType;
+
   @ApiProperty()
   content!: string;
+
+  @ApiProperty({
+    nullable: true,
+    type: String,
+    format: 'date-time',
+    description: 'When the note stops counting; null keeps it active until someone ends it',
+  })
+  expiresAt!: Date | null;
+
+  @ApiProperty({ nullable: true, type: String, format: 'date-time', description: 'When this warning was e-mailed to the user; null when it was not' })
+  emailedAt!: Date | null;
 
   @ApiProperty()
   authorId!: number;
@@ -136,6 +156,76 @@ export class CreateUserNoteDto {
   @IsString()
   @IsNotEmpty()
   content!: string;
+
+  @ApiProperty({ enum: UserNoteType, enumName: 'UserNoteType', required: false, description: 'Defaults to NOTE; BLOCK requires users.block' })
+  @IsOptional()
+  @IsEnum(UserNoteType)
+  type?: UserNoteType;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+    type: String,
+    format: 'date-time',
+    description: 'When the note stops counting; leave out to keep it active',
+  })
+  @IsOptional()
+  @IsDateString()
+  expiresAt?: string | null;
+
+  @ApiProperty({ required: false, description: 'E-mail this warning to the user (warnings only)' })
+  @IsOptional()
+  @IsBoolean()
+  sendEmail?: boolean;
+}
+
+export class UpdateUserNoteDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  content?: string;
+
+  @ApiProperty({ enum: UserNoteType, enumName: 'UserNoteType', required: false })
+  @IsOptional()
+  @IsEnum(UserNoteType)
+  type?: UserNoteType;
+
+  @ApiProperty({ required: false, nullable: true, type: String, format: 'date-time', description: 'null makes the note open-ended' })
+  @IsOptional()
+  @IsDateString()
+  expiresAt?: string | null;
+
+  @ApiProperty({ required: false, description: 'End the note now; it stays in the history' })
+  @IsOptional()
+  @IsBoolean()
+  end?: boolean;
+
+  @ApiProperty({ required: false, description: 'E-mail this warning to the user now, if it was not e-mailed before (warnings only)' })
+  @IsOptional()
+  @IsBoolean()
+  sendEmail?: boolean;
+}
+
+/** A note that still counts, as shown next to someone's reservations. */
+export class ActiveUserNoteDto {
+  @ApiProperty()
+  id!: number;
+
+  @ApiProperty({ enum: UserNoteType, enumName: 'UserNoteType' })
+  type!: UserNoteType;
+
+  @ApiProperty()
+  content!: string;
+
+  @ApiProperty({ nullable: true })
+  authorName!: string | null;
+
+  @ApiProperty()
+  createdAt!: Date;
+
+  @ApiProperty({ nullable: true, type: String, format: 'date-time' })
+  expiresAt!: Date | null;
 }
 
 export class UserDetailDto {
@@ -171,6 +261,9 @@ export class UserDetailDto {
 
   @ApiProperty({ type: [UserNoteDto] })
   notes!: UserNoteDto[];
+
+  @ApiProperty({ nullable: true, type: UserNoteDto, description: 'The block that keeps this user off the site right now' })
+  activeBlock!: UserNoteDto | null;
 }
 
 export class UpdateUserDto {

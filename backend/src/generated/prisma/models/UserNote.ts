@@ -42,7 +42,10 @@ export type UserNoteMinAggregateOutputType = {
   id: number | null
   userId: number | null
   authorId: number | null
+  type: $Enums.UserNoteType | null
   content: string | null
+  expiresAt: Date | null
+  emailedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -51,7 +54,10 @@ export type UserNoteMaxAggregateOutputType = {
   id: number | null
   userId: number | null
   authorId: number | null
+  type: $Enums.UserNoteType | null
   content: string | null
+  expiresAt: Date | null
+  emailedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -60,7 +66,10 @@ export type UserNoteCountAggregateOutputType = {
   id: number
   userId: number
   authorId: number
+  type: number
   content: number
+  expiresAt: number
+  emailedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -83,7 +92,10 @@ export type UserNoteMinAggregateInputType = {
   id?: true
   userId?: true
   authorId?: true
+  type?: true
   content?: true
+  expiresAt?: true
+  emailedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -92,7 +104,10 @@ export type UserNoteMaxAggregateInputType = {
   id?: true
   userId?: true
   authorId?: true
+  type?: true
   content?: true
+  expiresAt?: true
+  emailedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -101,7 +116,10 @@ export type UserNoteCountAggregateInputType = {
   id?: true
   userId?: true
   authorId?: true
+  type?: true
   content?: true
+  expiresAt?: true
+  emailedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -197,7 +215,10 @@ export type UserNoteGroupByOutputType = {
   id: number
   userId: number
   authorId: number
+  type: $Enums.UserNoteType
   content: string
+  expiresAt: Date | null
+  emailedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: UserNoteCountAggregateOutputType | null
@@ -229,7 +250,10 @@ export type UserNoteWhereInput = {
   id?: Prisma.IntFilter<"UserNote"> | number
   userId?: Prisma.IntFilter<"UserNote"> | number
   authorId?: Prisma.IntFilter<"UserNote"> | number
+  type?: Prisma.EnumUserNoteTypeFilter<"UserNote"> | $Enums.UserNoteType
   content?: Prisma.StringFilter<"UserNote"> | string
+  expiresAt?: Prisma.DateTimeNullableFilter<"UserNote"> | Date | string | null
+  emailedAt?: Prisma.DateTimeNullableFilter<"UserNote"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"UserNote"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserNote"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -240,7 +264,10 @@ export type UserNoteOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -254,7 +281,10 @@ export type UserNoteWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.UserNoteWhereInput | Prisma.UserNoteWhereInput[]
   userId?: Prisma.IntFilter<"UserNote"> | number
   authorId?: Prisma.IntFilter<"UserNote"> | number
+  type?: Prisma.EnumUserNoteTypeFilter<"UserNote"> | $Enums.UserNoteType
   content?: Prisma.StringFilter<"UserNote"> | string
+  expiresAt?: Prisma.DateTimeNullableFilter<"UserNote"> | Date | string | null
+  emailedAt?: Prisma.DateTimeNullableFilter<"UserNote"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"UserNote"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserNote"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -265,7 +295,10 @@ export type UserNoteOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserNoteCountOrderByAggregateInput
@@ -282,13 +315,19 @@ export type UserNoteScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"UserNote"> | number
   userId?: Prisma.IntWithAggregatesFilter<"UserNote"> | number
   authorId?: Prisma.IntWithAggregatesFilter<"UserNote"> | number
+  type?: Prisma.EnumUserNoteTypeWithAggregatesFilter<"UserNote"> | $Enums.UserNoteType
   content?: Prisma.StringWithAggregatesFilter<"UserNote"> | string
+  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"UserNote"> | Date | string | null
+  emailedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"UserNote"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserNote"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserNote"> | Date | string
 }
 
 export type UserNoteCreateInput = {
+  type?: $Enums.UserNoteType
   content: string
+  expiresAt?: Date | string | null
+  emailedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutNotesAboutInput
@@ -299,13 +338,19 @@ export type UserNoteUncheckedCreateInput = {
   id?: number
   userId: number
   authorId: number
+  type?: $Enums.UserNoteType
   content: string
+  expiresAt?: Date | string | null
+  emailedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type UserNoteUpdateInput = {
+  type?: Prisma.EnumUserNoteTypeFieldUpdateOperationsInput | $Enums.UserNoteType
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutNotesAboutNestedInput
@@ -316,7 +361,10 @@ export type UserNoteUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
   authorId?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumUserNoteTypeFieldUpdateOperationsInput | $Enums.UserNoteType
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -325,13 +373,19 @@ export type UserNoteCreateManyInput = {
   id?: number
   userId: number
   authorId: number
+  type?: $Enums.UserNoteType
   content: string
+  expiresAt?: Date | string | null
+  emailedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type UserNoteUpdateManyMutationInput = {
+  type?: Prisma.EnumUserNoteTypeFieldUpdateOperationsInput | $Enums.UserNoteType
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -340,7 +394,10 @@ export type UserNoteUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
   authorId?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumUserNoteTypeFieldUpdateOperationsInput | $Enums.UserNoteType
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -359,7 +416,10 @@ export type UserNoteCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
+  emailedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -374,7 +434,10 @@ export type UserNoteMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
+  emailedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -383,7 +446,10 @@ export type UserNoteMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
+  emailedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -478,12 +544,23 @@ export type UserNoteUncheckedUpdateManyWithoutAuthorNestedInput = {
   deleteMany?: Prisma.UserNoteScalarWhereInput | Prisma.UserNoteScalarWhereInput[]
 }
 
+export type EnumUserNoteTypeFieldUpdateOperationsInput = {
+  set?: $Enums.UserNoteType
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
 export type UserNoteCreateWithoutUserInput = {
+  type?: $Enums.UserNoteType
   content: string
+  expiresAt?: Date | string | null
+  emailedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   author: Prisma.UserCreateNestedOneWithoutNotesAuthoredInput
@@ -492,7 +569,10 @@ export type UserNoteCreateWithoutUserInput = {
 export type UserNoteUncheckedCreateWithoutUserInput = {
   id?: number
   authorId: number
+  type?: $Enums.UserNoteType
   content: string
+  expiresAt?: Date | string | null
+  emailedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -508,7 +588,10 @@ export type UserNoteCreateManyUserInputEnvelope = {
 }
 
 export type UserNoteCreateWithoutAuthorInput = {
+  type?: $Enums.UserNoteType
   content: string
+  expiresAt?: Date | string | null
+  emailedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutNotesAboutInput
@@ -517,7 +600,10 @@ export type UserNoteCreateWithoutAuthorInput = {
 export type UserNoteUncheckedCreateWithoutAuthorInput = {
   id?: number
   userId: number
+  type?: $Enums.UserNoteType
   content: string
+  expiresAt?: Date | string | null
+  emailedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -555,7 +641,10 @@ export type UserNoteScalarWhereInput = {
   id?: Prisma.IntFilter<"UserNote"> | number
   userId?: Prisma.IntFilter<"UserNote"> | number
   authorId?: Prisma.IntFilter<"UserNote"> | number
+  type?: Prisma.EnumUserNoteTypeFilter<"UserNote"> | $Enums.UserNoteType
   content?: Prisma.StringFilter<"UserNote"> | string
+  expiresAt?: Prisma.DateTimeNullableFilter<"UserNote"> | Date | string | null
+  emailedAt?: Prisma.DateTimeNullableFilter<"UserNote"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"UserNote"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserNote"> | Date | string
 }
@@ -579,7 +668,10 @@ export type UserNoteUpdateManyWithWhereWithoutAuthorInput = {
 export type UserNoteCreateManyUserInput = {
   id?: number
   authorId: number
+  type?: $Enums.UserNoteType
   content: string
+  expiresAt?: Date | string | null
+  emailedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -587,13 +679,19 @@ export type UserNoteCreateManyUserInput = {
 export type UserNoteCreateManyAuthorInput = {
   id?: number
   userId: number
+  type?: $Enums.UserNoteType
   content: string
+  expiresAt?: Date | string | null
+  emailedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type UserNoteUpdateWithoutUserInput = {
+  type?: Prisma.EnumUserNoteTypeFieldUpdateOperationsInput | $Enums.UserNoteType
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.UserUpdateOneRequiredWithoutNotesAuthoredNestedInput
@@ -602,7 +700,10 @@ export type UserNoteUpdateWithoutUserInput = {
 export type UserNoteUncheckedUpdateWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   authorId?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumUserNoteTypeFieldUpdateOperationsInput | $Enums.UserNoteType
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -610,13 +711,19 @@ export type UserNoteUncheckedUpdateWithoutUserInput = {
 export type UserNoteUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   authorId?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumUserNoteTypeFieldUpdateOperationsInput | $Enums.UserNoteType
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserNoteUpdateWithoutAuthorInput = {
+  type?: Prisma.EnumUserNoteTypeFieldUpdateOperationsInput | $Enums.UserNoteType
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutNotesAboutNestedInput
@@ -625,7 +732,10 @@ export type UserNoteUpdateWithoutAuthorInput = {
 export type UserNoteUncheckedUpdateWithoutAuthorInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumUserNoteTypeFieldUpdateOperationsInput | $Enums.UserNoteType
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -633,7 +743,10 @@ export type UserNoteUncheckedUpdateWithoutAuthorInput = {
 export type UserNoteUncheckedUpdateManyWithoutAuthorInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumUserNoteTypeFieldUpdateOperationsInput | $Enums.UserNoteType
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -644,7 +757,10 @@ export type UserNoteSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   userId?: boolean
   authorId?: boolean
+  type?: boolean
   content?: boolean
+  expiresAt?: boolean
+  emailedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -655,7 +771,10 @@ export type UserNoteSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   userId?: boolean
   authorId?: boolean
+  type?: boolean
   content?: boolean
+  expiresAt?: boolean
+  emailedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -666,7 +785,10 @@ export type UserNoteSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   userId?: boolean
   authorId?: boolean
+  type?: boolean
   content?: boolean
+  expiresAt?: boolean
+  emailedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -677,12 +799,15 @@ export type UserNoteSelectScalar = {
   id?: boolean
   userId?: boolean
   authorId?: boolean
+  type?: boolean
   content?: boolean
+  expiresAt?: boolean
+  emailedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserNoteOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "authorId" | "content" | "createdAt" | "updatedAt", ExtArgs["result"]["userNote"]>
+export type UserNoteOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "authorId" | "type" | "content" | "expiresAt" | "emailedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userNote"]>
 export type UserNoteInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -706,7 +831,16 @@ export type $UserNotePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id: number
     userId: number
     authorId: number
+    type: $Enums.UserNoteType
     content: string
+    /**
+     * When the note stops counting; null keeps it active until someone ends it.
+     */
+    expiresAt: Date | null
+    /**
+     * When this warning was e-mailed to the person it is about; null when it was not.
+     */
+    emailedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["userNote"]>
@@ -1137,7 +1271,10 @@ export interface UserNoteFieldRefs {
   readonly id: Prisma.FieldRef<"UserNote", 'Int'>
   readonly userId: Prisma.FieldRef<"UserNote", 'Int'>
   readonly authorId: Prisma.FieldRef<"UserNote", 'Int'>
+  readonly type: Prisma.FieldRef<"UserNote", 'UserNoteType'>
   readonly content: Prisma.FieldRef<"UserNote", 'String'>
+  readonly expiresAt: Prisma.FieldRef<"UserNote", 'DateTime'>
+  readonly emailedAt: Prisma.FieldRef<"UserNote", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"UserNote", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"UserNote", 'DateTime'>
 }

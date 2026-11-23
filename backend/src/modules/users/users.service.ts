@@ -1,14 +1,55 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { MailService } from '../mail/mail.service.js';
 import { ReservationStatus } from '../../dtos/reservations/reservation.dto.js';
-import type { CreateWhitelistDto, CreateUserNoteDto, UpdateUserDto, UserDetailDto, UserListResponseDto, UserNoteDto } from '../../dtos/users/user.dto.js';
+import {
+  UserNoteType,
+  type CreateWhitelistDto,
+  type CreateUserNoteDto,
+  type UpdateUserDto,
+  type UpdateUserNoteDto,
+  type UserDetailDto,
+  type UserListResponseDto,
+  type UserNoteDto,
+} from '../../dtos/users/user.dto.js';
 import { describeAudit } from '../audit/audit-context.js';
+import { HUB_TIME_ZONE } from '../../common/wall-clock.js';
+import { activeNoteFilter } from './user-notes.js';
 
 const WHITELIST_PREFIX = 'admin_whitelist.';
 
+type NoteRow = {
+  id: number;
+  type: UserNoteType;
+  content: string;
+  expiresAt: Date | null;
+  emailedAt: Date | null;
+  authorId: number;
+  author: { name: string | null };
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+const toNoteDto = (note: NoteRow): UserNoteDto => ({
+  id: note.id,
+  type: note.type,
+  content: note.content,
+  expiresAt: note.expiresAt,
+  emailedAt: note.emailedAt,
+  authorId: note.authorId,
+  authorName: note.author.name,
+  createdAt: note.createdAt,
+  updatedAt: note.updatedAt,
+});
+
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(UsersService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailService: MailService,
+  ) {}
 
   async list(args: { search?: string; adminOnly?: boolean; noShowsOnly?: boolean; page?: number; pageSize?: number }): Promise<UserListResponseDto> {
     const pageSize = args.pageSize ?? 25;
@@ -60,6 +101,12 @@ export class UsersService {
     });
     const noShowMap = new Map(noShowCounts.map((entry) => [entry.userId, entry._count._all]));
 
+    const blocks = await this.prisma.userNote.findMany({
+      where: { userId: { in: users.map((u) => u.id) }, type: UserNoteType.BLOCK, ...activeNoteFilter() },
+      select: { userId: true },
+    });
+    const blocked = new Set(blocks.map((block) => block.userId));
+
     const items = users.map((user) => ({
       id: user.id,
       name: user.name,
@@ -71,6 +118,7 @@ export class UsersService {
       reservationCount: user._count.reservations,
       noShowCount: noShowMap.get(user.id) ?? 0,
       roles: user.userRoles.map((ur) => ur.role.name),
+      isBlocked: blocked.has(user.id),
     }));
 
     return { items, total, page, pageSize, totalPages };
@@ -97,7 +145,7 @@ export class UsersService {
         },
         notesAbout: {
           orderBy: { createdAt: 'desc' },
-          include: { author: { select: { id: true, name: true } } },
+          include: { author: { select: { name: true } } },
         },
       },
     });
@@ -108,6 +156,12 @@ export class UsersService {
       this.prisma.reservation.count({ where: { userId: id } }),
       this.prisma.reservation.count({ where: { userId: id, status: ReservationStatus.NO_SHOW } }),
     ]);
+
+    const notes = user.notesAbout.map(toNoteDto);
+    const now = new Date();
+    const activeBlocks = notes.filter((note) => note.type === UserNoteType.BLOCK && (note.expiresAt === null || note.expiresAt > now));
+    // The block that ends last is the one that keeps them out: open-ended beats any end date
+    const activeBlock = activeBlocks.sort((a, b) => (b.expiresAt?.getTime() ?? Infinity) - (a.expiresAt?.getTime() ?? Infinity))[0] ?? null;
 
     return {
       id: user.id,
@@ -120,14 +174,8 @@ export class UsersService {
       reservationCount,
       noShowCount,
       recentReservations: user.reservations,
-      notes: user.notesAbout.map((n) => ({
-        id: n.id,
-        content: n.content,
-        authorId: n.authorId,
-        authorName: n.author.name,
-        createdAt: n.createdAt,
-        updatedAt: n.updatedAt,
-      })),
+      notes,
+      activeBlock,
     };
   }
 
@@ -218,32 +266,117 @@ export class UsersService {
     return { success: true };
   }
 
-  async createNote(userId: number, authorId: number, dto: CreateUserNoteDto): Promise<UserNoteDto> {
+  /**
+   * Adds a note about a user. A block (BLOCK) needs users.block and keeps the user off the site while it
+   * counts; a warning is e-mailed to the user when staff ask for it. A failed e-mail leaves emailedAt empty.
+   */
+  async createNote(userId: number, authorId: number, dto: CreateUserNoteDto, permissions: Set<string>): Promise<UserNoteDto> {
     await this.assertExists(userId);
+    const type = dto.type ?? UserNoteType.NOTE;
+    const expiresAt = this.parseExpiry(dto.expiresAt);
+    if (type === UserNoteType.BLOCK) await this.assertMayBlock(userId, authorId, permissions);
+    if (dto.sendEmail && type !== UserNoteType.WARNING) throw new BadRequestException('Alleen een waarschuwing kan gemaild worden.');
+
     const note = await this.prisma.userNote.create({
-      data: { userId, authorId, content: dto.content },
-      include: { author: { select: { id: true, name: true } } },
+      data: { userId, authorId, type, content: dto.content.trim(), expiresAt },
+      include: { author: { select: { name: true } } },
     });
-    return {
-      id: note.id,
-      content: note.content,
-      authorId: note.authorId,
-      authorName: note.author.name,
-      createdAt: note.createdAt,
-      updatedAt: note.updatedAt,
-    };
+
+    return toNoteDto(dto.sendEmail ? await this.emailWarning(note) : note);
   }
 
-  async deleteNote(noteId: number, currentUserId: number, canDeleteOthers: boolean) {
-    const note = await this.prisma.userNote.findUnique({ where: { id: noteId } });
-    if (!note) throw new NotFoundException('Note not found');
+  /** Edits a note or ends it now. Others' notes need users.notes.delete_others, anything about a block needs users.block. */
+  async updateNote(userId: number, noteId: number, currentUserId: number, dto: UpdateUserNoteDto, permissions: Set<string>): Promise<UserNoteDto> {
+    const note = await this.findNoteOf(userId, noteId, currentUserId, permissions);
+    const type = dto.type ?? note.type;
 
-    if (note.authorId !== currentUserId && !canDeleteOthers) {
-      throw new BadRequestException('You can only delete your own notes');
+    if (note.type === UserNoteType.BLOCK || type === UserNoteType.BLOCK) {
+      await this.assertMayBlock(userId, currentUserId, permissions, note.type === UserNoteType.BLOCK);
+    }
+
+    let expiresAt: Date | null | undefined;
+    if (dto.end) {
+      // Ending a note that already ended keeps the moment it ended
+      expiresAt = note.expiresAt && note.expiresAt <= new Date() ? note.expiresAt : new Date();
+    } else if (dto.expiresAt !== undefined) {
+      expiresAt = this.parseExpiry(dto.expiresAt);
+    }
+
+    if (dto.sendEmail) {
+      if (type !== UserNoteType.WARNING) throw new BadRequestException('Alleen een waarschuwing kan gemaild worden.');
+      if (note.emailedAt) throw new BadRequestException('Deze waarschuwing is al gemaild.');
+    }
+
+    const updated = await this.prisma.userNote.update({
+      where: { id: noteId },
+      data: { type, content: dto.content?.trim(), expiresAt },
+      include: { author: { select: { name: true } } },
+    });
+    return toNoteDto(dto.sendEmail ? await this.emailWarning(updated) : updated);
+  }
+
+  async deleteNote(userId: number, noteId: number, currentUserId: number, permissions: Set<string>) {
+    const note = await this.findNoteOf(userId, noteId, currentUserId, permissions);
+    if (note.type === UserNoteType.BLOCK && !permissions.has('users.block')) {
+      throw new ForbiddenException('Je hebt geen recht om blokkeringen te beheren.');
     }
 
     await this.prisma.userNote.delete({ where: { id: noteId } });
     return { success: true };
+  }
+
+  private async findNoteOf(userId: number, noteId: number, currentUserId: number, permissions: Set<string>) {
+    const note = await this.prisma.userNote.findUnique({ where: { id: noteId } });
+    if (!note || note.userId !== userId) throw new NotFoundException('Note not found');
+    if (note.authorId !== currentUserId && !permissions.has('users.notes.delete_others')) {
+      throw new ForbiddenException('Je kan alleen je eigen notities wijzigen of verwijderen.');
+    }
+    return note;
+  }
+
+  /** Who may be blocked: not yourself and not an admin. Changing or lifting an existing block only needs the permission. */
+  private async assertMayBlock(userId: number, currentUserId: number, permissions: Set<string>, existingBlock = false) {
+    if (!permissions.has('users.block')) throw new ForbiddenException('Je hebt geen recht om gebruikers te blokkeren.');
+    if (existingBlock) return;
+    if (userId === currentUserId) throw new BadRequestException('Je kan jezelf niet blokkeren.');
+    const admin = await this.prisma.userRole.findFirst({ where: { userId, role: { name: 'Admin' } }, select: { id: true } });
+    if (admin) throw new BadRequestException('Een admin kan niet geblokkeerd worden. Neem eerst de Admin-rol af.');
+  }
+
+  /** undefined keeps the current end, null makes the note open-ended; an end must lie in the future. */
+  private parseExpiry(value: string | null | undefined): Date | null {
+    if (value === undefined || value === null) return null;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) throw new BadRequestException('Ongeldige einddatum.');
+    if (date <= new Date()) throw new BadRequestException('De einddatum moet in de toekomst liggen.');
+    return date;
+  }
+
+  /** E-mails a warning to the person it is about and records when; on failure the note stays as it was. */
+  private async emailWarning(note: NoteRow & { userId: number }): Promise<NoteRow> {
+    const user = await this.prisma.user.findUnique({ where: { id: note.userId }, select: { email: true, name: true, sNumber: true } });
+    if (!user) return note;
+    try {
+      await this.mailService.sendMail(user.email, 'Waarschuwing - AP Gaming Hub', 'users/warning', {
+        name: user.name ?? (user.sNumber !== 'N/A' ? user.sNumber : 'gamer'),
+        content: note.content,
+        expiresAt: note.expiresAt
+          ? new Intl.DateTimeFormat('nl-BE', { dateStyle: 'long', timeStyle: 'short', timeZone: HUB_TIME_ZONE }).format(note.expiresAt)
+          : null,
+        rulesUrl: `${process.env.FRONTEND_URL}/info`,
+      });
+    } catch (error) {
+      // The warning is saved either way; the empty emailedAt tells staff the mail did not go out
+      this.logger.error(`Failed to send warning email: ${error instanceof Error ? error.message : String(error)}`);
+      describeAudit({ warningEmailFailedTo: user.email });
+      return note;
+    }
+    describeAudit({ warningEmailedTo: user.email });
+    return this.prisma.userNote.update({
+      where: { id: note.id },
+      data: { emailedAt: new Date() },
+      include: { author: { select: { name: true } } },
+    });
   }
 
   private async assertExists(id: number) {

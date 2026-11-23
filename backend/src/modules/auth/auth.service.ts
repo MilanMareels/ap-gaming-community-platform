@@ -11,6 +11,7 @@ import type { GoogleUserInfo } from './types/google-userinfo.type.js';
 import type { MicrosoftTokenResponse } from './types/microsoft-token-response.type.js';
 import type { MicrosoftUserInfo } from './types/microsoft-userinfo.type.js';
 import { describeAudit } from '../audit/audit-context.js';
+import { findActiveBlock } from '../users/user-notes.js';
 
 export type SsoProvider = 'google' | 'microsoft';
 
@@ -174,6 +175,11 @@ export class AuthService {
       return { user: null, token: null };
     }
 
+    const block = await this.getActiveBlock(user.id);
+    if (block) {
+      return { user, token: null, blockedUntil: block.expiresAt };
+    }
+
     const token = await this.generateToken(user.id, user.email);
     return { user, token };
   }
@@ -185,6 +191,11 @@ export class AuthService {
     const user = await this.findOrCreateUserFromMicrosoft(profile);
     if (!user) {
       return { user: null, token: null };
+    }
+
+    const block = await this.getActiveBlock(user.id);
+    if (block) {
+      return { user, token: null, blockedUntil: block.expiresAt };
     }
 
     const token = await this.generateToken(user.id, user.email);
@@ -244,6 +255,19 @@ export class AuthService {
 
   async verifyToken(token: string) {
     return this.jwtService.verifyAsync<JwtPayload>(token);
+  }
+
+  /** The block that keeps this user off the site right now, or null. */
+  async getActiveBlock(userId: number) {
+    return findActiveBlock(this.prisma, userId);
+  }
+
+  /**
+   * Whether a session must be refused because its user is blocked. While impersonating, the admin behind it
+   * counts, so admins can still look at the site as a blocked user.
+   */
+  async isSessionBlocked(claims: JwtPayload) {
+    return (await this.getActiveBlock(claims.realUserId ?? claims.sub)) !== null;
   }
 
   async getProfileFromToken(token: string) {
@@ -840,6 +864,7 @@ export class AuthService {
 
     const user = await this.prisma.user.findUnique({ where: { id: payload.sub }, select: { id: true, email: true } });
     if (!user) throw new UnauthorizedException('User not found');
+    if (await this.getActiveBlock(user.id)) throw new UnauthorizedException('Account blocked');
 
     return this.generateToken(user.id, user.email, MOBILE_TOKEN_TTL);
   }

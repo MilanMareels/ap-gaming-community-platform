@@ -1,6 +1,7 @@
 'use client';
 
-import { Calendar, CheckCircle2, XCircle } from 'lucide-react';
+import { Ban, Calendar, CheckCircle2, XCircle } from 'lucide-react';
+import { NoteCard } from '@/components/notes/UserNotes';
 import type { VerificationStatus, VerifiedReservation } from './types';
 
 interface ReservationVerificationResultProps {
@@ -74,6 +75,25 @@ export function ReservationVerificationResult({
         <div className='mb-4 flex items-center gap-2 text-emerald-300 font-semibold'>
           <CheckCircle2 className='h-5 w-5' /> Geldige reservatie
         </div>
+
+        {reservation.activeNotes.some((note) => note.type === 'BLOCK') && (
+          <div className='mb-4 flex items-start gap-3 rounded-xl border border-red-500/50 bg-red-950/40 p-3 text-sm text-red-200'>
+            <Ban className='mt-0.5 h-5 w-5 shrink-0 text-red-400' />
+            <p>
+              <span className='font-bold text-red-100'>Deze persoon is geblokkeerd.</span> Bekijk de blokkade hieronder voor je
+              toegang geeft.
+            </p>
+          </div>
+        )}
+
+        {reservation.activeNotes.length > 0 && (
+          <div className='mb-4 space-y-2'>
+            <p className='text-xs font-semibold uppercase tracking-wide text-slate-400'>Actieve notities</p>
+            {reservation.activeNotes.map((note) => (
+              <NoteCard key={note.id} note={note} compact />
+            ))}
+          </div>
+        )}
 
         <div className='grid grid-cols-1 gap-3 text-sm md:grid-cols-2'>
           <div className='rounded-xl border border-slate-700 bg-slate-900 p-3'>

@@ -36,6 +36,7 @@ export const ACTION_PHRASES: Record<string, string> = {
   'users.update': 'wijzigde een gebruiker',
   'users.delete': 'verwijderde een gebruiker',
   'users.createNote': 'schreef een notitie over een gebruiker',
+  'users.updateNote': 'wijzigde of beëindigde een notitie',
   'users.deleteNote': 'verwijderde een notitie',
   'users.createWhitelist': 'gaf een extern e-mailadres toegang',
   'users.deleteWhitelist': 'trok de toegang van een extern e-mailadres in',
@@ -186,6 +187,9 @@ export const FIELD_LABELS: Record<string, string> = {
   content: 'inhoud',
   category: 'categorie',
   note: 'notitie',
+  type: 'soort',
+  expiresAt: 'geldig tot',
+  emailedAt: 'gemaild op',
   createdByStaff: 'ingeboekt door staff',
 };
 
@@ -203,6 +207,9 @@ const VALUE_LABELS: Record<string, string> = {
   pc: 'PC',
   ps5: 'PS5',
   switch: 'Switch',
+  NOTE: 'Notitie',
+  WARNING: 'Waarschuwing',
+  BLOCK: 'Blokkade',
 };
 
 /** The field of a row that tells a person which record it is, e.g. a reservation's e-mail address. */

@@ -1107,7 +1107,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Add an admin note to a user */
+        /** Add a note, warning or block (block requires users.block) to a user */
         post: operations["UsersController_createNote"];
         delete?: never;
         options?: never;
@@ -1125,11 +1125,12 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** Delete a note (own notes always, others require users.notes.delete_others) */
+        /** Delete a note (own notes always, others require users.notes.delete_others; blocks require users.block) */
         delete: operations["UsersController_deleteNote"];
         options?: never;
         head?: never;
-        patch?: never;
+        /** Edit or end a note (own notes always, others require users.notes.delete_others; blocks require users.block) */
+        patch: operations["UsersController_updateNote"];
         trace?: never;
     };
     "/navigation": {
@@ -2705,9 +2706,24 @@ export interface components {
             reservationsOverTime: components["schemas"]["MonthlyCountDto"][];
             preferredSlots: components["schemas"]["HourCountDto"][];
         };
+        /** @enum {string} */
+        UserNoteType: "NOTE" | "WARNING" | "BLOCK";
+        ActiveUserNoteDto: {
+            id: number;
+            type: components["schemas"]["UserNoteType"];
+            content: string;
+            authorName: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            expiresAt: string | null;
+        };
         ReservationVerificationDto: {
             /** @example cm9x8k2df0000a1b2c3d4e5f6 */
             cuid: string;
+            userId: number;
+            /** @description Notes about this person that still count, most serious first */
+            activeNotes: components["schemas"]["ActiveUserNoteDto"][];
             /** @example student@student.ap.be */
             email: string;
             /** @example s123456 */
@@ -3022,6 +3038,8 @@ export interface components {
             reservationCount: number;
             noShowCount: number;
             roles: string[];
+            /** @description Whether an active block keeps this user off the site */
+            isBlocked: boolean;
         };
         UserListResponseDto: {
             items: components["schemas"]["UserListItemDto"][];
@@ -3064,7 +3082,18 @@ export interface components {
         };
         UserNoteDto: {
             id: number;
+            type: components["schemas"]["UserNoteType"];
             content: string;
+            /**
+             * Format: date-time
+             * @description When the note stops counting; null keeps it active until someone ends it
+             */
+            expiresAt: string | null;
+            /**
+             * Format: date-time
+             * @description When this warning was e-mailed to the user; null when it was not
+             */
+            emailedAt: string | null;
             authorId: number;
             authorName: string | null;
             /** Format: date-time */
@@ -3084,6 +3113,8 @@ export interface components {
             noShowCount: number;
             recentReservations: components["schemas"]["UserRecentReservationDto"][];
             notes: components["schemas"]["UserNoteDto"][];
+            /** @description The block that keeps this user off the site right now */
+            activeBlock: components["schemas"]["UserNoteDto"] | null;
         };
         UpdateUserDto: {
             name?: string;
@@ -3093,6 +3124,28 @@ export interface components {
         CreateUserNoteDto: {
             /** @description Note content */
             content: string;
+            /** @description Defaults to NOTE; BLOCK requires users.block */
+            type?: components["schemas"]["UserNoteType"];
+            /**
+             * Format: date-time
+             * @description When the note stops counting; leave out to keep it active
+             */
+            expiresAt?: string | null;
+            /** @description E-mail this warning to the user (warnings only) */
+            sendEmail?: boolean;
+        };
+        UpdateUserNoteDto: {
+            content?: string;
+            type?: components["schemas"]["UserNoteType"];
+            /**
+             * Format: date-time
+             * @description null makes the note open-ended
+             */
+            expiresAt?: string | null;
+            /** @description End the note now; it stays in the history */
+            end?: boolean;
+            /** @description E-mail this warning to the user now, if it was not e-mailed before (warnings only) */
+            sendEmail?: boolean;
         };
         NavLink: {
             id: number;
@@ -6289,6 +6342,32 @@ export interface operations {
         };
         responses: {
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserNoteDto"];
+                };
+            };
+        };
+    };
+    UsersController_updateNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                noteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserNoteDto"];
+            };
+        };
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

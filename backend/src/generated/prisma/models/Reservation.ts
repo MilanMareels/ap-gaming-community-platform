@@ -548,10 +548,6 @@ export type EnumReservationStatusFieldUpdateOperationsInput = {
   set?: $Enums.ReservationStatus
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type ReservationCreateWithoutUserInput = {
   cuid?: string
   controllers: number

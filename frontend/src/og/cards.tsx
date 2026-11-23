@@ -82,6 +82,7 @@ const STATIC_PAGES: Record<string, SimpleCard> = {
   'cancel-reservation': { title: 'Reservatie annuleren', eyebrow: 'Reserveren', photo: 'hub' },
   submission: { title: 'Je inzending', eyebrow: 'Formulier', photo: 'setup' },
   'unknown-user': { title: 'Geen toegang', eyebrow: 'AP Gaming Hub' },
+  blocked: { title: 'Account geblokkeerd', eyebrow: 'AP Gaming Hub' },
   'team-schedule': { title: 'Teamplanning', eyebrow: 'AP Esports', photo: 'setup' },
 };
 
