@@ -433,6 +433,11 @@ export default function AdminSettingsPage() {
                 </div>
               ))}
             </div>
+            {rules.maxPerDay.trim() === '1' && Number(rules.minGapMinutes) > 0 && (
+              <p className="mt-3 text-xs text-gray-500">
+                Met maximaal 1 reservatie per dag speelt de tijd tussen reservaties geen rol. Het huisreglement vermeldt ze dan niet.
+              </p>
+            )}
           </div>
         </div>
 

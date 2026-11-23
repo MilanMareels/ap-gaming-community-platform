@@ -1,8 +1,8 @@
 'use client';
 
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
-import { ShieldAlert, Terminal, Cpu, Users, Gamepad2, Zap, Lock, ChevronDown, ChevronUp, ClipboardList, Info } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Ban, CalendarCheck, ChevronDown, ChevronUp, Cpu, Gavel, ScrollText, Users } from 'lucide-react';
+import { useState, useEffect, type ReactNode } from 'react';
 import Link from 'next/link';
 import { apiClient } from '@/api';
 import DiscordIcon from '@/components/ui/DiscordIcon';
@@ -13,7 +13,8 @@ type ReservationRules = { maxPerDay: number; minGapMinutes: number };
 function describeSessionRules({ maxPerDay, minGapMinutes }: ReservationRules): string {
   const parts = ['Een sessie duurt 1, 1,5 of 2 uur.'];
   if (maxPerDay > 0) parts.push(`Je kan maximaal ${maxPerDay} ${maxPerDay === 1 ? 'reservatie' : 'reservaties'} per dag maken.`);
-  if (minGapMinutes > 0) parts.push(`Tussen twee van je reservaties moet minstens ${minGapMinutes} minuten zitten.`);
+  // With one reservation a day there is no second one to keep apart from, so the gap means nothing to the reader
+  if (minGapMinutes > 0 && maxPerDay !== 1) parts.push(`Tussen twee van je reservaties moet minstens ${minGapMinutes} minuten zitten.`);
   parts.push('Zo kunnen zo veel mogelijk studenten gebruikmaken van de faciliteiten.');
   return parts.join(' ');
 }
@@ -62,42 +63,225 @@ const FAQS: { question: string; answer: string | ((rules: ReservationRules) => s
   },
 ];
 
+/** The date at the top of the reglement; change it with every change to the rules below. */
+const LAST_UPDATED = '23 november 2026';
+
+type Section = { id: string; title: string; icon: typeof Users; intro?: ReactNode; articles: { title: string; body: ReactNode }[] };
+
+const ExternalLink = ({ href, children }: { href: string; children: ReactNode }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#d42422] underline underline-offset-2 hover:text-white">
+    {children}
+  </a>
+);
+
+const InternalLink = ({ href, children }: { href: string; children: ReactNode }) => (
+  <Link href={href} className="text-[#d42422] underline underline-offset-2 hover:text-white">
+    {children}
+  </Link>
+);
+
+function buildSections(sessionRules: string): Section[] {
+  return [
+    {
+      id: 'toegang',
+      title: 'Toegang en reservaties',
+      icon: CalendarCheck,
+      articles: [
+        {
+          title: 'Wie mag er gamen',
+          body: 'De Gaming Hub is er voor studenten van AP Hogeschool met een geldige studentenkaart. Toon je kaart wanneer een medewerker erom vraagt.',
+        },
+        {
+          title: 'Openingsuren',
+          body: (
+            <>
+              De hub is alleen toegankelijk tijdens de <InternalLink href="/schedule">openingsuren</InternalLink> of met een geldige reservatie.
+            </>
+          ),
+        },
+        {
+          title: 'Aanmelden bij aankomst',
+          body: 'Meld je bij aankomst aan bij een medewerker en toon de QR-code uit je bevestigingsmail. Zonder aanmelding kan je plek aan iemand anders gegeven worden.',
+        },
+        { title: 'Sessieduur en limieten', body: sessionRules },
+        {
+          title: 'Je reservatie is persoonlijk',
+          body: 'Je speelt zelf op de plek die je reserveerde. Je geeft of verkoopt je reservatie niet door aan iemand anders.',
+        },
+        {
+          title: 'Annuleren en no-shows',
+          body: (
+            <>
+              Kan je niet komen? <InternalLink href="/reservations/how-to-cancel">Annuleer je reservatie</InternalLink> via je profiel of je
+              bevestigingsmail, uiterlijk tot het begin ervan. Kom je niet opdagen zonder te annuleren, dan krijg je een no-show. Bij je eerste
+              no-show krijg je een herinnering, bij de tweede een waarschuwing. Na drie no-shows in één semester kan je niet meer reserveren tot
+              het volgende semester.
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      id: 'gedrag',
+      title: 'Gedragscode',
+      icon: Users,
+      intro: 'Behandel anderen zoals je zelf behandeld wilt worden. De Gaming Hub is een veilige en inclusieve plek voor iedereen.',
+      articles: [
+        {
+          title: 'Respect',
+          body: 'Je gaat respectvol om met andere bezoekers, met de medewerkers en met de ruimte. Dat geldt in de hub, in in-game chat en voice, en op onze Discord.',
+        },
+        {
+          title: 'Geen grensoverschrijdend gedrag',
+          body: (
+            <>
+              Grensoverschrijdend gedrag wordt niet getolereerd. Daaronder valt, zoals AP het omschrijft, elke aantasting van de fysieke of
+              psychische integriteit van een persoon, waaronder machtsmisbruik, ongewenst seksueel gedrag, geweld, discriminatie en pesterijen.
+              Racisme, seksisme en homofobie horen daar ook bij. Lees ook de{' '}
+              <ExternalLink href="https://student.ap.be/deontologische-code">deontologische code voor studenten</ExternalLink>.
+            </>
+          ),
+        },
+        {
+          title: 'Fair play',
+          body: 'Je gebruikt geen cheats, hacks of exploits, en je verstoort niet bewust het spel van anderen.',
+        },
+        {
+          title: 'Geluid',
+          body: 'Houd het volume aanvaardbaar. Gebruik een headset voor in-game geluid en voice chat.',
+        },
+        {
+          title: 'Instructies van medewerkers',
+          body: 'Je volgt de instructies van de medewerkers van de Gaming Hub. Bij een conflict of overlast spreek je meteen een medewerker aan.',
+        },
+        {
+          title: 'Melden',
+          body: (
+            <>
+              Word je zelf geconfronteerd met grensoverschrijdend gedrag? Spreek een medewerker aan, of neem in vertrouwen contact op met het
+              meldpunt van AP via <ExternalLink href="mailto:meldpuntgog@ap.be">meldpuntgog@ap.be</ExternalLink>. Meer info vind je op{' '}
+              <ExternalLink href="https://student.ap.be/grensoverschrijdend-gedrag">student.ap.be/grensoverschrijdend-gedrag</ExternalLink>.
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      id: 'middelen',
+      title: 'Roken, alcohol, eten en drinken',
+      icon: Ban,
+      articles: [
+        {
+          title: 'Niet roken of vapen',
+          body: 'Roken en vapen zijn verboden, net als in alle gebouwen van AP. Dat geldt voor sigaretten, e-sigaretten en vapes, en voor alle andere tabaks- en nicotineproducten.',
+        },
+        {
+          title: 'Geen alcohol of drugs',
+          body: 'Je brengt geen alcohol of drugs mee en gebruikt ze niet in de hub. Wie onder invloed is, krijgt geen toegang.',
+        },
+        {
+          title: 'Drinken alleen in een gesloten fles',
+          body: 'Drank breng je alleen mee in een afsluitbare fles of drinkbus. Houd ze dicht wanneer je niet drinkt, en houd ze uit de buurt van de apparatuur.',
+        },
+        {
+          title: 'Eten',
+          body: 'Eet niet aan of boven de apparatuur.',
+        },
+        {
+          title: 'Laat je plek netjes achter',
+          body: 'Gooi je afval weg, en laat de setup achter zoals je hem aantrof.',
+        },
+      ],
+    },
+    {
+      id: 'apparatuur',
+      title: 'Apparatuur en software',
+      icon: Cpu,
+      intro: 'Elke setup in de hub is meer dan €3.000 waard. Behandel hem met zorg.',
+      articles: [
+        {
+          title: 'Zorgvuldig gebruik',
+          body: 'Je gebruikt de apparatuur zoals ze bedoeld is. Je gaat niet agressief om met muis, toetsenbord, headset of controller.',
+        },
+        {
+          title: 'Geen software of aanpassingen',
+          body: 'Je installeert geen software en past geen systeeminstellingen aan zonder toestemming van een medewerker. Je gebruikt geen eigen USB-sticks of opslagmedia; alleen opslag die door de Gaming Hub is goedgekeurd.',
+        },
+        {
+          title: 'Geen illegale inhoud',
+          body: 'Je speelt alleen de games die op de toestellen staan. Illegale software, gekraakte games en andere illegale inhoud zijn verboden.',
+        },
+        {
+          title: 'Je eigen accounts',
+          body: 'Je logt alleen in met je eigen accounts, en deelt ze niet. Log altijd uit na je sessie: de Gaming Hub is niet verantwoordelijk voor accounts die je ingelogd laat.',
+        },
+        {
+          title: 'Uitgeleend materiaal',
+          body: 'Voor fysieke games en extra controllers kan een medewerker je studentenkaart als onderpand vragen. Breng ze terug voor het einde van je sessie.',
+        },
+        {
+          title: 'Defecten en schade',
+          body: 'Meld een defect of schade meteen aan een medewerker en probeer niets zelf te herstellen. Schade die je opzettelijk of door onzorgvuldig gebruik veroorzaakt, kan op jou verhaald worden.',
+        },
+      ],
+    },
+    {
+      id: 'sancties',
+      title: 'Sancties',
+      icon: Gavel,
+      articles: [
+        {
+          title: 'Ter plaatse',
+          body: 'Een medewerker kan je aanspreken op je gedrag en je vragen je sessie te stoppen en de hub te verlaten.',
+        },
+        {
+          title: 'Mogelijke maatregelen',
+          body: 'Afhankelijk van de ernst van de overtreding krijg je een waarschuwing, een tijdelijke blokkering of een definitieve uitsluiting. Wie geblokkeerd is, kan niet inloggen op de website of de app en kan dus ook niet reserveren.',
+        },
+        {
+          title: 'Ernstige feiten',
+          body: (
+            <>
+              Ernstige feiten melden we aan AP Hogeschool. Die kunnen leiden tot een tuchtprocedure volgens het orde- en tuchtreglement van AP (zie{' '}
+              <ExternalLink href="https://www.ap.be/reglementen-kalenders">ap.be/reglementen-kalenders</ExternalLink>).
+            </>
+          ),
+        },
+        {
+          title: 'Vragen of bezwaar',
+          body: 'Denk je dat een maatregel onterecht is? Spreek een medewerker aan of contacteer ons via Discord. We bekijken het samen met je.',
+        },
+      ],
+    },
+  ];
+}
+
 export default function InfoPage() {
-  const [activeTab, setActiveTab] = useState('conduct');
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [formUrl, setFormUrl] = useState('');
-  const [formTitle, setFormTitle] = useState('Formulier');
   const [rules, setRules] = useState<ReservationRules>({ maxPerDay: 1, minGapMinutes: 90 });
+  const [activeSection, setActiveSection] = useState('toegang');
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const res = await apiClient.GET('/settings/form');
-        if (res.data) {
-          const formData = res.data as unknown as { title: string; url: string };
-          if (formData.url && formData.url.trim() !== '') {
-            setFormUrl(formData.url);
-          }
-          setFormTitle(formData.title || 'Aanvraag / Feedback');
-        }
-      } catch {
-        // ignore
-      }
-    };
-    fetchSettings();
     apiClient
       .GET('/reservations/rules')
       .then((res) => res.data && setRules(res.data))
       .catch(() => {});
   }, []);
 
-  const sessionRules = describeSessionRules(rules);
+  const sections = buildSections(describeSessionRules(rules));
 
-  const tabs = [
-    { id: 'conduct', label: 'Gedragscode', icon: Users },
-    { id: 'hardware', label: 'Hardwareregels', icon: Cpu },
-    { id: 'general', label: 'Algemene regels', icon: ShieldAlert },
-  ];
+  // Highlight the section being read in the table of contents
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) setActiveSection(visible[0].target.id);
+      },
+      { rootMargin: '-20% 0px -60% 0px' },
+    );
+    document.querySelectorAll('[data-rule-section]').forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="min-h-screen py-24 px-6 relative overflow-hidden font-sans">
@@ -105,203 +289,115 @@ export default function InfoPage() {
 
       <div className="container mx-auto max-w-6xl relative z-10">
         <ScrollReveal direction="up">
-          <div className="mb-16 flex flex-col items-center">
+          <div className="mb-12 flex flex-col items-center text-center">
             <div className="inline-flex items-center justify-center p-4 bg-white/5 rounded-full mb-6 border border-white/10">
-              <Info size={48} className="text-[#d42422]" />
+              <ScrollText size={48} className="text-[#d42422]" />
             </div>
-            <h1 className="text-5xl md:text-8xl font-black italic tracking-tighter text-white uppercase text-center drop-shadow-lg">
-              HUB <span className="text-[#d42422]">PROTOCOLS</span>
+            <h1 className="text-5xl md:text-8xl font-black italic tracking-tighter text-white uppercase drop-shadow-lg">
+              HUIS<span className="text-[#d42422]">REGLEMENT</span>
             </h1>
-            <p className="text-[#d42422] tracking-[0.4em] font-bold text-sm mt-4 uppercase">// Verplichte lectuur voor alle studenten</p>
+            <p className="text-gray-400 tracking-[0.3em] font-bold text-xs mt-4 uppercase">AP Gaming Hub · Laatst bijgewerkt op {LAST_UPDATED}</p>
           </div>
         </ScrollReveal>
 
+        <div className="mx-auto mb-12 max-w-4xl rounded-2xl border border-white/10 bg-[#0a0f25] p-6 md:p-8 text-gray-300 leading-relaxed">
+          <p>
+            Dit huisreglement geldt voor iedereen die de AP Gaming Hub bezoekt of gebruikt. Wie reserveert of de hub binnenkomt, gaat ermee
+            akkoord. Het vult de reglementen van AP Hogeschool aan: het onderwijs- en examenreglement, het orde- en tuchtreglement en de
+            deontologische code voor studenten. Die reglementen gelden ook in de hub, en waar ze strenger zijn, gaan ze voor.
+          </p>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-8 mb-20">
-          <div className="w-full lg:w-1/3 space-y-4">
-            {tabs.map((tab) => {
-              const isActive = activeTab === tab.id;
-              const Icon = tab.icon;
+          <nav className="lg:w-1/4 shrink-0" aria-label="Inhoud van het reglement">
+            <div className="lg:sticky lg:top-28 rounded-2xl border border-white/10 bg-[#0a0f25] p-4">
+              <p className="mb-3 px-2 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500">Inhoud</p>
+              <ol className="space-y-1">
+                {sections.map((section, index) => {
+                  const Icon = section.icon;
+                  const active = activeSection === section.id;
+                  return (
+                    <li key={section.id}>
+                      <a
+                        href={`#${section.id}`}
+                        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${active ? 'bg-[#d42422] text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+                      >
+                        <Icon size={16} className={active ? 'text-white' : 'text-[#d42422]'} />
+                        <span>
+                          {index + 1}. {section.title}
+                        </span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          </nav>
+
+          <div className="flex-1 space-y-8">
+            {sections.map((section, sectionIndex) => {
+              const Icon = section.icon;
               return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center gap-4 p-6 rounded-2xl border-2 transition-all duration-300 font-bold uppercase tracking-wider text-left ${isActive ? 'bg-[#d42422] border-[#d42422] text-white shadow-[0_0_30px_rgba(212,36,34,0.3)] scale-105' : 'bg-[#0a0f25] border-white/10 text-gray-500 hover:text-white hover:border-white/30'}`}
+                <section
+                  key={section.id}
+                  id={section.id}
+                  data-rule-section
+                  className="scroll-mt-28 rounded-3xl border border-white/10 bg-[#0a0f25] p-6 md:p-10"
                 >
-                  <Icon size={24} className={isActive ? 'text-white' : 'text-[#d42422]'} />
-                  {tab.label}
-                </button>
+                  <div className="mb-6 flex items-center gap-4 border-b border-white/10 pb-4">
+                    <Icon size={28} className="shrink-0 text-[#d42422]" />
+                    <h2 className="text-2xl md:text-3xl font-black italic uppercase text-white">
+                      <span className="text-[#d42422]">{sectionIndex + 1}.</span> {section.title}
+                    </h2>
+                  </div>
+                  {section.intro && (
+                    <p className="mb-6 rounded-xl border-l-4 border-[#d42422] bg-black/40 p-4 font-medium text-gray-300">{section.intro}</p>
+                  )}
+                  <ol className="space-y-5">
+                    {section.articles.map((article, articleIndex) => (
+                      <li key={article.title} className="flex gap-4">
+                        <span className="w-10 shrink-0 pt-0.5 font-mono text-sm font-bold text-[#d42422]">
+                          {sectionIndex + 1}.{articleIndex + 1}
+                        </span>
+                        <div>
+                          <h3 className="font-bold text-white">{article.title}</h3>
+                          <p className="mt-1 text-gray-400 leading-relaxed">{article.body}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
               );
             })}
-          </div>
-
-          <div className="w-full lg:w-2/3 bg-[#0a0f25] border border-white/10 rounded-3xl p-8 md:p-12 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-              <Terminal size={200} />
-            </div>
-
-            {activeTab === 'conduct' && (
-              <div className="relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <h2 className="text-2xl md:text-4xl font-black italic text-white uppercase mb-8 border-b border-white/10 pb-4">Gedragscode</h2>
-                <div className="space-y-6 text-gray-400 leading-relaxed font-medium">
-                  <p>
-                    We respecteren elkaar, de apparatuur en de ruimte. AP Gaming Hub is een veilige en inclusieve omgeving voor iedereen. Racisme,
-                    seksisme, homofobie of andere vormen van discriminatie worden <span className="text-[#d42422]">niet getolereerd</span>.
-                  </p>
-
-                  <div className="bg-black/40 p-6 rounded-xl border-l-4 border-[#d42422]">
-                    <h4 className="text-white font-bold mb-2 uppercase tracking-widest">// Gouden regel</h4>
-                    <p>Behandel anderen zoals je zelf behandeld wilt worden. Respect staat altijd op één.</p>
-                  </div>
-
-                  <ul className="space-y-4 mt-6 list-none">
-                    <li className="flex items-start gap-4">
-                      <span className="text-[#d42422] font-black">01.</span>
-                      <span>Ruim je eigen rommel op. Laat de setup achter zoals je hem aantrof.</span>
-                    </li>
-                    <li className="flex items-start gap-4">
-                      <span className="text-[#d42422] font-black">02.</span>
-                      <span>Houd het volume op een aanvaardbaar niveau. Gebruik een headset voor in-game communicatie.</span>
-                    </li>
-                    <li className="flex items-start gap-4">
-                      <span className="text-[#d42422] font-black">03.</span>
-                      <span>Geen eten of drinken direct naast of boven de randapparatuur.</span>
-                    </li>
-                    <li className="flex items-start gap-4">
-                      <span className="text-[#d42422] font-black">04.</span>
-                      <span>Bij conflicten of overlast contacteer je meteen een beheerder.</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'hardware' && (
-              <div className="relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <h2 className="text-2xl md:text-4xl font-black italic text-white uppercase mb-8 border-b border-white/10 pb-4">Hardwareregels</h2>
-                <div className="space-y-6 text-gray-400 font-medium">
-                  <p>Onze setups zijn high-end. Behandel ze met uiterste zorg. Elke setup is ter waarde van €3.000+.</p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                    <div className="bg-white/5 p-6 rounded-xl border border-white/5 hover:border-white/20 transition-colors">
-                      <Cpu className="text-[#d42422] mb-4" size={32} />
-                      <h4 className="text-white font-bold mb-2 uppercase tracking-widest">Geen aanpassingen</h4>
-                      <p className="text-sm">
-                        Installeer geen eigen software zonder toestemming van een beheerder. Geen USB-sticks; alleen APG-goedgekeurde opslagmedia.
-                      </p>
-                    </div>
-                    <div className="bg-white/5 p-6 rounded-xl border border-white/5 hover:border-white/20 transition-colors">
-                      <ShieldAlert className="text-[#d42422] mb-4" size={32} />
-                      <h4 className="text-white font-bold mb-2 uppercase tracking-widest">Defecten melden</h4>
-                      <p className="text-sm">
-                        Meld defecte apparatuur onmiddellijk. Probeer niets zelf te repareren, anders kan je account geblokkeerd worden.
-                      </p>
-                    </div>
-                    <div className="bg-white/5 p-6 rounded-xl border border-white/5 hover:border-white/20 transition-colors">
-                      <Lock className="text-[#d42422] mb-4" size={32} />
-                      <h4 className="text-white font-bold mb-2 uppercase tracking-widest">Accountveiligheid</h4>
-                      <p className="text-sm">Deel je account niet en log altijd uit na je sessie.</p>
-                    </div>
-                    <div className="bg-white/5 p-6 rounded-xl border border-white/5 hover:border-white/20 transition-colors">
-                      <Gamepad2 className="text-[#d42422] mb-4" size={32} />
-                      <h4 className="text-white font-bold mb-2 uppercase tracking-widest">Randapparatuur</h4>
-                      <p className="text-sm">
-                        Gebruik de randapparatuur zoals bedoeld. Geen agressief gedrag richting muis, toetsenbord of controllers.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'general' && (
-              <div className="relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <h2 className="text-2xl md:text-4xl font-black italic text-white uppercase mb-8 border-b border-white/10 pb-4">Algemene regels</h2>
-                <div className="space-y-6 text-gray-400 font-medium">
-                  <p className="italic text-gray-300">Algemene richtlijnen voor toegang tot en gebruik van de AP Gaming Hub.</p>
-
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-4 bg-black/30 p-4 rounded-lg border border-white/5 hover:border-[#d42422]/50 transition-colors">
-                      <ShieldAlert className="text-[#d42422] mt-1 flex-shrink-0" size={20} />
-                      <div>
-                        <p className="font-bold text-white mb-1">Openingsuren</p>
-                        <p>
-                          De hub is alleen toegankelijk tijdens de aangegeven openingsuren of met een geldige reservatie. Zie het rooster op de
-                          website.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-4 bg-black/30 p-4 rounded-lg border border-white/5 hover:border-[#d42422]/50 transition-colors">
-                      <Users className="text-[#d42422] mt-1 flex-shrink-0" size={20} />
-                      <div>
-                        <p className="font-bold text-white mb-1">Studentenkaart verplicht</p>
-                        <p>
-                          Een geldige studentenkaart is verplicht. Alleen AP-studenten kunnen lid worden. Toon je kaart bij binnenkomst aan de
-                          beheerder.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-4 bg-black/30 p-4 rounded-lg border border-white/5 hover:border-[#d42422]/50 transition-colors">
-                      <Zap className="text-[#d42422] mt-1 flex-shrink-0" size={20} />
-                      <div>
-                        <p className="font-bold text-white mb-1">Sessieduur en limieten</p>
-                        <p>{sessionRules}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-4 bg-black/30 p-4 rounded-lg border border-white/5 hover:border-[#d42422]/50 transition-colors">
-                      <Lock className="text-[#d42422] mt-1 flex-shrink-0" size={20} />
-                      <div>
-                        <p className="font-bold text-white mb-1">Sancties</p>
-                        <p>
-                          No-shows, beschadigde apparatuur of gedragsproblemen kunnen leiden tot een tijdelijke blokkering. Bij herhaling kan een
-                          permanent verbod volgen.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            <p className="px-2 text-sm text-gray-500">
+              Het team van de AP Gaming Hub kan dit reglement aanpassen. De versie op deze pagina is altijd de geldende.
+            </p>
           </div>
         </div>
 
-        {/* Community & Resources Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20 pt-8 max-w-4xl mx-auto">
-          <ScrollReveal direction="left">
-            <div className="h-full bg-[#0a0f25] border border-white/10 p-8 rounded-[1.5rem] flex flex-col items-center text-center hover:border-[#d42422]/60 transition-all relative overflow-hidden group">
-              <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-[#d42422] rounded-full blur-[70px] opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none"></div>
-              <DiscordIcon size={42} className="text-[#d42422] mb-5" />
-              <h2 className="text-2xl font-bold italic uppercase mb-3 text-white tracking-wider">Word lid van Discord</h2>
-              <p className="text-gray-400 mb-7 text-base font-medium">Chat met andere studenten, vind teammates en blijf op de hoogte van events.</p>
+        {/* Community */}
+        <ScrollReveal direction="up">
+          <div className="mb-20 pt-8">
+            <div className="bg-[#0a0f25] border border-white/10 p-8 md:p-10 rounded-[1.5rem] flex flex-col md:flex-row items-center gap-6 md:gap-10 text-center md:text-left hover:border-[#d42422]/60 transition-all relative overflow-hidden group">
+              <div className="absolute -right-10 -bottom-10 w-60 h-60 bg-[#d42422] rounded-full blur-[90px] opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none"></div>
+              <DiscordIcon size={56} className="text-[#d42422] shrink-0" />
+              <div className="flex-1">
+                <h2 className="text-2xl md:text-3xl font-bold italic uppercase mb-2 text-white tracking-wider">Word lid van Discord</h2>
+                <p className="text-gray-400 text-base font-medium">
+                  Chat met andere studenten, vind teammates en blijf op de hoogte van events. Vragen over dit reglement kan je er ook kwijt.
+                </p>
+              </div>
               <a
                 href="https://discord.gg/FGCC9GTetC"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-[#d42422] hover:bg-[#ff3333] text-white px-6 py-3 rounded-lg font-bold uppercase tracking-wider text-sm transition-all hover:shadow-[0_0_20px_rgba(212,36,34,0.5)]"
+                className="shrink-0 bg-[#d42422] hover:bg-[#ff3333] text-white px-8 py-3 rounded-lg font-bold uppercase tracking-wider text-sm transition-all hover:shadow-[0_0_20px_rgba(212,36,34,0.5)]"
               >
                 Open Discord
               </a>
             </div>
-          </ScrollReveal>
-
-          {formUrl && (
-            <ScrollReveal direction="right">
-              <div className="h-full bg-gradient-to-br from-[#d42422] to-[#990000] p-8 rounded-[1.5rem] flex flex-col items-center text-center hover:scale-[1.01] transition-transform relative overflow-hidden group">
-                <div className="absolute -left-10 -top-10 w-40 h-40 bg-white rounded-full blur-[70px] opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none"></div>
-                <ClipboardList size={42} className="text-white mb-5" strokeWidth={1.5} />
-                <h2 className="text-2xl font-bold italic uppercase mb-3 text-white tracking-wider">{formTitle}</h2>
-                <p className="text-white/90 mb-7 text-base font-medium">Suggesties of hulp nodig? Dien een formulier in voor de beheerders.</p>
-                <a
-                  href={formUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white text-[#d42422] px-6 py-3 rounded-lg font-bold uppercase tracking-wider text-sm hover:shadow-lg transition-shadow"
-                >
-                  Open formulier
-                </a>
-              </div>
-            </ScrollReveal>
-          )}
-        </div>
+          </div>
+        </ScrollReveal>
 
         {/* FAQ Section */}
         <ScrollReveal direction="up">
