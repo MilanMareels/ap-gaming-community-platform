@@ -42,6 +42,9 @@ import { describeAudit, setAuditActor } from '../audit/audit-context.js';
 
 type LoginQuery = { returnUrl?: string; linkMode?: string };
 
+/** Where the mobile app starts its login; a login with this return URL belongs to the app. */
+const MOBILE_HANDOFF_PATH = '/api/auth/mobile/handoff';
+
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -87,7 +90,7 @@ export class AuthController {
     if (callbackResult.user && 'blockedUntil' in callbackResult) {
       setAuditActor({ sub: callbackResult.user.id, email: callbackResult.user.email });
       describeAudit({ event: 'login.refused', reason: 'Account geblokkeerd' });
-      return res.redirect(this.blockedUrl(callbackResult.blockedUntil ?? null));
+      return res.redirect(this.blockedUrl(callbackResult.blockedUntil ?? null, state.returnUrl));
     }
 
     if (!callbackResult.token) {
@@ -139,7 +142,7 @@ export class AuthController {
     if (callbackResult.user && 'blockedUntil' in callbackResult) {
       setAuditActor({ sub: callbackResult.user.id, email: callbackResult.user.email });
       describeAudit({ event: 'login.refused', reason: 'Account geblokkeerd' });
-      return res.redirect(this.blockedUrl(callbackResult.blockedUntil ?? null));
+      return res.redirect(this.blockedUrl(callbackResult.blockedUntil ?? null, state.returnUrl));
     }
 
     if (!callbackResult.token) {
@@ -162,9 +165,10 @@ export class AuthController {
     const token = this.extractToken(req);
     const claims = token ? await this.authService.verifyToken(token).catch(() => undefined) : undefined;
 
-    if (claims && (await this.authService.isSessionBlocked(claims))) {
+    const block = claims ? await this.authService.getActiveBlock(claims.realUserId ?? claims.sub) : null;
+    if (block) {
       this.clearAuthCookies(res);
-      return res.redirect(`${MOBILE_APP_CALLBACK_URL}?error=blocked`);
+      return res.redirect(this.blockedUrl(block.expiresAt, MOBILE_HANDOFF_PATH));
     }
 
     if (claims && (await this.authService.canUseMobileApp(claims.realUserId ?? claims.sub))) {
@@ -181,7 +185,7 @@ export class AuthController {
       return res.redirect(`${MOBILE_APP_CALLBACK_URL}?error=not-manager`);
     }
 
-    const returnUrl = `/api/auth/mobile/handoff?challenge=${encodeURIComponent(query.challenge)}&provider=${provider}`;
+    const returnUrl = `${MOBILE_HANDOFF_PATH}?challenge=${encodeURIComponent(query.challenge)}&provider=${provider}`;
     return res.redirect(`${this.config.frontend.url}/api/auth/${provider}/login?returnUrl=${encodeURIComponent(returnUrl)}`);
   }
 
@@ -276,9 +280,16 @@ export class AuthController {
 
   // --------------- Helpers ---------------
 
-  /** The page that tells a blocked user they can't sign in, and until when. */
-  private blockedUrl(until: Date | null) {
-    return `${this.config.frontend.url}${AUTH_BLOCKED_PATH}${until ? `?until=${encodeURIComponent(until.toISOString())}` : ''}`;
+  /**
+   * Where a blocked user goes instead of signing in: the page that says until when, or back to the mobile app
+   * when the login started there, so the app can say it instead of leaving them on a web page in its browser tab.
+   */
+  private blockedUrl(until: Date | null, returnUrl?: string) {
+    const untilParam = until ? `until=${encodeURIComponent(until.toISOString())}` : '';
+    if (returnUrl?.startsWith(MOBILE_HANDOFF_PATH)) {
+      return `${MOBILE_APP_CALLBACK_URL}?error=blocked${untilParam ? `&${untilParam}` : ''}`;
+    }
+    return `${this.config.frontend.url}${AUTH_BLOCKED_PATH}${untilParam ? `?${untilParam}` : ''}`;
   }
 
   private toState(query: LoginQuery) {
