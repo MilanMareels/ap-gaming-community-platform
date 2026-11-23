@@ -16,6 +16,7 @@ import { wallClockNow } from '../../common/wall-clock.js';
 import { bookableDays, hasAllowedDuration, wallClockDateKey, wallClockDay } from './booking-window.js';
 import { ReservationRulesService } from './reservation-rules.service.js';
 import { PeopleService, normalizeSNumber } from '../people/people.service.js';
+import { findActiveNotesByUser } from '../users/user-notes.js';
 
 /** Number of no-shows after which a user can no longer make reservations. */
 export const NO_SHOW_LIMIT = 3;
@@ -451,8 +452,12 @@ export class ReservationsService {
           })
         : reservation;
 
+    const activeNotes = await findActiveNotesByUser(this.prisma, [verifiedReservation.userId]);
+
     return {
       cuid: verifiedReservation.cuid,
+      userId: verifiedReservation.userId,
+      activeNotes: activeNotes.get(verifiedReservation.userId) ?? [],
       email: verifiedReservation.email,
       sNumber: verifiedReservation.user.sNumber,
       inventory: verifiedReservation.inventory,
@@ -507,11 +512,18 @@ export class ReservationsService {
       },
     });
 
+    // Staff at the desk see straight away who has a warning or block on their name
+    const activeNotes = await findActiveNotesByUser(
+      this.prisma,
+      reservations.map((r) => r.userId),
+    );
+
     return reservations.map((r) => ({
       ...r,
       user: {
         ...r.user,
         reservationCount: r.user._count.reservations,
+        activeNotes: activeNotes.get(r.userId) ?? [],
       },
     }));
   }

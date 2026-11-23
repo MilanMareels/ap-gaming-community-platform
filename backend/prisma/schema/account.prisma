@@ -33,10 +33,26 @@ model UserNote {
   authorId  Int
   author    User     @relation("UserNoteAuthor", fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
+  type      UserNoteType @default(NOTE)
   content   String
+
+  /// When the note stops counting; null keeps it active until someone ends it.
+  expiresAt DateTime?
+
+  /// When this warning was e-mailed to the person it is about; null when it was not.
+  emailedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId, type, expiresAt])
+}
+
+/// NOTE and WARNING are for staff only; an active BLOCK also keeps the person off the site.
+enum UserNoteType {
+  NOTE
+  WARNING
+  BLOCK
 }
 
 model GoogleSSOUser {

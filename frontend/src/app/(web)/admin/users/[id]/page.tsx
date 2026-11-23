@@ -10,35 +10,28 @@ import {
   Loader2,
   Shield,
   BarChart3,
-  StickyNote,
-  Send,
-  X,
   Eye,
   ScrollText,
+  Ban,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/admin/PageHeader';
 import { getApiErrorMessage } from '@/util/api-error';
+import type { UserNote } from '@/api';
+import { describeExpiry } from '@/components/notes/note-types';
 import { useAdmin } from '../../AdminShell';
+import { UserNotesPanel } from './UserNotesPanel';
 
 type SsoLink = { id: number; ssoId: string };
-
-type UserNote = {
-  id: number;
-  content: string;
-  authorId: number;
-  authorName: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
 
 type UserDetail = {
   id: number;
   name: string | null;
   email: string;
   sNumber: string;
+  isAdmin: boolean;
   googleLinks: SsoLink[];
   microsoftLinks: SsoLink[];
   reservationCount: number;
@@ -52,6 +45,7 @@ type UserDetail = {
     status: string;
   }[];
   notes: UserNote[];
+  activeBlock: UserNote | null;
 };
 
 type RoleListItem = {
@@ -98,14 +92,10 @@ export default function UserDetailPage() {
   const [userRoleIds, setUserRoleIds] = useState<Set<number>>(new Set());
   const [togglingRole, setTogglingRole] = useState<number | null>(null);
 
-  // Notes
-  const [newNote, setNewNote] = useState('');
-  const [submittingNote, setSubmittingNote] = useState(false);
-  const [deletingNoteId, setDeletingNoteId] = useState<number | null>(null);
-
   const canManageUsers = hasPermission('users.manage');
   const canManageRoles = hasPermission('users.roles.manage');
-  const canDeleteOtherNotes = hasPermission('users.notes.delete_others');
+  const canEditOtherNotes = hasPermission('users.notes.delete_others');
+  const canBlock = hasPermission('users.block');
   const canViewStats = hasPermission('statistics.view');
   const canViewAudit = hasPermission('audit.view');
   const isRealAdmin = (currentUser.roles ?? []).includes('Admin') && !currentUser.impersonation;
@@ -182,24 +172,6 @@ export default function UserDetailPage() {
     }
   };
 
-  const handleAddNote = async () => {
-    if (!newNote.trim()) return;
-    setSubmittingNote(true);
-    setError('');
-    try {
-      await api(`/users/${userId}/notes`, {
-        method: 'POST',
-        body: JSON.stringify({ content: newNote.trim() }),
-      });
-      setNewNote('');
-      await load();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add note');
-    } finally {
-      setSubmittingNote(false);
-    }
-  };
-
   const handleImpersonateUser = async () => {
     if (!confirm(`Wil je de site bekijken als ${detail?.name || 'deze gebruiker'}?`)) return;
     try {
@@ -210,18 +182,9 @@ export default function UserDetailPage() {
     }
   };
 
-  const handleDeleteNote = async (noteId: number) => {
-    if (!confirm('Ben je zeker dat je deze notitie wilt verwijderen?')) return;
-    setDeletingNoteId(noteId);
-    setError('');
-    try {
-      await api(`/users/${userId}/notes/${noteId}`, { method: 'DELETE' });
-      await load();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete note');
-    } finally {
-      setDeletingNoteId(null);
-    }
+  const liftBlock = async () => {
+    if (!detail?.activeBlock || !confirm(`De blokkade van ${detail.name || detail.email} nu opheffen?`)) return;
+    await action(() => api(`/users/${userId}/notes/${detail.activeBlock!.id}`, { method: 'PATCH', body: JSON.stringify({ end: true }) }));
   };
 
   if (loading) {
@@ -284,6 +247,26 @@ export default function UserDetailPage() {
       />
 
       {error && <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{error}</div>}
+
+      {detail.activeBlock && (
+        <div className="mb-6 flex flex-col gap-3 rounded-xl border border-red-500/40 bg-red-950/30 p-4 sm:flex-row sm:items-center">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/15">
+            <Ban size={20} className="text-red-400" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-bold text-red-100">Geblokkeerd: kan niet inloggen op de site of de app</p>
+            <p className="text-sm text-red-200/80">{describeExpiry(detail.activeBlock.expiresAt)}</p>
+            <p className="mt-1 truncate text-sm text-red-200/60" title={detail.activeBlock.content}>
+              {detail.activeBlock.content}
+            </p>
+          </div>
+          {canBlock && (
+            <Button size="sm" variant="secondary" onClick={liftBlock} disabled={busy}>
+              Blokkade opheffen
+            </Button>
+          )}
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left column */}
@@ -451,69 +434,16 @@ export default function UserDetailPage() {
 
         {/* Right column: Notes */}
         <div className="space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <StickyNote size={16} className="text-yellow-500" />
-              <div className={sectionTitle + ' !mb-0'}>Notities</div>
-            </div>
-
-            <div className="mb-4">
-              <textarea
-                placeholder="Schrijf een notitie..."
-                value={newNote}
-                onChange={(e) => setNewNote(e.target.value)}
-                rows={3}
-                className={inputClass + ' resize-none'}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                    handleAddNote();
-                  }
-                }}
-              />
-              <div className="flex items-center justify-between mt-2">
-                <span className="text-[10px] text-gray-600">Ctrl+Enter om te versturen</span>
-                <Button size="sm" variant="primary" onClick={handleAddNote} disabled={submittingNote || !newNote.trim()}>
-                  {submittingNote ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
-                  Toevoegen
-                </Button>
-              </div>
-            </div>
-
-            {detail.notes.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <StickyNote size={24} className="mx-auto mb-2 opacity-40" />
-                <p className="text-sm">Nog geen notities</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {detail.notes.map((note) => {
-                  const canDelete = note.authorId === currentUser.id || canDeleteOtherNotes;
-                  return (
-                    <div key={note.id} className="bg-slate-950 border border-slate-800 rounded-lg p-3 group">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm text-gray-300 whitespace-pre-wrap break-words flex-1">{note.content}</p>
-                        {canDelete && (
-                          <button
-                            onClick={() => handleDeleteNote(note.id)}
-                            disabled={deletingNoteId === note.id}
-                            className="p-1 rounded text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all shrink-0"
-                            title="Verwijderen"
-                          >
-                            {deletingNoteId === note.id ? <Loader2 size={12} className="animate-spin" /> : <X size={12} />}
-                          </button>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 mt-2 text-[11px] text-gray-600">
-                        <span className="font-medium">{note.authorName || 'Onbekend'}</span>
-                        <span>·</span>
-                        <span>{new Date(note.createdAt).toLocaleString('nl-NL')}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          <UserNotesPanel
+            user={detail}
+            notes={detail.notes}
+            currentUserId={currentUser.id}
+            isSelf={isSelf}
+            canEditOthers={canEditOtherNotes}
+            canBlock={canBlock}
+            onChanged={load}
+            onError={setError}
+          />
         </div>
       </div>
     </>

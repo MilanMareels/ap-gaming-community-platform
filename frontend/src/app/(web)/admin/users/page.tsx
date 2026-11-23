@@ -23,6 +23,7 @@ type UserListItem = {
   reservationCount: number;
   noShowCount: number;
   roles: string[];
+  isBlocked: boolean;
 };
 
 type UserListResponse = {
@@ -207,7 +208,14 @@ export default function AdminUsersPage() {
               {!loading &&
                 users.map((u) => (
                   <tr key={u.id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3.5 font-medium text-white">{u.name || <span className="text-gray-500">—</span>}</td>
+                    <td className="px-4 py-3.5 font-medium text-white">
+                      {u.name || <span className="text-gray-500">—</span>}
+                      {u.isBlocked && (
+                        <Badge variant="danger" className="ml-2">
+                          Geblokkeerd
+                        </Badge>
+                      )}
+                    </td>
                     <td className="px-4 py-3.5 text-gray-300">{u.email}</td>
                     <td className="px-4 py-3.5 text-gray-400 text-xs font-mono">{u.sNumber}</td>
                     <td className="px-4 py-3.5">

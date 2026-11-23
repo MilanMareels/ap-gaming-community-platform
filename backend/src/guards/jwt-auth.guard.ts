@@ -33,7 +33,8 @@ export class JwtAuthGuard implements CanActivate {
         const extracted = this.extractToken(publicRequest);
         if (extracted.token) {
           const claims = await this.authService.verifyToken(extracted.token);
-          publicRequest.user = claims;
+          // A blocked user browses public pages as a visitor
+          if (!(await this.authService.isSessionBlocked(claims))) publicRequest.user = claims;
         }
       } catch {
         // Ignore - user just won't be populated
@@ -68,6 +69,12 @@ export class JwtAuthGuard implements CanActivate {
       const response = context.switchToHttp().getResponse<Response>();
       this.clearAuthCookies(response);
       throw new UnauthorizedException('Invalid or expired authentication token');
+    }
+
+    // A block takes effect on the next request, also for sessions that were open before it
+    if (await this.authService.isSessionBlocked(claims)) {
+      this.clearAuthCookies(context.switchToHttp().getResponse<Response>());
+      throw new UnauthorizedException('Account blocked');
     }
 
     (request as Request & { user: typeof claims }).user = claims;

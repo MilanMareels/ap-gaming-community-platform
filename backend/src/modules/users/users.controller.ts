@@ -5,6 +5,7 @@ import {
   CreateUserNoteDto,
   CreateWhitelistDto,
   UpdateUserDto,
+  UpdateUserNoteDto,
   UserDetailDto,
   UserListQueryDto,
   UserListResponseDto,
@@ -90,20 +91,31 @@ export class UsersController {
 
   @Post(':id/notes')
   @RequirePermissions('users.view', 'users.manage')
-  @ApiOperation({ summary: 'Add an admin note to a user' })
+  @ApiOperation({ summary: 'Add a note, warning or block (block requires users.block) to a user' })
   @ApiCreatedResponse({ type: UserNoteDto })
-  createNote(@Param('id') id: string, @Body() dto: CreateUserNoteDto, @Req() req: Request): Promise<UserNoteDto> {
-    return this.usersService.createNote(+id, this.currentUserId(req), dto);
+  async createNote(@Param('id') id: string, @Body() dto: CreateUserNoteDto, @Req() req: Request): Promise<UserNoteDto> {
+    const userId = this.currentUserId(req);
+    return this.usersService.createNote(+id, userId, dto, await this.permissionsOf(req));
+  }
+
+  @Patch(':id/notes/:noteId')
+  @RequirePermissions('users.view', 'users.manage')
+  @ApiOperation({ summary: 'Edit or end a note (own notes always, others require users.notes.delete_others; blocks require users.block)' })
+  @ApiOkResponse({ type: UserNoteDto })
+  async updateNote(
+    @Param('id') id: string,
+    @Param('noteId') noteId: string,
+    @Body() dto: UpdateUserNoteDto,
+    @Req() req: Request,
+  ): Promise<UserNoteDto> {
+    return this.usersService.updateNote(+id, +noteId, this.currentUserId(req), dto, await this.permissionsOf(req));
   }
 
   @Delete(':id/notes/:noteId')
   @RequirePermissions('users.view', 'users.manage')
-  @ApiOperation({ summary: 'Delete a note (own notes always, others require users.notes.delete_others)' })
-  async deleteNote(@Param('id') _id: string, @Param('noteId') noteId: string, @Req() req: Request) {
-    const userId = this.currentUserId(req);
-    const permissions = await this.rbacService.getPermissionsForUser(userId);
-    const canDeleteOthers = permissions.has('users.notes.delete_others');
-    return this.usersService.deleteNote(+noteId, userId, canDeleteOthers);
+  @ApiOperation({ summary: 'Delete a note (own notes always, others require users.notes.delete_others; blocks require users.block)' })
+  async deleteNote(@Param('id') id: string, @Param('noteId') noteId: string, @Req() req: Request) {
+    return this.usersService.deleteNote(+id, +noteId, this.currentUserId(req), await this.permissionsOf(req));
   }
 
   @Delete(':id')
@@ -111,6 +123,13 @@ export class UsersController {
   @ApiOperation({ summary: 'Delete a user and cascade their reservations' })
   delete(@Param('id') id: string, @Req() req: Request) {
     return this.usersService.delete(+id, this.currentUserId(req));
+  }
+
+  /** The permissions that count for this request: those of the impersonated role when impersonating one. */
+  private async permissionsOf(req: Request): Promise<Set<string>> {
+    const user = (req as Request & { user?: JwtPayload }).user;
+    if (user?.impersonatingRoleId) return new Set(user.permissions ?? []);
+    return this.rbacService.getPermissionsForUser(this.currentUserId(req));
   }
 
   private currentUserId(req: Request): number {

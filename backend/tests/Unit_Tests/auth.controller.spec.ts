@@ -34,6 +34,7 @@ describe('AuthController mobile handoff', () => {
     authService = {
       verifyToken: jest.fn<() => Promise<unknown>>().mockResolvedValue(claims),
       canUseMobileApp: jest.fn<() => Promise<boolean>>().mockResolvedValue(true),
+      isSessionBlocked: jest.fn<() => Promise<boolean>>().mockResolvedValue(false),
       createMobileHandoffCode: jest.fn<() => Promise<string>>().mockResolvedValue('the-code'),
     };
     res = { redirect: jest.fn(), clearCookie: jest.fn() };

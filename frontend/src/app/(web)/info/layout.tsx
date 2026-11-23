@@ -5,7 +5,7 @@ import { pageMetadata } from '@/util/seo';
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata({
     title: 'Huisreglement',
-    description: 'De huisregels van de AP Gaming Hub: algemene regels, gedragscode en hardwareregels voor iedereen die komt gamen.',
+    description: 'Het huisreglement van de AP Gaming Hub: toegang en reservaties, gedragscode, roken, alcohol, eten en drinken, apparatuur en sancties.',
     path: '/info',
     image: await cardImage('page', 'info'),
   });

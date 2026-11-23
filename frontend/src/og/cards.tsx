@@ -68,7 +68,7 @@ function simpleCard(path: string[], spec: SimpleCard): Card {
 
 const STATIC_PAGES: Record<string, SimpleCard> = {
   home: { title: 'AP Gaming Hub', eyebrow: 'Reserve. Play. Repeat.', photo: 'hub', chips: ["Gaming pc's", 'Consoles', 'Esports', 'Events'] },
-  info: { title: 'Huisreglement', eyebrow: 'Gaming Hub', photo: 'setup', chips: ['Algemene regels', 'Gedragscode', 'Hardwareregels'] },
+  info: { title: 'Huisreglement', eyebrow: 'Gaming Hub', photo: 'setup', chips: ['Toegang', 'Gedragscode', 'Eten en drinken', 'Apparatuur'] },
   privacy: { title: 'Privacybeleid', eyebrow: 'AP Gaming', text: 'Welke gegevens we verzamelen, waarom we ze nodig hebben en hoe we ermee omgaan.' },
   twitch: { title: 'Live op Twitch', eyebrow: 'Livestream', photo: 'play', chips: ['twitch.tv/ap_gamingbe'] },
   'how-to-cancel': {
@@ -82,6 +82,7 @@ const STATIC_PAGES: Record<string, SimpleCard> = {
   'cancel-reservation': { title: 'Reservatie annuleren', eyebrow: 'Reserveren', photo: 'hub' },
   submission: { title: 'Je inzending', eyebrow: 'Formulier', photo: 'setup' },
   'unknown-user': { title: 'Geen toegang', eyebrow: 'AP Gaming Hub' },
+  blocked: { title: 'Account geblokkeerd', eyebrow: 'AP Gaming Hub' },
   'team-schedule': { title: 'Teamplanning', eyebrow: 'AP Esports', photo: 'setup' },
 };
 

@@ -1,0 +1,63 @@
+<mjml>
+  <mj-head>
+    <mj-title>Waarschuwing - AP Gaming Hub</mj-title>
+    <mj-attributes>
+      <mj-all font-family="Arial, sans-serif" />
+      <mj-text font-size="14px" color="#333333" line-height="1.6" />
+      <mj-button background-color="#DC2626" color="#ffffff" border-radius="4px" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f4">
+    <mj-section background-color="#DC2626" padding="30px 0">
+      <mj-column>
+        <mj-text align="center" font-size="32px" font-weight="bold" color="#ffffff"> AP Gaming Hub </mj-text>
+        <mj-text align="center" font-size="18px" color="#ffffff"> Waarschuwing </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#ffffff" padding="40px 30px 10px">
+      <mj-column>
+        <mj-text font-size="16px" color="#1f2937"> Beste {{ name | escape }}, </mj-text>
+        <mj-text font-size="14px" color="#4b5563">
+          Het team van de AP Gaming Hub geeft je een waarschuwing. Hieronder lees je waarom.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#ffffff" padding="0 30px">
+      <mj-column background-color="#fef3c7" border-left="4px solid #d97706" padding="16px 20px">
+        <mj-text font-size="14px" color="#78350f" line-height="1.7">{{ content | escape | newline_to_br }}</mj-text>
+        {% if expiresAt %}
+        <mj-text font-size="12px" color="#92400e" padding-top="0"> Deze waarschuwing geldt tot {{ expiresAt }}. </mj-text>
+        {% endif %}
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#ffffff" padding="20px 30px 10px">
+      <mj-column>
+        <mj-text font-size="14px" color="#4b5563">
+          We vragen je om het huisreglement van de Gaming Hub opnieuw door te nemen. Bij herhaling kan je toegang tot de Gaming Hub en
+          de website tijdelijk of definitief ingetrokken worden.
+        </mj-text>
+        <mj-text font-size="14px" color="#4b5563">
+          Denk je dat dit een vergissing is? Spreek een medewerker aan in de Gaming Hub of contacteer ons via
+          <a href="https://discord.gg/FGCC9GTetC" style="color: #dc2626">Discord</a>.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#ffffff" padding="10px 30px 30px">
+      <mj-column>
+        <mj-button href="{{ rulesUrl }}" font-size="14px"> Lees het huisreglement </mj-button>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#1f2937" padding="30px 30px">
+      <mj-column>
+        <mj-text align="center" font-size="13px" color="#9ca3af" line-height="1.6"> Voor vragen, neem contact met ons op. </mj-text>
+        <mj-divider border-color="#374151" padding="20px 0"></mj-divider>
+        <mj-text align="center" font-size="11px" color="#6b7280"> © {{ currentYear }} AP Gaming Hub. Alle rechten voorbehouden. </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

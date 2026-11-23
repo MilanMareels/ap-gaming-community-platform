@@ -126,7 +126,10 @@ export const UserNoteScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   authorId: 'authorId',
+  type: 'type',
   content: 'content',
+  expiresAt: 'expiresAt',
+  emailedAt: 'emailedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

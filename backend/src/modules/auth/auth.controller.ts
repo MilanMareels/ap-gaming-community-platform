@@ -32,6 +32,7 @@ import {
   AUTH_COOKIE_NAME,
   AUTH_DEFAULT_RETURN_URL,
   AUTH_LEGACY_COOKIE_NAME,
+  AUTH_BLOCKED_PATH,
   AUTH_UNKNOWN_USER_PATH,
   MOBILE_APP_CALLBACK_URL,
 } from './constants/auth.constants.js';
@@ -83,6 +84,12 @@ export class AuthController {
     describeAudit({ event: 'login', provider: 'google' });
     const callbackResult = await this.authService.handleGoogleCallback(query.code);
 
+    if (callbackResult.user && 'blockedUntil' in callbackResult) {
+      setAuditActor({ sub: callbackResult.user.id, email: callbackResult.user.email });
+      describeAudit({ event: 'login.refused', reason: 'Account geblokkeerd' });
+      return res.redirect(this.blockedUrl(callbackResult.blockedUntil ?? null));
+    }
+
     if (!callbackResult.token) {
       describeAudit({ event: 'login.refused', reason: 'Geen account voor dit e-mailadres' });
       return res.redirect(`${this.config.frontend.url}${AUTH_UNKNOWN_USER_PATH}`);
@@ -129,6 +136,12 @@ export class AuthController {
     describeAudit({ event: 'login', provider: 'microsoft' });
     const callbackResult = await this.authService.handleMicrosoftCallback(query.code);
 
+    if (callbackResult.user && 'blockedUntil' in callbackResult) {
+      setAuditActor({ sub: callbackResult.user.id, email: callbackResult.user.email });
+      describeAudit({ event: 'login.refused', reason: 'Account geblokkeerd' });
+      return res.redirect(this.blockedUrl(callbackResult.blockedUntil ?? null));
+    }
+
     if (!callbackResult.token) {
       describeAudit({ event: 'login.refused', reason: 'Geen account voor dit e-mailadres' });
       return res.redirect(`${this.config.frontend.url}${AUTH_UNKNOWN_USER_PATH}`);
@@ -148,6 +161,11 @@ export class AuthController {
   async mobileHandoff(@Query() query: MobileHandoffQueryDto, @Req() req: Request, @Res() res: Response) {
     const token = this.extractToken(req);
     const claims = token ? await this.authService.verifyToken(token).catch(() => undefined) : undefined;
+
+    if (claims && (await this.authService.isSessionBlocked(claims))) {
+      this.clearAuthCookies(res);
+      return res.redirect(`${MOBILE_APP_CALLBACK_URL}?error=blocked`);
+    }
 
     if (claims && (await this.authService.canUseMobileApp(claims.realUserId ?? claims.sub))) {
       const code = await this.authService.createMobileHandoffCode(claims, query.challenge);
@@ -257,6 +275,11 @@ export class AuthController {
   }
 
   // --------------- Helpers ---------------
+
+  /** The page that tells a blocked user they can't sign in, and until when. */
+  private blockedUrl(until: Date | null) {
+    return `${this.config.frontend.url}${AUTH_BLOCKED_PATH}${until ? `?until=${encodeURIComponent(until.toISOString())}` : ''}`;
+  }
 
   private toState(query: LoginQuery) {
     return {
