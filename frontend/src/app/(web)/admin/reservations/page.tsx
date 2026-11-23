@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Trash2, Gamepad2, Plus, Pencil, QrCode, CalendarDays, Search, UserPlus, UserCheck, History } from 'lucide-react';
+import { Trash2, Gamepad2, Plus, Pencil, QrCode, CalendarDays, Search, UserPlus, UserCheck, History, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Pagination } from '@/components/ui/Pagination';
@@ -13,6 +13,7 @@ import type { ReservationWithUser, ReservationStatus } from '@/api';
 import ReservationModal from './ReservationModal';
 import ReservationQrScannerModal from '@/components/reservations/ReservationQrScannerModal';
 import { formatBookedAt } from '@/util/booking-time';
+import { UserNotesFlag } from '@/components/notes/UserNotes';
 import { useAdmin } from '../AdminShell';
 
 const ITEMS_PER_PAGE = 10;
@@ -46,9 +47,16 @@ function BookedAt({ reservation, className = '' }: { reservation: ReservationWit
   );
 }
 
+const isBlocked = (r: ReservationWithUser) => r.user?.activeNotes?.some((note) => note.type === 'BLOCK') ?? false;
+
 function getInitials(name: string | undefined): string {
   if (!name) return '?';
-  return name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+  return name
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 }
 
 function ReservationTypeBadge({ reservationCount }: { reservationCount?: number }) {
@@ -57,9 +65,7 @@ function ReservationTypeBadge({ reservationCount }: { reservationCount?: number 
     <span
       title={isNew ? 'Nieuwe bezoeker' : 'Terugkerende bezoeker'}
       className={`inline-flex items-center justify-center w-5 h-5 rounded shrink-0 ${
-        isNew
-          ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
-          : 'bg-blue-500/20 border border-blue-500/30 text-blue-400'
+        isNew ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400' : 'bg-blue-500/20 border border-blue-500/30 text-blue-400'
       }`}
     >
       {isNew ? <UserPlus size={12} /> : <UserCheck size={12} />}
@@ -70,6 +76,7 @@ function ReservationTypeBadge({ reservationCount }: { reservationCount?: number 
 export default function AdminReservationsPage() {
   const { hasPermission } = useAdmin();
   const canViewAudit = hasPermission('audit.view');
+  const canViewUsers = hasPermission('users.view') || hasPermission('users.manage');
   const [reservations, setReservations] = useState<ReservationWithUser[]>([]);
   const [filterDate, setFilterDate] = useState(todayLocal);
   const [searchQuery, setSearchQuery] = useState('');
@@ -149,6 +156,15 @@ export default function AdminReservationsPage() {
     })
     .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
+  // Everyone expected on the chosen day who has notes that still count, so staff know before they arrive
+  const flagged = reservations
+    .filter((r) => (r.status === 'RESERVED' || r.status === 'PRESENT') && r.user?.activeNotes?.length)
+    // Without a date: everyone still to come, not the whole history
+    .filter((r) => (filterDate ? dateFromISO(r.startTime) === filterDate : dateFromISO(r.startTime) >= todayLocal()))
+    .sort((a, b) => a.startTime.localeCompare(b.startTime))
+    // Their first reservation of the day is when they walk in
+    .filter((r, index, list) => list.findIndex((other) => other.userId === r.userId) === index);
+
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
@@ -197,6 +213,30 @@ export default function AdminReservationsPage() {
           </>
         }
       />
+
+      {flagged.length > 0 && (
+        <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-950/10 p-4">
+          <div className="mb-3 flex items-center gap-2">
+            <TriangleAlert size={16} className="text-amber-400" />
+            <h2 className="text-sm font-bold text-white">Let op {filterDate === todayLocal() ? 'vandaag' : filterDate ? `op ${filterDate}` : 'bij komende reservaties'}</h2>
+            <span className="text-xs text-gray-500">
+              {flagged.length} {flagged.length === 1 ? 'persoon heeft' : 'personen hebben'} actieve notities
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {flagged.map((r) => (
+              <UserNotesFlag
+                key={r.userId}
+                notes={r.user?.activeNotes}
+                userId={r.userId}
+                userName={r.user?.name || r.email}
+                canViewUser={canViewUsers}
+                label={`${r.user?.name || r.email} · ${filterDate ? '' : `${dateFromISO(r.startTime)} `}${formatTime(r.startTime)}`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="bg-linear-to-br from-slate-900 via-slate-900 to-slate-900/90 rounded-xl border border-slate-800 overflow-hidden">
         {/* Toolbar */}
@@ -250,7 +290,12 @@ export default function AdminReservationsPage() {
             </div>
             {/* Quick device filter buttons */}
             <div className="flex gap-2 mt-2">
-              {[{ value: null, label: 'Alle' }, { value: 'pc', label: 'PC' }, { value: 'ps5', label: 'PS5' }, { value: 'switch', label: 'Switch' }].map((opt) => (
+              {[
+                { value: null, label: 'Alle' },
+                { value: 'pc', label: 'PC' },
+                { value: 'ps5', label: 'PS5' },
+                { value: 'switch', label: 'Switch' },
+              ].map((opt) => (
                 <button
                   key={opt.label}
                   onClick={() => setDeviceFilter(deviceFilter === opt.value ? null : opt.value)}
@@ -270,21 +315,29 @@ export default function AdminReservationsPage() {
         {/* Mobile cards */}
         <div className="md:hidden p-3 space-y-3">
           {paginated.map((r) => (
-            <div key={r.id} className="bg-linear-to-br from-slate-900 via-slate-900 to-slate-900/80 rounded-xl border border-slate-800 overflow-hidden hover:border-slate-700 transition-all">
+            <div
+              key={r.id}
+              className={`bg-linear-to-br from-slate-900 via-slate-900 to-slate-900/80 rounded-xl border overflow-hidden hover:border-slate-700 transition-all ${isBlocked(r) ? 'border-red-500/40' : 'border-slate-800'}`}
+            >
               <div className="p-4">
                 <div className="flex items-start justify-between gap-2 mb-3">
-                  <Link href={`/admin/users/${r.userId}`} className="flex items-center gap-3 group/user">
-                    <div className="w-9 h-9 rounded-full bg-linear-to-br from-red-500/20 to-red-600/10 border border-red-500/20 flex items-center justify-center text-xs font-bold text-red-400 shrink-0">
-                      {getInitials(r.user?.name)}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <p className="font-medium text-white text-sm group-hover/user:text-red-400 transition-colors">{r.user?.name || 'Unknown'}</p>
-                        <ReservationTypeBadge reservationCount={r.user?.reservationCount} />
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Link href={`/admin/users/${r.userId}`} className="flex items-center gap-3 group/user min-w-0">
+                      <div className="w-9 h-9 rounded-full bg-linear-to-br from-red-500/20 to-red-600/10 border border-red-500/20 flex items-center justify-center text-xs font-bold text-red-400 shrink-0">
+                        {getInitials(r.user?.name)}
                       </div>
-                      <p className="text-xs text-gray-500 mt-0.5">{r.user?.sNumber || r.email}</p>
-                    </div>
-                  </Link>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <p className="font-medium text-white text-sm group-hover/user:text-red-400 transition-colors">
+                            {r.user?.name || 'Unknown'}
+                          </p>
+                          <ReservationTypeBadge reservationCount={r.user?.reservationCount} />
+                        </div>
+                        <p className="text-xs text-gray-500 mt-0.5">{r.user?.sNumber || r.email}</p>
+                      </div>
+                    </Link>
+                    <UserNotesFlag notes={r.user?.activeNotes} userId={r.userId} userName={r.user?.name || r.email} canViewUser={canViewUsers} />
+                  </div>
                   {renderStatusSelect(r)}
                 </div>
                 <div className="grid grid-cols-4 gap-2 text-xs mb-3">
@@ -294,7 +347,9 @@ export default function AdminReservationsPage() {
                   </div>
                   <div className="rounded-lg bg-slate-950/60 border border-slate-800/60 p-2.5">
                     <p className="text-gray-500 text-[10px] uppercase font-semibold">Tijd</p>
-                    <p className="font-medium text-white mt-0.5">{formatTime(r.startTime)}-{formatTime(r.endTime)}</p>
+                    <p className="font-medium text-white mt-0.5">
+                      {formatTime(r.startTime)}-{formatTime(r.endTime)}
+                    </p>
                   </div>
                   <div className="rounded-lg bg-slate-950/60 border border-slate-800/60 p-2.5">
                     <p className="text-gray-500 text-[10px] uppercase font-semibold">Hardware</p>
@@ -302,7 +357,9 @@ export default function AdminReservationsPage() {
                   </div>
                   <div className="rounded-lg bg-slate-950/60 border border-slate-800/60 p-2.5">
                     <p className="text-gray-500 text-[10px] uppercase font-semibold">Controllers</p>
-                    <p className="font-medium text-white mt-0.5 flex items-center gap-1"><Gamepad2 size={12} /> {r.controllers}</p>
+                    <p className="font-medium text-white mt-0.5 flex items-center gap-1">
+                      <Gamepad2 size={12} /> {r.controllers}
+                    </p>
                   </div>
                 </div>
                 <BookedAt reservation={r} className="-mt-1" />
@@ -360,18 +417,22 @@ export default function AdminReservationsPage() {
             </thead>
             <tbody className="divide-y divide-slate-800/60">
               {paginated.map((r) => (
-                <tr key={r.id} className="hover:bg-slate-800/30 transition-colors">
+                <tr
+                  key={r.id}
+                  className={`transition-colors ${isBlocked(r) ? 'bg-red-950/20 hover:bg-red-950/30 shadow-[inset_3px_0_0_0_rgba(239,68,68,0.7)]' : 'hover:bg-slate-800/30'}`}
+                >
                   <td className="px-4 py-3.5">
-                    <Link href={`/admin/users/${r.userId}`} className="group/user">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-medium text-white group-hover/user:text-red-400 transition-colors">{r.user?.name || 'Unknown'}</span>
-                        <ReservationTypeBadge reservationCount={r.user?.reservationCount} />
-                      </div>
-                      <div className="text-xs text-gray-500 mt-0.5">
-                        {r.email}
-                        {r.user?.sNumber && <span className="text-gray-600 ml-1">({r.user.sNumber})</span>}
-                      </div>
-                    </Link>
+                    <div className="flex items-center gap-1.5">
+                      <Link href={`/admin/users/${r.userId}`} className="font-medium text-white hover:text-red-400 transition-colors">
+                        {r.user?.name || 'Unknown'}
+                      </Link>
+                      <ReservationTypeBadge reservationCount={r.user?.reservationCount} />
+                      <UserNotesFlag notes={r.user?.activeNotes} userId={r.userId} userName={r.user?.name || r.email} canViewUser={canViewUsers} />
+                    </div>
+                    <div className="text-xs text-gray-500 mt-0.5">
+                      {r.email}
+                      {r.user?.sNumber && <span className="text-gray-600 ml-1">({r.user.sNumber})</span>}
+                    </div>
                   </td>
                   <td className="px-4 py-3.5 text-gray-300">{dateFromISO(r.startTime)}</td>
                   <td className="px-4 py-3.5 text-gray-300">

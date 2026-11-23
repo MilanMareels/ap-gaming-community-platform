@@ -45,6 +45,7 @@ describe('AuthService', () => {
       setting: { findUnique: jest.fn<() => Promise<null>>().mockResolvedValue(null), delete: jest.fn() },
       role: { findUnique: jest.fn() },
       userRole: { upsert: jest.fn(), count: jest.fn<() => Promise<number>>().mockResolvedValue(1) },
+      userNote: { findMany: jest.fn<() => Promise<unknown[]>>().mockResolvedValue([]) },
     };
 
     const module = await Test.createTestingModule({

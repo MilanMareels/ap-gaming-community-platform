@@ -69,6 +69,7 @@ describe('ReservationsService', () => {
     const mockPrisma = {
       user: { findUnique: jest.fn(), findFirst: jest.fn(), findMany: jest.fn(), create: jest.fn(), update: jest.fn() },
       microsoftSSOUser: { findFirst: jest.fn<() => Promise<{ id: number }>>().mockResolvedValue({ id: 1 }) },
+      userNote: { findMany: jest.fn<() => Promise<unknown[]>>().mockResolvedValue([]) },
       reservation: {
         findFirst: jest.fn(),
         findUnique: jest.fn(),
@@ -400,6 +401,7 @@ describe('ReservationsService', () => {
       it('should mark a RESERVED reservation as PRESENT during verification', async () => {
         const reservation = {
           id: 12,
+          userId: 5,
           cuid: 'cm9x8k2df0000a1b2c3d4e5f6',
           email: 'student@student.ap.be',
           inventory: 'pc',
@@ -417,6 +419,16 @@ describe('ReservationsService', () => {
 
         prisma.reservation.findFirst.mockResolvedValue(reservation);
         prisma.reservation.update.mockResolvedValue(updatedReservation);
+        const warning = {
+          id: 3,
+          userId: 5,
+          type: 'WARNING',
+          content: 'Drank open',
+          expiresAt: null,
+          createdAt: new Date(),
+          author: { name: 'Staff' },
+        };
+        prisma.userNote.findMany.mockResolvedValue([warning]);
 
         const result = await service.verifyByCuid(reservation.cuid);
 
@@ -445,6 +457,8 @@ describe('ReservationsService', () => {
 
         expect(result).toEqual({
           cuid: updatedReservation.cuid,
+          userId: 5,
+          activeNotes: [{ id: 3, type: 'WARNING', content: 'Drank open', authorName: 'Staff', createdAt: warning.createdAt, expiresAt: null }],
           email: updatedReservation.email,
           sNumber: updatedReservation.user.sNumber,
           inventory: updatedReservation.inventory,
@@ -991,7 +1005,10 @@ describe('ReservationsService', () => {
 
     it('gives a per-person average lead time, or none when it is unknown', async () => {
       prisma.user.findUnique.mockResolvedValue(mockUser);
-      prisma.reservation.findMany.mockResolvedValueOnce([row('2026-11-16T14:00:00', '2026-11-16T12:00:00'), row('2026-11-17T14:00:00', '2026-11-17T13:00:00')]);
+      prisma.reservation.findMany.mockResolvedValueOnce([
+        row('2026-11-16T14:00:00', '2026-11-16T12:00:00'),
+        row('2026-11-17T14:00:00', '2026-11-17T13:00:00'),
+      ]);
       expect((await service.getUserStatistics(1)).avgLeadMinutes).toBe(90);
 
       prisma.reservation.findMany.mockResolvedValueOnce([row('2026-11-16T14:00:00', null)]);

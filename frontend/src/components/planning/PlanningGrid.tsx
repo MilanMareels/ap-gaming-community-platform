@@ -130,7 +130,8 @@ export function PlanningGrid({ view, onError, onBlockClick, dayActions, emptyTex
       ) : view.days.length === 0 ? (
         <p className="mt-6 rounded-2xl border border-white/10 bg-[#0a0f25] p-8 text-center text-gray-400">{emptyText}</p>
       ) : (
-        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
+        // One day per row, full width: with a full team the columns per player get too narrow side by side
+        <div className="mt-5 flex flex-col gap-4">
           {view.days.map((day) => (
             <DayGrid
               key={day.id}

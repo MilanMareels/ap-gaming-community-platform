@@ -36,7 +36,7 @@ export async function GET() {
       link('Evenementen', '/events', 'toernooien, LAN-party\'s en viewing party\'s'),
       link('Esports teams', '/roster', 'de competitieve rosters en spelers van AP Gaming'),
       link('Esports resultaten', '/results', 'uitslagen en komende wedstrijden van de esports teams'),
-      link('Huisreglement', '/info', 'algemene regels, gedragscode en hardwareregels van de hub'),
+      link('Huisreglement', '/info', 'toegang en reservaties, gedragscode, roken, alcohol, eten en drinken, apparatuur en sancties'),
       link('Vacatures', '/jobs', 'openstaande functies in de staff en esports teams'),
       link('Reservatie annuleren', '/reservations/how-to-cancel', 'hoe je een reservatie annuleert'),
       link('Twitch', '/twitch', 'livestream van AP Gaming'),

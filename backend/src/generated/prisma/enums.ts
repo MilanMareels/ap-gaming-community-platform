@@ -9,6 +9,15 @@
 * 🟢 You can import this file directly.
 */
 
+export const UserNoteType = {
+  NOTE: 'NOTE',
+  WARNING: 'WARNING',
+  BLOCK: 'BLOCK'
+} as const
+
+export type UserNoteType = (typeof UserNoteType)[keyof typeof UserNoteType]
+
+
 export const AuditActorType = {
   USER: 'USER',
   ANONYMOUS: 'ANONYMOUS',

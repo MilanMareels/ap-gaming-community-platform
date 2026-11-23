@@ -45,6 +45,7 @@ describe('Audit log over HTTP', () => {
       auditEvent: { create: jest.fn(async () => ({})) },
       user: { findMany: jest.fn(async () => [{ id: 3, email: 'staff@ap.be', name: 'Staff' }]) },
       role: { findUnique: jest.fn(async () => ({ name: 'Viewer' })) },
+      userNote: { findMany: jest.fn(async (): Promise<unknown[]> => []) },
     };
 
     @Controller('things')
@@ -151,6 +152,28 @@ describe('Audit log over HTTP', () => {
       action: 'things.guarded',
       success: false,
       error: 'Access denied. Required permission: things.manage',
+    });
+  });
+
+  describe('a blocked user', () => {
+    const blockFor = (blockedUserId: number) =>
+      prisma.userNote.findMany.mockImplementation(async ({ where }: any) => (where.userId === blockedUserId ? [{ id: 1, expiresAt: null }] : []));
+
+    it('is refused on every request, even with a session from before the block, and loses the session', async () => {
+      blockFor(3);
+      const jwt = await token({ sub: 3, email: 'staff@ap.be', realUserId: 3, impersonatingRoleId: 9, permissions: ['things.manage'] });
+      const response = await request(app.getHttpServer()).post('/api/things/guarded').set('Authorization', `Bearer ${jwt}`).expect(401);
+
+      expect(response.body.message).toBe('Account blocked');
+      expect(String(response.headers['set-cookie'])).toContain('apgh_token=;');
+      prisma.userNote.findMany.mockResolvedValue([]);
+    });
+
+    it('can still be viewed by an admin impersonating them', async () => {
+      blockFor(5);
+      const jwt = await token({ sub: 5, email: 'blocked@ap.be', realUserId: 3, impersonatingRoleId: 9, permissions: ['things.manage'] });
+      await request(app.getHttpServer()).post('/api/things/guarded').set('Authorization', `Bearer ${jwt}`).expect(201);
+      prisma.userNote.findMany.mockResolvedValue([]);
     });
   });
 

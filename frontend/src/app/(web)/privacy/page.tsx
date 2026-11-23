@@ -46,6 +46,13 @@ export default function PrivacyPage() {
                   identificatienummer van de betreffende provider om je account
                   te koppelen. We ontvangen geen wachtwoorden.
                 </li>
+                <li>
+                  <strong className='text-white'>Interne notities:</strong> Medewerkers
+                  kunnen bij je account notities, waarschuwingen of een blokkering
+                  bijhouden, bijvoorbeeld na een incident of een overtreding van het
+                  huisreglement. Die zijn alleen zichtbaar voor het team van de
+                  Gaming Hub.
+                </li>
               </ul>
             </section>
 
