@@ -34,7 +34,7 @@ describe('AuthController mobile handoff', () => {
     authService = {
       verifyToken: jest.fn<() => Promise<unknown>>().mockResolvedValue(claims),
       canUseMobileApp: jest.fn<() => Promise<boolean>>().mockResolvedValue(true),
-      isSessionBlocked: jest.fn<() => Promise<boolean>>().mockResolvedValue(false),
+      getActiveBlock: jest.fn<() => Promise<unknown>>().mockResolvedValue(null),
       createMobileHandoffCode: jest.fn<() => Promise<string>>().mockResolvedValue('the-code'),
     };
     res = { redirect: jest.fn(), clearCookie: jest.fn() };
@@ -72,6 +72,40 @@ describe('AuthController mobile handoff', () => {
     await controller.mobileHandoff(query, requestWithSession, res);
 
     expect(authService.canUseMobileApp).toHaveBeenCalledWith(42);
+  });
+
+  describe('a blocked user', () => {
+    it('should send a blocked session back to the app with the end of the block, and drop it', async () => {
+      authService.getActiveBlock.mockResolvedValue({ id: 1, expiresAt: new Date('2026-12-01T17:00:00.000Z') });
+
+      await controller.mobileHandoff(query, requestWithSession, res);
+
+      expect(res.redirect).toHaveBeenCalledWith('apgaminghub://auth?error=blocked&until=2026-12-01T17%3A00%3A00.000Z');
+      expect(res.clearCookie).toHaveBeenCalled();
+      expect(authService.createMobileHandoffCode).not.toHaveBeenCalled();
+    });
+
+    it('should check the real admin when impersonating', async () => {
+      authService.verifyToken.mockResolvedValue({ ...claims, sub: 7, realUserId: 42 });
+      await controller.mobileHandoff(query, requestWithSession, res);
+      expect(authService.getActiveBlock).toHaveBeenCalledWith(42);
+    });
+
+    it('should send a login that started in the app back to the app, and others to the blocked page', async () => {
+      const blockedUser = { user: { id: 5, email: 'b@ap.be' }, token: null, blockedUntil: null };
+      authService.decodeState = jest.fn((encoded: string) => ({ returnUrl: encoded }));
+      authService.handleMicrosoftCallback = jest.fn(async () => blockedUser);
+
+      await controller.microsoftCallback(
+        { code: 'c', state: '/api/auth/mobile/handoff?challenge=abc&provider=microsoft' },
+        requestWithoutSession,
+        res,
+      );
+      expect(res.redirect).toHaveBeenLastCalledWith('apgaminghub://auth?error=blocked');
+
+      await controller.microsoftCallback({ code: 'c', state: '/reservations' }, requestWithoutSession, res);
+      expect(res.redirect).toHaveBeenLastCalledWith(expect.stringMatching(/\/blocked$/));
+    });
   });
 
   describe('with Google', () => {
